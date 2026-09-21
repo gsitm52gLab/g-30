@@ -1,6 +1,7 @@
 import { migrateLegacyProducts } from "@/data/products/migrate";
 import { fixtures } from "@/data/fixtures";
 import { builtins } from "@/domain/tasks/templates";
+import { bootstrapCorpus } from '@/server/ai-review/corpus';
 import type { RecordRepository } from "@/domain/records";
 /** Insert missing IDs only. Never replace user edits or delete records. */
 export async function seed(repository: RecordRepository) {
@@ -38,6 +39,7 @@ export async function seed(repository: RecordRepository) {
             else preserved++;
         }
         const products = migrateLegacyProducts(store);
-        return { inserted, preserved, products };
+        const corpus = bootstrapCorpus(store);
+        return { inserted, preserved, products, corpus };
     });
 }

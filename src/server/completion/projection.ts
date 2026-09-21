@@ -1,4 +1,5 @@
 import { authorizeCampaignResidual } from './campaign';
+import { authorizeAiResidual } from '@/server/ai-review/completion';
 import type { Clock, StoredRecord, UnitOfWork } from '@/domain/records';
 import type { Principal } from '@/server/auth/service';
 import { decide } from '@/server/policy/policy';
@@ -21,7 +22,7 @@ export function projectBasis(s: UnitOfWork, p: Principal, task: StoredRecord<'ta
     // Do not interpret hidden participants' question bodies or expose their counts.
     if (p.user.data.role !== 'gsg') {
         const inquiries = safe.object(raw.inquiries), visible = inquiries.state === 'available' ? safe.array(safe.object(inquiries.value).items).filter(v => visibleConversation(s, p, safe.object(v).conversationId, clock)) : [];
-        raw = { ...raw, inquiries: inquiries.state === 'available' ? { connected: true, state: 'available', value: { items: visible, unresolved: visible.filter(v => safe.object(v).state !== 'resolved').length, externalWaiting: visible.filter(v => safe.object(v).state === 'external_waiting').length } } : { connected: true, state: 'unavailable', value: null, reason: 'source_unavailable' }, externalActions: safe.array(raw.externalActions).filter(v => safe.object(v).visibility === 'public') };
+        raw = { ...raw, ai: { connected: true, state: 'unavailable', value: null, reason: 'source_unavailable' }, inquiries: inquiries.state === 'available' ? { connected: true, state: 'available', value: { items: visible, unresolved: visible.filter(v => safe.object(v).state !== 'resolved').length, externalWaiting: visible.filter(v => safe.object(v).state === 'external_waiting').length } } : { connected: true, state: 'unavailable', value: null, reason: 'source_unavailable' }, externalActions: safe.array(raw.externalActions).filter(v => safe.object(v).visibility === 'public') };
     }
     const b = safe.basis(raw);
     const inquiries = b.inquiries.state === 'available' ? { ...b.inquiries, value: { items: b.inquiries.value.items.filter(i => visibleConversation(s, p, i.conversationId, clock)), unresolved: 0, externalWaiting: 0 } } : b.inquiries;
@@ -45,8 +46,9 @@ export function projectBasis(s: UnitOfWork, p: Principal, task: StoredRecord<'ta
         for (const use of b.latestSubmission.products.value)
             readProductUse(s, p, use.id, clock); return b.latestSubmission; });
     const campaign = b.campaign.state === 'available' ? available(() => { if (b.campaign.state !== 'available') safe.corrupt(); return authorizeCampaignResidual(s, p, task, b.campaign.value, clock); }) : b.campaign;
+    const ai = b.ai.state === 'available' ? available(() => { if (b.ai.state !== 'available') safe.corrupt(); return authorizeAiResidual(s, p, task, b.ai.value, clock); }) : b.ai;
     const externalActions = b.externalActions.filter(x => { const row = s.get('completionExternalAction', x.id); return !!row && row.data.taskId === task.id && (p.user.data.role === 'gsg' || row.data.visibility === 'public') && available(() => externalDTO(s, p, row, clock)).state === 'available'; });
-    return { ...b, latestSubmission: submissionSource.state === 'available' ? submissionSource.value : null, submittedSourceState: submissionSource.state, inquiries, corrections, currentProducts, externalActions, campaign, scope: p.user.data.role === 'gsg' ? 'current_gsg_access' as const : 'current_brand_access' as const };
+    return { ...b, latestSubmission: submissionSource.state === 'available' ? submissionSource.value : null, submittedSourceState: submissionSource.state, inquiries, corrections, currentProducts, externalActions, campaign, ai, scope: p.user.data.role === 'gsg' ? 'current_gsg_access' as const : 'current_brand_access' as const };
 }
 export function snapshotDTO(s: UnitOfWork, p: Principal, row: StoredRecord<'completionSnapshot'>, clock: Clock) {
     const task = completionTask(s, p, row.data.taskId, clock), d = row.data;

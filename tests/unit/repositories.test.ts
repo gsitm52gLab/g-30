@@ -54,7 +54,7 @@ for (const mode of ["mock", "sqlite"] as const) {
             const repo = create();
             expect((await seed(repo)).inserted).toBe(fixtures.length + builtins.length);
             await repo.transaction(s => { const task = s.get("task", "task-pop")!; s.update("task", task.id, task.revision, { ...task.data, title: "User edited title" }); s.create("checkpoint", { id: "extra", contextId: null, data: { value: "keep" } }); });
-            expect(await seed(repo)).toEqual({ inserted: 0, preserved: fixtures.length + builtins.length, products: { migrated: 0 } });
+            expect(await seed(repo)).toEqual({ inserted: 0, preserved: fixtures.length + builtins.length, products: { migrated: 0 }, corpus: { inserted: 0, preserved: 2 } });
             expect((await repo.get("task", "task-pop"))?.data.title).toBe("User edited title");
             expect(await repo.get("checkpoint", "extra")).not.toBeNull();
         });
@@ -71,9 +71,9 @@ describe("migration and persistence setup", () => {
     it("migrates an empty DB twice without losing writes", () => {
         const db = openDatabase(":memory:", true);
         try {
-            expect(migrate(db)).toEqual({ applied: 12, total: 12 });
+            expect(migrate(db)).toEqual({ applied: 13, total: 13 });
             db.prepare("INSERT INTO records VALUES ('checkpoint','preserved',NULL,'{}',1,'now','now')").run();
-            expect(migrate(db)).toEqual({ applied: 0, total: 12 });
+            expect(migrate(db)).toEqual({ applied: 0, total: 13 });
             expect(db.prepare("SELECT id FROM records").all()).toEqual([{ id: "preserved" }]);
         }
         finally {
