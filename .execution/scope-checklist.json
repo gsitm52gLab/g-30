@@ -459,8 +459,11 @@
       "owner_note": "G08",
       "requirement": "공지 대상/설명/양식·가이드/FAQ·업무유형안내, 게시/수정/확인자·시각, 연결업무. FR-001/BR-001",
       "verification_idea": "공지읽음으로수락/제출/완료불변. 수정전후본문·양식버전조회, 대상밖읽음명단/첨부도거부. 답변필요공지에서별도업무생성",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G08_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json"
+      ],
+      "remaining": "Actual G13 notification delivery and finalG18 regression trackedseparately."
     },
     {
       "id": "SA-35",

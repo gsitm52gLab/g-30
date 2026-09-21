@@ -63,7 +63,7 @@ export function decide(store: UnitOfWork, principal: Principal, action: Action, 
     }
     if (action === "notification.read" && resource.recipientUserId !== user.id) return { allowed: false, status: 404 };
     if (action === "membership.manage" && !canAdmin(user, resource.contextId!)) return { allowed: false, status: 403 };
-    if (["task.manage", "task.complete", "audit.read", "notice.manage", "inquiry.manage"].includes(action) && !scope.internalFields) return { allowed: false, status: 403 };
+    if (["task.manage", "task.complete", "audit.read", "evidence.assess", "notice.manage", "inquiry.manage"].includes(action) && !scope.internalFields) return { allowed: false, status: 403 };
     if (action === "price.read" && !scope.internalPrice) return { allowed: false, status: 403 };
     if (action === "submission.write" && !scope.internalFields &&
         resource.assigneeUserId !== user.id && !resource.coAssigneeUserIds?.includes(user.id)) return { allowed: false, status: 403 };

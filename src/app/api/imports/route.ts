@@ -1,0 +1,3 @@
+import { route, json } from '@/server/http/identity';
+import { ImportService } from '@/server/imports/service';
+export function GET(request: Request) { return route(request, async (identity, token) => json(await new ImportService(identity).configuration(token, new URL(request.url).searchParams.get('context') ?? ''))); }

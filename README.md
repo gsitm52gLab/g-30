@@ -1,8 +1,8 @@
 # GS HALE
 
-## G09 문의 서버 계약 후보
+## G09 문의 합본 후보
 
-G09 서버 구현은 UI·독립 검증 및 전체 모듈 수용과 구분합니다. `src/server/inquiries/contracts.ts`는 client type-only 진입점이고 `readInquirySummary(store, principal, contextId, clock, taskId?)`는 같은 UoW에서 홈/업무가 사용할 현재 권한 집계입니다.
+이 내부 후보는 수용된 G07 자료·Excel과 G08 공지에 G09 서버·UI를 합칩니다. 합본 자체 검사와 독립 검증·전체 모듈 수용은 구분합니다. `src/server/inquiries/contracts.ts`는 client type-only 진입점이고 `readInquirySummary(store, principal, contextId, clock, taskId?)`는 같은 UoW에서 홈/업무가 사용할 현재 권한 집계입니다.
 
 브랜드는 `POST /api/inquiries`의 `{contextId,taskId:null|id,idempotencyKey}`로 비공개 초안을 만듭니다. 초안은 현재 작성자만 읽으며 GSG/admin도 볼 수 없습니다. `POST /api/inquiries/:id/files?visibility=public`에 multipart `files`와 같은 순서의 `clientItemIds`를 1~10개 전송합니다. 파일별 ready/failed 응답과 같은 키 재시도는 기존 파일을 보존합니다. 업로드만으로 질문을 공개하지 않습니다. 실제 파일 선택 후 `POST /api/inquiries/:id`의 `publish_first`를 명시 전송하며 제목, 첫 내용, 양수 초안 revision을 사용합니다.
 
@@ -12,7 +12,7 @@ G09 서버 구현은 UI·독립 검증 및 전체 모듈 수용과 구분합니�
 
 파일은 정확한 `conversationId`와 `messageId` 참조로 읽습니다. 미전송 ready 파일은 현재 업로더만 읽으며 공개 메시지에 포함된 선택 파일만 상대에게 보입니다. 내부 파일의 공개 메시지 재사용이나 다른 업무/상품으로의 문의 파일 재사용은 제공하지 않습니다. 401/403/404는 보호 데이터·복구 입력을 제거하고, 409/503에서는 허용된 입력과 성공 파일·이미 만들어진 업무 ID를 보존합니다. 같은 intent를 재시도하고 새 질문/업무를 자동 생성하지 않습니다.
 
-`0008-inquiries.sql`은 이 분기의 7번째 migration입니다(0006 G07은 아직 포함되지 않음). 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
+현재 migration은 `0001`~`0008` 총 8개입니다. 기존 G07 체인은 `0008`만, G09 선행 분기(`0001`~`0005`, `0007`, `0008`)는 빠진 `0006`만 추가합니다. 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
 
 ```sh
 npm run build
@@ -26,7 +26,7 @@ INQUIRIES_MODE=sqlite E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inq
 
 현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
 
-G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본에 이어 이 후보는 G05 실제 답변 서버 계약을 추가합니다. 답변 UI는 별도 작업에서 연결하며 증빙·Excel, 검토·완료·문의·AI의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
+G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본, G05 실제 답변 UI/API, G07 증빙·Excel, G08 공지를 보존하며 G09 문의 UI/API를 합칩니다. 이 후보는 후행 검토·완료·AI나 G09 독립 수용의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
 
 ## 설치·실행
 
@@ -161,7 +161,7 @@ GS HALE은 해외 헬스케어 진출에 필요한 모든 일을 하나의 흐�
 
 참고자료는 인증된 `POST /api/files?taskId=...`에서 업로드하며 `GET /api/files/:id?taskId=...&mode=download|original|preview`에서 원본과 참조 업무의 최신 권한을 모두 검사합니다. private 파일 저장소는 기본 `.data/files`, 선택 환경변수 `FILE_STORAGE_DIR`입니다. 웹 public 폴더가 아닙니다. 1개 25MiB·1회 10개 제한과 이름/확장자/MIME/기본 signature 검사를 적용하고, PDF/PNG/JPEG만 브라우저 미리보기를 제공합니다. 다른 허용 형식은 원본 다운로드로 확인합니다. 악성코드 백신/파일 내용의 전문가 검토를 수행했다고 주장하지 않습니다. 과거 공개 요청의 정확한 FileVersion은 새 버전 이후에도 현재 권한이 있는 사용자가 조회할 수 있습니다.
 
-G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 상품 스냅샷(G06)은 연결됐으며 이 후보의 실제 답변 서버(G05)는 UI 작업과 검증을 진행 중입니다. GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. 기존 G04 과거 답변 검사의 합성 prior-submission과 실제 G05 제출을 구별합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
+G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 상품 스냅샷(G06)과 실제 답변 UI·서버(G05)는 선행 단계에서 통합·검증되었습니다. GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. 기존 G04 과거 답변 검사의 합성 prior-submission과 실제 G05 제출을 구별합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
 
 ```bash
 npm run check
@@ -183,7 +183,7 @@ HTTP 검사기는 새 `.data/g04-http-*` DB/파일과 별도 쿠키 이름을 �
 
 공통 정보 변경은 공유된 현재 정보를 갱신합니다. 미리보기에는 읽을 수 있는 적용 컨텍스트만 표시하고 숨겨진 대상의 이름·수·가격·파일은 반환하지 않습니다. 저장 명령은 각 common/context/price의 revision과 idempotencyKey를 사용합니다. `captureProductUse`는 후속 제출 트랜잭션에서 쓸 정확한 common/context/file 버전과 명시적으로 선택한 소비자가 버전을 저장합니다. 최신 가격을 당일 적용 가격으로 자동 간주하지 않습니다.
 
-G06의 상품 UI/API는 통합·브라우저 검사·독립 검증과 메인 수용을 마친 단계입니다. 초기 prior-use 레코드는 계약 검증용이며 실제 제출이 아닙니다. 이 G05 서버 후보는 실제 제출 트랜잭션에서 상품 사용본을 만들지만 G05 전체 수용을 뜻하지 않습니다. G07 증빙 집계/Excel, G10 검토, G11 완료 연결은 후속 의무입니다. 자료 집계는 연결 전 `connected:false`와 `null`로 표시합니다.
+G06의 상품 UI/API는 통합·브라우저 검사·독립 검증과 메인 수용을 마친 단계입니다. 초기 prior-use 레코드는 계약 검증용이며 실제 제출이 아닙니다. G05는 실제 제출 트랜잭션에서 상품 사용본을 만들며 선행 단계에서 수용되었습니다. 현재 G07 서버 후보는 증빙 집계/Excel을 연결하며, G10 검토·G11 완료는 후속 의무입니다. G07 자료 집계는 연결된 상태의 실제 요청·미제출·미확인 수를 반환하며 신규 상품의 0과 조회 실패를 구별합니다.
 
 상품 서버 검사기는 새 전용 DB/파일·쿠키와 자신의 프로세스를 사용합니다. SQLite 모드는 두 포트에서 실제 동시 수정/중복 등록을 확인하고 종료·재시작·재로그인 후 정확한 상품/가격/파일/스냅샷을 비교합니다. mock 모드의 fixture 준비는 검사 전용 IPC이며 제품 API에 준비용 경로를 추가하지 않습니다. 과거 사용 스냅샷은 명시적 fixture이며 실제 G05 제출 완료로 계산하지 않습니다.
 
@@ -222,9 +222,49 @@ SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
 
 저장된 공개 요청의 항목 구조가 손상된 경우 `REQUEST_INVALID`409로 답변 쓰기를 거부합니다. 읽기 평가는 `needs_reconfirmation`, `canSubmitFull:false`, 요청 구조 확인 필요를 표시합니다. 비정상 상품 범위를 공통 항목으로 바꿔 제출을 허용하지 않습니다. GSG가 실제 요청 편집에서 규칙을 확인·정정한 뒤 다시 공개하고, 작성자는 유지한 답변을 명시적으로 비교·재적용합니다. 정상 값의 알 수 없는 추가 키는 공개 출력에서 제외하지만 합법적인 제출은 유지합니다. 이 답변 구조 검사는 후행 GSG 수동 완료의 강제 승인 게이트가 아닙니다.
 
-## G08 공지·가이드 서버 계약 후보
+## G07 증빙·표준 Excel 통합 후보
 
-현재 G08은 서버 계약 후보이며 공지 UI·브랜드 홈·PC/모바일 통합과 독립 수용은 아직 완료되지 않았습니다. 공지 1건은 명시적인 컨텍스트 1개를 소유합니다. GSG는 공지·FAQ·업무 가이드·양식을 초안으로 저장하고 브랜드 보기의 공개 내용 투영을 확인한 뒤 새 불변 버전으로 공개합니다. 개정은 과거 본문·첨부·읽음을 덮어쓰지 않습니다.
+G07 자료·Excel UI/API와 V01~V03 수정이 포함된 통합 후보입니다. 수용된 G08과의 합본 자체·독립 검증 및 G07 수용은 아직 완료되지 않았습니다. 현업 원본 Excel 검증은 원본 미확보로 `NOT_RUN`이며, 합성 표준 `.xlsx`의 실제 검증과 구분합니다.
+
+증빙은 공개 요청/실제 제출/상품 자료의 정확한 파일 버전을 참조합니다. 파일을 복제하지 않고 상품별 적용 상태와 이력을 분리합니다. 적용 확인은 인증 승인·유효성 판단이 아닙니다. 업로드/증빙 등록만으로 제출하지 않으며, 증빙의 해당 없음은 공개 요청의 필수 항목을 면제하지 않습니다. 상품 자료 수는 현재 공개 요청과 실제 제출을 같은 표 projector로 집계합니다.
+
+Excel은 `GET /api/imports?context=ID`의 허용 열/한도를 받아 표준 양식을 사용합니다. `GET /api/imports/workbook?context=ID&kind=template|export`로 새 workbook을 생성합니다. `POST /api/imports/source?context=ID`에 multipart `file` 하나 → `POST /api/imports/preview`의 시트/헤더/열/행 선택 → `POST /api/imports/apply`의 명시적 반영 순서입니다. 한 배치는 선택한 컨텍스트 하나이며 모든 행의 `contextKey`가 일치해야 합니다. 숫자로 저장한 제품 코드·SKU·JAN·ITF의 손실된 0은 복구하지 않습니다. 업데이트의 빈 셀은 기존 값을 유지하고 `clearFields`로만 명시적으로 비웁니다.
+
+미리보기는 업무 DB를 변경하지 않고 권한을 확인한 비공개 임시 분석본만 저장합니다. `IMPORT_STORAGE_DIR`(기본 `.data/imports`)는 사용자별 최대 50개, 24시간 정리 대상이며 미리보기 적용 유효 시간은 30분입니다. 성공 배치·출처·버전·재시도 영수증은 DB에 영속됩니다. 동기 단일 트랜잭션에서 전체 CAS와 오류를 확인한 뒤 전부 반영합니다. 인증/가격 권한은 재시도 때도 현재 상태로 확인합니다.
+
+분석은 `exceljs@4.4.0`, `yauzl@3.4.0`와 설치된 `tsx`를 별도 Node 프로세스에서 사용합니다. ExcelJS 하위 `uuid`만 `11.1.1`로 고정해 버퍼 경계 advisory의 수정 버전을 사용하며, CJS/조건부 서식 workbook 호환성을 검사합니다. 10MiB 원본, ZIP 512개 항목/항목 32MiB/총 64MiB, 20시트/300,000 실제 셀, 선택 자료 5,000행·100열, 셀 32,767문자, 10초 제한과 256MiB V8 old-space 한도를 적용합니다. V8 한도는 프로세스 총 RSS 한도가 아닙니다. 암호화·매크로·수식 계산·외부 workbook/OLE 연결은 지원하지 않으며 링크를 실행하거나 가져오지 않습니다. `.xls` 보관은 기존 첨부 기능으로 가능하지만 Excel 가져오기는 `.xlsx`만 지원합니다.
+
+계약 검사는 작업 worktree 루트에서 다음과 같이 실행합니다. 실제 실행 결과와 실패 원본은 별도의 비공개 실행 증거에 남깁니다.
+
+```sh
+npm ci
+npm run check
+npm run build
+npx vitest run tests/unit/evidence.test.ts tests/unit/imports.test.ts tests/unit/imports-parser.test.ts tests/unit/products.test.ts tests/unit/repositories.test.ts
+# production build 이후, 비어 있는 자신 소유의 포트 사용
+IMPORTS_MODE=mock E2E_PORT=4171 npx tsx scripts/verify-imports-http.ts
+IMPORTS_MODE=sqlite E2E_PORT=4172 npx tsx scripts/verify-imports-http.ts
+```
+
+`IMPORTS_HTTP_REPORT`로 과거 결과를 덮어쓰지 않는 보고서 경로를 지정합니다. 검사기는 `.local/g07-http` 아래 새 전용 DB·파일·분석본과 포트별 쿠키를 사용하며 모든 실제 HTTP 응답·해시·자신의 서버 종료를 남깁니다. SQLite에서는 종료 후 새 PID·재로그인과 불변 원장 해시를 확인합니다. 동시 재시도는 실제 HTTP 요청을 겹쳐 보내 한 배치 응답을 확인하며, 별도 프로세스 간 동시 Excel 반영은 이 검사기에 포함하지 않습니다.
+
+저장된 배치 결과의 알려진 필드 구조가 손상되면 `STORAGE_UNAVAILABLE`503으로 안전하게 실패합니다. 원본 배치 기록을 다시 쓰지 않고 관리자 확인을 요청합니다. 정상 데이터의 알 수 없는 추가 키는 공개 DTO에서 제외합니다. 일반 링크 표시값에 매크로 관련 단어가 있다는 이유만으로 거부하지 않으며 실제 OOXML content type·요소·관계와 파일 구조를 검사합니다.
+
+
+G07 XLSX 입력은 SpreadsheetML의 실제 namespace URI와 local name으로 해석합니다. 표준 URI에 연결된 `x:` 등 접두사나 기본 namespace는 같은 의미로 처리하며, 구조 이름의 잘못된 URI·DTD·매크로·외부 통합문서 연결은 거부합니다. 원본 ZIP의 크기·CRC·경로 검사를 먼저 수행하고 제한된 메모리에서 ExcelJS용 XML/ZIP을 재직렬화합니다. 원본 업로드 bytes 기준 SHA와 셀의 정확한 숫자 문자열·앞자리 0·수식 거부 정책은 유지합니다. 이것이 모든 XLSX 확장 기능 또는 미확보 현업 양식의 호환성 보장은 아닙니다. `saxes@5.0.1`과 `jszip@3.10.2`는 기존 설치 버전을 direct exact dependency로 명시했습니다(ISC, JSZip의 MIT 라이선스 선택).
+
+접두사가 있는 합성 원본 세 종류의 실제 업로드→미리보기→반영/거부 회귀는 다음처럼 실행합니다. 서버/DB/파일은 매번 별도로 생성합니다.
+
+```bash
+IMPORTS_NAMESPACE_ONLY=1 IMPORTS_MODE=mock E2E_PORT=4191 npx tsx scripts/verify-imports-http.ts
+IMPORTS_NAMESPACE_ONLY=1 IMPORTS_MODE=sqlite E2E_PORT=4192 npx tsx scripts/verify-imports-http.ts
+```
+
+기본 E2E 실행기는 실행 회차·프로젝트·spec마다 DB, 일반 첨부 저장소와 `IMPORT_STORAGE_DIR`를 모두 별도로 생성합니다. 외부에서 물려받은 import 경로도 해당 spec의 `import_staging`으로 덮고 실행 summary에 경로를 남깁니다. 이전 staging은 삭제하지 않으며 실제 50개 보관 제한도 유지합니다.
+
+## G08 공지·가이드
+
+G08 공지 UI·브랜드 홈·PC/모바일·서버는 독립 검증과 루트 통합 회귀를 거쳐 수용된 상태입니다. 이 G07 합본에서의 공존 회귀는 별도 검증합니다. 공지 1건은 명시적인 컨텍스트 1개를 소유합니다. GSG는 공지·FAQ·업무 가이드·양식을 초안으로 저장하고 브랜드 보기의 공개 내용 투영을 확인한 뒤 새 불변 버전으로 공개합니다. 개정은 과거 본문·첨부·읽음을 덮어쓰지 않습니다.
 
 전체 대상은 해당 컨텍스트의 활성 브랜드 사용자라는 규칙이며 나중에 합류한 활성 사용자도 읽을 수 있습니다. 선택 대상의 빈 목록은 대상 없음입니다. 공개 당시 알림용 사용자 목록은 저장하지만 읽기 권한으로 고정하지 않습니다. 과거 버전과 파일도 현재 대상 권한 및 해당 과거 버전의 대상 권한을 함께 확인합니다. 읽음은 서버의 사용자·버전·시각 기록이며 업무 수락·제출·완료를 변경하지 않습니다. GSG만 대상/확인 명단을 받고 브랜드는 본인의 확인 사실을 받습니다.
 
@@ -232,7 +272,7 @@ SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
 
 파일 API는 기존 경로에 `?noticeId=...`와 선택 `versionId=...` 참조를 추가합니다. 기존 25MiB/10개와 private 저장소 규칙을 유지합니다. 업로드된 초안 파일은 공개 버전에 포함되기 전 브랜드가 읽거나 다른 자료에 재사용할 수 없습니다. 과거 버전에서 제거된 파일은 허용된 과거 공지 주소에서 정확한 바이트로 조회하며, 비동기 읽기 전후 권한을 다시 검사합니다. 공지 전용 파일 owner 추가는 기존 task/product 파일 원장을 다시 쓰지 않습니다.
 
-새 `0007-notices.sql`은 G07의 예약된 0006 뒤 번호입니다. 이 독립 분기는 선행 승인 5개 migration과 0007을 적용하며 G07과 직렬 통합되면 둘 다 적용합니다. 공개 버전·읽음은 불변이고 공개 pointer/event/audit/receipt는 하나의 transaction입니다. `NOTICE_PUBLISHED`/`NOTICE_REVISED` 사건은 G13 알림 소비 계약이며 실제 전달 완료를 뜻하지 않습니다.
+`0007-notices.sql`과 G07의 `0006-evidence-imports.sql`을 모두 유지하여 migration 파일은 총 7개입니다. 기존 0001~0006 DB에는 0007을 추가하고, 기존 0001~0005+0007 DB에는 아직 없는 0006을 추가합니다. 적용된 파일의 내용과 checksum은 바꾸지 않습니다. 공개 버전·읽음은 불변이고 공개 pointer/event/audit/receipt는 하나의 transaction입니다. `NOTICE_PUBLISHED`/`NOTICE_REVISED` 사건은 G13 알림 소비 계약이며 실제 전달 완료를 뜻하지 않습니다.
 
 ```sh
 npm ci

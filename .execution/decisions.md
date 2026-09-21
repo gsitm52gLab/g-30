@@ -88,3 +88,16 @@ G09 dependencies G04/G05 already ACCEPTED at37b. Only new domain types/actual pu
 
 ## 2026-09-21T17:29:20.688527+00:00 — Parallel isolated G10 domain and union preflight
 G10 depends on acceptedG05, so implementer may add only standalone corrections types/validators on37b while G09 has disjoint new files. Neither edits shared schema/policy/lock. G10 domain packet phrase intentional answer status means explicit reflection/resolution, not inquiry answers; clarified to author. Actual readonly G07/G08 union exposes6 source conflicts and clean-merge migration-count6 needs7; author resolution and populated both-direction upgrade required afterG08acceptance.
+
+## 2026-09-21T17:32:28.408403+00:00 — G08 independent PASS integrated, not yet accepted
+Root reviewed raw7groups, source and evidence hashes, default test IDs and current-version screenshot. Serial merge3c4e is product-identical to verified6460 across230 files. workflow assigned exact3c4e freshregression in separate g08-regression/4201/4202; no G08ACCEPTED or G07consumption before this gate. G09/G10 standalone source only stilldisjoint.
+
+## 2026-09-21T17:37:18.952427+00:00 — First inquiry file ownership and explicit send
+Root accepts minimal private conversation draft then owned per-item idempotentupload then atomic publish_first; actor-only draft excludes GSG/otherbrand/basiclist/home/events until send. This is delegated implementation choice fixing a static DTO cycle, not a user-confirmed new workflow requirement or runtime PASS. Current4 domain files may be revised; old artifacts frozen. Pure G09/G10 unit checks are not feature acceptance. G10 stored projector must not reuse strict command parsing as proof of safe positive unknown-extension reads.
+
+## 2026-09-21T17:42:42.262885+00:00 — G08 current stage ACCEPTED
+Exactcandidate6460 independent and integrated3c4e freshregression both reviewed. Currentnotice scopes, versions/read and atomic durableevent producer accepted. G13delivery/G09streams/G07coexistence/G18remain explicit; wholeGoalACTIVE. NextG07union consumes actualaccepted3c4e.
+
+
+## 2026-09-21T18:06:20.632668+00:00 — G09 actual contract and bounded parallel authoring
+Brand users initiate private inquiry drafts; GSG-created requests remain canonical task/notice workflows. Draft visibility is initiator-only even to GSG/admin, then explicit first publication enables current context GSG participation. This is delegated minimal design consistent with source section8, not a separate user-confirmed permission policy. Internal contract a511823 passed exact252 unit/static/build and root30blob review; actual HTTP/SSE/UI/AC remains pending. UI work may use frozen typed contract in its own worktree while the server author validates its actual runtime. Typed changes require explicit handoff deltas. G12 domain3files is independent accepted-base work; G12 actual server/UI is not implemented by those pure tests.

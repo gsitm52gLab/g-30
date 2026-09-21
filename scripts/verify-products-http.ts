@@ -179,7 +179,7 @@ try {
     const pid = (await minimum.json()).ids[0] as string;
     let d = await detail(brand, pid);
     check("unknown inputs remain unknown", d.common.temporaryCode && d.common.ingredients.classification === null && d.local.jan === "" && d.local.launchDate.value === null, ["SA-24"]);
-    check("material counts disconnected not fake zero", !d.materialCounts.connected && d.materialCounts.requested === null && d.materialCounts.missing === null && d.materialCounts.unconfirmed === null, ["SA-22"]);
+    check("new product material counts connected with actual zero requests", d.materialCounts.connected && d.materialCounts.requested === 0 && d.materialCounts.missing === 0 && d.materialCounts.unconfirmed === 0, ["SA-22"]);
     const full = { ...blankCommon(), name: "HTTP 공개 상품 최신", code: "001-HTTP-A", localNames: [{ language: "ja", name: "合成現地名称" }], category: "합성 분류", capacity: { amount: "30.50", unit: "mL", raw: "30.50 mL" }, variants: { color: "합성 색", scent: "합성 향", other: "합성 변형" }, description: "합성 설명", usage: "합성 사용법", originCountry: "원문 원산지", manufacturer: "원문 제조사", manufacturingDetails: "제조 원문", ingredients: { text: "전성분 원문", language: "ko", submittedAt: "2026-09-21", classification: null }, packaging: { container: "용기", packaging: "포장", label: "라벨", box: "박스", itf: "00000111" } };
     const save = { contextId: A, command: "save_common", common: full, expectedCommonRevision: d.commonRevision, idempotencyKey: randomUUID() };
     const first = await brand.mutate(`/api/products/${pid}`, save), retry = await brand.mutate(`/api/products/${pid}`, save);

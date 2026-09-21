@@ -36,15 +36,15 @@ export function receipt(s: UnitOfWork, p: Principal, contextId: string, command:
 export function audit(s: UnitOfWork, p: Principal, clock: Clock, contextId: string, action: string, targetId: string, before: Record<string, unknown>, after: Record<string, unknown>) {
     s.create("audit", { id: newId(), contextId, data: { actorId: p.user.id, at: clock(), action, targetId, before, after } });
 }
-export function commonVersion(s: UnitOfWork, p: Principal, clock: Clock, product: StoredRecord<"product">, common: ProductCommon, archived: boolean) {
+export function commonVersion(s: UnitOfWork, p: Principal, clock: Clock, product: StoredRecord<"product">, common: ProductCommon, archived: boolean, source = "사용자 입력") {
     const old = product.data.currentVersionId ? s.get("productVersion", product.data.currentVersionId) : null;
-    const version = s.create("productVersion", { id: newId(), contextId: null, data: { productId: product.id, common, archived, ...provenance(p, clock, (old?.data.sequence ?? 0) + 1, old?.id ?? null) } });
+    const version = s.create("productVersion", { id: newId(), contextId: null, data: { productId: product.id, common, archived, ...provenance(p, clock, (old?.data.sequence ?? 0) + 1, old?.id ?? null, source) } });
     s.update("product", product.id, product.revision, { ...product.data, currentVersionId: version.id, name: common.name, code: common.code, category: common.category, size: common.capacity.raw || [common.capacity.amount, common.capacity.unit].filter(Boolean).join(" "), status: archived ? "archived" : "active", archivedAt: archived ? clock() : null });
     return version;
 }
-export function contextVersion(s: UnitOfWork, p: Principal, clock: Clock, cp: StoredRecord<"contextProduct">, fields: ProductContextFields, files: ProductFileBinding[]) {
+export function contextVersion(s: UnitOfWork, p: Principal, clock: Clock, cp: StoredRecord<"contextProduct">, fields: ProductContextFields, files: ProductFileBinding[], source = "사용자 입력") {
     const old = cp.data.currentVersionId ? s.get("contextProductVersion", cp.data.currentVersionId) : null;
-    const version = s.create("contextProductVersion", { id: newId(), contextId: cp.contextId, data: { contextProductId: cp.id, fields, files, ...provenance(p, clock, (old?.data.sequence ?? 0) + 1, old?.id ?? null) } });
+    const version = s.create("contextProductVersion", { id: newId(), contextId: cp.contextId, data: { contextProductId: cp.id, fields, files, ...provenance(p, clock, (old?.data.sequence ?? 0) + 1, old?.id ?? null, source) } });
     s.update("contextProduct", cp.id, cp.revision, { ...cp.data, currentVersionId: version.id });
     return version;
 }

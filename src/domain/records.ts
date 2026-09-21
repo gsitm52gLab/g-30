@@ -1,4 +1,6 @@
 import type { ConversationData, QuestionData, MessageData, InquiryReadData, QuestionTransitionData, InquiryTaskLinkData, InquiryEventData, InquiryCursorData } from './inquiries/types';
+import type { EvidenceData, EvidenceVersionData, EvidenceLinkData, EvidenceAssessmentData } from './evidence/types';
+import type { ImportBatchData } from './imports/types';
 import type { NoticeData, NoticeVersionData, NoticeReadData } from './notices/types';
 import type { SubmissionData, SubmissionDraftData } from './submissions/types';
 import type { CommonProductExtension, ProductVersionData, ContextProductData, ContextProductVersionData, PriceData, RetailPriceVersionData, InternalPriceVersionData, ProductUseSnapshotData } from "./products/types";
@@ -104,6 +106,11 @@ export interface RecordDataMap {
     inquiryTaskLink: InquiryTaskLinkData;
     inquiryEvent: InquiryEventData;
     inquiryCursor: InquiryCursorData;
+    evidence: EvidenceData;
+    evidenceVersion: EvidenceVersionData;
+    evidenceLink: EvidenceLinkData;
+    evidenceAssessment: EvidenceAssessmentData;
+    importBatch: ImportBatchData;
     notice: NoticeData;
     noticeVersion: NoticeVersionData;
     noticeRead: NoticeReadData;

@@ -2,7 +2,7 @@
 export interface ResourceScope {
     id: string;
     contextId: string | null;
-    kind: "notice" | "context" | "membership" | "task" | "product" | "inquiry" | "file" | "search" | "export" | "notification" | "audit" | "ai_input" | "ai_result" | "account";
+    kind: "evidence" | "notice" | "context" | "membership" | "task" | "product" | "inquiry" | "file" | "search" | "export" | "notification" | "audit" | "ai_input" | "ai_result" | "account";
     visibility: "public" | "internal" | "draft";
     /** Private inquiry drafts are restricted even for GSG administrators. */
     privateOwnerId?: string;
@@ -19,6 +19,7 @@ export interface ResourceScope {
 }
 
 export const actionKinds = {
+    "evidence.read": "evidence", "evidence.edit": "evidence", "evidence.assess": "evidence",
     "notice.read": "notice", "notice.manage": "notice",
     "context.read": "context", "context.create": "context",
     "membership.manage": "membership", "account.manage": "account",

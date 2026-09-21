@@ -1,6 +1,6 @@
-import type { StoredRecord, UnitOfWork } from "@/domain/records";
-import type { ProductCommon, ProductContextFields, ProductFileBinding } from "@/domain/products/types";
-import { blankContext, normalizeProductCode, sharedCommonNotice } from "@/domain/products/types";
+import type { UnitOfWork } from "@/domain/records";
+import type { ProductFileBinding } from "@/domain/products/types";
+import { sharedCommonNotice } from "@/domain/products/types";
 import { commonInput, contextInput, bindingsInput, retailInput, internalInput } from "@/domain/products/validate";
 import { object, str, enumValue } from "@/domain/tasks/validate";
 import { IdentityService, type Principal } from "@/server/auth/service";
@@ -11,7 +11,8 @@ import { canReferenceFile, visibleFile } from "@/server/files/access";
 import { resolveProduct, productContextScope, visibleProductRelations } from "./access";
 import { productDetail, productItem, visibleContexts } from "./read";
 import { commonDTO, commonDiff, contextDTO, bindingDTO } from "./projection";
-import { newId, fresh, uniqueCode, receipt, audit, commonVersion, contextVersion, provenance } from "./store";
+import { newId, fresh, receipt, audit } from "./store";
+import { addProductContext, createProduct, updateProductCommon, updateProductContext, writeRetailPrice, writeInternalPrice } from "./mutations";
 export interface ProductListQuery {
     context?: string;
     q?: string;
@@ -33,15 +34,6 @@ function pageNumber(value: string | undefined, fallback: number) {
 export class ProductService {
     constructor(public identity: IdentityService, private fault?: (command: string) => void) { }
     get clock() { return this.identity.clock; }
-    private project(s: UnitOfWork, p: Principal, contextId: string, fields: ProductContextFields) {
-        if (fields.projectId) {
-            const project = s.get("project", fields.projectId);
-            if (!project || project.contextId !== contextId)
-                unavailable();
-            if (p.user.data.role !== "gsg" && !project.data.taskIds.some(id => { const t = s.get("task", id); return !!t && decide(s, p, "task.read", taskScope(t), this.clock).allowed; }))
-                unavailable();
-        }
-    }
     private bindings(s: UnitOfWork, p: Principal, contextId: string, productId: string, files: ProductFileBinding[]) {
         for (const binding of files) {
             const file = s.get("fileVersion", binding.fileVersionId);
@@ -52,17 +44,6 @@ export class ProductService {
                 resolveProduct(s, p, contextId, pid, this.clock);
         }
     }
-    private addContext(s: UnitOfWork, p: Principal, product: StoredRecord<"product">, contextId: string, common: ProductCommon, fields = blankContext()) {
-        authorize(s, p, "product.edit", productContextScope(contextId, product.id), this.clock);
-        const context = s.get("context", contextId);
-        if (!context || context.data.brandId !== product.data.brandId)
-            unavailable();
-        uniqueCode(s, contextId, common.code, product.id);
-        this.project(s, p, contextId, fields);
-        const cp = s.create("contextProduct", { id: newId(), contextId, data: { productId: product.id, brandId: product.data.brandId!, normalizedCode: normalizeProductCode(common.code), currentVersionId: null } });
-        contextVersion(s, p, this.clock, cp, fields, []);
-        return cp.id;
-    }
     async create(token: string | undefined, input: Record<string, unknown>) {
         const v = object(input, ["contextId", "brandId", "common", "fields", "idempotencyKey"]), contextId = str(v.contextId, 160, true), brandId = str(v.brandId, 160, true), common = commonInput(v.common), fields = contextInput(v.fields ?? {});
         return this.identity.repo.transaction(s => {
@@ -72,10 +53,7 @@ export class ProductService {
             if (!context?.data.brandId || context.data.brandId !== brandId)
                 unavailable();
             return receipt(s, p, contextId, "product.create", v, () => {
-                uniqueCode(s, contextId, common.code);
-                const product = s.create("product", { id: newId(), contextId: null, data: { schemaVersion: 2, brandId, currentVersionId: null, archivedAt: null, name: common.name, code: common.code, brand: context.data.brand, size: common.capacity.raw, category: common.category, status: "active", missingMaterials: 0 } });
-                commonVersion(s, p, this.clock, product, common, false);
-                const cpId = this.addContext(s, p, product, contextId, common, fields);
+                const result = createProduct(s, p, this.clock, contextId, brandId, common, fields), product = s.get("product", result.productId)!, cpId = result.contextProductId;
                 audit(s, p, this.clock, contextId, "product.created", product.id, {}, { name: common.name, code: common.code });
                 s.create("domainEvent", { id: newId(), contextId, data: { eventType: "PRODUCT_CREATED", targetId: product.id, sourceVersionId: s.get("product", product.id)!.data.currentVersionId!, actorId: p.user.id, at: this.clock() } });
                 return { ids: [product.id, cpId] };
@@ -94,7 +72,7 @@ export class ProductService {
                 const statusMatches = !query.status || (query.status === "archived" ? item.archived : !item.archived && item.local.salesStatus === query.status);
                 return (!query.country || c.countryId === query.country) && (!query.retailer || c.retailerId === query.retailer) && (!query.brand || c.brandId === query.brand) && (!query.category || item.common.category === query.category) && (!query.sku || item.local.sku.toLocaleLowerCase().includes(query.sku.toLocaleLowerCase())) && statusMatches && (!search || [item.common.name, item.common.code, item.local.localName, item.local.sku, item.local.jan, ...item.common.localNames.map(n => n.name)].some(v => v.toLocaleLowerCase().includes(search)));
             }).sort((a, b) => a.common.name.localeCompare(b.common.name) || a.contextProductId.localeCompare(b.contextProductId));
-            return { mode: this.identity.repo.mode, contexts, items: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length, page, pageSize, materialCounts: { connected: false as const, requested: null, missing: null, unconfirmed: null } };
+            return { mode: this.identity.repo.mode, contexts, items: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length, page, pageSize, materialCounts: { connected: true as const, requested: rows.reduce((n,r)=>n+r.materialCounts.requested,0), missing: rows.reduce((n,r)=>n+r.materialCounts.missing,0), unconfirmed: rows.reduce((n,r)=>n+r.materialCounts.unconfirmed,0) } };
         });
     }
     async detail(token: string | undefined, productId: string, contextId: string) { return this.identity.repo.transaction(s => productDetail(s, this.identity.principal(s, token), resolveProduct(s, this.identity.principal(s, token), contextId, productId, this.clock), this.clock)); }
@@ -129,13 +107,7 @@ export class ProductService {
                 if (command === "save_common" || command === "archive" || command === "restore") {
                     fresh(r.product, v.expectedCommonRevision);
                     const common = command === "save_common" ? commonInput(v.common) : commonDTO(r.common.data.common);
-                    const relations = s.list("contextProduct").filter(cp => cp.data.productId === productId);
-                    for (const cp of relations)
-                        uniqueCode(s, cp.contextId!, common.code, productId);
-                    if (common.code !== r.common.data.common.code)
-                        for (const cp of relations)
-                            s.update("contextProduct", cp.id, cp.revision, { ...cp.data, normalizedCode: normalizeProductCode(common.code) });
-                    versionId = commonVersion(s, p, this.clock, r.product, common, command === "archive" || command !== "restore" && r.common.data.archived).id;
+                    versionId = updateProductCommon(s, p, this.clock, contextId, productId, v.expectedCommonRevision, common, command === "archive" || command !== "restore" && r.common.data.archived).id;
                 }
                 else if (command === "save_context" || command === "save_files") {
                     fresh(r.relation, v.expectedContextRevision);
@@ -149,31 +121,20 @@ export class ProductService {
                             unavailable();
                         files = [...hidden, ...submitted];
                     }
-                    this.project(s, p, contextId, fields);
-                    versionId = contextVersion(s, p, this.clock, r.relation, fields, files).id;
+                    versionId = updateProductContext(s, p, this.clock, contextId, productId, v.expectedContextRevision, fields, files).id;
                 }
                 else if (command === "save_retail") {
-                    const fields = retailInput(v.price), existing = s.list("retailPrice", contextId).find(x => x.data.contextProductId === r.relation.id);
-                    fresh(existing ?? null, v.expectedPriceRevision);
-                    const root = existing ?? s.create("retailPrice", { id: newId(), contextId, data: { contextProductId: r.relation.id, currentVersionId: null } }), old = root.data.currentVersionId ? s.get("retailPriceVersion", root.data.currentVersionId) : null;
-                    const version = s.create("retailPriceVersion", { id: newId(), contextId, data: { priceId: root.id, fields, ...provenance(p, this.clock, (old?.data.sequence ?? 0) + 1, old?.id ?? null) } });
-                    s.update("retailPrice", root.id, root.revision, { ...root.data, currentVersionId: version.id });
-                    versionId = version.id;
+                    versionId = writeRetailPrice(s, p, this.clock, contextId, productId, v.expectedPriceRevision, retailInput(v.price)).id;
                 }
                 else if (command === "save_internal") {
-                    const fields = internalInput(v.price), existing = s.list("internalPrice", contextId).find(x => x.data.contextProductId === r.relation.id);
-                    fresh(existing ?? null, v.expectedPriceRevision);
-                    const root = existing ?? s.create("internalPrice", { id: newId(), contextId, data: { contextProductId: r.relation.id, currentVersionId: null } }), old = root.data.currentVersionId ? s.get("internalPriceVersion", root.data.currentVersionId) : null;
-                    const version = s.create("internalPriceVersion", { id: newId(), contextId, data: { priceId: root.id, fields, ...provenance(p, this.clock, (old?.data.sequence ?? 0) + 1, old?.id ?? null) } });
-                    s.update("internalPrice", root.id, root.revision, { ...root.data, currentVersionId: version.id });
-                    versionId = version.id;
+                    versionId = writeInternalPrice(s, p, this.clock, contextId, productId, v.expectedPriceRevision, internalInput(v.price)).id;
                 }
                 else if (command === "link_context") {
                     fresh(r.product, v.expectedCommonRevision);
                     if (r.common.data.archived)
                         fail("VALIDATION", 422, "보관한 상품은 복원한 뒤 연결해 주세요.");
                     const target = str(v.targetContextId, 160, true);
-                    versionId = this.addContext(s, p, r.product, target, commonDTO(r.common.data.common));
+                    versionId = addProductContext(s, p, this.clock, r.product, target, commonDTO(r.common.data.common));
                 }
                 else if (command === "link_task") {
                     if (r.common.data.archived)
