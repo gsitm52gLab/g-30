@@ -85,3 +85,6 @@ G08 dependencies are accepted G04/G05 with G06 in37b ancestry; G07 is not a prer
 
 ## 2026-09-21T17:25:44.536886+00:00 — G09 standalone domain stage while G08 verifies
 G09 dependencies G04/G05 already ACCEPTED at37b. Only new domain types/actual pure command validators and narrow unit file assigned to goals in isolated g09-contract; no shared schema/policy/lock/file/UI edits, no unaccepted sibling source. Later fullserver/UI moves to latest accepted combined base under explicit shared lease. G09 legacy task route entry narrow lease approved from actual route read. All feature AC remain NOT_RUN. G07 dd77 author repair evidence reviewed; independent and current-sibling union mandatory before acceptance.
+
+## 2026-09-21T17:29:20.688527+00:00 — Parallel isolated G10 domain and union preflight
+G10 depends on acceptedG05, so implementer may add only standalone corrections types/validators on37b while G09 has disjoint new files. Neither edits shared schema/policy/lock. G10 domain packet phrase intentional answer status means explicit reflection/resolution, not inquiry answers; clarified to author. Actual readonly G07/G08 union exposes6 source conflicts and clean-merge migration-count6 needs7; author resolution and populated both-direction upgrade required afterG08acceptance.
