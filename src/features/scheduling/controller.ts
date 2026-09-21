@@ -42,74 +42,137 @@ export function useSchedule(initial: {
     const [list, setList] = useState<ScheduleList | null>(initial.list), [detail, setDetail] = useState(initial.detail), [editor, setEditor] = useState(seed), [pending, setPending] = useState<Pending | null>(null), [recovery, setRecovery] = useState<Saved | null>(null), [busy, setBusy] = useState(false), [ready, setReady] = useState(false), [error, setError] = useState(''), [message, setMessage] = useState(''), [storageError, setStorageError] = useState('');
     const live = useRef({ alive: false, halted: false, generation: 0, locked: false, read: 0 }), state = useRef({ editor: seed, pending: null as Pending | null }), latest = useRef(initial.detail);
     const active = useCallback((g: number) => live.current.alive && !live.current.halted && g === live.current.generation, []);
-    const purge = useCallback(() => { live.current.halted = true; live.current.generation++; live.current.locked = false; state.current = { editor: { id: null, revision: 0, value: blank(), dateTime: { local: '', offset: '' }, reason: '' }, pending: null }; setList(null); setDetail(null); setEditor(state.current.editor); setPending(null); setRecovery(null); setReady(false); setBusy(false); setMessage(''); setStorageError(''); setError('현재 접근 권한을 확인할 수 없습니다. 로그인과 담당 범위를 확인한 뒤 다시 열어 주세요.'); try {
-        sessionStorage.removeItem(key);
-    }
-    catch { } }, [key]);
-    const handle = useCallback((e: unknown, g: number) => { if (!active(g))
-        return; if (denied(e)) {
-        purge();
-        announceDenied(contextId);
-    }
-    else
-        setError(e instanceof Error ? e.message : '연결을 확인해 주세요. 작성값은 유지됩니다.'); }, [active, purge, contextId]);
-    function persist() { if (!active(live.current.generation))
-        return; try {
-        sessionStorage.setItem(key, JSON.stringify({ actorId: initial.actorId, contextId, ...state.current }));
+    const purge = useCallback(() => {
+        live.current.halted = true;
+        live.current.generation++;
+        live.current.locked = false;
+        state.current = { editor: { id: null, revision: 0, value: blank(), dateTime: { local: '', offset: '' }, reason: '' }, pending: null };
+        setList(null);
+        setDetail(null);
+        setEditor(state.current.editor);
+        setPending(null);
+        setRecovery(null);
+        setReady(false);
+        setBusy(false);
+        setMessage('');
         setStorageError('');
-    }
-    catch {
-        setStorageError('이 브라우저에 복구 기록을 저장하지 못했습니다. 화면을 닫기 전에 저장 결과를 확인해 주세요.');
-    } }
-    function edit(next: Editor) { if (!active(live.current.generation) || state.current.pending)
-        return; state.current.editor = next; setEditor(next); persist(); }
-    function mark(p: Pending | null) { state.current.pending = p; setPending(p); persist(); }
-    const refresh = useCallback(async (id?: string | null, filters = '') => { const g = live.current.generation, seq = ++live.current.read; try {
-        await currentActor(contextId, initial.actorId);
+        setError('현재 접근 권한을 확인할 수 없습니다. 로그인과 담당 범위를 확인한 뒤 다시 열어 주세요.');
+        try {
+            sessionStorage.removeItem(key);
+        }
+        catch { }
+    }, [key]);
+    const handle = useCallback((e: unknown, g: number) => {
         if (!active(g))
-            return null;
-        const [l, d] = await Promise.all([request<ScheduleList>(`/api/schedule?context=${encodeURIComponent(contextId)}${filters}`), (id === undefined ? latest.current?.id : id) ? request<ScheduleDetail>(`/api/schedule/${encodeURIComponent((id === undefined ? latest.current!.id : id)!)}`) : Promise.resolve(null)]);
-        if (!active(g) || seq !== live.current.read)
-            return null;
-        if (l.contextId !== contextId || d && d.contextId !== contextId || latest.current?.capabilities.manage && d && !d.capabilities.manage) {
+            return;
+        if (denied(e)) {
             purge();
+            announceDenied(contextId);
+        }
+        else
+            setError(e instanceof Error ? e.message : '연결을 확인해 주세요. 작성값은 유지됩니다.');
+    }, [active, purge, contextId]);
+    function persist() {
+        if (!active(live.current.generation))
+            return;
+        try {
+            sessionStorage.setItem(key, JSON.stringify({ actorId: initial.actorId, contextId, ...state.current }));
+            setStorageError('');
+        }
+        catch {
+            setStorageError('이 브라우저에 복구 기록을 저장하지 못했습니다. 화면을 닫기 전에 저장 결과를 확인해 주세요.');
+        }
+    }
+    function edit(next: Editor) {
+        if (!active(live.current.generation) || state.current.pending)
+            return;
+        state.current.editor = next;
+        setEditor(next);
+        persist();
+    }
+    function mark(p: Pending | null) { state.current.pending = p; setPending(p); persist(); }
+    const refresh = useCallback(async (id?: string | null, filters = '') => {
+        const g = live.current.generation, seq = ++live.current.read;
+        try {
+            await currentActor(contextId, initial.actorId);
+            if (!active(g))
+                return null;
+            const [l, d] = await Promise.all([request<ScheduleList>(`/api/schedule?context=${encodeURIComponent(contextId)}${filters}`), (id === undefined ? latest.current?.id : id) ? request<ScheduleDetail>(`/api/schedule/${encodeURIComponent((id === undefined ? latest.current!.id : id)!)}`) : Promise.resolve(null)]);
+            if (!active(g) || seq !== live.current.read)
+                return null;
+            if (l.contextId !== contextId || d && d.contextId !== contextId || latest.current?.capabilities.manage && d && !d.capabilities.manage || initial.list.capabilities.create && (!l.capabilities.create || state.current.editor.value.taskId && !l.tasks.some(t => t.id === state.current.editor.value.taskId))) {
+                purge();
+                return null;
+            }
+            setList(l);
+            setDetail(d);
+            latest.current = d;
+            setReady(true);
+            setError('');
+            return { list: l, detail: d };
+        }
+        catch (e) {
+            handle(e, g);
             return null;
         }
-        setList(l);
-        setDetail(d);
-        latest.current = d;
-        setReady(true);
-        setError('');
-        return { list: l, detail: d };
-    }
-    catch (e) {
-        handle(e, g);
-        return null;
-    } }, [contextId, initial.actorId, active, handle, purge]);
-    useEffect(() => { const life = live.current; life.alive = true; life.halted = false; const g = ++life.generation; void Promise.resolve().then(() => refresh()).then(v => { if (!v || !active(g))
-        return; try {
-        const raw = sessionStorage.getItem(key);
-        if (raw) {
-            const saved = JSON.parse(raw) as Saved;
-            if (saved.actorId === initial.actorId && saved.contextId === contextId && saved.editor && saved.editor.value && (!saved.editor.id || saved.editor.id === initial.detail?.id || saved.pending?.ids?.[0] === saved.editor.id)) {
-                if (v.list.capabilities.create)
-                    setRecovery(saved);
-                else
-                    sessionStorage.removeItem(key);
+    }, [contextId, initial.actorId, initial.list.capabilities.create, active, handle, purge]);
+    useEffect(() => {
+        const life = live.current;
+        life.alive = true;
+        life.halted = false;
+        const g = ++life.generation;
+        void Promise.resolve().then(() => refresh()).then(v => {
+            if (!v || !active(g))
+                return;
+            try {
+                const raw = sessionStorage.getItem(key);
+                if (raw) {
+                    const saved = JSON.parse(raw) as Saved;
+                    if (saved.actorId === initial.actorId && saved.contextId === contextId && saved.editor && saved.editor.value && (!saved.editor.id || saved.editor.id === initial.detail?.id || saved.pending?.ids?.[0] === saved.editor.id)) {
+                        if (v.list.capabilities.create)
+                            setRecovery(saved);
+                        else
+                            sessionStorage.removeItem(key);
+                    }
+                }
             }
+            catch {
+                setStorageError('저장된 복구 기록을 읽지 못했습니다. 현재 서버 기록을 확인해 주세요.');
+            }
+        });
+        const focus = () => {
+            if (document.visibilityState === 'visible')
+                void refresh();
+        };
+        const revoked = (e: Event) => {
+            if ((e as CustomEvent).detail === contextId)
+                purge();
+        };
+        window.addEventListener('focus', focus);
+        document.addEventListener('visibilitychange', focus);
+        window.addEventListener(deniedEvent, revoked);
+        const timer = setInterval(focus, 30000);
+        return () => { life.alive = false; life.generation++; clearInterval(timer); window.removeEventListener('focus', focus); document.removeEventListener('visibilitychange', focus); window.removeEventListener(deniedEvent, revoked); };
+    }, [refresh, active, key, initial.actorId, contextId, initial.detail?.id, purge]);
+    function reconcile(d: ScheduleDetail) {
+        const next = { id: d.id, revision: d.revision, value: d.current.content, dateTime: localFields(d.current.content.deadline), reason: '' };
+        state.current = { editor: next, pending: null };
+        setEditor(next);
+        setPending(null);
+        setRecovery(null);
+        setMessage('저장 결과를 확인했습니다. 이 일정의 종료와 업무 완료는 별도입니다.');
+        try {
+            sessionStorage.removeItem(key);
         }
+        catch { }
+        ;
     }
-    catch {
-        setStorageError('저장된 복구 기록을 읽지 못했습니다. 현재 서버 기록을 확인해 주세요.');
-    } }); const focus = () => { if (document.visibilityState === 'visible')
-        void refresh(); }; const revoked = (e: Event) => { if ((e as CustomEvent).detail === contextId)
-        purge(); }; window.addEventListener('focus', focus); document.addEventListener('visibilitychange', focus); window.addEventListener(deniedEvent, revoked); const timer = setInterval(focus, 30000); return () => { life.alive = false; life.generation++; clearInterval(timer); window.removeEventListener('focus', focus); document.removeEventListener('visibilitychange', focus); window.removeEventListener(deniedEvent, revoked); }; }, [refresh, active, key, initial.actorId, contextId, initial.detail?.id, purge]);
-    function reconcile(d: ScheduleDetail) { const next = { id: d.id, revision: d.revision, value: d.current.content, dateTime: localFields(d.current.content.deadline), reason: '' }; state.current = { editor: next, pending: null }; setEditor(next); setPending(null); setRecovery(null); setMessage('저장 결과를 확인했습니다. 이 일정의 종료와 업무 완료는 별도입니다.'); try {
-        sessionStorage.removeItem(key);
+    async function reread() {
+        const p = state.current.pending;
+        const v = await refresh(p?.ids?.[0] ?? state.current.editor.id);
+        if (v?.detail && p?.ids)
+            reconcile(v.detail);
     }
-    catch { } ; }
-    async function reread() { const p = state.current.pending; const v = await refresh(p?.ids?.[0] ?? state.current.editor.id); if (v?.detail && p?.ids)
-        reconcile(v.detail); }
     async function execute(command: Body['command'] = 'save') {
         if (live.current.locked || !ready || !active(live.current.generation))
             return;
@@ -174,12 +237,31 @@ export function useSchedule(initial: {
             }
         }
     }
-    async function rebase() { const v = await refresh(state.current.editor.id); if (!v)
-        return; const next = { ...state.current.editor, revision: v.detail?.revision ?? 0 }; state.current = { editor: next, pending: null }; setEditor(next); setPending(null); persist(); setMessage('작성값을 유지하고 최신 버전을 기준으로 선택했습니다. 차이를 확인하고 다시 저장해 주세요.'); }
-    function restore() { if (!recovery || !active(live.current.generation))
-        return; state.current = { editor: recovery.editor, pending: recovery.pending }; setEditor(recovery.editor); setPending(recovery.pending); setRecovery(null); persist(); }
-    return { list, detail, editor, edit, pending, recovery, restore, discardRecovery: () => { setRecovery(null); try {
-            sessionStorage.removeItem(key);
-        }
-        catch { } }, ready, busy, error, message, storageError, refresh, execute, rebase, reread };
+    async function rebase() {
+        const v = await refresh(state.current.editor.id);
+        if (!v)
+            return;
+        const next = { ...state.current.editor, revision: v.detail?.revision ?? 0 };
+        state.current = { editor: next, pending: null };
+        setEditor(next);
+        setPending(null);
+        persist();
+        setMessage('작성값을 유지하고 최신 버전을 기준으로 선택했습니다. 차이를 확인하고 다시 저장해 주세요.');
+    }
+    function restore() {
+        if (!recovery || !active(live.current.generation))
+            return;
+        state.current = { editor: recovery.editor, pending: recovery.pending };
+        setEditor(recovery.editor);
+        setPending(recovery.pending);
+        setRecovery(null);
+        persist();
+    }
+    return { list, detail, editor, edit, pending, recovery, restore, discardRecovery: () => {
+            setRecovery(null);
+            try {
+                sessionStorage.removeItem(key);
+            }
+            catch { }
+        }, ready, busy, error, message, storageError, refresh, execute, rebase, reread };
 }

@@ -54,7 +54,7 @@ export function ScheduleTimeline({ state }: {
         return <p role="alert" className={s.error}>{state.message}</p>;
     if (!state.groups.some(g => g.items.length))
         return <section className={s.empty}><h2>표시할 일정이 없습니다</h2><p>{state.emptyMessage}</p></section>;
-    return <div className={s.stack}>{state.groups.filter(g => g.items.length).map(group => <section className={s.stack} key={group.key}><div className={s.groupHeading}><h2>{group.label}</h2>{group.items.length > 1 && <span className={s.hint}>병렬 일정 {group.items.length}건</span>}</div><div className={s.timeline}>{group.items.map(item => <ScheduleCard item={item} key={item.id}/>)}</div></section>)}</div>;
+    return <div className={s.stack}>{state.groups.filter(g => g.items.length).map(group => <section className={s.stack} key={group.key}><div className={s.groupHeading}><h2>{group.label}</h2>{group.items.length > 1 && <span className={s.hint}>일정 {group.items.length}건</span>}</div><div className={s.timeline}>{group.items.map(item => <ScheduleCard item={item} key={item.id}/>)}</div></section>)}</div>;
 }
 export function ScheduleHistory({ entries }: {
     entries: ScheduleHistoryEntry[];
