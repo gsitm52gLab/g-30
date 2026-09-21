@@ -130,18 +130,22 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G13 persisted 
         const ordinary = (await scheduling.command(admin, save(content({ kind: 'shipping', deadline: { ...content().deadline, responsibleUserId: 'user-co' } })))).ids[0];
         const completion = new CompletionService(identity), w = await completion.workspace(admin, taskId); await completion.command(admin, { command: 'complete', taskId, expectedTaskRevision: w.taskRevision, expectedBasisHash: w.preview!.basisHash, memo: '', idempotencyKey: randomUUID() });
         expect((await scheduling.detail(co, ordinary)).calendar.reminder).toMatchObject({ eligible: false, reason: 'task_inactive' });
-        const current = (await repo.get('task', f.taskId))!; await new TaskService(identity).command(admin, f.taskId, { command: 'assign', expectedRevision: current.revision, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: [], idempotencyKey: randomUUID() });
+        const current = (await repo.get('task', f.taskId))!; await new TaskService(identity).command(admin, f.taskId, { command: 'assign', expectedRevision: current.revision, assignment: { ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: [] }, idempotencyKey: randomUUID() });
         expect((await scheduling.detail(co, manual)).calendar.recipientState).toBe('needs_assignment');
     });
     it('N13-11 AC13-02/03 real notice and multi-item correction draft0/public recipient1, read markers unchanged', async () => {
         await setup(); directory = await mkdtemp(join(tmpdir(), 'g13-notification-')); const notifications = new NotificationService(identity), notices = new NoticeService(identity), corrections = new CorrectionService(identity);
         const noticeId = (await notices.create(admin, { contextId, content: { ...blankNotice(), title: '공지 수신', body: '공개', audience: { mode: 'selected', userIds: ['user-luna'] } }, idempotencyKey: randomUUID() })).ids[0];
-        const target = await completionSubmission(identity, directory, taskId), items = ['one', 'two', 'three'].map(key => ({ key, target, internalOpinionVersionIds: [], publicSource: '공개 수정', change: '변경', reason: '사유', publicDescription: '공개 내용', priority: 'normal', issue: 'correction' }));
+        const target = await completionSubmission(identity, directory, taskId), items = [];
+        for (const key of ['one', 'two', 'three']) {
+            const opinion = (await corrections.command(admin, { command: 'save_opinion', taskId, opinionId: null, expectedRevision: 0, opinion: { target, source: { kind: 'external_opinion', agency: '기관', reviewer: '검토자', source: 'PRIVATE_NOTIFICATION_SOURCE' }, originalText: 'PRIVATE_NOTIFICATION_ORIGINAL', internalFileVersionIds: [], receivedOn: '2026-09-21', conflictingOpinionVersionIds: [] }, idempotencyKey: randomUUID() })).ids[1];
+            items.push({ key, target, internalOpinionVersionIds: [opinion], publicSource: '공개 수정', change: '변경', reason: '사유', publicDescription: '공개 내용', priority: 'normal', issue: 'correction' });
+        }
         const draft = (await corrections.command(admin, { command: 'save_draft', taskId, draftId: null, expectedRevision: 0, draft: { title: '공개 보완 묶음', summary: '보완 세 항목', items, mode: 'normal', pendingScopes: [], previousBatchVersionId: null }, idempotencyKey: randomUUID() })).ids[0];
         await notifications.sync(brand, contextId); expect((await notifications.list(brand, contextId)).items.some(n => ['공지 수신', '공개 보완 묶음'].includes(n.title))).toBe(false);
         await notices.command(admin, noticeId, { command: 'publish', expectedRevision: 1, idempotencyKey: randomUUID() }); await corrections.command(admin, { command: 'publish', taskId, draftId: draft, expectedRevision: 1, idempotencyKey: randomUUID() });
         for (const token of [brand, co]) { await notifications.sync(token, contextId); await notifications.sync(token, contextId); const list = await notifications.list(token, contextId); expect(list.items.filter(n => n.title === '공개 보완 묶음')).toHaveLength(1); expect(list.items.filter(n => n.title === '공지 수신')).toHaveLength(token === brand ? 1 : 0); }
-        expect(await repo.list('noticeRead')).toHaveLength(0);
+        expect(await repo.list('noticeRead')).toHaveLength(0); expect(JSON.stringify(await notifications.list(brand, contextId))).not.toContain('PRIVATE_NOTIFICATION');
     });
     it('N13-07 actual G04 activity identity and external wait GSG-only source remain separate', async () => {
         await setup(); const task = (await repo.get('task', taskId))!;
