@@ -82,3 +82,6 @@ Valid prefix aliases with identical namespace URI/local names and equal expanded
 ## G08 progresses independently of G07 repair — state101
 
 G08 dependencies are accepted G04/G05 with G06 in37b ancestry; G07 is not a prerequisite. Earlier planned G07-first union is a scheduling preference, not a completion requirement. With G08server/UI frozen while G07V02 is under repair, assemble/verify G08 first at accepted37b plus its own candidates. No unaccepted G07 source is consumed. If G08 is accepted first, author-resolve its common-schema/policy union with G07 in a new candidate before independent G07 verification and integration. Both features coexistence remains mandatory in G07/G18, original failures retained.
+
+## 2026-09-21T17:25:44.536886+00:00 — G09 standalone domain stage while G08 verifies
+G09 dependencies G04/G05 already ACCEPTED at37b. Only new domain types/actual pure command validators and narrow unit file assigned to goals in isolated g09-contract; no shared schema/policy/lock/file/UI edits, no unaccepted sibling source. Later fullserver/UI moves to latest accepted combined base under explicit shared lease. G09 legacy task route entry narrow lease approved from actual route read. All feature AC remain NOT_RUN. G07 dd77 author repair evidence reviewed; independent and current-sibling union mandatory before acceptance.
