@@ -308,4 +308,27 @@ Internal opinions append versions. Published batches and their source draft are 
 
 Public preview: GET `/api/corrections/drafts/:id/preview` (GSG only). Exact batch: GET `/api/corrections/:id`. Target-file links use `/api/corrections/files/:id` and recheck the current batch/item plus original file authority before and after file IO. Internal opinion files use existing internal task uploads; no draft or upload releases them to brands.
 
-Run the existing `npm ci`, `npm run db:setup`, `npm run check`, and `npm run build` setup/check commands. Migration `0009-corrections.sql` adds constraints without changing previous SQL. This combined branch contains 0001 through 0009 (nine). A previous accepted G09 database gains only 0009; the previous isolated G10 chain gains 0006 and 0008. Existing applied SQL bytes and records remain unchanged. The actual corrections UI is available at `/tasks/:id/corrections?context=...`; downstream notification delivery and independent acceptance remain separate stages.
+Run the existing `npm ci`, `npm run db:setup`, `npm run check`, and `npm run build` setup/check commands. Migration `0009-corrections.sql` adds constraints without changing previous SQL. The accepted G10 integration contained 0001 through 0009 (nine). This G12 union adds 0010 and contains ten migrations. The accepted G10 chain gains only 0010; the isolated G12 chain (0001–0007 plus0010) gains 0008 and0009. Historical source membership is preserved independently of numeric order. Existing applied SQL bytes and records remain unchanged. The actual corrections UI is available at `/tasks/:id/corrections?context=...`; downstream notification delivery and independent acceptance remain separate stages.
+
+### PR 행사 서버 계약 (G12)
+
+`/api/campaigns`의 목록·명령, `/:id`의 공개 버전·이력, `/:id/preview`, `/catalogs`, `/summary?taskId=…`와 인증된 `/files/:id` 경로를 제공합니다. GSG가 공개한 메뉴 정의를 브랜드가 선택하면 같은 업무의 새 요청 버전에 선택 범위와 실제 기록자·승인 원본 출처를 고정합니다. 일반 요청 항목과 미공개 초안, 과거 제출본은 유지하며 기존 답변은 명시적으로 새 요청에 전환합니다. 미선택·불참의 현재 자료 요구는 제외하고, 이미 신청한 불참의 외부 사실은 취소 협의 보류로 별도 보존합니다. 캠페인·업무 요청·조건 의존성 충돌은 기존 기록을 유지하고 409로 재확인을 요청합니다. 송장·파일만으로 실물 수령이나 업무 완료를 처리하지 않습니다.
+
+행사 UI는 이 합본에 연결되어 있으며 독립 수용은 별도 검증 단계입니다. 실제 알림 발송은 G13 후행입니다. 자체 검사에는 합성 데이터만 사용합니다.
+
+```sh
+npm run check
+npm run build
+CAMPAIGNS_MODE=mock E2E_PORT=4219 E2E_AUX_PORT=4220 npx tsx scripts/verify-campaigns-http.ts
+CAMPAIGNS_MODE=sqlite E2E_PORT=4219 E2E_AUX_PORT=4220 npx tsx scripts/verify-campaigns-http.ts
+```
+
+검사마다 고유 DB·파일 디렉터리를 만들며 `CAMPAIGNS_HTTP_ROOT`, `CAMPAIGNS_HTTP_REPORT`로 별도 증거 위치를 지정할 수 있습니다. SQLite 검사는 일반 `next start` 및 실제 두 프로세스 경합·재시작을 사용합니다. mock 검사는 프로세스 내 저장소 관찰을 위해 테스트 자식 서버를 사용하며 운영 경로에 테스트 API를 추가하지 않습니다. 보고서의 실제 검사 수·계층을 확인하세요.
+
+### G12 PR·행사 UI 후보
+
+업무 상세의 **PR·행사 참여와 실물**에서 같은 업무에 연결된 행사를 봅니다. GSG는 카탈로그 원문·번역을 내부에 저장하고, 실제 공개 요청의 준비물과 상품 버전을 메뉴별로 선택한 후 서버 미리보기를 거쳐 공개합니다. 브랜드 담당자는 참여할 메뉴를 선택합니다. 선택 결과로 요청 버전이 달라져도 기존 답변 초안은 보존되며 답변 화면에서 명시적으로 전환합니다.
+
+외부 신청·선정·진행은 별도 사실입니다. 신청 후 불참은 취소 협의로 남습니다. 촬영·배포 목적지별 송장·발송·수령도 각각 기록하고, 후속 산출물은 실제 제출한 답변·파일·상품 사용본을 참조합니다. 이 UI 후보는 아직 G12 독립 수용 전이며 외부 신청·운송 실행·알림 발송을 수행하지 않습니다.
+
+허용된 합성 환경에서 `npm run build` 후 `E2E_PORT=4229 npm run test:e2e -- campaigns` 또는 `E2E_PORT=4229 npm run test:e2e:db -- campaigns`로 캠페인 UI 여정을 실행합니다. 표준 실행기는 project×spec마다 서버·DB·파일을 격리합니다. 포트와 보고서 경로는 실행 환경에서 지정하며 실제 `.env` 값은 필요 없습니다.

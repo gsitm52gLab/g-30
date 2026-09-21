@@ -33,9 +33,17 @@ export interface TaskExtension {
     templateVersionId?: string | null;
     cycle?: { sourceTaskId: string; label: string; start: string; end: string } | null;
 }
+/** Generated only from a GSG-approved campaign; actor is the actual selection recorder. */
+export interface CampaignRequestSource {
+    kind: 'campaign_selection'; campaignId: string; campaignVersionId: string;
+    selectionVersionId: string | null; sourceFactId: string | null; originalRequestId: string;
+    actorId: string; eventSequence: number; activeMenuKeys: string[];
+    retainedCancellationMenuKeys: string[]; retainedRequirementKeys: string[];
+    materialProductIds: string[]; noMaterials: boolean;
+}
 export interface RequestVersionData {
     taskId: string; sequence: number; previousId: string | null; templateVersionId: string | null;
-    content: RequestContent; publishedBy: string; publishedAt: string; changedKeys: string[];
+    content: RequestContent; publishedBy: string; publishedAt: string; changedKeys: string[]; source?: CampaignRequestSource;
 }
 export interface TemplateVersionData {
     templateId: string; name: string; sequence: number; previousId: string | null;

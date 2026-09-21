@@ -1,5 +1,5 @@
 import type { RecordKind, StoredRecord } from "@/domain/records";
-import type { Deadline, RequestContent, Requirement } from "@/domain/tasks/types";
+import type { Deadline, RequestContent, Requirement, CampaignRequestSource } from "@/domain/tasks/types";
 import { requirementTypes } from "@/domain/tasks/types";
 import type { evaluateRequirements } from "@/domain/tasks/evaluate";
 
@@ -37,8 +37,8 @@ export function projectedRequest(c: RequestContent, internal: boolean, fileIds: 
     // Spreading a freshly constructed safe DTO is intentional; no stored payload is spread.
     return internal ? {...publicContent,internalOriginal:text(c.internalOriginal),internalMemo:text(c.internalMemo)} : publicContent;
 }
-export function projectedVersion(row: StoredRecord<"requestVersion">, content: ReturnType<typeof projectedRequest>) {
-    const v=row.data;return {id:text(row.id),sequence:number(v.sequence),publishedBy:text(v.publishedBy),publishedAt:text(v.publishedAt),changedKeys:stringList(v.changedKeys),content};
+export function projectedVersion(row: StoredRecord<"requestVersion">, content: ReturnType<typeof projectedRequest>, source:CampaignRequestSource|null=null) {
+    const v=row.data;return {id:text(row.id),sequence:number(v.sequence),publishedBy:text(v.publishedBy),publishedAt:text(v.publishedAt),changedKeys:stringList(v.changedKeys),content,source};
 }
 export function projectedActivity(row: StoredRecord<"taskActivity">) {
     const a=row.data;

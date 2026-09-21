@@ -1,5 +1,6 @@
 import type { CorrectionRecords } from './corrections/records';
 import type { ConversationData, QuestionData, MessageData, InquiryReadData, QuestionTransitionData, InquiryTaskLinkData, InquiryEventData, InquiryCursorData } from './inquiries/types';
+import type { CampaignRecords } from './campaigns/records';
 import type { EvidenceData, EvidenceVersionData, EvidenceLinkData, EvidenceAssessmentData } from './evidence/types';
 import type { ImportBatchData } from './imports/types';
 import type { NoticeData, NoticeVersionData, NoticeReadData } from './notices/types';
@@ -98,7 +99,7 @@ export interface ProductData extends CommonProductExtension {
     status: "draft" | "active" | "archived";
     missingMaterials: number;
 }
-export interface RecordDataMap extends CorrectionRecords {
+export interface RecordDataMap extends CorrectionRecords, CampaignRecords {
     conversation: ConversationData;
     inquiryQuestion: QuestionData;
     inquiryMessage: MessageData;
