@@ -1,6 +1,6 @@
 # Execution checkpoint
 
-State version: 30
+State version: 32
 Updated: 2026-09-21T10:50:09.785645+00:00
 Active Goal: existing user Goal, ACTIVE
 Accepted product commit: `cec612fbeb3795e233d07121a54db9ac96adbf4b`

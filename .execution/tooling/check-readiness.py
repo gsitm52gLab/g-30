@@ -67,7 +67,8 @@ for original in baseline['tasks']:
     if task['state'] != 'ACCEPTED':
         pending.append({'id': task['id'], 'group': 'goal', 'status': task['state']})
         continue
-    if not task.get('implementer_session_id') or not task.get('verifier_session_id') or task['implementer_session_id'] == task['verifier_session_id']:
+    implementers = task.get('implementer_session_ids', [task.get('implementer_session_id')])
+    if not all(implementers) or not task.get('verifier_session_id') or task['verifier_session_id'] in implementers:
         errors.append({'id': task['id'], 'error': 'missing independent session IDs'})
     for field in ['candidate_commit', 'integration_commit', 'verification_result', 'regression_result']:
         value = task.get(field)
@@ -82,6 +83,8 @@ for rows, ids, label in [
 ]:
     index(rows, ids, label)
     completion_rows(rows, label)
+for row in deferred:
+    completion_rows(row.get('check_groups', []), 'deferred producer/consumer groups')
 completion_rows([r for r in trace['external_levels'] if r.get('required_for_goal')], 'required external integration')
 final = tasks.get('G18', {})
 if final.get('state') == 'ACCEPTED' and final.get('integration_commit') != state.get('accepted_commit'):

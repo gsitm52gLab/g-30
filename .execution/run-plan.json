@@ -418,7 +418,8 @@
         "src/domain/requirements/**",
         "src/domain/events/**",
         "src/server/config.ts",
-        ".gitignore"
+        ".gitignore",
+        "src/app/layout.tsx"
       ],
       "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-impl",
       "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1",
@@ -485,10 +486,17 @@
             "src/features/projects/**",
             "src/app/tasks/**",
             "src/app/projects/**",
-            "src/components/navigation.tsx"
+            "src/components/navigation.tsx",
+            "src/app/layout.tsx"
           ],
           "base_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
-          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ui/task.json"
+          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ui/task.json",
+          "ownership_addenda": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ui/ownership-addendum-1.json"
+          ],
+          "ownership_limits": {
+            "src/app/layout.tsx": "sidebar copy only; see addendum"
+          }
         }
       ],
       "implementer_session_ids": [
@@ -1240,7 +1248,7 @@
   "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
   "current_goal": "G04",
   "next_action": "G04 server/UI isolated implementation; main serial subtask merge then full exact candidate independent verification",
-  "state_version": 30,
+  "state_version": 32,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1267,7 +1275,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T10:58:29.266622+00:00",
+  "updated_at": "2026-09-21T11:00:28.139399+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
