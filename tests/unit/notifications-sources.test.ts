@@ -115,7 +115,13 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G13 actual pro
     it('S13-08 actual G12 selected/decline/cancellation preserve facts and no brand nag; general requirement survives decline', async () => {
         await setup(); const f = await completionCampaign(identity); await f.select();
         const campaignEvent = await event(brand, 'CAMPAIGN_PUBLISHED', f.campaignId); expect(campaignEvent.disposition).toBe('eligible');
-        expect(await event(brand, 'TASK_REQUEST_REVISED', f.taskId)).toMatchObject({ disposition: 'eligible', recipientId: 'user-luna' });
+        const currentRequestId = (await repo.get('task', f.taskId))!.data.currentRequestId;
+        const requestEvents = await events('TASK_REQUEST_REVISED', f.taskId);
+        const currentEvent = requestEvents.find(e => e.data.sourceVersionId === currentRequestId)!;
+        expect(currentEvent).toBeDefined();
+        expect(await read(brand, (s, p) => notificationEventSource(s, p, currentEvent.id, () => NOW))).toMatchObject({ disposition: 'eligible', recipientId: 'user-luna' });
+        const earlierEvents = requestEvents.filter(e => e.id !== currentEvent.id); expect(earlierEvents).toHaveLength(1);
+        for (const old of earlierEvents) expect(await read(brand, (s, p) => notificationEventSource(s, p, old.id, () => NOW))).toMatchObject({ disposition: 'superseded', recipientId: 'user-luna' });
         expect((await event(gsg, 'CAMPAIGN_SELECTION_RECORDED', f.campaignId)).disposition).toBe('eligible');
         const selected = await read(brand, (s, p) => campaignSchedules(s, p, f.campaignId, () => NOW)); expect(selected.filter(r => r.active)).not.toHaveLength(0); expect(selected.filter(r => !r.active)).not.toHaveLength(0); expect(JSON.stringify(selected)).not.toContain(campaignMarker);
         await f.applied(); await f.select('decline'); const records = await repo.list('campaignExternalFact');
