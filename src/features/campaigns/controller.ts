@@ -109,7 +109,7 @@ export function useCampaign(initial: Workspace, selection: string | null, versio
             return;
         live.current.locked = true;
         const g = live.current.generation;
-        update({ busy: true, error: '', code: '' });
+        update({ busy: true, error: '', code: '', message: '' });
         try {
             let p = current.current.recovery.pending;
             if (!p) {
