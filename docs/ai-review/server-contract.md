@@ -84,3 +84,6 @@ AI_REVIEW_HISTORY_REPORT=/absolute/own/history.json npx tsx scripts/verify-ai-re
 ```
 
 HTTP 검증의 SQLite 마지막 두 사례는 전용 DB에 unknown extra 및 손상된 scalar를 명시 주입합니다. 과거DB 검증은 accepted0804 소스를 Git export하고 그 실제 생산자로 만든 DB/파일을 닫은 다음, 파일시스템 복사가 끝난 후에만 복사본을 SQLite로 엽니다. 원본 DB/파일은 수정하지 않습니다. 정확도·전문가 검수·G17 provider·독립검증을 이 자체검사로 대체하지 않습니다.
+
+## G17 supersession
+G17 adds explicit configured OpenAI settings, persistent per-network attempts and usage. The original synthetic-only phase above is historical; see `docs/ai-provider/server-contract.md` for current provider interfaces. Existing human review, exact source/corpus validation and manual-completion independence remain unchanged.

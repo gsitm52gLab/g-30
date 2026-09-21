@@ -75,12 +75,12 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
         const fileHash = hash((await files.download(brand, file.id, reference, 'original')).bytes);
         expect(fileHash).toBe(hash(png));
         expect((await repo.list('commandReceipt')).length).toBeGreaterThan(4);
-        expect(migrate(db)).toEqual({ applied: 7, total: 13 });
+        expect(migrate(db)).toEqual({ applied: 8, total: 14 });
         expect(rows()).toEqual(before);
         const allMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as { name: string; sha256: string; applied_at: string }[];
         expect(allMigrations.filter(m => Number(m.name.slice(0, 4)) <= 5 || Number(m.name.slice(0, 4)) === firstModule)).toEqual(oldMigrations);
         for (const m of allMigrations) expect(m.sha256).toBe(hash(await readFile(path.join(sqlSource, m.name))));
-        expect(migrate(db)).toEqual({ applied: 0, total: 13 });
+        expect(migrate(db)).toEqual({ applied: 0, total: 14 });
         expect(rows()).toEqual(before);
         expect(await original.replay()).toEqual(original.result);
         expect(rows()).toEqual(before);

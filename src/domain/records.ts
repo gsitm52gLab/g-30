@@ -1,3 +1,4 @@
+import type { ProviderRecords } from './ai-provider/types';
 import type { AiReviewRecords } from './ai-review/records';
 import type { CompletionRecords } from './completion/types';
 import type { AiInputData, AiVersionData, AiAssetData, AiRunData, AiSnapshotData } from './ai-input/records';
@@ -102,7 +103,7 @@ export interface ProductData extends CommonProductExtension {
     status: "draft" | "active" | "archived";
     missingMaterials: number;
 }
-export interface RecordDataMap extends CorrectionRecords, CampaignRecords, CompletionRecords, AiReviewRecords {
+export interface RecordDataMap extends ProviderRecords, CorrectionRecords, CampaignRecords, CompletionRecords, AiReviewRecords {
     aiInput: AiInputData;
     aiVersion: AiVersionData;
     aiAsset: AiAssetData;
