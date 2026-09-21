@@ -28,7 +28,8 @@ export function deadline(v: unknown): Deadline {
     let value: string | null = null;
     if (d.value !== null) {
         value = precision === "date" ? dateValue(d.value) : str(d.value, 60, true);
-        if (precision === "datetime" && (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}.*(?:Z|[+-]\d{2}:\d{2})$/.test(value) || Number.isNaN(Date.parse(value)))) fail("VALIDATION", 422, "일시는 시간대 오프셋을 포함해야 합니다.");
+        if (precision === "datetime" && (!/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d{1,3})?)?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.test(value) || Number.isNaN(Date.parse(value)))) fail("VALIDATION", 422, "일시는 유효한 시각과 시간대 오프셋을 포함해야 합니다.");
+        if (precision === "datetime") dateValue(value.slice(0, 10));
     }
     return { value, precision, timezone, certainty: enumValue(d.certainty, ["confirmed", "requested", "expected", "needs_confirmation"]), source: str(d.source, 1000), sourceVersion: str(d.sourceVersion, 200), responsibleUserId: str(d.responsibleUserId, 160, true), raw: str(d.raw, 2000) };
 }
@@ -59,5 +60,5 @@ export function content(v: unknown): RequestContent {
     const milestones = list(d.milestones, 40).map(v => { const m = object(v, ["id", "kind", "deadline", "counterpart", "visibility"]); return { id: ids([m.id])[0], kind: enumValue(m.kind, ["application", "review", "printing_delivery", "publication_use"]), deadline: deadline(m.deadline), counterpart: str(m.counterpart, 500, true), visibility: enumValue(m.visibility, ["public", "internal"]) }; });
     if (new Set(milestones.map(m => m.id)).size !== milestones.length) fail("VALIDATION", 422, "일정 식별자가 중복됩니다.");
     const links = list(d.links, 20).map(v => { const l = object(v, ["url", "description", "contentFixed"]); const url = str(l.url, 2048, true); try { if (!["https:", "http:"].includes(new URL(url).protocol)) throw 0; } catch { fail("VALIDATION", 422, "http 또는 https 링크를 입력해 주세요."); } if (l.contentFixed !== false) fail("VALIDATION", 422, "외부 링크의 내용은 고정되지 않습니다."); return { url, description: str(l.description, 1000, true), contentFixed: false as const }; });
-    return { title: str(d.title, 200, true), description: str(d.description, 20000), purpose: str(d.purpose, 2000), output: str(d.output, 2000), productionResponsibility: str(d.productionResponsibility, 1000), subtitleResponsibility: str(d.subtitleResponsibility, 1000), originalResponsibility: str(d.originalResponsibility, 1000), usePlace: str(d.usePlace, 1000), nextAction: str(d.nextAction, 1000, true), deadline: deadline(d.deadline), milestones, requirements, referenceFileIds: ids(d.referenceFileIds, 10), links, internalOriginal: str(d.internalOriginal, 20000), internalMemo: str(d.internalMemo, 10000) };
+    return { title: str(d.title, 200, true), description: str(d.description, 20000), purpose: str(d.purpose, 2000), output: str(d.output, 2000), productionResponsibility: str(d.productionResponsibility, 1000), subtitleResponsibility: str(d.subtitleResponsibility, 1000), originalResponsibility: str(d.originalResponsibility, 1000), usePlace: str(d.usePlace, 1000), nextAction: str(d.nextAction, 1000, true), deadline: deadline(d.deadline), milestones, requirements, referenceFileIds: ids(d.referenceFileIds), links, internalOriginal: str(d.internalOriginal, 20000), internalMemo: str(d.internalMemo, 10000) };
 }

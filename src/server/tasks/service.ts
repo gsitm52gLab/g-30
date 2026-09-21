@@ -57,7 +57,8 @@ export class TaskService {
             const file = s.get("fileVersion", fid);
             if (!file || file.contextId !== target.contextId) unavailable();
             const origin = this.task(s, p, file.data.taskId);
-            if (origin.contextId !== target.contextId || !taskId) unavailable();
+            if (origin.contextId !== target.contextId) unavailable();
+            if (file.data.visibility === "public" && taskScope(origin).visibility !== "public" && origin.id !== taskId) fail("VALIDATION",422,"다른 업무의 참고자료는 원본 업무 공개 후 연결해 주세요.");
         }
     }
     private template(s: UnitOfWork, p: Principal, contextId: string, versionId: unknown) {
@@ -83,7 +84,9 @@ export class TaskService {
                     const projectId = input.projectId ? str(input.projectId, 160, true) : null;
                     const project = projectId ? s.get("project", projectId) : null;
                     if (projectId && (!project || project.contextId !== t.contextId) || category === "onboarding" && !project) fail("VALIDATION", 422, "신규 입점 프로젝트를 선택해 주세요.");
-                    const tid = this.createOne(s, p, t, c, category, projectId, template?.id ?? null, str(input.subtype ?? "직접 작성", 200)); result.push(tid);
+                    const localContent = targets.length > 1 ? { ...c, deadline: { ...c.deadline, responsibleUserId: t.ownerId }, milestones: c.milestones.map(m => ({ ...m, deadline: { ...m.deadline, responsibleUserId: t.ownerId } })), requirements: c.requirements.map(q => ({ ...q, productIds: q.productIds.length ? t.productIds : [] })) } : c;
+                    if (targets.length > 1 && c.requirements.some(q => q.productIds.length) && !t.productIds.length) fail("VALIDATION",422,"제품별 요청을 복제할 각 컨텍스트의 제품을 선택해 주세요.");
+                    const tid = this.createOne(s, p, t, localContent, category, projectId, template?.id ?? null, str(input.subtype ?? "직접 작성", 200)); result.push(tid);
                     if (project) s.update("project", project.id, project.revision, { ...project.data, taskIds: [...project.data.taskIds, tid] });
                 }
                 return { ids: result };
@@ -122,14 +125,14 @@ export class TaskService {
             });
         });
     }
-    private publish(s: UnitOfWork, p: Principal, row: StoredRecord<"task">, c: RequestContent, templateVersionId = row.data.templateVersionId ?? null) {
+    private publish(s: UnitOfWork, p: Principal, row: StoredRecord<"task">, c: RequestContent, templateVersionId = row.data.templateVersionId ?? null, preservedDraft?: RequestContent) {
         if (!row.contextId || row.data.schemaVersion !== 2) fail("VALIDATION", 422, "새 요청 업무에서 공개해 주세요.");
         const target = this.target(s, p, { contextId: row.contextId, ownerId: row.data.ownerId, assigneeId: row.data.assigneeId, coAssigneeIds: row.data.coAssigneeIds ?? [], productIds: row.data.productIds });
         this.validateContent(s, p, target, c, row.id);
         if (!c.description.trim() || !c.requirements.length) fail("VALIDATION", 422, "공개 설명과 요청 항목을 작성해 주세요.");
         const previous = row.data.currentRequestId ? s.get("requestVersion", row.data.currentRequestId) : null;
         const version = s.create("requestVersion", { id: id(), contextId: row.contextId, data: { taskId: row.id, sequence: (previous?.data.sequence ?? 0) + 1, previousId: previous?.id ?? null, templateVersionId, content: c, publishedBy: p.user.id, publishedAt: this.clock(), changedKeys: c.requirements.filter(q => !previous?.data.content.requirements.some(old => JSON.stringify(old) === JSON.stringify(q))).map(q => q.key) } });
-        s.update("task", row.id, row.revision, { ...row.data, visibility: "public", status: row.data.status === "draft" ? "requested" : row.data.status, title: c.title, description: c.description, deadline: c.deadline.value, nextAction: c.nextAction, currentRequestId: version.id, draft: c, templateVersionId });
+        s.update("task", row.id, row.revision, { ...row.data, visibility: "public", status: row.data.status === "draft" ? "requested" : row.data.status, title: c.title, description: c.description, deadline: c.deadline.value, nextAction: c.nextAction, currentRequestId: version.id, draft: preservedDraft ?? c, templateVersionId });
         this.audit(s, p, row.contextId, "task.published", row.id, { requestVersionId: previous?.id ?? null }, { requestVersionId: version.id, sequence: version.data.sequence });
         this.event(s, p, row.contextId, previous ? "TASK_REQUEST_REVISED" : "TASK_PUBLISHED", row.id, version.id); return version;
     }
@@ -149,7 +152,7 @@ export class TaskService {
                 else if (cmd === "assign") {
                     const t = this.target(s, p, { ...object(input.assignment, ["ownerId", "assigneeId", "coAssigneeIds"]), contextId: row.contextId, productIds: row.data.productIds });
                     s.update("task", row.id, row.revision, { ...row.data, ownerId: t.ownerId, assigneeId: t.assigneeId, coAssigneeIds: t.coAssigneeIds, assignmentNeedsAttention: false });
-                    this.audit(s, p, row.contextId!, "task.reassigned", row.id, { assigneeId: row.data.assigneeId, ownerId: row.data.ownerId, authorId: row.data.authorId }, { assigneeId: t.assigneeId, ownerId: t.ownerId, authorId: row.data.authorId });
+                    this.audit(s, p, row.contextId!, "task.reassigned", row.id, { assigneeId: row.data.assigneeId, ownerId: row.data.ownerId, coAssigneeIds: row.data.coAssigneeIds ?? [], authorId: row.data.authorId }, { assigneeId: t.assigneeId, ownerId: t.ownerId, coAssigneeIds: t.coAssigneeIds, authorId: row.data.authorId });
                     this.event(s, p, row.contextId!, "TASK_ASSIGNMENT_CHANGED", row.id, row.data.currentRequestId ?? null);
                 } else if (["hold", "cancel", "resume"].includes(cmd)) {
                     const reason = str(input.reason, 2000, true);
@@ -160,22 +163,28 @@ export class TaskService {
                     const cycle = object(input.cycle, ["label", "start", "end"]), start = dateValue(cycle.start), end = dateValue(cycle.end);
                     if (end < start) fail("VALIDATION", 422, "대상 기간 순서를 확인해 주세요.");
                     const target = this.target(s, p, { contextId: row.contextId, ownerId: row.data.ownerId, assigneeId: row.data.assigneeId, coAssigneeIds: row.data.coAssigneeIds ?? [], productIds: input.productIds ?? row.data.productIds });
-                    const c = { ...row.data.draft!, title: `${row.data.draft!.title} · ${str(cycle.label, 100, true)}`, referenceFileIds: [] };
+                    const c = { ...row.data.draft!, title: `${row.data.draft!.title} · ${str(cycle.label, 100, true)}`, requirements: row.data.draft!.requirements.map(q => ({ ...q, productIds: input.productIds !== undefined && q.productIds.length ? target.productIds : q.productIds })) };
+                    if (input.productIds !== undefined && row.data.draft!.requirements.some(q=>q.productIds.length) && !target.productIds.length) fail("VALIDATION",422,"제품별 요청을 복제할 제품을 선택해 주세요.");
                     const tid = this.createOne(s, p, target, c, "spot", null, row.data.templateVersionId ?? null, row.data.subtype ?? "정기 업데이트");
                     const fresh = s.get("task", tid)!; s.update("task", tid, fresh.revision, { ...fresh.data, cycle: { sourceTaskId: row.id, label: str(cycle.label, 100, true), start, end } }); return { ids: [tid] };
                 } else {
                     if (!row.data.currentRequestId || ["cancelled", "completed", "on_hold"].includes(row.data.status)) fail("CONFLICT", 409, "공개된 진행 업무에서 사용해 주세요.");
-                    let proposed = null; const reason = str(input.reason ?? "", 2000, cmd === "schedule");
+                    if (["read","accept"].includes(cmd) && s.list("taskActivity",row.contextId!).some(a=>a.data.taskId===row.id && a.data.requestId===row.data.currentRequestId && a.data.userId===p.user.id && a.data.kind===cmd)) return { ids:[row.id] };
+                    let proposed = null, decision: "apply" | "keep" | null = null, resultingRequestId: string | null = null; const reason = str(input.reason ?? "", 2000, cmd === "schedule");
                     if (cmd === "schedule") { proposed = deadline(input.deadline); if (!activeMember(s, proposed.responsibleUserId, row.contextId!)) fail("VALIDATION", 422, "확인 담당자를 확인해 주세요."); }
                     if (cmd === "schedule_decide") {
                         const request = s.get("taskActivity", str(input.activityId, 160, true));
                         if (!request || request.data.taskId !== row.id || request.data.kind !== "schedule" || s.list("taskActivity", row.contextId!).some(a => a.data.respondsTo === request.id)) fail("CONFLICT", 409, "처리할 일정 조정 요청을 확인해 주세요.");
-                        const decision = enumValue(input.decision, ["apply", "keep"]);
-                        if (decision === "apply") this.publish(s, p, row, { ...row.data.draft!, deadline: request.data.proposedDeadline! });
+                        decision = enumValue(input.decision, ["apply", "keep"] as const);
+                        const published = s.get("requestVersion", row.data.currentRequestId)!;
+                        if (request.data.requestId !== published.id) fail("CONFLICT",409,"조정 요청 이후 공개 내용이 변경됐습니다. 최신 요청에서 일정을 다시 협의해 주세요.");
+                        resultingRequestId = decision === "apply" ? this.publish(s, p, row, { ...published.data.content, deadline: request.data.proposedDeadline! }, row.data.templateVersionId, JSON.stringify(row.data.draft) === JSON.stringify(published.data.content) ? undefined : row.data.draft).id : published.id;
                     }
-                    s.create("taskActivity", { id: id(), contextId: row.contextId, data: { taskId: row.id, requestId: row.data.currentRequestId, userId: p.user.id, kind: cmd === "schedule_decide" ? "schedule_resolved" : cmd as "read" | "accept" | "schedule", at: this.clock(), reason, proposedDeadline: proposed, respondsTo: cmd === "schedule_decide" ? str(input.activityId, 160, true) : null } });
+                    const sequence = 1 + Math.max(0, ...s.list("taskActivity",row.contextId!).filter(a=>a.data.taskId===row.id).map(a=>a.data.sequence ?? 0));
+                    s.create("taskActivity", { id: id(), contextId: row.contextId, data: { taskId: row.id, requestId: row.data.currentRequestId, userId: p.user.id, kind: cmd === "schedule_decide" ? "schedule_resolved" : cmd as "read" | "accept" | "schedule", at: this.clock(), sequence, reason, proposedDeadline: proposed, respondsTo: cmd === "schedule_decide" ? str(input.activityId, 160, true) : null, decision, resultingRequestId } });
                     if (cmd === "accept" && row.data.status === "requested") s.update("task", row.id, row.revision, { ...row.data, status: "in_progress" });
-                    this.audit(s, p, row.contextId!, `task.${cmd}`, row.id, {}, { requestVersionId: row.data.currentRequestId });
+                    this.audit(s, p, row.contextId!, `task.${cmd}`, row.id, {}, { requestVersionId: row.data.currentRequestId, decision, resultingRequestId });
+                    if (cmd === "accept") this.event(s, p, row.contextId!, "TASK_ACCEPTED", row.id, row.data.currentRequestId);
                     if (cmd === "schedule") this.event(s, p, row.contextId!, "TASK_SCHEDULE_CHANGE_REQUESTED", row.id, row.data.currentRequestId);
                 }
                 return { ids: [row.id] };
@@ -199,13 +208,23 @@ export class TaskService {
             const selected = list(input.targets, 50).map(v => object(v, ["id", "expectedRevision"]));
             if (!selected.length || new Set(selected.map(t => t.id)).size !== selected.length) fail("VALIDATION", 422, "적용할 업무를 선택해 주세요.");
             return this.receipt(s, p, contextId, "template.apply", input, () => {
-                const result = selected.map(t => { const row = this.task(s, p, str(t.id, 160, true), true); if (row.contextId !== contextId) unavailable(); this.fresh(row, t.expectedRevision); if (!row.data.currentRequestId || ["cancelled", "completed"].includes(row.data.status)) fail("CONFLICT", 409, "공개된 현재 업무를 선택해 주세요."); this.publish(s, p, row, template.data.content, template.id); return row.id; }); return { ids: result };
+                const result = selected.map(t => { const row = this.task(s, p, str(t.id, 160, true), true); if (row.contextId !== contextId) unavailable(); this.fresh(row, t.expectedRevision); if (!row.data.currentRequestId || ["cancelled", "completed"].includes(row.data.status)) fail("CONFLICT", 409, "공개된 현재 업무를 선택해 주세요."); this.publish(s, p, row, { ...template.data.content, deadline: { ...template.data.content.deadline, responsibleUserId: template.data.content.deadline.responsibleUserId || row.data.ownerId } }, template.id); return row.id; }); return { ids: result };
             });
         });
     }
-    private projectedContent(s: UnitOfWork, p: Principal, c: RequestContent, internal: boolean) {
+    async previewTemplate(token: string | undefined, input: Record<string,unknown>) {
+        return this.identity.repo.transaction(s=>{const p=this.identity.principal(s,token),contextId=str(input.contextId,160,true);this.manage(s,p,contextId);const template=this.template(s,p,contextId,input.versionId);if(!template)unavailable();
+            return {targets:list(input.targets,50).map(v=>{const t=object(v,["id","expectedRevision"]),row=this.task(s,p,str(t.id,160,true),true);if(row.contextId!==contextId)unavailable();this.fresh(row,t.expectedRevision);const previous=row.data.currentRequestId?s.get("requestVersion",row.data.currentRequestId):null;
+                return {id:row.id,title:row.data.title,currentVersionId:previous?.id??null,addedKeys:template.data.content.requirements.filter(q=>!previous?.data.content.requirements.some(o=>o.key===q.key)).map(q=>q.key),changedKeys:template.data.content.requirements.filter(q=>previous?.data.content.requirements.some(o=>o.key===q.key&&JSON.stringify(o)!==JSON.stringify(q))).map(q=>q.key)};
+            })};
+        });
+    }
+    async preview(token:string|undefined,taskId:string) {
+        return this.identity.repo.transaction(s=>{const p=this.identity.principal(s,token),row=this.task(s,p,taskId,true);if(!row.data.draft)fail("VALIDATION",422,"새 요청 업무에서 미리보기를 사용해 주세요.");return {content:this.projectedContent(s,p,row.data.draft,false,row.id)};});
+    }
+    private projectedContent(s: UnitOfWork, p: Principal, c: RequestContent, internal: boolean, prospectiveTaskId?:string) {
         const { internalOriginal, internalMemo, ...rest } = c;
-        const referenceFileIds = c.referenceFileIds.filter(fid => { const f = s.get("fileVersion", fid), origin = f ? s.get("task", f.data.taskId) : null; return f && origin && decide(s, p, "task.read", taskScope(origin), this.clock).allowed && (internal || f.data.visibility === "public"); });
+        const referenceFileIds = c.referenceFileIds.filter(fid => { const f = s.get("fileVersion", fid), origin = f ? s.get("task", f.data.taskId) : null; return f && origin && decide(s, p, "task.read", taskScope(origin), this.clock).allowed && (internal || f.data.visibility === "public" && (taskScope(origin).visibility === "public" || origin.id===prospectiveTaskId)); });
         return { ...rest, referenceFileIds, milestones: c.milestones.filter(m => internal || m.visibility === "public"), ...(internal ? { internalOriginal, internalMemo } : {}) };
     }
     async detail(token: string | undefined, taskId: string, contextId?: string) {
@@ -215,11 +234,12 @@ export class TaskService {
             const prior = s.list("priorSubmission", row.contextId!).filter(v => v.data.taskId === taskId).sort((a,b) => b.createdAt.localeCompare(a.createdAt))[0] ?? null;
             const previous = prior ? s.get("requestVersion", prior.data.requestId) : null;
             const request = current ? this.projectedContent(s, p, current.data.content, internal) : null;
-            const fileIds = new Set([...(request?.referenceFileIds ?? []), ...(internal ? row.data.draft?.referenceFileIds ?? [] : [])]);
+            const projectedVersions = versions.map(v => ({ id: v.id, sequence: v.data.sequence, publishedBy: v.data.publishedBy, publishedAt: v.data.publishedAt, changedKeys: v.data.changedKeys, content: this.projectedContent(s,p,v.data.content,internal) }));
+            const fileIds = new Set([...projectedVersions.flatMap(v=>v.content.referenceFileIds), ...(internal ? row.data.draft?.referenceFileIds ?? [] : [])]);
             const files = s.list("fileVersion", row.contextId!).filter(f => fileIds.has(f.id) || internal && f.data.taskId === taskId).filter(f => internal || f.data.visibility === "public").map(f => ({ id: f.id, name: f.data.originalName, bytes: f.data.bytes, mime: f.data.mime, sha256: f.data.sha256, preview: f.data.preview, visibility: f.data.visibility }));
             return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal ? row.data.draft ?? null : null, request,
-                versions: versions.map(v => ({ id: v.id, sequence: v.data.sequence, publishedBy: v.data.publishedBy, publishedAt: v.data.publishedAt, changedKeys: v.data.changedKeys, content: this.projectedContent(s,p,v.data.content,internal) })),
-                activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId),
+                versions: projectedVersions,
+                activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
                 requirementStatus: current ? evaluateRequirements(current.data.content, prior?.data as PriorSubmissionData ?? null, previous?.data.content ?? null) : [],
                 submissionConnection: "G05 제출 기능 연결 전", completionConnection: "G11 수동 완료 연결 전", notificationConnection: "G13 앱 알림 연결 전" };

@@ -44,7 +44,8 @@ export interface ProjectData {
 }
 export interface TaskActivityData {
     taskId: string; requestId: string; userId: string; kind: "read" | "accept" | "schedule" | "schedule_resolved";
-    at: string; reason: string; proposedDeadline: Deadline | null; respondsTo: string | null;
+    at: string; sequence: number; reason: string; proposedDeadline: Deadline | null; respondsTo: string | null;
+    decision: "apply" | "keep" | null; resultingRequestId: string | null;
 }
 /** Read-only port for G05. Production submission creation belongs to G05. */
 export interface PriorSubmissionData {

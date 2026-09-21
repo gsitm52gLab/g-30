@@ -26,7 +26,8 @@
     "check": "npm run lint && npm run typecheck && npm test",
     "verify": "npm run check && npm run build && npm run db:restart && npm run identity:races && npm run identity:restart && npm run test:e2e && npm run test:e2e:db",
     "identity:restart": "tsx scripts/verify-identity-restart.ts",
-    "identity:races": "tsx scripts/verify-identity-races.ts"
+    "identity:races": "tsx scripts/verify-identity-races.ts",
+    "tasks:http": "tsx scripts/verify-tasks-http.ts"
   },
   "dependencies": {
     "@next/env": "16.3.5",

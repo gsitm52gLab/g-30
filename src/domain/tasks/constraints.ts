@@ -7,6 +7,23 @@ export function taskRelations<K extends RecordKind>(s: UnitOfWork, kind: K, inpu
         const task = s.get("task", d.taskId);
         if (!task || task.contextId !== input.contextId) throw new StoreError("INVALID_RECORD");
     }
+    if (kind === "requestVersion") {
+        const d = input.data as import("./types").RequestVersionData;
+        if (s.list("requestVersion").some(r => r.data.taskId === d.taskId && r.data.sequence === d.sequence)) throw new StoreError("CONFLICT");
+        if (d.previousId && s.get("requestVersion", d.previousId)?.data.taskId !== d.taskId) throw new StoreError("INVALID_RECORD");
+    }
+    if (kind === "templateVersion") {
+        const d = input.data as import("./types").TemplateVersionData;
+        if (s.list("templateVersion").some(r => r.contextId === input.contextId && r.data.templateId === d.templateId && r.data.sequence === d.sequence)) throw new StoreError("CONFLICT");
+    }
+    if (kind === "taskActivity" || kind === "priorSubmission") {
+        const d = input.data as { taskId: string; requestId: string };
+        if (s.get("requestVersion", d.requestId)?.data.taskId !== d.taskId) throw new StoreError("INVALID_RECORD");
+    }
+    if (kind === "task") {
+        const d = input.data as import("../records").TaskData;
+        if (d.schemaVersion === 2 && (d.projectId && s.get("project", d.projectId)?.contextId !== input.contextId || d.currentRequestId && s.get("requestVersion", d.currentRequestId)?.data.taskId !== input.id)) throw new StoreError("INVALID_RECORD");
+    }
     if (kind === "commandReceipt") {
         const d = input.data as { key: string };
         if (s.list("commandReceipt").some(r => r.data.key === d.key && r.id !== input.id)) throw new StoreError("CONFLICT");

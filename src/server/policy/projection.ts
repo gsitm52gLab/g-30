@@ -39,7 +39,7 @@ export function projectTask(store: UnitOfWork, principal: Principal, row: Stored
         productIds: strings(d.productIds), notes: strings(d.notes), authorId: d.authorId,
         contributorIds: strings(d.contributorIds), assignmentNeedsAttention: d.assignmentNeedsAttention,
         schemaVersion: d.schemaVersion, visibility: d.visibility, subtype: d.subtype, projectId: d.projectId,
-        coAssigneeIds: strings(d.coAssigneeIds), currentRequestId: d.currentRequestId, templateVersionId: d.templateVersionId, cycle: d.cycle,
+        coAssigneeIds: strings(d.coAssigneeIds), currentRequestId: d.currentRequestId, templateVersionId: d.templateVersionId, cycle: d.cycle ? {sourceTaskId:d.cycle.sourceTaskId,label:d.cycle.label,start:d.cycle.start,end:d.cycle.end} : null,
         ...privateFields(d, decision),
     } };
 }
@@ -90,13 +90,13 @@ const auditKeys: Record<string, readonly string[]> = {
     "invitation.accepted": ["status", "membershipId"],
     "membership.changed": ["status", "scope", "internalPriceAccess"],
     "user.status": ["status"],
-    "task.reassigned": ["assigneeId", "ownerId", "authorId"],
+    "task.reassigned": ["assigneeId", "ownerId", "authorId", "coAssigneeIds"],
     "task.created": ["title", "category", "projectId"],
     "task.draft": ["revision"],
     "task.published": ["requestVersionId", "sequence"],
     "task.state": ["status", "reason"],
     "task.read": ["requestVersionId"], "task.accept": ["requestVersionId"],
-    "task.schedule": ["requestVersionId"], "task.schedule_decide": ["requestVersionId"],
+    "task.schedule": ["requestVersionId"], "task.schedule_decide": ["requestVersionId", "decision", "resultingRequestId"],
     "project.created": ["title", "taskCount"], "project.dependencies": ["count"],
     "template.saved": ["previousId", "templateVersionId"],
 };
@@ -106,6 +106,7 @@ export function projectAudit(row: StoredRecord<"audit">) {
     function changes(value: Record<string, unknown>) {
         const safe: Record<string, unknown> = {};
         for (const key of auditKeys[d.action] ?? []) if (Object.hasOwn(value, key) && scalar(value[key])) safe[key] = value[key];
+        if (d.action === "task.reassigned" && Array.isArray(value.coAssigneeIds) && value.coAssigneeIds.every(id => typeof id === "string")) safe.coAssigneeIds = [...value.coAssigneeIds];
         return safe;
     }
     return { ...metadata(row), data: {
