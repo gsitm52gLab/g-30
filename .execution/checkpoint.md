@@ -1,6 +1,6 @@
 # GS HALE execution checkpoint
 
-State93; Goal ACTIVE. Root /Users/evan/workspace/gs-hale branch run/integration. Preserve main/origin/.env and user untracked docs/execution-v2. No fetch/push/deploy/OpenAI calls. .execution/run-plan.json authoritative; evidence root .execution/private/runs/RUN-20260921-01. Product accepted37b7fe1912ebe383991d94540aff7e8a23ab7631, G00/G01/G02/G04/G05/G06 current stages ACCEPTED; G07 IMPLEMENTING; wholeGoal incomplete.
+State94; Goal ACTIVE. Root /Users/evan/workspace/gs-hale branch run/integration. Preserve main/origin/.env and user untracked docs/execution-v2. No fetch/push/deploy/OpenAI calls. .execution/run-plan.json authoritative; evidence root .execution/private/runs/RUN-20260921-01. Product accepted37b7fe1912ebe383991d94540aff7e8a23ab7631, G00/G01/G02/G04/G05/G06 current stages ACCEPTED; G07 IMPLEMENTING; wholeGoal incomplete.
 
 ## Current work / next action
 
@@ -33,3 +33,5 @@ State91: workflow typedbinding complete/rootreviewed6inputhash/20Gitblobs/38arti
 State92: FullUI firsttypecheck passed authorreported. Rootprovisional Importscreen found401/403only clearing despite serverprivatebatch/scope404; goals patched404protectedpreview/inspection/batchclear, safeintent/receipt retained andcurrent-rightsrefresh beforemoreactions. Actualgrantloss404browser test pending. Copy ordinaryhyperlinkallowed vs externalworkbookblocked fixed; productatomic/transaction/NOT_RUN jargon replacedplainlabels. G07/1/main-provisional-ui-review.json runtime0, workingtreeobservation notfrozencandidate. No additional implementation assigned to idleworkflow.
 
 State93: G07-SRV-02 OPEN/P2 ordinary inert hyperlink containing oleObject falsely rejected by wholeXMLwordsearch. Root original rawlog reviewed1FAIL/4filteredSKIP at770d4e2 plusnewworkingtreetest. main-server-finding-02.json; finaldb7c164 structuralchecks authorvalidation ongoing, independent required. UI first/second desktop fixture and assertion failures preserved, thirdcandidate c16fc3b includes UI key change plus fixture corrections; no final browserclaim yet.
+
+State94: G07 server final db7c164 frozen/root reviewed484artifacts/54Gitblobs/46commandpairs, fresh220unit/build/http31mock34SQLite with2PID/relogin. ExactrawexportZIP2 and actual503canary absence reviewed, G05/G06prior770 sourceidentity16paths confirmedfresh0. main-server-final-review.json. SRV01/02 independentpending. Sharedlease released; prd G08 assigned accepted37b in .worktrees/g08-impl branchrun/g08-impl,4183/4184,migration0007, packetG08/1/task.json. NavwithhelduntilG07UIrelease; optionalembeddedCreateTaskcallback allowedpreservingdefaults. Root G07 finalUI+assembly/verification next; acceptedstill37b.

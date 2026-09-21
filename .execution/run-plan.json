@@ -1377,12 +1377,15 @@
       "subtasks": [
         {
           "id": "G07-SERVER",
-          "state": "FINAL_CANDIDATE_AUTHOR_VALIDATION_PACKAGING",
+          "state": "AUTHOR_SELF_CHECKED_ROOT_REVIEWED_LEASE_RELEASED",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g07-server",
           "session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
           "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/server/task.json",
           "contract_commit": "a8f6f28c27a8820874b82516969e5abcba64e1b4",
-          "provisional_final_candidate": "db7c164f9e8a810b7004d4892587af7bbb80f21a"
+          "provisional_final_candidate": "db7c164f9e8a810b7004d4892587af7bbb80f21a",
+          "candidate_commit": "db7c164f9e8a810b7004d4892587af7bbb80f21a",
+          "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/server/implementation-result.json",
+          "main_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-final-review.json"
         },
         {
           "id": "G07-UI",
@@ -1430,24 +1433,25 @@
         {
           "id": "G07-SRV-01",
           "severity": "P1",
-          "status": "OPEN_AUTHOR_REPAIR_IN_PROGRESS",
+          "status": "AUTHOR_FIXED_ROOT_REVIEWED_INDEPENDENT_PENDING",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-finding-01.json"
         },
         {
           "id": "G07-SRV-02",
           "severity": "P2",
-          "status": "OPEN_AUTHOR_REPAIR_AWAITING_INDEPENDENT_VERIFICATION",
+          "status": "AUTHOR_FIXED_ROOT_REVIEWED_INDEPENDENT_PENDING",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-finding-02.json"
         }
       ],
       "dependency_audit": {
-        "status": "BOUNDED_OVERRIDE_COMPATIBILITY_IN_PROGRESS",
+        "status": "BOUNDED_OVERRIDE_AUTHOR_COMPATIBILITY_ROOT_REVIEWED",
         "reported_findings": "ExcelJS4.4.0 transitively uuid8.3.2; moderate direct+transitive advisory count2",
         "owner": "/root/prd",
         "proposed_change": "ExcelJS-only uuid exact11.1.1 override; preserve original audit/actual CJS and workbook parsing/export/conditionalformat evidence",
-        "final_audit": "PENDING"
+        "final_audit": "0 observed findings; full combined independent pending"
       },
-      "provisional_ui_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-provisional-ui-review.json"
+      "provisional_ui_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-provisional-ui-review.json",
+      "main_server_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-final-review.json"
     },
     {
       "id": "G08",
@@ -1457,16 +1461,39 @@
         "G04",
         "G05"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": null,
+      "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": null,
-      "attempt": 0,
-      "owned_paths": [],
-      "actual_worktree_cwd": null,
-      "evidence_root": ".execution/private/runs/<run-id>/G08/<attempt>/",
+      "attempt": 1,
+      "owned_paths": [
+        "src/domain/notices/**",
+        "src/server/notices/**",
+        "src/features/notices/**",
+        "src/app/notices/**",
+        "src/app/api/notices/**",
+        "src/domain/records.ts",
+        "src/domain/constraints.ts",
+        "src/domain/tasks/types.ts (notice file-owner variant only)",
+        "src/server/db/migrations/0007-notices.sql",
+        "src/server/policy/{types,policy}.ts",
+        "src/server/files/{service,access}.ts",
+        "src/app/api/files/{route.ts,[id]/route.ts} (reference parsing only)",
+        "src/components/navigation.tsx (notices link)",
+        "src/app/page.tsx (scoped actual notice panel)",
+        "tests/unit/notices*.test.ts",
+        "tests/unit/repositories.test.ts (new migration count only)",
+        "tests/e2e/notices*.spec.ts",
+        "tests/fixtures/notices*",
+        "scripts/verify-notices*",
+        "README.md",
+        "src/domain/tasks/constraints.ts (notice file-owner relation guard only; existing task/product checks preserved)",
+        "src/features/tasks/create.tsx (optional embedded creation callback and single-context constraint only; existing standalone defaults and canonical G04 API unchanged)"
+      ],
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g08-impl",
+      "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1",
       "acceptance": [
         {
           "id": "AC-08-01",
@@ -1487,11 +1514,13 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR ownership gap corrected in private draft. Keep implementation unassigned until exactbase/shared schema lease binding.",
+      "next_action": "Implement full G08 on accepted37b; notice nav withheld until G07 UI lease release; G07 repair priority if independent finding.",
       "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/task-draft.json",
       "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-task.json",
       "dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-review.json",
-      "main_dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-dor-review.json"
+      "main_dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-dor-review.json",
+      "base_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/task.json"
     },
     {
       "id": "G09",
@@ -2041,8 +2070,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G07",
-  "next_action": "G07 full UI goals on internalf5e21b2, server prd completing HTTP/adversarial/newPID, verifier workflow binding helpers only on frozena8. Review final author candidates, assemble then assign exact combined independent verification.",
-  "state_version": 93,
+  "next_action": "G07 final UI validation then internal assemble db7 server delta and independent exact combined verification. G08 independent accepted-base implementation in parallel with shared single-owner lease.",
+  "state_version": 94,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2069,7 +2098,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T16:24:07.293819+00:00",
+  "updated_at": "2026-09-21T16:26:48.531212+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
