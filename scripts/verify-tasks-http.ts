@@ -159,7 +159,7 @@ try {
     if(projectionEnabled) {
         await command(admin,projectionTask,"publish"); const before=await storedProjectionSnapshot();
         const b=await detail(brand,projectionTask),g=await detail(admin,projectionTask),preview=await admin.json<{content:unknown}>(`/api/tasks/${projectionTask}?preview=1`),cat=await admin.json<TaskCatalog>(`/api/tasks?context=${ctx}`),project=await brand.json<unknown>("/api/projects/v03-http-project");
-        const gsg=new Client();await gsg.login("gsg@example.test");const nonprice=await detail(gsg,projectionTask),nonpriceCatalog=await gsg.json<TaskCatalog>(`/api/tasks?context=${ctx}`);
+        const gsg=new Client();await gsg.login("operator@example.test");const nonprice=await detail(gsg,projectionTask),nonpriceCatalog=await gsg.json<TaskCatalog>(`/api/tasks?context=${ctx}`);
         const objects={b,g,preview,cat,project,nonprice,nonpriceCatalog};writeFileSync(`${reportFile}.projection-api-private.json`,JSON.stringify(objects,null,2),{mode:0o600});
         check("V03 actual API current/history/draft/template/activity/project exclude stored nested extensions",!JSON.stringify(objects).includes(projectionMarker),["G04-V03","AC-04-02","A19"]);
         const expected=projectionContent(),{internalOriginal,internalMemo,...publicExpected}=expected;
