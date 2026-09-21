@@ -1,3 +1,9 @@
+# State138 latest — G15 independent assigned to new nonauthor
+
+Accepted246 stays11/19. Newnonimplementer /root/ai_verify UUID01a0c5c7-c60d-7eb0-b570-b5b65a92cbde independentlyvalidates exactb1ddba38fdce0b871549fe7d8a364fe71057004a innewdetachedg15-verification4235/36, formal32febb… sourceimmutable/noenv. Actualsession_meta/privateprefixbindingdf9c… verified. WorkflowG14doneidle; active root+goals+prd+ai_verify=4. PriorprdG15verification superseded; prdcontinueG11campaign thenUI, workflowwholeG11verifier.
+
+Goalsb1dd onlyCSRFcookieorder helperchange from634 productbytesidentical; historypositiveG12UI28/G15OCR26 andmockdesktop15 authorreported rootreviewpending. OriginalwrongpositiveG12malformedfixture503 retained. G14prepc3e0…32source+4inputs rootreview0errors. G03taskdraftd181… futurehome/nav/kanban/timeline/exactbranding NOTASSIGNED. G17actualAPI mandatoryNOT_RUN.
+
 # State137 latest — G11 campaign consumer assigned, G15 early freeze
 
 Accepted24636458b6fab6b93c6b215d9a627a5d84b26b98 stays11/19 GoalACTIVE. G15combined63430 sourcefreeze rootearlyreviewdbcf3b…151sourcepairs raw425unit/build PASS0errors, independentpending. Sharedlease released; authorhistoryhelper first17migrationassertionsPASS thenCSRF403 because pre-CSRFcookieheader harnessoracle, originalretained/test-onlyrepair pending. Goalsactualproof continues4233/34.
