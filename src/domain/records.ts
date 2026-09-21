@@ -1,5 +1,6 @@
 import type { EvidenceData, EvidenceVersionData, EvidenceLinkData, EvidenceAssessmentData } from './evidence/types';
 import type { ImportBatchData } from './imports/types';
+import type { NoticeData, NoticeVersionData, NoticeReadData } from './notices/types';
 import type { SubmissionData, SubmissionDraftData } from './submissions/types';
 import type { CommonProductExtension, ProductVersionData, ContextProductData, ContextProductVersionData, PriceData, RetailPriceVersionData, InternalPriceVersionData, ProductUseSnapshotData } from "./products/types";
 import type { TaskExtension, RequestVersionData, TemplateVersionData, ProjectData, TaskActivityData, PriorSubmissionData, DomainEventData, CommandReceiptData, FileVersionData } from "./tasks/types";
@@ -101,6 +102,9 @@ export interface RecordDataMap {
     evidenceLink: EvidenceLinkData;
     evidenceAssessment: EvidenceAssessmentData;
     importBatch: ImportBatchData;
+    notice: NoticeData;
+    noticeVersion: NoticeVersionData;
+    noticeRead: NoticeReadData;
     submission: SubmissionData;
     submissionDraft: SubmissionDraftData;
     productVersion: ProductVersionData;

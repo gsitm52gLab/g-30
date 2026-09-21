@@ -11,12 +11,14 @@
         "G18"
       ],
       "expected": "Reassignment preserves original real submission/file authors after actual submission UI/API exists",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
-      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
+      "remaining": "Required G18 final regression remains; actual producer requirement now verified.",
+      "current_g05_stage": "PASS real G04 reassignment after actual submitted file: original provider/recorder/uploader/ID/hash preserved, old write403/new read200"
     },
     {
       "id": "D02",
@@ -27,12 +29,14 @@
         "G18"
       ],
       "expected": "Initial file policy harness expands to actual upload/original/preview/download and cross-context reuse paths",
-      "status": "NOT_RUN",
+      "status": "PASS_CURRENT_G05_PATHS",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
-      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
+      "remaining": "Future G08/G09/G10/G15 file/reference owners require currentauth verification; finalG18 whole file matrix.",
+      "current_g05_stage": "PASS current actual task/product/submission upload/original/preview/download/reuse paths; new future owners require own current-auth checks"
     },
     {
       "id": "D03",
@@ -84,12 +88,14 @@
         "G18"
       ],
       "expected": "Actual prior submission -> new request version -> old answer/file snapshots unchanged -> added requirements only -> explicit resubmission",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
-      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
+      "remaining": "Required G18 final regression remains; actual producer requirement now verified.",
+      "current_g05_stage": "PASS actual submission ->new request ->explicit rebase/resubmit with old immutable content"
     },
     {
       "id": "D07",
@@ -135,7 +141,8 @@
       "expected": "Actual G05 submission captures exact immutable common product/context product/retail price/file versions; subsequent G06 product/context/file changes leave prior submission snapshots unchanged. Evidence/review/completion/AI consume exact immutable submission/product/file references with current permissions.",
       "status": "NOT_RUN",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
       "origin_goals": [
         "G05",
@@ -148,8 +155,10 @@
             "G05",
             "G18"
           ],
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+          ]
         },
         {
           "id": "D09-downstream-consumers",
@@ -165,7 +174,9 @@
         }
       ],
       "source": "PRD-06 AC-06-03, G06/preparation.md sections6/10 and G05/preparation.md section5",
-      "current_g06_stage": "Contract only, producer and downstream consumer groups remain NOT_RUN"
+      "current_g06_stage": "Contract only, producer and downstream consumer groups remain NOT_RUN",
+      "current_g05_stage": "PASS actual sameUoW G05 product/context/publicretail/file capture and subsequent G06 edits preserve prior",
+      "remaining": "Actual G07/G10/G11/G15 exact reference consumers not yet implemented/verified."
     },
     {
       "id": "D10",
@@ -184,11 +195,13 @@
       "status": "NOT_RUN",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
-      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition.",
-      "current_g06_stage": "Current product persistence only; later records remain required"
+      "remaining": "Later inquiries/completion/evidence/import/notification/AI records and finalG18 persistence still required.",
+      "current_g06_stage": "Current product persistence only; later records remain required",
+      "current_g05_stage": "PASS current identity/tasks/products/submissions/receipts restart; later record types remain required"
     }
   ]
 }

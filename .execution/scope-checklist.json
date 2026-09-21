@@ -204,11 +204,12 @@
       "owner_note": "G04+G05",
       "requirement": "읽음≠수락≠일정조정≠제출≠완료; 취소/보류 및 부분제출/외부대기 배지. BR-001",
       "verification_idea": "순서별 버튼을누르고 저장상태비교. 일정조정요청만으로기존마감변화0, GSG반영후이력생성. 상태열하나로부분제출/외부대기정보를소실하지않음",
-      "status": "PASS_CURRENT_G04_STAGE",
+      "status": "PASS_CURRENT_G05_STAGE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
-      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
+      "scope_note": "Actual read/accept/schedule/hold/partial/full distinct. Actual external wait/physical/manual completion states remain G09/G11/G12."
     },
     {
       "id": "SA-16",
@@ -218,8 +219,11 @@
       "owner_note": "G05",
       "requirement": "임시저장/부분/전체제출, 줄글·값·편집원본·확인본·증빙링크가 같은 제출 버전에 고정. FR-005·006, BR-003·004·026",
       "verification_idea": "v1텍스트/원본.ai/확인PDF/링크 제출 후v2수정. v1본문·값·파일·댓글·검토·전달 참조 해시/ID불변. 업로드만으로 제출상태 변화0",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G05_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+      ],
+      "scope_note": "Actual text/typed/artifact/link/provenance/version immutable; actual comments/review/external delivery consumers G09/G10/G11 pending."
     },
     {
       "id": "SA-17",
@@ -229,8 +233,11 @@
       "owner_note": "G05",
       "requirement": "전체제출은 형식적 충족; 미제출정확·저장실패/새로고침복구·중복클릭1버전. FR-005·030, BR-027",
       "verification_idea": "3필수중2개 부분제출→잔여1, 전체요청은구조적미충족안내. 제출API응답유실/재시도로버전1개. 저장실패뒤작성값복구",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+      ],
+      "scope_note": "Actual partial/full structural denominator, response loss oneversion and failed-save-refresh recovery verified."
     },
     {
       "id": "SA-18",
@@ -240,8 +247,11 @@
       "owner_note": "G05",
       "requirement": "PDF·PNG/JPG·XLS/XLSX·CSV·DOC/DOCX·PPT/PPTX·Illustrator.ai·ZIP·MP4/MOV 보관; preview와download전용 구분. 원안6절",
       "verification_idea": "형식별 합성파일1개 저장/다운로드 원본 hash대조. preview불가파일은명시. .ai를AI입력으로해석하지않음. ZIP해제/매크로실행없음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+      ],
+      "scope_note": "Current actual supported format storage and exact download hashes; preview-only vs download-only distinct; no archive/macro execution."
     },
     {
       "id": "SA-19",
@@ -251,8 +261,11 @@
       "owner_note": "G05",
       "requirement": "25MiB/개·회당10개, MIME/확장자·권한 서버검사, 파일별실패/재시도/삭제·임시업로드관리. 원안6·13절",
       "verification_idea": "한도정확/1byte초과/11개·MIME위조·타context파일검사. 실패파일별상태, 임시첨부삭제가이미제출한버전파일을지우지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+      ],
+      "scope_note": "New multipart path 25MiB exact/+1,10/11, format/auth, mixed rows/retry/removal and original immutable versions tested."
     },
     {
       "id": "SA-20",
@@ -262,8 +275,11 @@
       "owner_note": "G05",
       "requirement": "대용량영상 링크+설명, 가변링크 ‘내용미고정’, 사용본확정 시 보관사본/고정식별자; 서버임의수집없음. BR-026",
       "verification_idea": "같은URL외부내용변경을가정해과거검토가자동갱신안됨. 사용본에는고정참조, 링크등록만으로외부네트워크fetch0",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G05_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+      ],
+      "scope_note": "Variable URL/description and fixed reference immutable; no arbitrary fetch. Actual review/use consumer G10/G11 remains."
     },
     {
       "id": "SA-21",
@@ -274,8 +290,11 @@
       "owner_note": "G05+G07",
       "requirement": "정확한 파일버전 참조 재사용, GSG 공개범위와 원본범위 확인. 새원본≠과거업무자동갱신. BR-003·022·023",
       "verification_idea": "공통증빙v1을2업무에참조후원본v2등록. 과거2업무v1유지. 같은브랜드다른context비공개원본은재사용거부",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G05_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+      ],
+      "scope_note": "Exact immutable file reuse and original+reference current auth in tasks/products/submissions; actual Evidence consumer G07 pending."
     },
     {
       "id": "SA-22",
@@ -313,11 +332,12 @@
       "owner_note": "G06",
       "requirement": "최소등록3값, 임시코드구분·컨텍스트내중복·미확인barcode/성분분류/만료일. 원안7.1",
       "verification_idea": "브랜드/이름/코드만등록성공, 요청별추가필수는해당업무에서검사. 임시코드표시, 중복거부, 모르는값null/미확인유지",
-      "status": "PASS_CURRENT_G06_STAGE",
+      "status": "PASS",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
-      "scope_note": "Minimum registration current; actual submission-specific requirements await G05"
+      "scope_note": "G06 minimum product registration plus actual G05 request/product-specific denominator and scope checks now verified."
     },
     {
       "id": "SA-25",
@@ -369,11 +389,12 @@
       "owner_note": "G06",
       "requirement": "자료/인증/시험·수상증빙, 업무/검토사용처/언어/매체, 변경자/전후/출처·상품/파일버전. FR-023/BR-003·004",
       "verification_idea": "상품에서자료·정확한제출/검토로탐색. 공통정보변경시영향context표시, 현재최신/과거검토스냅샷불변. 보관/판매중단해도기존이력/연결조회가능",
-      "status": "PASS_CURRENT_G06_STAGE",
+      "status": "PASS_CURRENT_G05_STAGE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
-      "scope_note": "Current file metadata/history and capture contract fixture; real submission/review/evidence G05/G07/G10 required"
+      "scope_note": "Actual G05 capture/historical product/file navigation now verified; G07 evidence/G10 review consumers still pending."
     },
     {
       "id": "SA-29",

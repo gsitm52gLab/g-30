@@ -33,6 +33,7 @@ function scopeDecision(store: UnitOfWork, user: StoredRecord<"user">, resource: 
     const validMember = membership && (user.data.role === "gsg" ? membership.data.role === "operator" : membership.data.role === "brand");
     if (!admin && !validMember) return { allowed: false, status: 404 };
     const internalFields = user.data.role === "gsg";
+    if (!internalFields && resource.audienceUserIds !== undefined && (!Array.isArray(resource.audienceUserIds) || !resource.audienceUserIds.includes(user.id))) return { allowed: false, status: 404 };
     if (resource.visibility !== "public" && !internalFields) return { allowed: false, status: 404 };
     const internalPrice = internalFields && (admin && user.data.adminGrant?.internalPriceAccess === true ||
         !!validMember && membership.data.internalPriceAccess === true);
@@ -61,7 +62,7 @@ export function decide(store: UnitOfWork, principal: Principal, action: Action, 
     }
     if (action === "notification.read" && resource.recipientUserId !== user.id) return { allowed: false, status: 404 };
     if (action === "membership.manage" && !canAdmin(user, resource.contextId!)) return { allowed: false, status: 403 };
-    if (["task.manage", "task.complete", "audit.read", "evidence.assess"].includes(action) && !scope.internalFields) return { allowed: false, status: 403 };
+    if (["task.manage", "task.complete", "audit.read", "evidence.assess", "notice.manage"].includes(action) && !scope.internalFields) return { allowed: false, status: 403 };
     if (action === "price.read" && !scope.internalPrice) return { allowed: false, status: 403 };
     if (action === "submission.write" && !scope.internalFields &&
         resource.assigneeUserId !== user.id && !resource.coAssigneeUserIds?.includes(user.id)) return { allowed: false, status: 403 };

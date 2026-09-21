@@ -52,3 +52,39 @@ Original7.1 requests material counts, not a substitute task count. Before the ac
 
 
 G05 delegated defaults (state66): exact requestId/requirementKey/productId identity, shared draft CAS and consumed-draft uniqueness; one canonical typed evaluator; providedBy/recordedBy/uploader separate. Paused draft save permitted, explicit submit waits resume; GSG manual completion remains unblocked. Request OR immutable-submission file release plus original AND reference authorization; upload/draft is not publication. Scoped sessionStorage recovery required for failed-save+refresh, no raw file bytes/auth secrets. Preparation decisions and formal packet hold complete rationale.
+
+
+## G07 evidence and Excel implementation decisions
+
+- Accepted37b baseline. Immutable Evidence metadata/source and independent per-product assessment. Current inventory, actual G05 submission, and human application assessment are distinct. Human N/A notes cannot waive canonical required requests; explicit request change required.
+- Standard XLSX batch has one explicitly selected context verified in every row; other contexts use separate batches, no implicit relationship creation. Any row error blocks the entire batch. New/update/skip, preview and explicit apply are distinct.
+- Single synchronous UoW product mutation adapter preserves common/context/price versions, provenance, audit, batch and one receipt. Current price permission is separate. Export constructs a new allowlisted workbook.
+- External workbook/OLE, macros and formula execution unsupported. Ordinary hyperlink display/URL is read without execution/fetch and validated by mapped field. Actual business Excel NOT_RUN remains distinct from standard functionality.
+- One server schema/migration/policy/lockfile writer. Root reviews actual typed contract commit before separate UI assignment; internal contract freeze is not checkpoint acceptance.
+
+G07 pre-freeze clarification: only complete exact historical submission addresses carry requestId/submissionId/requirementKey/productId. Ordinary current-request navigation must not look like an incomplete historical address. Evidence application confirmation is a file/product relationship; it does not clear canonical human content/specification pending. Preserve that pending status/count without adding G10 review implementation. Source review findings G07/1/main-provisional-contract-review.json; runtime NOT_RUN.
+
+## G08 notice target eligibility — 2026-09-21
+
+One notice has one explicit country×retailer×brand context. “All active brand members” is a current eligibility rule; a publish-time recipient snapshot does not permanently exclude legitimate members who join later. Every read/file path still requires current context membership and eligibility under both current publication and the requested historical version. Target changes publish a new immutable version. A selected-user mode is not mandatory; if supplied, an empty selection means no recipients, never all. Version-specific read receipts do not mark the next revision read. This is a delegated design decision applying PRD-08, not completed verification.
+
+
+## G07 independent OOXML namespace compatibility repair — state99
+
+Valid prefix aliases with identical namespace URI/local names and equal expanded XML trees remain standard XLSX input. Eight original/diagnostic pairs preserve ZIP entries, expanded XML tags/attributes/text/children. The root reviewed original HTTP422 and ExcelJS failure; namespace-only diagnosis passes but does not close original fixture. Repair must use namespace semantics consistently in guards, raw numerical/formula/resource accounting and decoder, preserving security/precision limits and original source hash. This is a supported input compatibility correction, not a native Excel operational compatibility claim. Primary reference: https://www.w3.org/TR/xml-names/ sections2.1/6.
+
+
+## G09 1:1 participant default — state100
+
+원안8절·PRD09의 1:1 문의에 대해 브랜드 시작 사용자와 현재 해당 컨텍스트 GSG 운영팀이 참여하는 기본값을 정한다. 같은 브랜드/컨텍스트라는 이유만으로 다른 브랜드 사용자에게 대화를 공개하지 않는다. 업무 연결·담당자 변경은 문의 참여자 변경이나 G05 제출 변환이 아니다. 원 작성자/메시지/파일/해결 이력은 보존하고 비활성·권한 철회 직후 구독/재조회/파일도 제한한다. 이는 위임받은 설계 기본값이며 사용자가 별도로 승인한 정책이라고 주장하지 않는다. 구현 계약은 private G09/1/participant-policy-decision.json을 소비한다. 실제 구현·검증은 아직 NOT_RUN.
+
+
+## G08 progresses independently of G07 repair — state101
+
+G08 dependencies are accepted G04/G05 with G06 in37b ancestry; G07 is not a prerequisite. Earlier planned G07-first union is a scheduling preference, not a completion requirement. With G08server/UI frozen while G07V02 is under repair, assemble/verify G08 first at accepted37b plus its own candidates. No unaccepted G07 source is consumed. If G08 is accepted first, author-resolve its common-schema/policy union with G07 in a new candidate before independent G07 verification and integration. Both features coexistence remains mandatory in G07/G18, original failures retained.
+
+## 2026-09-21T17:25:44.536886+00:00 — G09 standalone domain stage while G08 verifies
+G09 dependencies G04/G05 already ACCEPTED at37b. Only new domain types/actual pure command validators and narrow unit file assigned to goals in isolated g09-contract; no shared schema/policy/lock/file/UI edits, no unaccepted sibling source. Later fullserver/UI moves to latest accepted combined base under explicit shared lease. G09 legacy task route entry narrow lease approved from actual route read. All feature AC remain NOT_RUN. G07 dd77 author repair evidence reviewed; independent and current-sibling union mandatory before acceptance.
+
+## 2026-09-21T17:29:20.688527+00:00 — Parallel isolated G10 domain and union preflight
+G10 depends on acceptedG05, so implementer may add only standalone corrections types/validators on37b while G09 has disjoint new files. Neither edits shared schema/policy/lock. G10 domain packet phrase intentional answer status means explicit reflection/resolution, not inquiry answers; clarified to author. Actual readonly G07/G08 union exposes6 source conflicts and clean-merge migration-count6 needs7; author resolution and populated both-direction upgrade required afterG08acceptance.

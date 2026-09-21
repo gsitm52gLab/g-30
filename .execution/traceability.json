@@ -77,11 +77,12 @@
         "G05"
       ],
       "summary": "읽음/수락/조정·줄글·부분/전체 제출",
-      "status": "PARTIAL_G04_ACCEPTED",
+      "status": "PASS",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
-      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
+      "remaining": "Actual G04 read/accept/schedule and G05 text/file/partial/full/version/recovery verified; finalG18 regression remains."
     },
     {
       "id": "A06",
@@ -92,8 +93,11 @@
         "G10"
       ],
       "summary": "버전·수정 묶음·늦은/상충 의견",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G05_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+      ],
+      "remaining": "Immutable actual submissions verified; actual correction batch/late conflicts/reflection vs resolution remain G10."
     },
     {
       "id": "A07",
@@ -264,13 +268,14 @@
         "G14"
       ],
       "summary": "서버 전 경로 권한·가격/파일/AI 격리",
-      "status": "PARTIAL_G06_ACCEPTED",
+      "status": "PARTIAL_G05_ACCEPTED",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
-      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
+      "remaining": "Current G05 channels verified; evidence/Excel/notices/messages/notification/search/export/AI later channels mandatory."
     },
     {
       "id": "A20",
@@ -283,15 +288,16 @@
         "G14"
       ],
       "summary": "동시 변경·멱등성·DB 영속성",
-      "status": "PARTIAL_G06_ACCEPTED",
+      "status": "PARTIAL_G05_ACCEPTED",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
       ],
-      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
+      "remaining": "Actual tasks/products/submissions/audit/receipts CAS/idempotency/restart verified; inquiries/completion and later records pending."
     },
     {
       "id": "A21",
@@ -341,8 +347,11 @@
         "G18"
       ],
       "summary": "모바일·키보드·상태/큰 파일",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G05_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+      ],
+      "remaining": "Actual G05 PC/mobile typed/upload/recovery/keyboard verified; inquiry/globalhome/final accessibility G09/G03/G18 pending."
     },
     {
       "id": "A25",
