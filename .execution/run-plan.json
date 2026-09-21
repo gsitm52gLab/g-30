@@ -378,7 +378,7 @@
       "dependencies": [
         "G02"
       ],
-      "state": "VERIFYING",
+      "state": "IMPLEMENTING_FIX",
       "required_for_product_completion": true,
       "candidate_commit": "3304c5b97096699f00ea6863f30df8b715745301",
       "integration_commit": null,
@@ -461,7 +461,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Await exact3304 independent final UI/RSC/semantic coverage; then main review, serial root merge and exact integration regression.",
+      "next_action": "Preserve exact3304 independent FAIL and all successful current UI coverage; goals repairs V03 output projection at new isolated base3304 worktree. Independent exact new candidate must pass before root integration.",
       "base_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/task.json",
       "ownership_addenda": [
@@ -515,6 +515,21 @@
           "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ui-fix1/task.json",
           "candidate_commit": "6fbb52f2e902cad91b0274fe7ad2acc4fc23439b",
           "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ui-fix1/implementation-result.json"
+        },
+        {
+          "id": "G04-PROJECTION-FIX1",
+          "state": "IMPLEMENTING",
+          "base_commit": "3304c5b97096699f00ea6863f30df8b715745301",
+          "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
+          "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-projection-fix1",
+          "owned_paths": [
+            "src/server/tasks/service.ts",
+            "src/server/tasks/projection.ts",
+            "src/domain/tasks/types.ts",
+            "tests/unit/tasks.test.ts",
+            "scripts/verify-tasks-http.ts"
+          ],
+          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/projection-fix1/task.json"
         }
       ],
       "implementer_session_ids": [
@@ -635,6 +650,18 @@
           "evidence_sha256": "b92e467f371edac3743945e56c0af78182e7a870948e6e60d4364a54babafd8b",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "repair_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/state-fix1/task.json"
+        },
+        {
+          "id": "G04-V03",
+          "severity": "P1",
+          "title": "Stored unknown/private nested request fields cross public API/SSR output boundary",
+          "status": "REPRODUCED_REPAIR_ASSIGNED",
+          "source_commit": "3304c5b97096699f00ea6863f30df8b715745301",
+          "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification/raw/projection.json",
+          "evidence_sha256": "b7b185766b580e7a8e3af924a3ba83654d2cab886b3eae06f11d1033d3d11e0c",
+          "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
+          "repair_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/projection-fix1/task.json",
+          "scope": "Stored synthetic extension fixture tests output allowlist. Unknown public client input is still rejected; no DB write exploit claimed."
         }
       ],
       "internal_integration_commit": "986511c929d4aa837cc7e76d18ee94df4e0ce1f2",
@@ -1396,8 +1423,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
   "current_goal": "G04",
-  "next_action": "Await exact3304 independent final UI/RSC/semantic coverage; then main review, serial root merge and exact integration regression.",
-  "state_version": 43,
+  "next_action": "Preserve exact3304 independent FAIL and all successful current UI coverage; goals repairs V03 output projection at new isolated base3304 worktree. Independent exact new candidate must pass before root integration.",
+  "state_version": 44,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1424,7 +1451,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T11:58:09.069396+00:00",
+  "updated_at": "2026-09-21T11:59:27.562149+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
