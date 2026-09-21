@@ -30,7 +30,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
     const originalFiles = path.join(directory, 'original-files'), copiedFiles = path.join(directory, 'copied-files');
     await mkdir(priorSql); await mkdir(originalFiles);
     const source = path.resolve('src/server/db/migrations'), names = (await readdir(source)).filter(x => x.endsWith('.sql')).sort();
-    expect(names.map(n => Number(n.slice(0, 4)))).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]);
+    expect(names.map(n => Number(n.slice(0, 4)))).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     for (const name of names.filter(n => Number(n.slice(0, 4)) <= 8 && Number(n.slice(0, 4)) !== missing)) await copyFile(path.join(source, name), path.join(priorSql, name));
     let db = openDatabase(originalDb, true);
     expect(migrate(db, priorSql)).toEqual({ applied: 7, total: 7 });
@@ -78,12 +78,12 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
         const priorFileHashes = await Promise.all((await readdir(originalFiles)).sort().map(async name => ({ name, sha256: hash(await readFile(path.join(originalFiles, name))) })));
         db = openDatabase(copyDb); repo = createSqliteRepository(db, () => NOW); identity = new IdentityService(repo, () => NOW);
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
-        expect(migrate(db)).toEqual({ applied: 4, total: 11 });
+        expect(migrate(db)).toEqual({ applied: 5, total: 12 });
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
         const allMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as { name: string; sha256: string }[];
         expect(allMigrations.filter(x => Number(x.name.slice(0, 4)) <= 8 && Number(x.name.slice(0, 4)) !== missing)).toEqual(oldMigrations);
         for (const m of allMigrations) expect(m.sha256).toBe(hash(await readFile(path.join(source, m.name))));
-        expect(migrate(db)).toEqual({ applied: 0, total: 11 }); expect((await seed(repo)).inserted).toBe(0);
+        expect(migrate(db)).toEqual({ applied: 0, total: 12 }); expect((await seed(repo)).inserted).toBe(0);
         expect(await existing.replay()).toEqual(existing.result);
         expect(await new NoticeService(identity).command(admin, noticeId, noticePublish)).toEqual(noticeReceipt);
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);

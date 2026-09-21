@@ -1,3 +1,4 @@
+import { readCompletionSummary } from '@/server/completion/summary';
 import { readSubmissionReview } from '@/server/corrections/summary';
 import { campaignRequestSource,materialProductIds } from '@/server/tasks/campaign-request';
 import type { Clock, StoredRecord, UnitOfWork } from '@/domain/records';
@@ -28,7 +29,7 @@ export function snapshotDTO(s: UnitOfWork, p: Principal, row: StoredRecord<'subm
         content: contentDTO(d), answers: d.answers.map(a => storedAnswerDTO(s, p, task.contextId!, a)), files,
         products: d.productUseIds.map(id => readProductUse(s, p, id, clock)), providedBy: providerDTO(s, p, task.contextId!, d.providedBy),
         recordedBy: d.recordedBy, recorderLabel: userLabel(s, p, task.contextId!, d.recordedBy), submittedAt: d.submittedAt, contentHash: d.contentHash,
-        evaluation: safeEvaluation(request.data.content,d.answers,request.data.content,false,campaignRequestSource(s,request)?.noMaterials===true), review: readSubmissionReview(s,p,task.id,row.id,clock), completion: { connected: false as const, status: 'not_completed' as const } };
+        evaluation: safeEvaluation(request.data.content,d.answers,request.data.content,false,campaignRequestSource(s,request)?.noMaterials===true), review: readSubmissionReview(s,p,task.id,row.id,clock), completion: readCompletionSummary(s,p,task.id,clock) };
 }
 export function workspace(s: UnitOfWork, p: Principal, taskId: string, clock: Clock) {
     const { task, request } = submissionTask(s, p, taskId, clock), caps = capabilities(s, p, task, clock), draft = sharedDraft(s, task), latest = latestSubmission(s, task);
@@ -59,7 +60,7 @@ export function workspace(s: UnitOfWork, p: Principal, taskId: string, clock: Cl
         priorFixture: !latest && s.list('priorSubmission', task.contextId!).some(v => v.data.taskId === task.id) ? { present: true, label: '이전 답변 계약 예시 — 실제 제출 아님' } : null,
         availableFiles, products,
         providers: caps.proxy ? s.list('membership', task.contextId!).flatMap(m => { const user = s.get('user', m.data.userId); return user ? [{ userId: user.id, label: userLabel(s, p, task.contextId!, user.id) }] : []; }) : [],
-        connections: { review: true, completion: false, notificationDelivery: false } };
+        connections: { review: true, completion: true, notificationDelivery: false } };
 }
 export function rebasePreview(s: UnitOfWork, p: Principal, taskId: string, clock: Clock) {
     const { task, request } = submissionTask(s, p, taskId, clock, true), draft = sharedDraft(s, task), old = draft ? s.get('requestVersion', draft.data.baseRequestId) : null;
