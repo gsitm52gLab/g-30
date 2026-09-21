@@ -56,8 +56,10 @@ export interface PriorSubmissionData {
 }
 export interface DomainEventData { eventType: string; targetId: string; sourceVersionId: string | null; actorId: string; at: string }
 export interface CommandReceiptData { key: string; actorId: string; command: string; bodyHash: string; result: { ids: string[] } }
+export type FileOwner = { kind: "task"; taskId: string } | { kind: "product"; productId: string; contextProductId: string };
 export interface FileVersionData {
-    taskId: string; storageKey: string; originalName: string; mime: string; bytes: number; sha256: string;
+    /** Legacy task files retain taskId and immutable bytes; new files also have an explicit owner. */
+    taskId: string | null; owner?: FileOwner; storageKey: string; originalName: string; mime: string; bytes: number; sha256: string;
     uploaderId: string; visibility: "public" | "internal"; preview: boolean;
 }
 export const certaintyLabels = { confirmed: "확정", requested: "요청", expected: "예상", needs_confirmation: "확인 필요" };

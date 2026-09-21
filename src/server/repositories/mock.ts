@@ -1,5 +1,5 @@
 import { checkRelations } from "@/domain/constraints";
-import { assertSynchronous, checkInput, jsonCopy, StoreError, systemClock, type Clock, type RecordDataMap, type RecordInput, type RecordKind, type RecordRepository, type StoredRecord, type UnitOfWork } from "@/domain/records";
+import { assertSynchronous, updatedContext, checkInput, jsonCopy, StoreError, systemClock, type Clock, type RecordDataMap, type RecordInput, type RecordKind, type RecordRepository, type StoredRecord, type UnitOfWork } from "@/domain/records";
 export function createMockRepository(clock: Clock = systemClock): RecordRepository {
     let records = new Map<string, StoredRecord>();
     const key = (kind: RecordKind, id: string) => `${kind}:${id}`;
@@ -18,15 +18,16 @@ export function createMockRepository(clock: Clock = systemClock): RecordReposito
             records.set(key(kind, input.id), record);
             return jsonCopy(record);
         },
-        update<K extends RecordKind>(kind: K, id: string, expectedRevision: number, data: RecordDataMap[K]) {
+        update<K extends RecordKind>(kind: K, id: string, expectedRevision: number, data: RecordDataMap[K], migration?: { legacyProductContextId: string }) {
             const current = store.get(kind, id);
             if (!current)
                 throw new StoreError("NOT_FOUND");
             if (current.revision !== expectedRevision)
                 throw new StoreError("CONFLICT");
-            checkInput({ id, contextId: current.contextId, data });
-            checkRelations(store, kind, { id, contextId: current.contextId, data });
-            const record = { ...current, data: jsonCopy(data), revision: current.revision + 1, updatedAt: clock() };
+            const contextId = updatedContext(current, data, migration);
+            checkInput({ id, contextId, data });
+            checkRelations(store, kind, { id, contextId, data });
+            const record = { ...current, contextId, data: jsonCopy(data), revision: current.revision + 1, updatedAt: clock() };
             records.set(key(kind, id), record);
             return jsonCopy(record);
         },

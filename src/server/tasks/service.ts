@@ -1,3 +1,5 @@
+import { resolveProduct, visibleProductRelations } from "@/server/products/access";
+import { canReferenceFile } from "@/server/files/access";
 import { createHash, randomUUID } from "node:crypto";
 import type { UnitOfWork, StoredRecord } from "@/domain/records";
 import type { RequestContent, PriorSubmissionData } from "@/domain/tasks/types";
@@ -46,7 +48,7 @@ export class TaskService {
             const u = s.get("user", uid), m = activeMember(s, uid, contextId);
             if (!u || u.data.status !== "active" || u.data.role !== role || !m || m.data.role !== (role === "gsg" ? "operator" : "brand")) fail("VALIDATION", 422, "담당자는 같은 컨텍스트의 활성 멤버여야 합니다.");
         }
-        for (const productId of productIds) if (s.get("product", productId)?.contextId !== contextId) unavailable();
+        for (const productId of productIds) resolveProduct(s,p,contextId,productId,this.clock);
         return { contextId, ownerId, assigneeId, coAssigneeIds, productIds };
     }
     private validateContent(s: UnitOfWork, p: Principal, target: Target, c: RequestContent, taskId?: string) {
@@ -57,9 +59,7 @@ export class TaskService {
         for (const fid of c.referenceFileIds) {
             const file = s.get("fileVersion", fid);
             if (!file || file.contextId !== target.contextId) unavailable();
-            const origin = this.task(s, p, file.data.taskId);
-            if (origin.contextId !== target.contextId) unavailable();
-            if (file.data.visibility === "public" && taskScope(origin).visibility !== "public" && origin.id !== taskId) fail("VALIDATION",422,"다른 업무의 참고자료는 원본 업무 공개 후 연결해 주세요.");
+            canReferenceFile(s,p,file,{id:taskId ?? "new-task",contextId:target.contextId,kind:"task",visibility:"draft"},this.clock);
         }
     }
     private template(s: UnitOfWork, p: Principal, contextId: string, versionId: unknown) {
@@ -245,7 +245,10 @@ export class TaskService {
         return this.identity.repo.transaction(s=>{const p=this.identity.principal(s,token),row=this.task(s,p,taskId,true);if(!row.data.draft)fail("VALIDATION",422,"새 요청 업무에서 미리보기를 사용해 주세요.");return {content:this.projectedContent(s,p,row.data.draft,false,row.id)};});
     }
     private projectedContent(s: UnitOfWork, p: Principal, c: RequestContent, internal: boolean, prospectiveTaskId?:string) {
-        const referenceFileIds = stringList(c.referenceFileIds).filter(fid => { const f = s.get("fileVersion", fid), origin = f ? s.get("task", f.data.taskId) : null; return f && origin && decide(s, p, "task.read", taskScope(origin), this.clock).allowed && (internal || f.data.visibility === "public" && (taskScope(origin).visibility === "public" || origin.id===prospectiveTaskId)); });
+        const referenceFileIds = stringList(c.referenceFileIds).filter(fid => {
+            const file=s.get("fileVersion",fid); if(!file)return false;
+            try { const origin=canReferenceFile(s,p,file,{id:prospectiveTaskId??"request-projection",contextId:file.contextId,kind:"task",visibility:internal?"draft":"public"},this.clock); return internal || file.data.visibility === "public" && (origin.visibility === "public" || origin.id===prospectiveTaskId); } catch { return false; }
+        });
         return projectedRequest(c, internal, referenceFileIds);
     }
     async detail(token: string | undefined, taskId: string, contextId?: string) {
@@ -258,7 +261,7 @@ export class TaskService {
             const projectedVersions = versions.map(v => projectedVersion(v, this.projectedContent(s,p,v.data.content,internal)));
             const fileIds = new Set([...projectedVersions.flatMap(v=>v.content.referenceFileIds), ...(internal ? row.data.draft?.referenceFileIds ?? [] : [])]);
             const files = s.list("fileVersion", row.contextId!).filter(f => fileIds.has(f.id) || internal && f.data.taskId === taskId).filter(f => internal || f.data.visibility === "public").map(f => ({ id: f.id, name: f.data.originalName, bytes: f.data.bytes, mime: f.data.mime, sha256: f.data.sha256, preview: f.data.preview, visibility: f.data.visibility }));
-            return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal && row.data.draft ? projectedRequest(row.data.draft, true, this.projectedContent(s,p,row.data.draft,true).referenceFileIds) : null, request,
+            return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal && row.data.draft ? projectedRequest(row.data.draft, true, this.projectedContent(s,p,row.data.draft,true,row.id).referenceFileIds) : null, request,
                 versions: projectedVersions,
                 activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)).map(projectedActivity),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
@@ -273,7 +276,7 @@ export class TaskService {
             const members = s.list("membership",contextId).filter(m=>m.data.status==="active").flatMap(m=> { const u=s.get("user",m.data.userId); return u?.data.status==="active" ? [{id:u.id,name:u.data.name,role:u.data.role}] : []; });
             const visible = new Set(tasks.map(t=>t.id));
             return { userId:p.user.id, canManage:internal, mode:this.identity.repo.mode, contexts:s.list("context").filter(c=>hasScope(s,p,c.id,this.clock)).map(projectContext), members, tasks,
-                products:s.list("product",contextId).map(v=>({id:v.id,name:v.data.name})),
+                products:visibleProductRelations(s,p,this.clock,contextId).map(cp=>resolveProduct(s,p,contextId,cp.data.productId,this.clock)).filter(r=>!r.common.data.archived).map(r=>({id:r.product.id,name:r.common.data.common.name})),
                 projects:s.list("project",contextId).filter(v=>internal || v.data.taskIds.some(t=>visible.has(t))).map(v=>({id:v.id,revision:v.revision,title:v.data.title,status:v.data.status})),
                 templates:internal?s.list("templateVersion").filter(v=>v.contextId===contextId || v.contextId===null && v.data.builtin && v.id.startsWith("builtin-")).map(v=>projectedTemplate(v,projectedRequest(v.data.content,true,this.projectedContent(s,p,v.data.content,true).referenceFileIds))):[] };
         });

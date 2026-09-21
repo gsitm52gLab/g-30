@@ -152,3 +152,24 @@ E2E_PORT=4141 APP_ORIGIN=http://127.0.0.1:4141 npm run test:e2e:db
 ```
 
 HTTP 검사기는 새 `.data/g04-http-*` DB/파일과 별도 쿠키 이름을 사용하며 자신의 서버만 종료합니다. SQLite 모드는 실제 서버 종료·재기동 후 재로그인하여 요청 버전·활동 순서·원본 byte hash를 비교합니다. mock은 메모리 모드이므로 프로세스 종료 후 업무 영속성을 주장하지 않습니다. `TASKS_HTTP_REPORT`와 브라우저 `E2E_REPORT`/`E2E_ARTIFACTS`는 선택 보고서 경로입니다. 실제 `.env`·외부 API·메일은 필요하지 않습니다.
+
+## G06 상품 서버 계약 (UI 통합 전 내부 단계)
+
+브랜드 공통 상품은 기존 Product ID를 유지하고, 컨텍스트별 SKU·JAN·등록/판매/출시 정보·프로젝트·파일 연결과 소비자가/내부 공급가를 별도 버전으로 저장합니다. `npm run db:setup`은 migration 0004와 모든 기존 상품의 원본 보존 이행을 실행합니다. 이미 이행한 상품은 다시 덮어쓰지 않으며 모호한 기존 용량 문자열은 원문으로 남깁니다.
+
+인증된 `/api/products`의 목록·생성, `/api/products/:id?context=...`의 상세·명령, `/api/products/:id/impact`의 공통 변경 미리보기를 제공합니다. 상품 파일은 `POST /api/files?productId=...&contextId=...`와 같은 소유 범위를 사용하는 GET으로 처리하며 기존 `taskId` 파일 경로도 유지합니다. 업로드 한도와 private 저장소는 G04와 같습니다. 브랜드의 같은 컨텍스트 비담당자도 공개 상품을 편집할 수 있고, 내부 가격 필드·이력은 최신 명시 권한이 있는 GSG에게만 전달합니다.
+
+공통 정보 변경은 공유된 현재 정보를 갱신합니다. 미리보기에는 읽을 수 있는 적용 컨텍스트만 표시하고 숨겨진 대상의 이름·수·가격·파일은 반환하지 않습니다. 저장 명령은 각 common/context/price의 revision과 idempotencyKey를 사용합니다. `captureProductUse`는 후속 제출 트랜잭션에서 쓸 정확한 common/context/file 버전과 명시적으로 선택한 소비자가 버전을 저장합니다. 최신 가격을 당일 적용 가격으로 자동 간주하지 않습니다.
+
+이 내부 단계에서 상품 API·파일 권한·SQLite 재시작은 서버 자체검사 대상으로 검증합니다. 제품 UI 통합·브라우저 검증과 독립 수용은 아직 완료되지 않았습니다. 초기 prior-use 레코드는 계약 검증용이며 G05의 실제 제출 생산자가 아닙니다. G07 증빙 집계/Excel, G10 검토, G11 완료 연결은 후속 의무입니다. 자료 집계는 연결 전 `connected:false`와 `null`로 표시합니다.
+
+상품 서버 검사기는 새 전용 DB/파일·쿠키와 자신의 프로세스를 사용합니다. SQLite 모드는 두 포트에서 실제 동시 수정/중복 등록을 확인하고 종료·재시작·재로그인 후 정확한 상품/가격/파일/스냅샷을 비교합니다. mock 모드의 fixture 준비는 검사 전용 IPC이며 제품 API에 준비용 경로를 추가하지 않습니다. 과거 사용 스냅샷은 명시적 fixture이며 실제 G05 제출 완료로 계산하지 않습니다.
+
+```bash
+npm run build
+PRODUCTS_MODE=mock E2E_PORT=4161 E2E_AUX_PORT=4164 npm run products:http
+PRODUCTS_MODE=sqlite E2E_PORT=4161 E2E_AUX_PORT=4164 npm run products:http
+npm run products:migration-check
+```
+
+`PRODUCTS_HTTP_REPORT`는 보고서 경로를 지정하며 실제 요청/상태/응답 hash와 프로세스 종료를 남깁니다. `E2E_PORT`/`E2E_AUX_PORT`는 비어 있는 자신 소유 슬롯으로 함께 바꿀 수 있습니다. 기존 원장에 이행할 수 없는 상품이 있으면 전체 데이터 이행을 원복하고 CLI에 G06 모듈·상품 ID·원본 컨텍스트 ID·허용된 사유만 표시합니다. 원문 값·비공개 가격·stack을 진단에 넣지 않으며 API의 일반 오류 응답도 그대로 유지합니다.

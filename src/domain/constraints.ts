@@ -1,8 +1,10 @@
 import { StoreError, type RecordKind, type RecordInput, type UnitOfWork } from "./records";
+import { productRelations } from "./products/constraints";
 import { taskRelations } from "./tasks/constraints";
 /** Same constraints for mock/SQLite; SQL adds cross-process uniqueness. */
 export function checkRelations<K extends RecordKind>(store: UnitOfWork, kind: K, input: RecordInput<K>) {
     taskRelations(store, kind, input);
+    productRelations(store, kind, input);
     const data = input.data as unknown as Record<string, unknown>;
     const unique = (field: string, value: unknown, scoped = false) => {
         if (value !== undefined && store.list(kind, scoped ? input.contextId ?? "" : undefined).some(r => r.id !== input.id && (r.data as unknown as Record<string, unknown>)[field] === value))

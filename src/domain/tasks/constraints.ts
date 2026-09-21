@@ -2,10 +2,20 @@ import { StoreError, type UnitOfWork, type RecordKind, type RecordInput } from "
 export function taskRelations<K extends RecordKind>(s: UnitOfWork, kind: K, input: RecordInput<K>) {
     const immutable: RecordKind[] = ["requestVersion", "templateVersion", "taskActivity", "priorSubmission", "domainEvent", "commandReceipt", "fileVersion"];
     if (immutable.includes(kind) && s.get(kind, input.id)) throw new StoreError("INVALID_RECORD");
-    if (["requestVersion", "taskActivity", "priorSubmission", "fileVersion"].includes(kind)) {
+    if (["requestVersion", "taskActivity", "priorSubmission"].includes(kind)) {
         const d = input.data as { taskId: string };
         const task = s.get("task", d.taskId);
         if (!task || task.contextId !== input.contextId) throw new StoreError("INVALID_RECORD");
+    }
+    if (kind === "fileVersion") {
+        const d = input.data as import("./types").FileVersionData;
+        if (d.owner?.kind === "product") {
+            const cp = s.get("contextProduct", d.owner.contextProductId);
+            if (d.taskId !== null || !cp || cp.contextId !== input.contextId || cp.data.productId !== d.owner.productId) throw new StoreError("INVALID_RECORD");
+        } else {
+            const task = d.taskId ? s.get("task", d.taskId) : null;
+            if (!task || task.contextId !== input.contextId || d.owner && (d.owner.kind !== "task" || d.owner.taskId !== d.taskId)) throw new StoreError("INVALID_RECORD");
+        }
     }
     if (kind === "requestVersion") {
         const d = input.data as import("./types").RequestVersionData;
