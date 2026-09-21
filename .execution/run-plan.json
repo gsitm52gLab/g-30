@@ -3431,14 +3431,20 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/main-acceptance.json",
         "sha256": "4cd598d0aacd2c8baa53a19052933bb626ee509b5588d5e265979686d027b60d"
       },
-      "regression_result": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/regression-result.json",
-        "sha256": "ab4206b16560c8d835ad2321a18601b83c9a59224f923df80debc83f2b7d4ced"
-      },
+      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/regression-result.json",
       "regression_root_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/main-regression-review.json",
         "sha256": "e1b3a1c827981b4b5b6a756cf4f412bddd29a3c0dc2f12428392c3445f9fb430"
-      }
+      },
+      "regression_result_ref": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/regression-result.json",
+        "sha256": "ab4206b16560c8d835ad2321a18601b83c9a59224f923df80debc83f2b7d4ced"
+      },
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/1/verification-result.json",
+      "implementer_session_ids": [
+        "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+        "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a"
+      ]
     },
     {
       "id": "G17",
@@ -3528,7 +3534,12 @@
       "documentation_root_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/documentation-preflight/main-review.json",
         "sha256": "361088a3e94bc0a793b849e474576388b0a06b328131be88d8b5257d6d063869"
-      }
+      },
+      "verifier_preparation_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verifier-preparation-task.json",
+        "sha256": "8ca7c67151be6805af82be3aad4078926a1ffdecaea5c09071af865ea0c6bd78"
+      },
+      "verifier_preparation_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g17-verifier-preparation"
     },
     {
       "id": "G18",
@@ -3623,7 +3634,7 @@
   "accepted_commit": "60b99ce05639278a221a96d7a3c575344cb7e08e",
   "current_goal": "G17",
   "next_action": "G16 ACCEPTED14/19 exact60b99; goalsG17 fullstackexclusivecommon0015/package, prdG13 additiveunionthenworkflow independent; G14/G03/G18 gatedcontinue.",
-  "state_version": 155,
+  "state_version": 156,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3655,7 +3666,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T23:18:04.844542+00:00",
+  "updated_at": "2026-09-21T23:19:39.145158+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -3690,5 +3701,12 @@
   "cross_module_copy_census": {
     "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/cross-module-copy-census-state148.json",
     "sha256": "0df9cd3360e5cf8a704234200430610a73a2a63af7621dc45c490461ca601179"
-  }
+  },
+  "metadata_corrections": [
+    {
+      "at": "2026-09-21T23:19:39.145158+00:00",
+      "scope": "G16 readiness-compatible verification_result/regression_result are absolute path strings; separately named hash refs retained. Both actual author session IDs listed.",
+      "original_failure": "state155 readiness line75 TypeError PosixPath/dict then empty-outputJSONdecode; originalcommitted metadata preserved5ea7b05. No acceptance evidence/product/source changed."
+    }
+  ]
 }
