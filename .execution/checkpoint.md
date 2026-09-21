@@ -33,3 +33,6 @@ State65: G06 accepted current product stage at7f409a2. Main reviewed exact indep
 
 
 State66: G05 SERVER assigned prd atg05-server, exact accepted7f409a2 base,4151/4154, no realenv/API. Packet G05/1/server/task.json. Typed contract milestone first, then main-review/disjoint goalsUI; workflow independent final combined verifier. Source common schema/files/evaluator owned only by server. Recovery decision binds failed-save+refresh to scoped text/ready-ref recovery, never claims raw failed File bytes recovered.
+
+
+State68: G05 server implementation continues; narrow ownership addenda1(taskLabels declaration),2(products/read.ts reusable task-file publication predicate) are active. Main inspected actual duplicate request-only filter; central request OR immutable submission eligibility required without relaxing original/reference/current auth. Workflow preparing verification plan only, no runtime candidate. UI prep path G05/1/ui-task-preparation.json (NOT_ASSIGNED). Recovery decision remains required.
