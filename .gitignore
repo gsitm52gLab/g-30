@@ -12,3 +12,9 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 .DS_Store
+*.env
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+next-env.d.ts
