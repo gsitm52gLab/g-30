@@ -218,3 +218,12 @@ npm run check
 npm run build
 npx vitest run tests/unit/notices.test.ts
 ```
+
+G08 서버 실제 API 검사기는 다음 명령으로 실행합니다. 두 포트는 비어 있는 자신 소유 슬롯을 지정하며, 실행마다 새 합성 DB/파일/쿠키를 만듭니다. SQLite는 두 프로세스의 CAS·멱등 공개, 실제 종료·새 PID 재시작·재로그인을 포함합니다.
+
+```sh
+NOTICES_MODE=mock E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notices-http.ts
+NOTICES_MODE=sqlite E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notices-http.ts
+```
+
+`NOTICES_HTTP_ROOT`는 런타임 부모(기본 `.local/g08-http`), `NOTICES_HTTP_REPORT`는 새 결과 경로입니다. 보고서는 실제 요청·응답 본문 파일/hash, assertion 단위 결과, PID/종료와 저장소 경로를 기록합니다. 원 보고서를 보존하려면 새 경로를 쓰세요. HTTP로 실제 업무와 제출을 만든 뒤 공지 읽음 전후 업무·요청·활동·제출·상품 캡처·파일 원장을 비교합니다. 공지 파일의 상품/다른 공지 재사용과 원본·참조 양측 권한도 검사합니다. 신규 멤버/알 수 없는 저장 확장 키 준비는 제품 endpoint가 없는 private IPC/저장소 fixture이며 읽기 권한은 실제 HTTP로 검사합니다. late fault와 비동기 파일 읽기 중 철회는 양 adapter 단위 검사, 기존 데이터 migration은 별도 `notices-migration.test.ts`가 확인합니다. UI·HTML/RSC·독립 검증은 별도 증거가 필요합니다.
