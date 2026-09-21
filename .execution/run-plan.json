@@ -2169,10 +2169,14 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
+      "next_action": "29sources+2inputs root SHAchecked; author prd after G12combined freeze/ownchecks and exclusive commonlease.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/task-draft.json",
         "sha256": "3d461495e1a211d3933148e854fcbcc6edf9b2b83c0c5ab57fc7d3f98f77c654"
+      },
+      "dor_preparation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/dor-current-producers.json",
+        "sha256": "3a1e27dbd4dad2e0c14cb5dddd153d59e1c8ba346f4f37758daf21d895f87040"
       }
     },
     {
@@ -2331,7 +2335,10 @@
         "sha256": "126189e1727137581fbc0ab10a2c2408ada392b0c92d07e070a803fe187791a1"
       },
       "combined_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-combined",
-      "verification_preparation": "workflow READONLY_OWN_PREPARATION_ONLY_NOT_RUN"
+      "verification_preparation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/verifier-preparation/plan.json",
+        "sha256": "afd937f8ceae7c79cbf5878188d11d6e6383749c240eab8c7dbe6bc7da98b8b2"
+      }
     },
     {
       "id": "G13",
@@ -2455,7 +2462,7 @@
       "verifier_session_id": null,
       "attempt": 1,
       "owned_paths": [],
-      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g15-server",
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g15-ui",
       "evidence_root": ".execution/private/runs/<run-id>/G15/<attempt>/",
       "acceptance": [
         {
@@ -2483,7 +2490,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Actual normalNextOCR found snapshot keyorderhash mismatch after16HTTPPASS; goals narrow own snapshot.ts fix+persistedOCRregression then finalserverpacket.340unit/build21f earlyproof not endpointsuccess.",
+      "next_action": "goals implements G15 UI on frozen44060 with ownpaths initially; taskentries/README lease deferred; noAPI yet. Finalcombined → prd independent wholeG15.",
       "extraction_task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/extraction-task-draft.json",
         "sha256": "74a2797771a8160647c0d48485a4d85d182354497ff999fe173cc0a3b51dbe78",
@@ -2513,7 +2520,7 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/main-extraction-review.json",
         "sha256": "81b39ec1f2fec22f1d11276d0b5d5d3fec5cd9ad2a89d5e6fc4bb22adea9f1da"
       },
-      "shared_lease": "RELEASED_CONTRACT_21f_OWN_SNAPSHOT_ONLY_REPAIR",
+      "shared_lease": "RELEASED; G12combined owns commonpaths",
       "subtasks": {
         "extraction": {
           "candidate": "cd648ff1fc2407606e4449050e0388935ee65eca",
@@ -2522,18 +2529,26 @@
           "lease": "RELEASED"
         },
         "server": {
-          "state": "AUTHOR_ACTUAL_ENDPOINT_REPAIRING",
+          "state": "AUTHOR_FINAL_ROOT_REVIEWED_NOT_ACCEPTED",
           "agent": "/root/goals",
           "ports": [
             4233,
             4234
           ],
           "contract_candidate": "21f6302bfe813dec2aa1e33dc793d60f31aca8f6",
-          "shared_lease": "RELEASED"
+          "shared_lease": "RELEASED",
+          "candidate": "44060d35b638fac9c488f060102e5e90426ec24b"
         },
         "ui": {
-          "state": "NOT_ASSIGNED",
-          "intended_agent": "/root/goals"
+          "state": "IMPLEMENTING",
+          "intended_agent": "/root/goals",
+          "agent": "/root/goals",
+          "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g15-ui",
+          "base_commit": "44060d35b638fac9c488f060102e5e90426ec24b",
+          "ports": [
+            4233,
+            4234
+          ]
         },
         "independent": {
           "state": "NOT_ASSIGNED",
@@ -2544,6 +2559,18 @@
       "server_contract_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/main-server-contract-review.json",
         "sha256": "8ecd219c9d585a0c05e97673212693ab11f105fb1610083f695b4de20f976854"
+      },
+      "server_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/server/implementation-result.json",
+        "sha256": "0816aa932c64f5350432e70efdd9ac2f762a61e86c7d1c6ccb820475222c2545"
+      },
+      "server_final_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/main-server-final-review.json",
+        "sha256": "89282c015d7825913bff441ceaff2abb4bc37aa8cc8715cccc1a62b5a5ebd88f"
+      },
+      "ui_packet": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/ui-task.json",
+        "sha256": "f7c69a89561a664488c245d0dc65163a28e9e1afc4352f3fafcb426a529577e1"
       }
     },
     {
@@ -2751,8 +2778,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6",
   "current_goal": "G12",
-  "next_action": "G10accepted10/19; assignprd G12combined latest953 union thenG11. Workflow readonlyG12 independentprep. GoalsG15finalserverpacket nextrootreview→ownUIphase.",
-  "state_version": 130,
+  "next_action": "G12 combined earlyfreeze → workflow exactindependent; goals G15 UI ownpaths; prd G11 after combined ownchecks/lease release; mandatory G17/G18 later.",
+  "state_version": 131,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2783,7 +2810,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T20:06:45.394396+00:00",
+  "updated_at": "2026-09-21T20:12:51.203225+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

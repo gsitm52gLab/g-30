@@ -1,3 +1,9 @@
+# State131 latest — G15 UI dispatched
+
+Accepted product stays953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6; 10/19, Goal ACTIVE. Goals new .worktrees/g15-ui at44060, formalui-task f7c69a89561a664488c245d0dc65163a28e9e1afc4352f3fafcb426a529577e1 ownfeatures/routes/nav/tests ports4233/34, sharedREADME/taskentry deferred. Rootserverfinalreview89282c015d7825913bff441ceaff2abb4bc37aa8cc8715cccc1a62b5a5ebd88f:897artifacts/281source/27commands plusoriginal8+18historical sources unchanged; raw160+186HTTP read.346unit,28+3skip/31HTTP,45+4skip/106+3skip history distinctlevels. No UI/independent/OpenAI PASS yet.
+
+prd G12combined running exclusivecommonlease; workflow read-only ownprep complete planafd937f8ceae7c79cbf5878188d11d6e6383749c240eab8c7dbe6bc7da98b8b2 (7groups,0execution) awaits exactcombined. G11DoR29source+2input hashes verified; authornext after prd combinedchecks. State130 metadata correction preserved originalb192a21; compatible stringresultrefs restored707a9f8, readiness10/19,91AC,193pending,0integrityerrors.
+
 Latest dispatch: prd G12combined formalpacket126189e1727137581fbc0ab10a2c2408ada392b0c92d07e070a803fe187791a1, newworktree .worktrees/g12-combined baseaccepted953 branchrun/g12-combined ports4229/30; exclusivecommonrecords/constraints/task/submissionread/README lease. Earlyfreeze then workflow independent, authorownchecks mayfinish onunchangedcandidate.
 
 # State130 latest — G10 ACCEPTED
