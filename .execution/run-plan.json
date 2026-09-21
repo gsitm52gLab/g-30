@@ -1515,12 +1515,12 @@
         "G04",
         "G05"
       ],
-      "state": "IMPLEMENTING",
+      "state": "VERIFYING",
       "required_for_product_completion": true,
       "candidate_commit": "6460de707f870068bf4b682a83d872e53de84ff0",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
-      "verifier_session_id": null,
+      "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
       "owned_paths": [
         "src/domain/notices/**",
@@ -1568,7 +1568,7 @@
           "evidence": []
         }
       ],
-      "next_action": "goals exact6460 combinedauthorcheck. Rootreview then assignworkflow exactindependentG08 before G07repaircompletion; G07 notdependency. IndependentPASS thenrootserialintegration andexactimpactregression. LaterG07/G08sharedunion requiresauthorresolvednewcandidate andindependentimpact.",
+      "next_action": "workflow exact6460 independent7groups/defaultbothmodes; rootrawreview result thenserialintegration/exactregression onlyafterPASS. G07 repair continues independently.",
       "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/task-draft.json",
       "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-task.json",
       "dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-review.json",
@@ -1627,11 +1627,12 @@
         },
         {
           "id": "G08-ASSEMBLY-SELFCHECK",
-          "state": "RUNNING",
+          "state": "AUTHOR_PASS_ROOT_REVIEWED",
           "session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g08-assembly",
           "candidate_commit": "6460de707f870068bf4b682a83d872e53de84ff0",
-          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/assembly/selfcheck-task.json"
+          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/assembly/selfcheck-task.json",
+          "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/assembly/selfcheck/result.json"
         }
       ],
       "requirement_addenda": [
@@ -1646,7 +1647,9 @@
       "main_ui_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-ui-final-review.json",
       "main_binding_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-binding-review.json",
       "verification_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-task-draft.json",
-      "verification_checkout_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-checkout.json"
+      "verification_checkout_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-checkout.json",
+      "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-task.json",
+      "main_combined_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-combined-review.json"
     },
     {
       "id": "G09",
@@ -1700,7 +1703,9 @@
       ],
       "next_action": "Rootdraft prepared fromPRD/source/deferredchecks; noimplementation until latestacceptedbase/sharedlease. Confirm delegated 1:1participantdefault duringbinding; actualGSGhome residual question count requiredG09.",
       "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/task-draft.json",
-      "participant_policy_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/participant-policy-decision.json"
+      "participant_policy_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/participant-policy-decision.json",
+      "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/dor-task.json",
+      "preparation_status": "GOALS_DOR_READ_ONLY_REVIEW_RUNNING_NO_IMPLEMENTATION"
     },
     {
       "id": "G10",
@@ -2198,8 +2203,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G08",
-  "next_action": "goals exact6460 combinedauthorcheck. Rootreview then assignworkflow exactindependentG08 before G07repaircompletion; G07 notdependency. IndependentPASS thenrootserialintegration andexactimpactregression. LaterG07/G08sharedunion requiresauthorresolvednewcandidate andindependentimpact.",
-  "state_version": 102,
+  "next_action": "workflow exact6460 independent7groups/defaultbothmodes; rootrawreview result thenserialintegration/exactregression onlyafterPASS. G07 repair continues independently.",
+  "state_version": 103,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2226,7 +2231,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T17:16:26.596482+00:00",
+  "updated_at": "2026-09-21T17:17:58.011089+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
