@@ -1,0 +1,12 @@
+import type { CompletionWorkspace, CompletionSnapshot, ExternalAction } from '@/server/completion/service';
+import type { ExternalActionInput } from '@/domain/completion/types';
+import type { TaskCatalog } from '@/server/tasks/service';
+export type { CompletionWorkspace, CompletionSnapshot, ExternalAction, TaskCatalog };
+type Base = { taskId:string; expectedTaskRevision:number; idempotencyKey:string };
+export type Command = Base & ({command:'complete';expectedBasisHash:string;memo:string}|{command:'reopen';completionId:string;reason:string}|{command:'record_external';action:ExternalActionInput}|{command:'link_followup';completionId:string;followupTaskId:string;expectedFollowupRevision:number;reason:string});
+export type Forms = { memo:string; reopenReason:string; followupReason:string; followupTaskId:string; completionId:string; external:ExternalActionInput|null; createdTaskId:string|null };
+export type Recovery = {actorId:string;contextId:string;taskId:string;at:number;forms:Forms;pending:{body:Command;ids:string[]|null}|null};
+export const blankForms = ():Forms => ({memo:'',reopenReason:'',followupReason:'',followupTaskId:'',completionId:'',external:null,createdTaskId:null});
+export const purposeLabels = {review_request:'검토 요청',application:'신청',final_use:'최종 사용'};
+export const statusLabels:Record<string,string> = {draft:'초안',requested:'요청됨',in_progress:'진행 중',partial:'부분 제출',submitted:'제출됨',completed:'완료',on_hold:'보류',cancelled:'취소',not_completed:'완료 전',reopened:'재개됨',pending:'대기',answered:'답변됨',external_waiting:'외부 확인 대기',resolved:'해결',needs_confirmation:'추가 확인 필요',reflected:'반영 기록됨',not_reflected:'미반영',participate:'참여',decline:'불참',discuss:'협의',applied:'신청됨',not_applied:'신청 전',withdrawal_requested:'취소 요청',selected:'선정',not_selected:'미선정',not_started:'시작 전',preparing:'준비 중',ready:'준비 완료',finished:'종료',not_received:'미수령',received:'수령 기록',none:'없음',discussion:'취소 협의 중'};
+export const taskHref=(id:string,context:string)=>`/tasks/${encodeURIComponent(id)}?context=${encodeURIComponent(context)}`;

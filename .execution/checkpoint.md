@@ -1,3 +1,13 @@
+# State144 latest — G15 ACCEPTED, G16 owned pure implementation authorized
+
+Acceptedcd7c434 12/19. Rootregressionb16d8a review445artifacts581Git/cwd9cmd32CRC425unit28rawbrowser44own+1mockskip. OriginalhelperSSR404fail2 preserved, narrowtailvalidNextstreamed200+404digest/canaryabsence. G17actualAPI NOT_RUN. G16prd formalserver-task ownedpurecorpus/types/validators only, commonleaseNOT_GRANTED pendingrootG11union. G11ce049 independentffb24 PASS received1722artifacts rootreviewnext, 9expectedconflicts thenworkflowregression. GoalACTIVE.
+
+# State143 latest — G15 integrated, bounded regression assigned
+
+Root serialintegration cd7c434432dc92d393f6036981c2aadc8e508e29 preserveslatestledger and543nonledgerpaths byteidentical d8d0, binding9621…. Accepted246 remains11/19 untilregression. Independent repaired28662 PASS rootb2f09 review1397artifacts575Git/cwd16cmd106CRC337HTTP76raw425+222P1mockskip, sourcebound22+54fresh0. DEFclosedexactd8d0; original8977FAIL+8helpererrors remain. Four helpernumericHTTPstatus collisions rawrechecked. Genericchecker --candidate metadataflag failed becauseartifactmanifestnocandidatefield, actualmanualstartup/commands/Gitbindingsverified, nofilehashmismatch. Formalregression1a2c… ai_verify detachedg15-regression4235/36 bounded20G15+G12/G10union/ownminimal/newPID notwholecore repeat.
+
+G11ce049 authorfinal934245/manifest1468 root0d0e review1557artifacts510Git/snapshot/cwd484unchangedpairs22cmd93CRC40rawPASS427unit+19newPID,8oldsourcefilesunchanged. Workflow independentce049 reports427/build40browserPASS, own15+remainingongoing originaltwofixture422preserved. G11unionpreviewf6b7… nineconflicts README/legacypage/records/constraints/5migrationcounttests; noactualunionyet. Goalsdoneidle; prddoneidle G16draftready afterG15accepted. G17actualcallNOT_RUN.
+
 # State142 latest — both G15 repair and G11 completion independently validating
 
 Accepted246 stays11/19 GoalACTIVE. G15d8d0 independentai_verify reports425/build+76UIpassed, owncausalfirstharnesswrongbusyexpectation retained correctioninprogress finalpacketpending. Rootprior8ownreports334HTTPbody semantic0a791, actualnonemptyRSC2component/context/inputIDpositive7a350 (textfetchedclientAPI, zero-byteRSCexcluded). Integrationregressiondraft5d645… ready notassigned.

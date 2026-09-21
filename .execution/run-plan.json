@@ -2173,7 +2173,7 @@
           "evidence": []
         }
       ],
-      "next_action": "workflow independent7groups+40browser exactce049 final; goalsfinalruntimepacket. Originalad3 UI32+restart19PASS andinitialreadrace1P1Ftwice retained; POSTfollowup3PASS notproductdefect.",
+      "next_action": "Independentffb24 received rootrawreview thenserialunion withacceptedG15; ownAIrealproducer deferredG16/17.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/task-draft.json",
         "sha256": "3d461495e1a211d3933148e854fcbcc6edf9b2b83c0c5ab57fc7d3f98f77c654"
@@ -2266,7 +2266,7 @@
         "sha256": "b66cd112c6d67b56385e4cc153cdcf5014c3e94d1ce94c6543608ce69b98306b"
       },
       "ui_phase": {
-        "state": "AUTHOR_REPAIR_FROZEN_FINAL_PROOF_RUNNING",
+        "state": "AUTHOR_FINAL_ROOT_REVIEWED_RELEASED",
         "agent": "/root/goals",
         "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g11-ui",
         "base_commit": "fe2e17e04d25d618e4b9c861b16fed3fc85cfd8e",
@@ -2325,7 +2325,23 @@
             "sha256": "0543550e22bfaaef188aef07c4b8e98163e4796003c9cf5d45339194ad10d4b1"
           }
         }
-      ]
+      ],
+      "ui_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/ui/implementation-result.json",
+        "sha256": "93424597be5296ff3932369f3dd1fa4460b2281df3a72e1168ccc784ba3b413f"
+      },
+      "ui_final_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/ui/main-final-review.json",
+        "sha256": "0d0e0bad58c03c388be740352480a12558d4407d34f1f7b715df6ae06ea3cfc9"
+      },
+      "g15_union_preparation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/g15-union-preparation.json",
+        "sha256": "f6b7ce3b8b74f4188c4920da10a09ded214cfa3ecba591dabf733060f504367c"
+      },
+      "regression_draft": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/regression-task-draft.json",
+        "sha256": "ea2aa7ea59cf6c01229994ff956ee545bcf1ec9161e530642cabb5a3c3247986"
+      }
     },
     {
       "id": "G12",
@@ -2712,10 +2728,10 @@
         "G05",
         "G06"
       ],
-      "state": "VERIFYING",
+      "state": "ACCEPTED",
       "required_for_product_completion": true,
       "candidate_commit": "d8d0cd520b1130c6b68023f8e65bf6e1b0907588",
-      "integration_commit": null,
+      "integration_commit": "cd7c434432dc92d393f6036981c2aadc8e508e29",
       "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
       "verifier_session_id": "01a0c5c7-c60d-7eb0-b570-b5b65a92cbde",
       "attempt": 1,
@@ -2726,29 +2742,37 @@
         {
           "id": "AC-15-01",
           "expected": "약용/분류 불명/지원 외 매체를 일반 화장품으로 추정해 실행하지 않는다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_CURRENT_G15_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+          ]
         },
         {
           "id": "AC-15-02",
           "expected": "PDF 일부 선택 시 선택 범위와 실제 읽은 범위만 결과에 표시한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_CURRENT_G15_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+          ]
         },
         {
           "id": "AC-15-03",
           "expected": "초과·잠금·손상·빈 파일·OCR 불명확을 명시하고 읽지 못한 구간을 검토 완료로 표시하지 않는다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_CURRENT_G15_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+          ]
         },
         {
           "id": "AC-15-04",
           "expected": "공개/합성 데이터만 외부 호출에 사용하고 실제 기밀 입력은 전송하지 않는다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_LOCAL_G15_BOUNDARY_G17_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+          ]
         }
       ],
-      "next_action": "ai_verify independent d8d0 closure + all affected UI, unchanged prior159+54 assertions sourcebound fresh0; originalb1dd71P1F remains. Then root serial integration/affected regression beforeACCEPTED.",
+      "next_action": "G16 now eligible; G17 actualprovider remains mandatoryNOT_RUN; G18 final audit.",
       "extraction_task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/extraction-task-draft.json",
         "sha256": "74a2797771a8160647c0d48485a4d85d182354497ff999fe173cc0a3b51dbe78",
@@ -2815,7 +2839,7 @@
           "candidate": "1eec0ce3aaa1086dfdf349ab26ac8f0b79a7e389"
         },
         "independent": {
-          "state": "REPAIR_CLOSURE_RUNNING",
+          "state": "INDEPENDENT_PASS_ROOT_REVIEWED",
           "intended_agent": "/root/ai_verify",
           "agent": "/root/ai_verify",
           "candidate": "d8d0cd520b1130c6b68023f8e65bf6e1b0907588",
@@ -2849,6 +2873,15 @@
           ],
           "scope": "ownscreen+newdeterministicrace e2e only",
           "candidate": "d8d0cd520b1130c6b68023f8e65bf6e1b0907588"
+        },
+        "regression": {
+          "state": "RUNNING",
+          "agent": "/root/ai_verify",
+          "candidate": "cd7c434432dc92d393f6036981c2aadc8e508e29",
+          "ports": [
+            4235,
+            4236
+          ]
         }
       },
       "server_contract_candidate": "21f6302bfe813dec2aa1e33dc793d60f31aca8f6",
@@ -2929,7 +2962,7 @@
         {
           "id": "DEF-G15-V01",
           "severity": "high",
-          "state": "INDEPENDENT_REPAIR_CLOSURE_PENDING",
+          "state": "CLOSED_INDEPENDENT_AND_INTEGRATED",
           "description": "DuringhistoryGETloading oldknownrun readiness200allowedtrue persists besideunknownnewversion; actualreversecaseconfirmed. No actualprovider calls.",
           "independent_evidence": {
             "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/verification/DEF-G15-V01.json",
@@ -2938,6 +2971,10 @@
           "main_review": {
             "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-readiness-defect-review.json",
             "sha256": "e80e38af5fe82f181916b0902f3a74d63ce1e66a4db86ab995dbe8cd1d9edf9d"
+          },
+          "closure": {
+            "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/verification-repair/DEF-G15-V01-closure.json",
+            "sha256": "1082a785e58a044c4c2133101f8b4c4e02baeca2b1354e7ecd55a250e2309834"
           }
         }
       ],
@@ -2977,6 +3014,34 @@
       "regression_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/regression-task-draft.json",
         "sha256": "5d645856487256be43054face236296c4bef87d8a1c247ce15f3cb27bc7e677d"
+      },
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/verification-repair-result.json",
+      "independent_repair_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-repair-independent-review.json",
+        "sha256": "b2f09a386839cb4d9fcbe898468003d672591f45b687fc6b8936adbae990cd89"
+      },
+      "integration_source_binding": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/integration-source-binding.json",
+        "sha256": "9621fad4f1f11e20a1cfdf5ae65ce5bd45e8d14f59764354657a688311be4c44"
+      },
+      "regression_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/regression-task.json",
+        "sha256": "1a2c674ce003ee35db5788c74a91f95a1551f8289a5b3c11e85265ad4a6deff1"
+      },
+      "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g15-regression",
+      "accepted_commit": "cd7c434432dc92d393f6036981c2aadc8e508e29",
+      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/regression-result.json",
+      "regression_result_ref": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/regression-result.json",
+        "sha256": "02369b0319e8c9949ef3bbf9ae51e6d1340b23b47a865570cdbb3352740de66c"
+      },
+      "regression_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-regression-review.json",
+        "sha256": "b16d8a66f626a6db32d161353e93273a0e8a9d822a97c483b1b5a89a8f065754"
+      },
+      "main_acceptance": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json",
+        "sha256": "9a21d4c1a9d8925c55490e23656859d608562e58f11987eec020a4dcefd3a933"
       }
     },
     {
@@ -2986,15 +3051,15 @@
       "dependencies": [
         "G15"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": null,
+      "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": null,
       "attempt": 0,
       "owned_paths": [],
-      "actual_worktree_cwd": null,
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g16-server",
       "evidence_root": ".execution/private/runs/<run-id>/G16/<attempt>/",
       "acceptance": [
         {
@@ -3034,7 +3099,7 @@
           "evidence": []
         }
       ],
-      "next_action": "G15ACCEPTED then prd explicitservercorpusassignment with0013lease; GSGinternalresults+explicit syntheticengine+deploymentcuratedcorpus. Noimplementationyet.",
+      "next_action": "prd ownedpurecorpus/types/validators only; commonregistration afterrootG11union andexplicitlease.",
       "source_discovery": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/source-discovery/discovery-result.json",
         "sha256": "4c7d03ae48d90a142f0c0b707a304203a4d381097c9a694ddf4f9c4958de8410",
@@ -3067,6 +3132,21 @@
       "server_task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/server-task-draft.json",
         "sha256": "f7e605436b162ebf86c260fa1b27716f06a08f34b4d649679ea894bba61cd89d"
+      },
+      "base_commit": "cd7c434432dc92d393f6036981c2aadc8e508e29",
+      "shared_lease": "NOT_GRANTED_ROOT_G11_UNION_PRIORITY",
+      "adoption_preparation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/adoption-preparation.json",
+        "sha256": "fd5355d0f3adb1285566909cea12cd9bfb29e2cc278fc7f7eaa27c28780e7464"
+      },
+      "adoption_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/main-adoption-preparation-review.json",
+        "sha256": "fcd3addc8b7d66dfaf6cc05d0126a867fb8b78c5b6d766af82b161df487512f7"
+      },
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/server-task.json",
+      "server_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/server-task.json",
+        "sha256": "d2a8f7cf818332523ca0075d84a7401365ba5cb4ec656b3c31a122baee0f6978"
       }
     },
     {
@@ -3210,10 +3290,10 @@
   "secret_policy": "env runtime only; no values in packets/logs/Git",
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
-  "accepted_commit": "24636458b6fab6b93c6b215d9a627a5d84b26b98",
+  "accepted_commit": "cd7c434432dc92d393f6036981c2aadc8e508e29",
   "current_goal": "G15",
-  "next_action": "Review d8d0 independentclosure, serialintegrate/regressG15; workflowG11ce049independent. G16serverdraftready dependencywait.",
-  "state_version": 142,
+  "next_action": "G15accepted12/19. prdG16ownedpurephase; rootG11independentreview/serialunion→workflowregression thenleaseG16registration; G13afterG11accepted.",
+  "state_version": 144,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3244,7 +3324,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T21:35:15.851055+00:00",
+  "updated_at": "2026-09-21T21:57:30.558097+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
