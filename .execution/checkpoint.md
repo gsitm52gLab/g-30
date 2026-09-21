@@ -1,3 +1,7 @@
+# Current checkpoint — state161
+
+2026-09-21T23:41:00.637902+00:00; G13 exactf48e integrationregression(workflow); G17 ownerrorrecovery/fullUI/runtime(goals), actualauthor07cprovider1verifiedbutnotaccepted. G14 startsafterG13ACCEPTED. Accepted14/19. RootG13ccbbb verifies1097artifacts707source21cmd58ZIP; serialf48e all723nonledger0c97same. Taskregressione42f; ports4253/54. G17typedprep b151/rootnewreview source44/32snapshot, staticS01/S02 authorhandling, S03falsealarmwithdrawn. Livec326 actualsyntheticcall1 response/schema/usage0.03488estimate/no legalapproval; independentNOT_RUN. Userenv/v2 preserved.
+
 # Current checkpoint — state160
 
 2026-09-21T23:34:48.493151+00:00; G13 independent closing then0c97testrepairclosure; G17 interrupted/baseURL repair and fullUI/runtime. G14 fulltaskv2 ready awaitingG13ACCEPTED; accepted14/19. Rootrepair681b verifies68artifacts701src7cmd5ZIPinclold4fresh103chunks; old390btestFAIL retained. Workflowformalclosure dab4 thenfinalcandidate0c97; unchangedprooffresh0. G17recovery482d explicitunknownacknowledgement/currentCAS/max3/lateclaimguard; commonlease free. G14draft20acf noassignment.
