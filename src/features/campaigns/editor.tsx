@@ -8,7 +8,7 @@ import { MenuProducts } from './menu-products';
 import { MenuRequirements, requestFromCurrent } from './menu-requirements';
 import { MenuConditions } from './menu-conditions';
 import { MenuDeliverables } from './menu-deliverables';
-import { taskHref } from './model';
+import { taskHref, equalValues } from './model';
 import { PublicMenus } from './public-view';
 import s from './ui.module.css';
 export interface CampaignEditorValue {
@@ -20,7 +20,7 @@ export function Editor({ c }: {
     c: Controller;
 }) {
     const d = c.state.data!, detail = d.detail, formKey = 'draft:' + (detail?.id ?? 'new'), editor = c.form<CampaignEditorValue>(formKey, { campaignId: detail?.id ?? null, revision: detail?.revision ?? 0, draft: detail?.staff?.draft ?? { title: '', menus: [] } }), set = (v: CampaignEditorValue) => c.setForm(formKey, v), draft = editor.draft, update = (v: CampaignDraft) => set({ ...editor, draft: v });
-    const changed = JSON.stringify(draft) !== JSON.stringify(detail?.staff?.draft), catalogs = d.catalogs?.items.flatMap(x => x.versions) ?? [];
+    const changed = !equalValues(draft, detail?.staff?.draft), catalogs = d.catalogs?.items.flatMap(x => x.versions) ?? [];
     function add() { const request = requestFromCurrent(c); if (!request)
         return; const menu: MenuDraft = { identity: { catalogVersionId: catalogs[0]?.id ?? '', menuKey: crypto.randomUUID(), menuName: '', menuNumber: '' }, sourceStatements: [], conflicts: [], conditions: { state: 'needs_confirmation', sourceStatementIds: [], publicExplanation: '', cost: { amount: null, currency: null, taxIncluded: 'unknown' }, discount: '', points: '', cancellationTerms: '', schedules: [] }, templateVersionId: null, request, products: [], physical: [], followups: [] }; update({ ...draft, menus: [...draft.menus, menu] }); }
     if (!d.task.request)

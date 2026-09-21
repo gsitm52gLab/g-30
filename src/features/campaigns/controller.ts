@@ -4,7 +4,9 @@ import { CampaignError, denied, request } from './client';
 import { freshRecovery, type Command, type Recovery, type State, type Workspace, type CampaignPreview } from './model';
 const prefix = 'gs-hale:campaigns:';
 function readRecovery(key: string): Recovery | null { try {
-    const text = sessionStorage.getItem(key);
+    const actorPrefix=key.split(':').slice(0,3).join(':')+':';
+        for(const storedKey of Object.keys(sessionStorage))if(storedKey.startsWith(prefix)&&!storedKey.startsWith(actorPrefix))sessionStorage.removeItem(storedKey);
+        const text = sessionStorage.getItem(key);
     if (!text || text.length > 900000)
         return null;
     const r = JSON.parse(text) as Recovery;

@@ -58,3 +58,11 @@ export const identityKey = (m: {
     menuKey: string;
 }) => JSON.stringify([m.catalogVersionId, m.menuKey]);
 export const taskHref = (id: string, context: string) => `/tasks/${encodeURIComponent(id)}?context=${encodeURIComponent(context)}`;
+/** Compare user values independent of server allowlist object-key order. Arrays retain their order. */
+export function equalValues(a:unknown,b:unknown):boolean {
+ if(Object.is(a,b))return true;
+ if(!a||!b||typeof a!=='object'||typeof b!=='object')return false;
+ if(Array.isArray(a)||Array.isArray(b))return Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((v,i)=>equalValues(v,b[i]));
+ const x=a as Record<string,unknown>,y=b as Record<string,unknown>,keys=Object.keys(x);
+ return keys.length===Object.keys(y).length&&keys.every(k=>Object.hasOwn(y,k)&&equalValues(x[k],y[k]));
+}
