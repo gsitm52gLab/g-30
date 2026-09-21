@@ -518,7 +518,7 @@
         },
         {
           "id": "G04-PROJECTION-FIX1",
-          "state": "FIXED_CANDIDATE_CHECKING",
+          "state": "IMPLEMENTER_CHECKED_MAIN_REVIEWED_INDEPENDENT_PENDING",
           "base_commit": "3304c5b97096699f00ea6863f30df8b715745301",
           "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-projection-fix1",
@@ -530,7 +530,8 @@
             "scripts/verify-tasks-http.ts"
           ],
           "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/projection-fix1/task.json",
-          "candidate_commit": "fb493e69830461fbf3fa11be90d9b50c94b0e334"
+          "candidate_commit": "fb493e69830461fbf3fa11be90d9b50c94b0e334",
+          "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/projection-fix1/implementation-result.json"
         }
       ],
       "implementer_session_ids": [
@@ -674,14 +675,14 @@
       "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-task.json",
       "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/projection-fix1/implementation-result.json",
       "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
-      "implementation_report_status": "EXACT_FIXED_CANDIDATE_CHECKS_IN_PROGRESS",
+      "implementation_report_status": "MAIN_REVIEWED_EXACT_FINAL_EVIDENCE",
       "main_candidate_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/main-candidate-review.json",
       "repair_base_commit": "3304c5b97096699f00ea6863f30df8b715745301",
       "prior_verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
       "prior_main_candidate_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/main-candidate-review.json",
       "internal_repair_assembly": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/subintegration/merge-result.json",
       "original_task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/task.json",
-      "main_implementation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/main-implementation-review.json",
+      "main_implementation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/projection-fix1/main-implementation-review.json",
       "prior_main_rejection": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/main-rejection.json",
       "prior_failed_candidates": [
         {
@@ -703,7 +704,9 @@
           "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/3",
           "reason": "Implementer added and corrected nonpriceGSG test fixture before final result; runtime/product byte-identical"
         }
-      ]
+      ],
+      "main_source_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/3/main-source-review.json",
+      "implementation_result_sha256": "6b8a1a0a607b05a312498dc2319cb03af8dd35a034551ddc6d95cbc3aa84fe0d"
     },
     {
       "id": "G05",
@@ -1449,7 +1452,7 @@
   "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
   "current_goal": "G04",
   "next_action": "Review finalfb493e6 exact implementation and independent projection/affected regression. Preserve interim5b and original3304 failure. No root merge before independent PASS.",
-  "state_version": 46,
+  "state_version": 47,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1476,7 +1479,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T12:09:24.610876+00:00",
+  "updated_at": "2026-09-21T12:14:18.930222+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
