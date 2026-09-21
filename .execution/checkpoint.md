@@ -1,3 +1,7 @@
+# Current checkpoint — state152
+
+2026-09-21T22:50:34.197458+00:00; accepted product0804a4a1a750ab4dee149036659e212480230242; 13/19. G16 combined839c exact independent ai_verify worktree g16-verification ports4241/42. Root UI review e1bc verified471artifacts/655sources/767reusepairs/12commands/42browserrows/44traceCRC; original2fail and71invalidcapture excluded. G13 typedbdb commonlease RELEASED, root13cb reviewed606unit/build; prd fullUI task8a5a with normalContextBarpulse, goals own HTTP/history. G17 configuredactualOpenAI NOT_RUN mandatory. Untracked execution-v2 preserved.
+
 # State151 latest — G16 server author evidence reviewed; G13 UI split
 
 Accepted0804 remains13/19, GoalACTIVE. G16 server final20e4fd3 rootmain-final-review8b696050 verified457private+4ownedhistory artifacts/615Git source/65changed/25commands/7reusebindings/368HTTPbodies/392acceptedoldsrc/104oldrows12SQL. Fresh runtime mock22P6SQLiteonlyskip/DB28P/history10P; original14P1F13NOTRUN preserved; earlier512unit+bridge4P20filtered sourcebound notfinal514fresh. WholeG16 UI/independent/realOpenAI notdone. Workflow fullUI earlyd041 exactcheck/browser now; afterward additive20e4 harness/doc merge requested, runtime ddb identical. Narrow union assertion+READMEG10 lease0e180 granted. Independent G16draft9b7a ready notassigned, ai_verifyidle.
