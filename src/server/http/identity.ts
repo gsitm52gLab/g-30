@@ -6,7 +6,7 @@ import { StoreError } from "@/domain/records";
 export function requestToken(request: Request) { const name = authConfig().cookieName; return request.headers.get("cookie")?.split(";").map(x => x.trim()).find(x => x.startsWith(`${name}=`))?.slice(name.length + 1); }
 export function json(data: unknown, status = 200) { return NextResponse.json(data, { status, headers: { "Cache-Control": "no-store, private", "Referrer-Policy": "no-referrer" } }); }
 export function sessionCookie(response: NextResponse, token: string, expiresAt: string) { const c = authConfig(); response.cookies.set(c.cookieName, token, { httpOnly: true, sameSite: "lax", secure: c.secure, path: "/", expires: new Date(expiresAt) }); }
-export async function readBody(request: Request, keys: string[]) { if (!request.headers.get("content-type")?.startsWith("application/json"))
+export async function readBody(request: Request, keys: string[], limit = 16384) { if (!request.headers.get("content-type")?.startsWith("application/json"))
     fail("VALIDATION", 422, "JSON 요청이 필요합니다.");
     const reader = request.body?.getReader();
     const chunks: Uint8Array[] = [];
@@ -17,7 +17,7 @@ export async function readBody(request: Request, keys: string[]) { if (!request.
                 const { done, value } = await reader.read();
                 if (done) break;
                 length += value.byteLength;
-                if (length > 16384) {
+                if (length > limit) {
                     await reader.cancel();
                     fail("VALIDATION", 422, "입력 내용이 너무 큽니다.");
                 }

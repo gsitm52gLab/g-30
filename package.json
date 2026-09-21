@@ -16,8 +16,8 @@
     "lint": "eslint src scripts tests next.config.ts playwright.config.ts vitest.config.ts *.mjs --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test",
-    "test:e2e:db": "cross-env E2E_DATA_SOURCE=sqlite playwright test",
+    "test:e2e": "tsx scripts/run-e2e.ts",
+    "test:e2e:db": "cross-env E2E_DATA_SOURCE=sqlite tsx scripts/run-e2e.ts",
     "test:install": "playwright install chromium",
     "db:migrate": "tsx scripts/db.ts migrate",
     "db:seed": "tsx scripts/db.ts seed",
@@ -26,7 +26,8 @@
     "check": "npm run lint && npm run typecheck && npm test",
     "verify": "npm run check && npm run build && npm run db:restart && npm run identity:races && npm run identity:restart && npm run test:e2e && npm run test:e2e:db",
     "identity:restart": "tsx scripts/verify-identity-restart.ts",
-    "identity:races": "tsx scripts/verify-identity-races.ts"
+    "identity:races": "tsx scripts/verify-identity-races.ts",
+    "tasks:http": "tsx scripts/verify-tasks-http.ts"
   },
   "dependencies": {
     "@next/env": "16.3.5",

@@ -4,6 +4,7 @@ import { createSqliteRepository } from "@/server/repositories/sqlite";
 import { migrate, openDatabase } from "@/server/db/database";
 import { seed } from "@/server/db/seed";
 import { fixtures } from "@/data/fixtures";
+import { builtins } from "@/domain/tasks/templates";
 import { StoreError, type RecordRepository, type UnitOfWork } from "@/domain/records";
 const clock = () => "2026-09-21T01:00:00.000Z";
 for (const mode of ["mock", "sqlite"] as const) {
@@ -51,9 +52,9 @@ for (const mode of ["mock", "sqlite"] as const) {
         });
         it("seeds idempotently and preserves existing edits and extra records", async () => {
             const repo = create();
-            expect((await seed(repo)).inserted).toBe(fixtures.length);
+            expect((await seed(repo)).inserted).toBe(fixtures.length + builtins.length);
             await repo.transaction(s => { const task = s.get("task", "task-pop")!; s.update("task", task.id, task.revision, { ...task.data, title: "User edited title" }); s.create("checkpoint", { id: "extra", contextId: null, data: { value: "keep" } }); });
-            expect(await seed(repo)).toEqual({ inserted: 0, preserved: fixtures.length });
+            expect(await seed(repo)).toEqual({ inserted: 0, preserved: fixtures.length + builtins.length });
             expect((await repo.get("task", "task-pop"))?.data.title).toBe("User edited title");
             expect(await repo.get("checkpoint", "extra")).not.toBeNull();
         });
@@ -70,9 +71,9 @@ describe("migration and persistence setup", () => {
     it("migrates an empty DB twice without losing writes", () => {
         const db = openDatabase(":memory:", true);
         try {
-            expect(migrate(db)).toEqual({ applied: 2, total: 2 });
+            expect(migrate(db)).toEqual({ applied: 3, total: 3 });
             db.prepare("INSERT INTO records VALUES ('checkpoint','preserved',NULL,'{}',1,'now','now')").run();
-            expect(migrate(db)).toEqual({ applied: 0, total: 2 });
+            expect(migrate(db)).toEqual({ applied: 0, total: 3 });
             expect(db.prepare("SELECT id FROM records").all()).toEqual([{ id: "preserved" }]);
         }
         finally {
