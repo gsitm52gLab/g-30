@@ -95,11 +95,12 @@
         "G10"
       ],
       "summary": "버전·수정 묶음·늦은/상충 의견",
-      "status": "PARTIAL_G05_ACCEPTED",
+      "status": "PASS_CURRENT_G10_STAGE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
       ],
-      "remaining": "Immutable actual submissions verified; actual correction batch/late conflicts/reflection vs resolution remain G10."
+      "remaining": "G18 wholeunion regression remains"
     },
     {
       "id": "A07",
@@ -111,8 +112,11 @@
         "G17"
       ],
       "summary": "무승인게이트 수동 완료·잔여 스냅샷",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G10_REMAINDER_PRODUCER",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
+      ],
+      "remaining": "G11actual manualcompletion + G17actualAI failure/basicwork +G18"
     },
     {
       "id": "A08",

@@ -551,8 +551,11 @@
       "owner_note": "G10",
       "requirement": "출처·대상버전·페이지/위치·수정내용/이유·공개설명·우선순위·반영본·해소확인자. FR-007·018/BR-016",
       "verification_idea": "내부원문과공개설명을다르게작성후brand미리보기. 항목3개중2개반영/1개미반영이구별되고GSG확인한항목만해소",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G10_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
+      ],
+      "remaining": "G18 finalunion; actualG16AIproducer later forSA40"
     },
     {
       "id": "SA-39",
@@ -562,8 +565,11 @@
       "owner_note": "G10",
       "requirement": "공개묶음불변·늦은의견후속묶음·충돌추가확인·긴급공개남은기관/범위. FR-006·018/BR-005·016",
       "verification_idea": "v1공개후늦은/상충의견을v2묶음으로추가. 첫공개본문불변, 미해소/대기범위계속표시. 취합중알림0/공개시묶음1",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G10_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
+      ],
+      "remaining": "G18 finalunion; actualG16AIproducer later forSA40"
     },
     {
       "id": "SA-40",
@@ -573,8 +579,11 @@
       "owner_note": "G10",
       "requirement": "검토기관/검토자·자료버전·매체/언어/사용처/제품범위·수신일/결과/근거/기록자, 내부/기관/AI구분. FR-008/BR-003·005",
       "verification_idea": "동일파일의다른사용처·언어검토를별도저장. 재제출시과거의견참고연결가능하나자동승인0. 파일교체만으로모든수정해소0",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G10_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
+      ],
+      "remaining": "G18 finalunion; actualG16AIproducer later forSA40"
     },
     {
       "id": "SA-41",

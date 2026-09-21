@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "rule": "Root allocates new migration filename; immutable accepted SQL bytes stay unchanged. File count is actual checkout migrations, never inferred from highest reserved number. Reservation does not grant schema lease or mark implementation complete.",
-  "at": "2026-09-21T19:59:42.835416+00:00",
+  "at": "2026-09-21T20:06:45.394396+00:00",
   "reservations": [
     {
       "id": "0001",
@@ -55,7 +55,7 @@
       "id": "0009",
       "file": "0009-corrections.sql",
       "goal": "G10",
-      "state": "INTEGRATED_PENDING_REGRESSION"
+      "state": "ACCEPTED"
     },
     {
       "id": "0010",

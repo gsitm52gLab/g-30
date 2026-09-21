@@ -35,14 +35,16 @@
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
       "remaining": "G10/G12/G15 later owner references and finalG18 file matrix.",
       "current_g05_stage": "PASS current actual task/product/submission upload/original/preview/download/reuse paths; new future owners require own current-auth checks",
       "current_g08_stage": "Current notice original/reference/file/upload/read/replay authority including afterIO verified; later owners remain.",
       "current_g07_stage": "Addactual evidence reference original/preview/download/revoke; futureG09/G10/G15/G18 remain",
-      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS."
+      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS.",
+      "current_g10_stage": "PASS currentcorrection/private/public/review/version/permissionandpersistenceroutes; futurewholeunion notyet"
     },
     {
       "id": "D03",
@@ -76,11 +78,13 @@
       "status": "NOT_RUN",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
       ],
       "current_g08_stage": "Actual current notice paths and UI clear on loss of current membership/target verified; G09stream/G13consumer/G18 remaining.",
       "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS.",
-      "remaining": "G13 notification delivery and finalG18; actual inquiry live SSE revoked access now passed."
+      "remaining": "G13 notification delivery and finalG18; actual inquiry live SSE revoked access now passed.",
+      "current_g10_stage": "PASS currentcorrection/private/public/review/version/permissionandpersistenceroutes; futurewholeunion notyet"
     },
     {
       "id": "D05",
@@ -124,12 +128,14 @@
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
       "remaining": "Actual G13 downstream notification delivery/dedup still NOT_RUN; current G09 durable event producer only.",
       "current_g08_stage": "NOTICE_PUBLISHED/NOTICE_REVISED durable atomic event producer/version identity verified only; G13 actualnotification delivery remains.",
-      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS."
+      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS.",
+      "current_g10_stage": "PASS currentcorrection/private/public/review/version/permissionandpersistenceroutes; futurewholeunion notyet"
     },
     {
       "id": "D08",
@@ -162,7 +168,8 @@
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
       ],
       "origin_goals": [
         "G05",
@@ -196,8 +203,9 @@
       "source": "PRD-06 AC-06-03, G06/preparation.md sections6/10 and G05/preparation.md section5",
       "current_g06_stage": "Contract only, producer and downstream consumer groups remain NOT_RUN",
       "current_g05_stage": "PASS actual sameUoW G05 product/context/publicretail/file capture and subsequent G06 edits preserve prior",
-      "remaining": "G10/G11/G15 actual historical consumers and finalG18 remain.",
-      "current_g07_stage": "AddG07realhistoricalconsumer to downstreamgroup, G10/G11/G15/G18remain; do not mark wholeD09PASS"
+      "remaining": "G11/G15 actualhistoricalconsumers andfinalG18 remain",
+      "current_g07_stage": "AddG07realhistoricalconsumer to downstreamgroup, G10/G11/G15/G18remain; do not mark wholeD09PASS",
+      "current_g10_stage": "PASS currentcorrection/private/public/review/version/permissionandpersistenceroutes; futurewholeunion notyet"
     },
     {
       "id": "D10",
@@ -220,7 +228,8 @@
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
       "remaining": "G10/G11/G12/AI/search later entities and finalG18 persistence remain.",
@@ -228,7 +237,8 @@
       "current_g05_stage": "PASS current identity/tasks/products/submissions/receipts restart; later record types remain required",
       "current_g08_stage": "Actual distinctPID/relogin notice versions/read/file/event/receipt persist; later entities remain.",
       "current_g07_stage": "Addpopulatedmissing-siblingSQL migration/oldrecords/files/newPID proof, futuremodulemigrations/finalG18 remain",
-      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS."
+      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS.",
+      "current_g10_stage": "PASS currentcorrection/private/public/review/version/permissionandpersistenceroutes; futurewholeunion notyet"
     }
   ]
 }
