@@ -60,7 +60,7 @@ export function workspace(s: UnitOfWork, p: Principal, taskId: string, clock: Cl
         priorFixture: !latest && s.list('priorSubmission', task.contextId!).some(v => v.data.taskId === task.id) ? { present: true, label: '이전 답변 계약 예시 — 실제 제출 아님' } : null,
         availableFiles, products,
         providers: caps.proxy ? s.list('membership', task.contextId!).flatMap(m => { const user = s.get('user', m.data.userId); return user ? [{ userId: user.id, label: userLabel(s, p, task.contextId!, user.id) }] : []; }) : [],
-        connections: { review: true, completion: true, notificationDelivery: false } };
+        connections: { review: true, completion: true, notificationDelivery: true } };
 }
 export function rebasePreview(s: UnitOfWork, p: Principal, taskId: string, clock: Clock) {
     const { task, request } = submissionTask(s, p, taskId, clock, true), draft = sharedDraft(s, task), old = draft ? s.get('requestVersion', draft.data.baseRequestId) : null;
