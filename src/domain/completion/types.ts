@@ -1,4 +1,5 @@
 import type { CampaignCompletionRemainder } from './campaign';
+import type { AiCompletionRemainder } from '../ai-review/completion';
 import type { TaskData } from '../records';
 import type { QuestionDTO } from '../inquiries/types';
 export type Available<T> = {
@@ -99,7 +100,7 @@ export interface CompletionBasis {
         recordedAt: string;
     }[];
     campaign: Unconnected | Available<CampaignCompletionRemainder>;
-    ai: Unconnected;
+    ai: Unconnected | Available<AiCompletionRemainder>;
 }
 export type ExternalPurpose = 'review_request' | 'application' | 'final_use';
 export type ExternalActor = {
