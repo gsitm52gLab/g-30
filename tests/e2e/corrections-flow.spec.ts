@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { seed, open, opinionUI, batchUI, button, field, settled, login, produce, getWorkspace, chooseTarget, capture, retain, recordJSON, canary, ctx } from '../fixtures/corrections-ui';
+test.beforeEach(async ({page}) => {await page.context().tracing.start({screenshots:true,snapshots:true,sources:true});});
 test.afterEach(async ({ page }, info) => retain(page, info));
 test('G10 UI-A AC10-01/02 actual five items exact old opinion preview public selective reflection separate resolution', async ({ page }, info) => {
     test.setTimeout(150000);

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { seed, open, opinionUI, batchUI, button, field, settled, getWorkspace, mutate, capture, retain, recordJSON } from '../fixtures/corrections-ui';
+test.beforeEach(async ({page}) => {await page.context().tracing.start({screenshots:true,snapshots:true,sources:true});});
 test.afterEach(async ({ page }, info) => retain(page, info));
 test('G10 UI-D actual lost response same key and committed POST failed GET reread only', async ({ page }, info) => { test.setTimeout(100000); const { id, v1 } = await seed(page); await open(page, id); let dropped = false; const sent: unknown[] = []; await page.route('**/api/corrections', async (route) => { if (route.request().method() === 'POST' && !dropped) {
     dropped = true;
