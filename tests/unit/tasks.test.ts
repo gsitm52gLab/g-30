@@ -130,7 +130,55 @@ for (const mode of ["mock", "sqlite"] as const) describe(`${mode} G04 actual tas
         expect((await repo.get("task", result.ids[1]))!.data.status).toBe("draft");
         expect(await Promise.all(result.ids.slice(1).map(id=>repo.get("task",id)))).toEqual(independentBefore);
         await command(result.ids[0], "hold", { reason: "잠시 보류" }); await expect(command(result.ids[0], "accept", {}, brand)).rejects.toMatchObject({ status: 409 }); await command(result.ids[0], "cancel", { reason: "합의 취소" }); await command(result.ids[0], "resume", { reason: "명시 재개" });
-        expect((await repo.get("task", result.ids[0]))!.data.status).toBe("requested");
+        // SA-15: hold/cancel must preserve already accepted progress, not reset it to requested.
+        expect((await repo.get("task", result.ids[0]))!.data.status).toBe("in_progress");
+    });
+    it("G04-V02 AC-04-05 SA-15 requested/accepted nested pause restores progress without duplicate acceptance or state events", async () => {
+        await setup(); const id = await publish();
+        await expect(command(id, "resume", { reason: "not paused" })).rejects.toMatchObject({ status: 409 });
+        await command(id, "hold", { reason: "requested hold" }); await command(id, "resume", { reason: "requested resume" });
+        expect((await repo.get("task", id))!.data.status).toBe("requested");
+        await command(id, "accept", {}, brand); const history = await repo.list("taskActivity"); const versions = await repo.list("requestVersion");
+        const hold = { command: "hold", expectedRevision: (await repo.get("task", id))!.revision, reason: "accepted hold", idempotencyKey: randomUUID() };
+        await tasks.command(admin, id, hold); const paused = await repo.get("task", id); const stateEvents = await repo.list("domainEvent");
+        await tasks.command(admin, id, hold); await command(id, "hold", { reason: "same hold" });
+        expect(await repo.get("task", id)).toEqual(paused); expect(await repo.list("domainEvent")).toEqual(stateEvents);
+        await command(id, "cancel", { reason: "nested cancellation" }); await command(id, "hold", { reason: "nested hold" });
+        expect((await repo.get("task", id))!.data.resumeStatus).toBe("in_progress");
+        const before = await Promise.all([repo.list("task"), repo.list("audit"), repo.list("domainEvent"), repo.list("commandReceipt")]);
+        const failing = new TaskService(identity, () => { throw new Error("state rollback"); });
+        await expect(failing.command(admin, id, { command: "resume", reason: "failure", expectedRevision: (await repo.get("task", id))!.revision, idempotencyKey: randomUUID() })).rejects.toThrow("state rollback");
+        expect(await Promise.all([repo.list("task"), repo.list("audit"), repo.list("domainEvent"), repo.list("commandReceipt")])).toEqual(before);
+        await expect(tasks.command(admin, id, { ...hold, command: "resume", idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+        await expect(command(id, "resume", { reason: "brand forbidden" }, brand)).rejects.toMatchObject({ status: 403 });
+        const resume = { command: "resume", reason: "restore", expectedRevision: (await repo.get("task", id))!.revision, idempotencyKey: randomUUID() };
+        await tasks.command(admin, id, resume); const restored = await repo.get("task", id); await tasks.command(admin, id, resume);
+        expect(await repo.get("task", id)).toEqual(restored); expect(restored!.data).toMatchObject({ status: "in_progress", resumeStatus: null });
+        await command(id, "accept", {}, brand); expect((await repo.get("task", id))!.data.status).toBe("in_progress");
+        expect(await repo.list("taskActivity")).toEqual(history); expect(await repo.list("requestVersion")).toEqual(versions);
+        expect((await repo.list("domainEvent")).filter(e => e.data.eventType === "TASK_ACCEPTED")).toHaveLength(1);
+    });
+    it("G04-V02 SA-15 partial state and prior answers survive pause and new-public-version is not auto-accepted", async () => {
+        await setup(); const id = await publish(); await command(id, "accept", {}, brand); const v1 = (await tasks.detail(admin,id)).versions[0];
+        await repo.transaction(s => { const row=s.get("task",id)!; s.update("task",id,row.revision,{...row.data,status:"partial"}); s.create("priorSubmission",{id:"state-prior",contextId:ctx,data:{taskId:id,requestId:v1.id,authorId:"user-luna",answers:[{requirementKey:"description",productId:null,value:"previous partial answer",fileVersionIds:[]}]}}); });
+        const prior=await repo.get("priorSubmission","state-prior"); await command(id,"hold",{reason:"partial hold"});
+        await command(id,"save",{content:{...payload(),description:"new request version"}}); await command(id,"publish"); const v2=(await tasks.detail(admin,id)).versions[0];
+        expect(v2.id).not.toBe(v1.id); await command(id,"cancel",{reason:"nested"}); await command(id,"resume",{reason:"restore partial"});
+        expect((await repo.get("task",id))!.data.status).toBe("partial"); expect(await repo.get("priorSubmission","state-prior")).toEqual(prior);
+        expect((await repo.list("taskActivity")).filter(a=>a.data.kind==="accept"&&a.data.requestId===v2.id)).toHaveLength(0);
+        await command(id,"accept",{},brand); await command(id,"accept",{},brand); expect((await repo.get("task",id))!.data.status).toBe("partial");
+        expect((await repo.list("taskActivity")).filter(a=>a.data.kind==="accept")).toHaveLength(2); expect((await repo.list("domainEvent")).filter(e=>e.data.eventType==="TASK_ACCEPTED")).toHaveLength(2);
+    });
+    it("G04-V02 legacy paused fallback uses current request acceptance only and repairs previously inconsistent requested state", async () => {
+        await setup(); const id=await publish(); await command(id,"accept",{},brand);
+        async function legacy(status: "on_hold" | "cancelled" | "requested") { await repo.transaction(s=>{const row=s.get("task",id)!; const data={...row.data,status}; delete data.resumeStatus; s.update("task",id,row.revision,data);}); }
+        await legacy("on_hold"); await command(id,"resume",{reason:"legacy accepted"}); expect((await repo.get("task",id))!.data.status).toBe("in_progress");
+        await legacy("requested"); const accepted=await repo.list("taskActivity"), events=await repo.list("domainEvent");
+        await command(id,"accept",{},brand); expect((await repo.get("task",id))!.data.status).toBe("in_progress"); expect(await repo.list("taskActivity")).toEqual(accepted); expect(await repo.list("domainEvent")).toEqual(events);
+        await command(id,"save",{content:{...payload(),description:"v2 without acceptance"}}); await command(id,"publish"); await legacy("cancelled"); await command(id,"resume",{reason:"legacy unaccepted latest"});
+        expect((await repo.get("task",id))!.data.status).toBe("requested"); expect((await repo.list("taskActivity")).filter(a=>a.data.kind==="accept")).toHaveLength(1);
+        await repo.transaction(s=>{const row=s.get("task",id)!;s.update("task",id,row.revision,{...row.data,status:"completed"});});
+        await expect(command(id,"resume",{reason:"cannot invent completion"})).rejects.toMatchObject({status:409});
     });
     it("A04/A19 SA-04 exact reference bytes stay private before publish, survive revisions and revoke with membership", async () => {
         await setup(); const directory = await mkdtemp(path.join(os.tmpdir(), "g04-file-")); directories.push(directory); const files = new FileService(identity, directory);

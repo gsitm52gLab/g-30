@@ -74,7 +74,14 @@ try {
     check("file forged reference rejected", (await brand.send(`/api/files/${file.id}?taskId=task-wave`)).status === 404, ["A19"]);
     await command(team, taskId, "read"); const t = await detail(team, taskId); check("team read stays separate from acceptance", t.activities.some(a => a.data.kind === "read") && t.task.data.status === "requested", ["AC-04-05"]);
     check("team cannot accept", (await team.mutate(`/api/tasks/${taskId}`, { command: "accept", expectedRevision: t.task.revision, idempotencyKey: randomUUID() })).status === 403, ["A19"]);
-    await command(brand, taskId, "accept"); await command(brand, taskId, "schedule", { deadline: { ...c.deadline, value: "2026-11-03" }, reason: "브랜드 협의" });
+    await command(admin, taskId, "hold", { reason: "V02 requested hold" }); await command(admin, taskId, "resume", { reason: "V02 requested restore" });
+    check("V02 requested task resumes requested", (await detail(brand,taskId)).task.data.status === "requested", ["G04-V02","AC-04-05","SA-15"]);
+    await command(brand, taskId, "accept"); const acceptanceBeforePause=(await detail(brand,taskId)).activities;
+    await command(admin, taskId, "hold", { reason: "V02 accepted hold" }); await command(admin, taskId, "cancel", { reason: "V02 nested cancel" }); await command(admin, taskId, "hold", { reason: "V02 nested hold" }); await command(admin, taskId, "resume", { reason: "V02 restore accepted" });
+    await command(brand, taskId, "accept"); const resumed=await detail(brand,taskId);
+    check("V02 accepted nested pause resumes in_progress with identical acceptance history", resumed.task.data.status === "in_progress" && JSON.stringify(resumed.activities) === JSON.stringify(acceptanceBeforePause), ["G04-V02","AC-04-05","SA-15"]);
+    check("V02 direct active resume rejects", (await admin.mutate(`/api/tasks/${taskId}`,{command:"resume",reason:"already active",expectedRevision:resumed.task.revision,idempotencyKey:randomUUID()})).status===409, ["G04-V02","SA-15"]);
+    await command(brand, taskId, "schedule", { deadline: { ...c.deadline, value: "2026-11-03" }, reason: "브랜드 협의" });
     const requested = await detail(brand, taskId); check("schedule proposal does not alter deadline", requested.request!.deadline.value === c.deadline.value, ["AC-04-05"]);
     const v1 = published.versions[0].id, activityId = requested.activities.find(a => a.data.kind === "schedule")!.id;
     const draft = { ...c, description: "PRIVATE_DRAFT_NOT_PUBLISHED" }; await command(admin, taskId, "save", { content: draft }); await command(admin, taskId, "schedule_decide", { activityId, decision: "apply", reason: "기한만 반영" });
@@ -86,10 +93,27 @@ try {
         const fixtureRepo = createSqliteRepository(openDatabase(filename)); await fixtureRepo.transaction(s => s.create("priorSubmission", { id: "g04-prior-http-fixture", contextId: ctx, data: { taskId, requestId: v1, authorId: "user-luna", answers: [{ requirementKey: "q-short_text", productId: null, value: "합성 이전 답변", fileVersionIds: [] }] } })); fixtureRepo.close();
         const next = { ...c, requirements: [...c.requirements, { ...blankRequirement("added-file", "file"), label: "개정 추가 필수 파일" }] }; await command(admin, taskId, "save", { content: next }); await command(admin, taskId, "publish");
         const revised = await detail(brand, taskId); check("actual API prior-submission fixture retained and additions missing", revised.requirementStatus.some(q => q.requirementKey === "q-short_text" && q.status === "prior_received") && revised.requirementStatus.some(q => q.requirementKey === "added-file" && q.status === "missing"), ["AC-04-04", "D06"]);
-        const beforeHash = createHash("sha256").update(JSON.stringify(revised)).digest("hex"); await stop(); await start(); check("actual different server process", processes[0].pid !== processes[1].pid, ["A20"]);
+        await command(admin,taskId,"hold",{reason:"V02 persist paused progress"}); const paused=await detail(brand,taskId);
+        const beforeHash = createHash("sha256").update(JSON.stringify(paused)).digest("hex"); await stop(); await start(); check("actual different server process", processes[0].pid !== processes[1].pid, ["A20"]);
         const relogged = new Client(); await relogged.login("luna@example.test"); const after = await detail(relogged, taskId); check("all task versions activities and projection survive actual restart/relogin", createHash("sha256").update(JSON.stringify(after)).digest("hex") === beforeHash, ["A20", "AC-04-02", "AC-04-04", "AC-04-05"]);
+        await command(admin,taskId,"resume",{reason:"V02 restart restore"}); const afterResume=await detail(relogged,taskId);
+        check("V02 restart restores accepted progress while latest request remains unaccepted", afterResume.task.data.status==="in_progress" && !afterResume.activities.some(a=>a.data.kind==="accept"&&a.data.requestId===afterResume.versions[0].id), ["G04-V02","AC-04-05","A20"]);
         const restored = await relogged.send(`/api/files/${file.id}?taskId=${taskId}&mode=original`); check("immutable bytes survive restart", createHash("sha256").update(Buffer.from(await restored.arrayBuffer())).digest("hex") === file.sha256, ["A04", "SA-04"]);
         const inspect = createSqliteRepository(openDatabase(filename)); const events = await inspect.list("domainEvent", ctx); check("CR03 durable acceptance event exists once", events.filter(e => e.data.targetId === taskId && e.data.eventType === "TASK_ACCEPTED").length === 1, ["AC-04-05", "CR03"]); check("change notice event persisted", events.some(e => e.data.targetId === taskId && e.data.eventType === "TASK_REQUEST_REVISED"), ["AC-04-04", "D07"]); inspect.close();
+    }
+    if (mode === "sqlite") {
+        async function legacy(status: "on_hold" | "cancelled" | "requested") {
+            const fixture=createSqliteRepository(openDatabase(filename)); await fixture.transaction(s=>{const row=s.get("task",taskId)!;const data={...row.data,status};delete data.resumeStatus;s.update("task",taskId,row.revision,data);});fixture.close();
+        }
+        await legacy("cancelled"); await command(admin,taskId,"resume",{reason:"V02 legacy latest not accepted"});
+        check("V02 legacy ignores acceptance for older request", (await detail(brand,taskId)).task.data.status==="requested", ["G04-V02","SA-15"]);
+        await command(brand,taskId,"accept"); const accepted=(await detail(brand,taskId)).activities;
+        await legacy("on_hold"); await command(admin,taskId,"resume",{reason:"V02 legacy latest accepted"});
+        check("V02 legacy current acceptance restores progress", (await detail(brand,taskId)).task.data.status==="in_progress", ["G04-V02","SA-15"]);
+        await legacy("requested"); await command(brand,taskId,"accept"); const repaired=await detail(brand,taskId);
+        check("V02 old inconsistent requested repaired without new acceptance", repaired.task.data.status==="in_progress" && JSON.stringify(repaired.activities)===JSON.stringify(accepted), ["G04-V02","AC-04-05"]);
+        const inspect=createSqliteRepository(openDatabase(filename)); const events=await inspect.list("domainEvent",ctx);
+        check("V02 no duplicate acceptance event per request after repair", events.filter(e=>e.data.targetId===taskId&&e.data.eventType==="TASK_ACCEPTED").length===2, ["G04-V02","A20"]);inspect.close();
     }
     const catalog = await admin.json<TaskCatalog>(`/api/tasks?context=${ctx}`); check("seven basic templates present", catalog.templates.filter(t => t.builtin).length === 7, ["SA-47"]);
     const builtInApply = await admin.mutate("/api/templates", { command: "apply", contextId: ctx, versionId: "builtin-pop-v1", targets: [{ id: taskId, expectedRevision: (await detail(admin,taskId)).task.revision }], idempotencyKey: randomUUID() }); check("builtin template applies with explicit owner fallback", builtInApply.status === 200, ["SA-14"]);
