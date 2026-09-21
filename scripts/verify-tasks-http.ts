@@ -40,7 +40,7 @@ class Client {
     }
     async mutate(url: string, body: unknown, method = "POST") { const csrf = await (await this.send("/api/auth/csrf")).json(); return this.send(url, method, body, csrf.csrfToken); }
     async json<T>(url: string): Promise<T> { const r = await this.send(url); check(`GET ${url.split("?")[0]}`, r.status === 200); return r.json(); }
-    async login(email: string) { check(`actual login ${email}`, (await this.mutate("/api/auth/login", { email, password: DEMO_PASSWORD })).status === 200, ["A01", "A02"]); }
+    async login(email: string) { check(`actual login ${email}`, (await this.mutate("/api/auth/login", { email, password: DEMO_PASSWORD })).status === 200, ["A19"]); }
     async upload(taskId: string, bytes: Buffer, name = "참고.pdf") { const csrf = await (await this.send("/api/auth/csrf")).json(); const body = new FormData(); body.append("files", new Blob([new Uint8Array(bytes)], { type: "application/pdf" }), name); body.append("visibility", "public"); return fetch(`${origin}/api/files?taskId=${taskId}`, { method: "POST", headers: { Cookie: this.cookie, Origin: origin, "X-CSRF-Token": csrf.csrfToken }, body }); }
 }
 const ctx = "ctx-jp-a-luna", target = { contextId: ctx, ownerId: "user-gsg", assigneeId: "user-luna", coAssigneeIds: ["user-co"], productIds: ["product-serum"] };
@@ -51,29 +51,29 @@ async function detail(client: Client, id: string) { return client.json<TaskDetai
 async function command(client: Client, id: string, command: string, extra: Record<string, unknown> = {}) { const d = await detail(client, id); const r = await client.mutate(`/api/tasks/${id}`, { command, expectedRevision: d.task.revision, idempotencyKey: randomUUID(), ...extra }); check(`${command} HTTP mutation`, r.status === 200, ["AC-04-01", "AC-04-04", "AC-04-05"]); return r; }
 try {
     await start(); await admin.login("admin@example.test"); await brand.login("luna@example.test"); await team.login("team@example.test"); await foreign.login("wave@example.test");
-    check("anonymous task list blocked", (await new Client().send(`/api/tasks?context=${ctx}`)).status === 401, ["A02"]);
-    check("task create CSRF blocked", (await admin.send("/api/tasks", "POST", {})).status === 403, ["A02"]);
-    check("brand cannot create task", (await brand.mutate("/api/tasks", { targets: [target], content: c, category: "spot", idempotencyKey: randomUUID() })).status === 403, ["A02"]);
+    check("anonymous task list blocked", (await new Client().send(`/api/tasks?context=${ctx}`)).status === 401, ["A19"]);
+    check("task create CSRF blocked", (await admin.send("/api/tasks", "POST", {})).status === 403, ["A19"]);
+    check("brand cannot create task", (await brand.mutate("/api/tasks", { targets: [target], content: c, category: "spot", idempotencyKey: randomUUID() })).status === 403, ["A19"]);
     const createBody = { targets: [target], content: c, category: "spot", idempotencyKey: randomUUID() };
     const created = await admin.mutate("/api/tasks", createBody); check("actual task created", created.status === 201, ["AC-04-01"]); const taskId = (await created.json()).ids[0];
-    const retry = await admin.mutate("/api/tasks", createBody); check("same command replay returns same task", (await retry.json()).ids[0] === taskId, ["AC-04-01", "A17"]);
-    check("brand cannot read private draft", (await brand.send(`/api/tasks/${taskId}`)).status === 404, ["A02", "SA-12"]);
-    check("foreign task hidden", (await foreign.send(`/api/tasks/${taskId}`)).status === 404, ["A02"]);
+    const retry = await admin.mutate("/api/tasks", createBody); check("same command replay returns same task", (await retry.json()).ids[0] === taskId, ["AC-04-01", "A20"]);
+    check("brand cannot read private draft", (await brand.send(`/api/tasks/${taskId}`)).status === 404, ["A19", "SA-12"]);
+    check("foreign task hidden", (await foreign.send(`/api/tasks/${taskId}`)).status === 404, ["A19"]);
     const bytes = Buffer.from("%PDF-1.4\nSynthetic original G04 HTTP reference\n%%EOF");
-    const uploaded = await admin.upload(taskId, bytes); check("multipart reference uploaded", uploaded.status === 201, ["A05", "SA-03"]); const file = (await uploaded.json()).files[0];
-    const raw = await admin.send(`/api/files/${file.id}?taskId=${taskId}`); check("manager exact original hash", createHash("sha256").update(Buffer.from(await raw.arrayBuffer())).digest("hex") === file.sha256, ["A05"]);
-    check("draft file private", (await brand.send(`/api/files/${file.id}?taskId=${taskId}`)).status === 404, ["A02"]);
-    check("forged extension rejected", (await admin.upload(taskId, bytes, "unsafe.exe")).status === 422, ["A05"]);
+    const uploaded = await admin.upload(taskId, bytes); check("multipart reference uploaded", uploaded.status === 201, ["A04", "SA-04", "partial-SA-19"]); const file = (await uploaded.json()).files[0];
+    const raw = await admin.send(`/api/files/${file.id}?taskId=${taskId}`); check("manager exact original hash", createHash("sha256").update(Buffer.from(await raw.arrayBuffer())).digest("hex") === file.sha256, ["A04", "SA-04"]);
+    check("draft file private", (await brand.send(`/api/files/${file.id}?taskId=${taskId}`)).status === 404, ["A19"]);
+    check("forged extension rejected", (await admin.upload(taskId, bytes, "unsafe.exe")).status === 422, ["A04", "SA-04"]);
     c.referenceFileIds = [file.id]; await command(admin, taskId, "save", { content: c });
     const preview = await admin.json<{ content: unknown }>(`/api/tasks/${taskId}?preview=1`); await command(admin, taskId, "publish");
     const published = await detail(brand, taskId); check("preview equals actual public DTO", JSON.stringify(preview.content) === JSON.stringify(published.request), ["AC-04-02", "SA-12"]);
     check("all eight requirements roundtrip", published.request!.requirements.length === 8, ["SA-10"]);
-    check("external deadline separate with original preserved", published.request!.deadline.value === "2026-10-01" && published.request!.milestones[0].deadline.value === "2026-10-20" && published.request!.milestones[0].deadline.raw.includes("원문 충돌"), ["AC-04-02"]);
-    check("internal original absent from brand response", !JSON.stringify(published).includes("INTERNAL_ONLY_G04"), ["A02"]);
-    const download = await brand.send(`/api/files/${file.id}?taskId=${taskId}&mode=preview`); check("authorized preview private no-store plus original bytes", download.status === 200 && download.headers.get("cache-control")!.includes("no-store") && createHash("sha256").update(Buffer.from(await download.arrayBuffer())).digest("hex") === file.sha256, ["A05"]);
-    check("file forged reference rejected", (await brand.send(`/api/files/${file.id}?taskId=task-wave`)).status === 404, ["A02"]);
+    check("external deadline separate with original preserved", published.request!.deadline.value === "2026-10-01" && published.request!.milestones[0].deadline.value === "2026-10-20" && published.request!.milestones[0].deadline.raw.includes("원문 충돌"), ["AC-04-02", "A17"]);
+    check("internal original absent from brand response", !JSON.stringify(published).includes("INTERNAL_ONLY_G04"), ["A19"]);
+    const download = await brand.send(`/api/files/${file.id}?taskId=${taskId}&mode=preview`); check("authorized preview private no-store plus original bytes", download.status === 200 && download.headers.get("cache-control")!.includes("no-store") && createHash("sha256").update(Buffer.from(await download.arrayBuffer())).digest("hex") === file.sha256, ["A04", "SA-04"]);
+    check("file forged reference rejected", (await brand.send(`/api/files/${file.id}?taskId=task-wave`)).status === 404, ["A19"]);
     await command(team, taskId, "read"); const t = await detail(team, taskId); check("team read stays separate from acceptance", t.activities.some(a => a.data.kind === "read") && t.task.data.status === "requested", ["AC-04-05"]);
-    check("team cannot accept", (await team.mutate(`/api/tasks/${taskId}`, { command: "accept", expectedRevision: t.task.revision, idempotencyKey: randomUUID() })).status === 403, ["A02"]);
+    check("team cannot accept", (await team.mutate(`/api/tasks/${taskId}`, { command: "accept", expectedRevision: t.task.revision, idempotencyKey: randomUUID() })).status === 403, ["A19"]);
     await command(brand, taskId, "accept"); await command(brand, taskId, "schedule", { deadline: { ...c.deadline, value: "2026-11-03" }, reason: "브랜드 협의" });
     const requested = await detail(brand, taskId); check("schedule proposal does not alter deadline", requested.request!.deadline.value === c.deadline.value, ["AC-04-05"]);
     const v1 = published.versions[0].id, activityId = requested.activities.find(a => a.data.kind === "schedule")!.id;
@@ -86,13 +86,13 @@ try {
         const fixtureRepo = createSqliteRepository(openDatabase(filename)); await fixtureRepo.transaction(s => s.create("priorSubmission", { id: "g04-prior-http-fixture", contextId: ctx, data: { taskId, requestId: v1, authorId: "user-luna", answers: [{ requirementKey: "q-short_text", productId: null, value: "합성 이전 답변", fileVersionIds: [] }] } })); fixtureRepo.close();
         const next = { ...c, requirements: [...c.requirements, { ...blankRequirement("added-file", "file"), label: "개정 추가 필수 파일" }] }; await command(admin, taskId, "save", { content: next }); await command(admin, taskId, "publish");
         const revised = await detail(brand, taskId); check("actual API prior-submission fixture retained and additions missing", revised.requirementStatus.some(q => q.requirementKey === "q-short_text" && q.status === "prior_received") && revised.requirementStatus.some(q => q.requirementKey === "added-file" && q.status === "missing"), ["AC-04-04", "D06"]);
-        const beforeHash = createHash("sha256").update(JSON.stringify(revised)).digest("hex"); await stop(); await start(); check("actual different server process", processes[0].pid !== processes[1].pid, ["A01"]);
-        const relogged = new Client(); await relogged.login("luna@example.test"); const after = await detail(relogged, taskId); check("all task versions activities and projection survive actual restart/relogin", createHash("sha256").update(JSON.stringify(after)).digest("hex") === beforeHash, ["A01", "AC-04-02", "AC-04-04", "AC-04-05"]);
-        const restored = await relogged.send(`/api/files/${file.id}?taskId=${taskId}&mode=original`); check("immutable bytes survive restart", createHash("sha256").update(Buffer.from(await restored.arrayBuffer())).digest("hex") === file.sha256, ["A05"]);
+        const beforeHash = createHash("sha256").update(JSON.stringify(revised)).digest("hex"); await stop(); await start(); check("actual different server process", processes[0].pid !== processes[1].pid, ["A20"]);
+        const relogged = new Client(); await relogged.login("luna@example.test"); const after = await detail(relogged, taskId); check("all task versions activities and projection survive actual restart/relogin", createHash("sha256").update(JSON.stringify(after)).digest("hex") === beforeHash, ["A20", "AC-04-02", "AC-04-04", "AC-04-05"]);
+        const restored = await relogged.send(`/api/files/${file.id}?taskId=${taskId}&mode=original`); check("immutable bytes survive restart", createHash("sha256").update(Buffer.from(await restored.arrayBuffer())).digest("hex") === file.sha256, ["A04", "SA-04"]);
         const inspect = createSqliteRepository(openDatabase(filename)); const events = await inspect.list("domainEvent", ctx); check("CR03 durable acceptance event exists once", events.filter(e => e.data.targetId === taskId && e.data.eventType === "TASK_ACCEPTED").length === 1, ["AC-04-05", "CR03"]); check("change notice event persisted", events.some(e => e.data.targetId === taskId && e.data.eventType === "TASK_REQUEST_REVISED"), ["AC-04-04", "D07"]); inspect.close();
     }
     const catalog = await admin.json<TaskCatalog>(`/api/tasks?context=${ctx}`); check("seven basic templates present", catalog.templates.filter(t => t.builtin).length === 7, ["SA-47"]);
     const builtInApply = await admin.mutate("/api/templates", { command: "apply", contextId: ctx, versionId: "builtin-pop-v1", targets: [{ id: taskId, expectedRevision: (await detail(admin,taskId)).task.revision }], idempotencyKey: randomUUID() }); check("builtin template applies with explicit owner fallback", builtInApply.status === 200, ["SA-14"]);
-    const oldFile = await brand.send(`/api/files/${file.id}?taskId=${taskId}`); check("old-version reference remains available and metadata projected", oldFile.status === 200 && (await detail(brand, taskId)).files.some(f => f.id === file.id), ["A05", "AC-04-04"]);
+    const oldFile = await brand.send(`/api/files/${file.id}?taskId=${taskId}`); check("old-version reference remains available and metadata projected", oldFile.status === 200 && (await detail(brand, taskId)).files.some(f => f.id === file.id), ["A04", "SA-04", "AC-04-04"]);
 } catch (error) { failure = error instanceof Error ? error.message : "unknown failure"; process.exitCode = 1; }
 finally { await stop(); const report = { status: failure ? "FAIL" : "PASS", mode, level: "implementer-self-check", unit: "assertion", passed: checks.filter(c=>c.status==="PASS").length, failed: checks.filter(c=>c.status==="FAIL").length, skipped: 0, failure, checks, processes, actualHttp: true, processRestart: mode === "sqlite", sqliteFixture: mode === "sqlite" ? "synthetic prior submission, actual G05 producer remains NOT_RUN" : null, credentialsAndCookies: "memory only; not recorded" }; writeFileSync(reportFile, JSON.stringify(report,null,2), { mode: 0o600 }); console.log(JSON.stringify({ status: report.status, passed: report.passed, failed: report.failed, reportFile })); }
