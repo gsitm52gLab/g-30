@@ -1,6 +1,19 @@
 import { createHash } from "node:crypto";
 import { StoreError, type UnitOfWork } from "@/domain/records";
 import { blankCommon, blankContext, normalizeProductCode } from "@/domain/products/types";
+const reasons = ["missing_brand_context", "missing_required_name", "missing_required_code", "duplicate_context_code"] as const;
+export type ProductMigrationReason = typeof reasons[number];
+export class ProductMigrationError extends StoreError {
+    constructor(public productID: string, public sourceContextID: string | null, public reason: ProductMigrationReason) {
+        super(reason === "duplicate_context_code" ? "CONFLICT" : "INVALID_RECORD");
+    }
+}
+/** CLI-only allowlist: API handlers keep their existing generic StoreError response. */
+export function productMigrationDiagnostic(error: unknown) {
+    if (!(error instanceof ProductMigrationError) || !reasons.includes(error.reason))
+        return null;
+    return { module: "G06", productID: error.productID, sourceContextID: error.sourceContextID, reason: error.reason };
+}
 /** Domain migration uses the same lossless transaction in mock and SQLite. */
 export function migrateLegacyProducts(s: UnitOfWork, fault?: () => void) {
     let migrated = 0;
@@ -8,8 +21,14 @@ export function migrateLegacyProducts(s: UnitOfWork, fault?: () => void) {
         if (old.data.schemaVersion === 2)
             continue;
         const context = old.contextId ? s.get("context", old.contextId) : null;
-        if (!context?.data.brandId || typeof old.data.name !== "string" || !old.data.name.trim() || typeof old.data.code !== "string" || !old.data.code.trim())
-            throw new StoreError("INVALID_RECORD");
+        if (!context?.data.brandId)
+            throw new ProductMigrationError(old.id, old.contextId, "missing_brand_context");
+        if (typeof old.data.name !== "string" || !old.data.name.trim())
+            throw new ProductMigrationError(old.id, old.contextId, "missing_required_name");
+        if (typeof old.data.code !== "string" || !old.data.code.trim())
+            throw new ProductMigrationError(old.id, old.contextId, "missing_required_code");
+        if (s.list("contextProduct", old.contextId!).some(cp => cp.data.normalizedCode === normalizeProductCode(old.data.code)))
+            throw new ProductMigrationError(old.id, old.contextId, "duplicate_context_code");
         const common = blankCommon();
         common.name = old.data.name;
         common.code = old.data.code;

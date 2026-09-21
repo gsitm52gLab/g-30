@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { isDeepStrictEqual } from "node:util";
 import { createHash, randomUUID } from "node:crypto";
 import { spawn, execFileSync, type ChildProcess } from "node:child_process";
 import { createWriteStream, mkdirSync, mkdtempSync, writeFileSync, readFileSync } from "node:fs";
@@ -193,7 +194,7 @@ try {
     const b = await detail(brand, pid, B);
     await command(brand, pid, "save_context", { fields: { ...b.local, sku: "000-B", jan: "00000022", salesStatus: "selling" }, expectedContextRevision: b.contextRevision }, B);
     d = await detail(team, pid);
-    check("non-assignee can edit local public fields", hash(d.local) === hash(localA), ["SA-25", "A19"]);
+    check("non-assignee can edit local public fields", isDeepStrictEqual(d.local,localA), ["SA-25", "A19"]);
     check("local contexts remain independent", (await detail(brand, pid, B)).local.sku === "000-B", ["AC-06-02"]);
     const impact = await team.mutate(`/api/products/${pid}/impact`, { contextId: A, common: { ...d.common, name: "팀원 공통 수정" }, expectedCommonRevision: d.commonRevision }), impactBody = await impact.json() as ProductImpact;
     check("impact lists only permitted contexts", impact.status === 200 && impactBody.visibleContexts.length === 1 && impactBody.visibleContexts[0].id === A && !JSON.stringify(impactBody).includes(B) && !Object.hasOwn(impactBody, "total"), ["AC-06-04", "SA-28"]);
@@ -261,10 +262,10 @@ try {
     check("CR02 actual replay response projects IDs only", replay.status === 200 && JSON.stringify(await replay.json()) === JSON.stringify({ ids: [pid] }), ["G06-CR02"]);
     const receiptAfter = await fixture<FixtureSnapshot>({ action: "snapshot", productId: pid, contextId: A });
     check("CR02 poisoned immutable receipt preserved", receiptAfter.receipts.find(r => r.id === receiptFixture.id)?.sha256 === receiptFixture.sha256, ["G06-CR02"], "DB_FIXTURE");
-    const home = await brand.send(`/?context=${A}`), html = await home.text();
-    writeFileSync(`${reportFile}.home-private.html`, html, { mode: 0o600 });
-    check("CR04 actual home href carries selected context", home.status === 200 && html.includes(`/products/product-serum?context=${A}`) && !html.includes("context=null"), ["G06-CR04"]);
-    check("actual home SSR contains no private product marker/price", !html.includes(PRODUCT_CANARY) && !html.includes(privatePriceValue), ["AC-06-04"]);
+    const home = await brand.send(`/products?context=${A}`), html = await home.text();
+    writeFileSync(`${reportFile}.legacy-products-private.html`, html, { mode: 0o600 });
+    check("CR04 actual legacy product-card href carries selected context", home.status === 200 && html.includes(`/products/product-serum?context=${A}`) && !html.includes("context=null"), ["G06-CR04"]);
+    check("actual legacy product-list SSR contains no private product marker/price", !html.includes(PRODUCT_CANARY) && !html.includes(privatePriceValue), ["AC-06-04"]);
     const taskContent = { ...blankContent(), title: "HTTP 상품 업무 연결", description: "실제 공개 연결", deadline: { ...blankContent().deadline, responsibleUserId: "user-gsg" }, requirements: [{ ...blankRequirement("text"), label: "요청 항목" }] };
     const taskCreated = await admin.mutate("/api/tasks", { targets: [{ contextId: A, ownerId: "user-gsg", assigneeId: "user-luna", coAssigneeIds: [], productIds: [pid] }], content: taskContent, category: "spot", idempotencyKey: randomUUID() });
     check("actual G04 creation keeps Product ID", taskCreated.status === 201, ["AC-06-01"]);

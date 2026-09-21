@@ -161,4 +161,15 @@ HTTP 검사기는 새 `.data/g04-http-*` DB/파일과 별도 쿠키 이름을 �
 
 공통 정보 변경은 공유된 현재 정보를 갱신합니다. 미리보기에는 읽을 수 있는 적용 컨텍스트만 표시하고 숨겨진 대상의 이름·수·가격·파일은 반환하지 않습니다. 저장 명령은 각 common/context/price의 revision과 idempotencyKey를 사용합니다. `captureProductUse`는 후속 제출 트랜잭션에서 쓸 정확한 common/context/file 버전과 명시적으로 선택한 소비자가 버전을 저장합니다. 최신 가격을 당일 적용 가격으로 자동 간주하지 않습니다.
 
-이 내부 단계의 제품 UI 통합·실제 HTTP/브라우저/재시작 검증은 아직 완료되지 않았습니다. 초기 prior-use 레코드는 계약 검증용이며 G05의 실제 제출 생산자가 아닙니다. G07 증빙 집계/Excel, G10 검토, G11 완료 연결은 후속 의무입니다. 자료 집계는 연결 전 `connected:false`와 `null`로 표시합니다.
+이 내부 단계에서 상품 API·파일 권한·SQLite 재시작은 서버 자체검사 대상으로 검증합니다. 제품 UI 통합·브라우저 검증과 독립 수용은 아직 완료되지 않았습니다. 초기 prior-use 레코드는 계약 검증용이며 G05의 실제 제출 생산자가 아닙니다. G07 증빙 집계/Excel, G10 검토, G11 완료 연결은 후속 의무입니다. 자료 집계는 연결 전 `connected:false`와 `null`로 표시합니다.
+
+상품 서버 검사기는 새 전용 DB/파일·쿠키와 자신의 프로세스를 사용합니다. SQLite 모드는 두 포트에서 실제 동시 수정/중복 등록을 확인하고 종료·재시작·재로그인 후 정확한 상품/가격/파일/스냅샷을 비교합니다. mock 모드의 fixture 준비는 검사 전용 IPC이며 제품 API에 준비용 경로를 추가하지 않습니다. 과거 사용 스냅샷은 명시적 fixture이며 실제 G05 제출 완료로 계산하지 않습니다.
+
+```bash
+npm run build
+PRODUCTS_MODE=mock E2E_PORT=4161 E2E_AUX_PORT=4164 npm run products:http
+PRODUCTS_MODE=sqlite E2E_PORT=4161 E2E_AUX_PORT=4164 npm run products:http
+npm run products:migration-check
+```
+
+`PRODUCTS_HTTP_REPORT`는 보고서 경로를 지정하며 실제 요청/상태/응답 hash와 프로세스 종료를 남깁니다. `E2E_PORT`/`E2E_AUX_PORT`는 비어 있는 자신 소유 슬롯으로 함께 바꿀 수 있습니다. 기존 원장에 이행할 수 없는 상품이 있으면 전체 데이터 이행을 원복하고 CLI에 G06 모듈·상품 ID·원본 컨텍스트 ID·허용된 사유만 표시합니다. 원문 값·비공개 가격·stack을 진단에 넣지 않으며 API의 일반 오류 응답도 그대로 유지합니다.

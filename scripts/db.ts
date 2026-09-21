@@ -1,3 +1,4 @@
+import { productMigrationDiagnostic } from "@/data/products/migrate";
 import { loadProjectEnv } from "@/server/config/load-env";
 import { parseStorageConfig } from "@/server/config/parse";
 import { openDatabase, migrate } from "@/server/db/database";
@@ -18,6 +19,7 @@ try {
     }
   } finally { if (db.open) db.close(); }
 } catch (error) {
-  console.error(JSON.stringify({ operation: action, status: "failed", code: error instanceof StoreError ? error.code : "DATABASE_OR_CONFIGURATION_ERROR" }));
+  const diagnostic = productMigrationDiagnostic(error);
+  console.error(JSON.stringify({ operation: action, status: "failed", code: error instanceof StoreError ? error.code : "DATABASE_OR_CONFIGURATION_ERROR", ...(diagnostic ? { diagnostic } : {}) }));
   process.exitCode = 1;
 }
