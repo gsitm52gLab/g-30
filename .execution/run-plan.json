@@ -852,7 +852,7 @@
       ],
       "state": "IMPLEMENTING",
       "required_for_product_completion": true,
-      "candidate_commit": null,
+      "candidate_commit": "51339b4e435818a8bdb63dd7d0310ff9b5ca0719",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": null,
@@ -921,7 +921,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Review frozen G06 server/UI author packets; assign exact51339b combined selfchecks, then independent verification.",
+      "next_action": "prd runs exact51339b combined author checks; workflow independent assignment after results reviewed.",
       "base_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/task.json",
       "ownership_addenda": [
@@ -990,16 +990,17 @@
           "id": "G06-CR05",
           "severity": "P2",
           "title": "Product file view omits original uploader/time required by U06-08 and AC06-05",
-          "status": "REPAIR_ASSIGNED",
+          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
           "runtime_status": "STATIC_CONTRACT_GAP",
           "owner": "prd/goals",
-          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-3.json"
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-3.json",
+          "repair_candidate": "cd5e43abedb8bef58355d8315b46640094f0e070"
         },
         {
           "id": "G06-CR06",
           "severity": "P3",
           "title": "Mobile product section navigation wraps Korean labels character by character",
-          "status": "IMPLEMENTER_REPAIR_MAIN_VISUAL_CHECK_PENDING",
+          "status": "IMPLEMENTER_REPAIR_MAIN_VISUAL_REVIEWED_INDEPENDENT_PENDING",
           "source": "Mobile screenshot and CSS .tabs a flex basis",
           "owner": "goals",
           "repair_candidate": "8019017947f2e394447a093b0d2ea03ef95ecdc3"
@@ -1065,7 +1066,9 @@
       "assembly_candidate": "51339b4e435818a8bdb63dd7d0310ff9b5ca0719",
       "assembly_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-assembly",
       "assembly_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/assembly/assembly-record.json",
-      "assembly_state": "ASSEMBLED_AUTHOR_PACKETS_PENDING"
+      "assembly_state": "COMBINED_AUTHOR_SELF_CHECK_ASSIGNED",
+      "main_author_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-author-packet-review.json",
+      "combined_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/assembly/selfcheck-task.json"
     },
     {
       "id": "G07",
@@ -1707,8 +1710,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
-  "next_action": "Review frozen G06 server/UI author packets; assign exact51339b combined selfchecks, then independent verification.",
-  "state_version": 60,
+  "next_action": "prd runs exact51339b combined author checks; workflow independent assignment after results reviewed.",
+  "state_version": 61,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1735,7 +1738,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T13:14:51.057976+00:00",
+  "updated_at": "2026-09-21T13:17:14.788057+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
