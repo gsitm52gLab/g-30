@@ -1,3 +1,9 @@
+# State145 latest — G11 serial union under targeted regression
+
+Acceptedcd7 12/19 remains. G11ce049 independentffb24 root77ae3review1722artifacts528Git/cwd31cmd21exit0/10exit1,48CRC153literalHTTP/427unit40rawbrowser,17ownbusiness9UI5history4IO. Allhelpererrors retained; ownnonprice/mobileclickedbody notcaptured vsstandard40actualchannels separate. Rootclarifies originalinitialrace two runs1P1F notverifier2FAIL phrase. Rootmerge0804a4a 9conflicts resolvedbothrecords/constraints/taskentry/readme;7migrationtestcounts12, allSQL1..12original. Bindingba8f593nonledger458both69G1554G11same12uniondelta. Formalregression7866 workflow newg11-regression4231/32 bounded28+freshcheck/build+ownseams.
+
+PrdG16server-taskd2a8 ownpurephase oncd7; no commonlease beforeG11acceptedbase. Ai_verifyG16readonlyverifierprep, root+3active. G17realAPI mandatoryNOT_RUN. GoalACTIVE.
+
 # State144 latest — G15 ACCEPTED, G16 owned pure implementation authorized
 
 Acceptedcd7c434 12/19. Rootregressionb16d8a review445artifacts581Git/cwd9cmd32CRC425unit28rawbrowser44own+1mockskip. OriginalhelperSSR404fail2 preserved, narrowtailvalidNextstreamed200+404digest/canaryabsence. G17actualAPI NOT_RUN. G16prd formalserver-task ownedpurecorpus/types/validators only, commonleaseNOT_GRANTED pendingrootG11union. G11ce049 independentffb24 PASS received1722artifacts rootreviewnext, 9expectedconflicts thenworkflowregression. GoalACTIVE.
