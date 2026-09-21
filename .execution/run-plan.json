@@ -1447,7 +1447,8 @@
       "internal_assembly_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/assembly/internal-merge.json",
       "ownership_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/server/ownership-addendum-1.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/v02-dependency-addendum.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/v02-dependency-addendum.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/v03-resource-addendum.json"
       ],
       "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g07-verify",
       "open_findings": [
@@ -1475,6 +1476,14 @@
           "severity": "P1",
           "status": "REPAIR_ASSIGNED",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/main-v02-review.json"
+        },
+        {
+          "id": "G07-V03",
+          "status": "AUTHOR_FIXED_FINAL_VALIDATING",
+          "classification": "E2E_IMPORT_STAGING_ISOLATION",
+          "source_candidate": "fb8f32dc6c3064d8069b88e9539f9223b02305b0",
+          "provisional_repair_candidate": "dd77e9b4bb876ebdd9d6084b6de61c282e8eb63a",
+          "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/v03-resource-addendum.json"
         }
       ],
       "dependency_audit": {
@@ -1495,7 +1504,8 @@
       "repair_addendum": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/v02-task.json",
       "prior_verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verification-result.json",
       "prior_main_rejection": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-rejection.json",
-      "v01_author_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/main-v01-author-review.json"
+      "v01_author_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/main-v01-author-review.json",
+      "provisional_repair_candidate": "dd77e9b4bb876ebdd9d6084b6de61c282e8eb63a"
     },
     {
       "id": "G08",
@@ -1634,7 +1644,9 @@
       "internal_assembly_commit": "6460de707f870068bf4b682a83d872e53de84ff0",
       "internal_assembly_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/assembly/internal-merge.json",
       "main_ui_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-ui-final-review.json",
-      "main_binding_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-binding-review.json"
+      "main_binding_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-binding-review.json",
+      "verification_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-task-draft.json",
+      "verification_checkout_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-checkout.json"
     },
     {
       "id": "G09",
@@ -2187,7 +2199,7 @@
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G08",
   "next_action": "goals exact6460 combinedauthorcheck. Rootreview then assignworkflow exactindependentG08 before G07repaircompletion; G07 notdependency. IndependentPASS thenrootserialintegration andexactimpactregression. LaterG07/G08sharedunion requiresauthorresolvednewcandidate andindependentimpact.",
-  "state_version": 101,
+  "state_version": 102,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2214,7 +2226,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T17:11:19.895859+00:00",
+  "updated_at": "2026-09-21T17:16:26.596482+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
