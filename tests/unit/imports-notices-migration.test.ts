@@ -25,7 +25,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
     const sqlSource = path.resolve('src/server/db/migrations'), sqlDirectory = path.join(directory, 'prior');
     await mkdir(sqlDirectory);
     const names = (await readdir(sqlSource)).filter(n => /^\d+.*\.sql$/.test(n)).sort();
-    expect(names).toEqual(['0001-foundation.sql', '0002-identity.sql', '0003-tasks.sql', '0004-products.sql', '0005-submissions.sql', '0006-evidence-imports.sql', '0007-notices.sql', '0008-inquiries.sql', '0009-corrections.sql', '0010-campaigns.sql', '0011-completion.sql', '0012-ai-input.sql', '0013-ai-review.sql']);
+    expect(names).toEqual(['0001-foundation.sql', '0002-identity.sql', '0003-tasks.sql', '0004-products.sql', '0005-submissions.sql', '0006-evidence-imports.sql', '0007-notices.sql', '0008-inquiries.sql', '0009-corrections.sql', '0010-campaigns.sql', '0011-completion.sql', '0012-ai-input.sql', '0013-ai-review.sql', '0015-ai-provider.sql']);
     for (const name of names.filter(n => Number(n.slice(0, 4)) <= 5 || Number(n.slice(0, 4)) === firstModule)) await copyFile(path.join(sqlSource, name), path.join(sqlDirectory, name));
     const db = openDatabase(path.join(directory, 'populated.sqlite'), true);
     let repo: ReturnType<typeof createSqliteRepository> | undefined;
