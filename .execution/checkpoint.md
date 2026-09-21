@@ -1,3 +1,11 @@
+# State134 latest — mobile defects repaired, independent closure pending
+
+Accepted953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6 stays10/19 GoalACTIVE. G12 original74e independent **FAIL** G12-V01 configured390→425 clipping; weakB04 invalidated. Rootreview909f0d34…3582artifacts/4inputs/319CRC24commands noerrors. Narrow CSS+layouttest5229e8ca author391/build+mock8/DB8,20rawgeometry rootreview40b04da…198artifacts0errors. Workflow formal9197afa… newdetachedg12-layout-verification ports4231/32, changedlayout fresh +unchangedserverproof fresh0; no integration untilnewPASS.
+
+G11 servercaf891 typedcontract rootreview7c4fb2f9…26artifacts31changedGit/worktree8commands0errors;372unit/build. Sharedlease RELEASED. Prd resumed actualHTTP/race/restart/copyfirsthistory afterG12repair, currentHTTP proofpending. G11 UI later. Ownverificationdraftaa4bf3… NOTASSIGNED.
+
+G15 latest1eec0ce CSS-only after5df actual190charLatin title overflow (configured390 vsinner1560/full4366), source red preserved. Authorreports final4stronggeometryPASS +build; prior56functional/9restart counts sourceboundfresh0, oldweakR10 notgeometryproof. Finalpacket/rootreviewpending; wholeindependentprd only. G16 SA59/60/61 scopeaddendum938e974… and mobilegeometryguardaea99e… nowtracked. G17actualminimumOpenAIcallstillNOT_RUN mandatory.
+
 # State133 latest — G11 server underway, G12 author reviewed
 
 Accepted953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6 stays10/19 GoalACTIVE. PrdformalG11/server-task911609858919e0b5405bd447ae3928b75b06791d830dcbd75f3f5d42e17b2215 new .worktrees/g11-server branchrun/g11-server exact953,ports4229/30,noenv; exclusivecommonserverrecords/constraints/0011/tasksservice/submissionread, noUIphase. DraftDoR29sourceverified. NarrowG05testoracleaddendumd5afbe8094a044781349a1367090eb85a61ef14f2c43afdc95d8c0d10539e476 permits UI-E andR12 connected:true ANDnot_completed preservingpartial/allotherassertions. Needearlycontractfreeze thenHTTP/race/historyfinal; eventualgoalsUI whileprdindependentG15 possible.

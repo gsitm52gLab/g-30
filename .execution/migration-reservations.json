@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "rule": "Root allocates new migration filename; immutable accepted SQL bytes stay unchanged. File count is actual checkout migrations, never inferred from highest reserved number. Reservation does not grant schema lease or mark implementation complete.",
-  "at": "2026-09-21T20:24:47.204478+00:00",
+  "at": "2026-09-21T20:43:20.556067+00:00",
   "reservations": [
     {
       "id": "0001",
@@ -67,7 +67,7 @@
       "id": "0011",
       "file": "0011-completion.sql",
       "goal": "G11",
-      "state": "AUTHOR_SERVER_IMPLEMENTING_EXCLUSIVE_SHARED_LEASE"
+      "state": "AUTHOR_CONTRACT_FROZEN_SHARED_LEASE_RELEASED"
     },
     {
       "id": "0012",
