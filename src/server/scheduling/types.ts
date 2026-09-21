@@ -8,6 +8,7 @@ export interface SourceSchedule {
     taskId: string | null;
     title: string;
     nextAction?: string;
+    recipientPolicy?: 'task_assignees' | 'explicit_action_owner' | 'external_gsg';
     kind: string;
     source: ScheduleSource;
     sourceRevision: number;
@@ -17,6 +18,7 @@ export interface SourceSchedule {
     unresolvedConflict: boolean;
     active: boolean;
     need: CurrentNeed | null;
+    actionOwnerIds: string[];
     recipient: CurrentRecipient | null;
     recipientState: 'current_recipient' | 'other_recipient' | 'needs_assignment';
     reminderSupport: 'current_need' | 'source_schedule_only';

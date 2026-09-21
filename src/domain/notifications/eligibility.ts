@@ -14,12 +14,13 @@ export function reminderEligibility(facts: ReminderFacts, now: string): Reminder
         if (need.remaining === 0) return { eligible: false, reason: 'no_remaining' };
     } else if (need.kind === 'responsible_action') {
         if (['draft', 'completed', 'cancelled', 'on_hold'].includes(need.taskStatus)) return { eligible: false, reason: 'task_inactive' };
+        if (need.recipientRole === 'brand' && !need.participationActive) return { eligible: false, reason: 'participation_inactive' };
         if (!need.pending) return { eligible: false, reason: 'no_remaining' };
     } else if (need.state !== 'external_waiting') return { eligible: false, reason: 'external_wait_ended' };
     if (!recipient) return { eligible: false, reason: 'needs_assignment' };
     if (!recipient.active) return { eligible: false, reason: 'recipient_inactive' };
     if (!recipient.sourceReadable) return { eligible: false, reason: 'source_denied' };
-    if (recipient.role !== (need.kind === 'brand_submission' ? 'brand' : 'gsg')) return { eligible: false, reason: 'wrong_recipient_role' };
+    if (recipient.role !== (need.kind === 'brand_submission' ? 'brand' : need.kind === 'responsible_action' ? need.recipientRole : 'gsg')) return { eligible: false, reason: 'wrong_recipient_role' };
     if (timing.unresolvedConflict) return { eligible: false, reason: 'unresolved_conflict' };
     const calendar = calendarPosition(timing.deadline, now);
     if (calendar.basis === 'undated') return { eligible: false, reason: 'undated' };
