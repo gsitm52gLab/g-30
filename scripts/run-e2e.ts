@@ -135,17 +135,17 @@ async function main() {
                     const slot = `${String(index + 1).padStart(2, "0")}-${path.basename(selection.file).replace(/[^a-zA-Z0-9._-]/g, "_")}`;
                     const fileArtifacts = path.join(artifactDirectory, slot), fileData = path.join(dataDirectory, slot);
                     mkdirSync(fileArtifacts, { recursive: true }); mkdirSync(fileData, { recursive: true });
-                    const database = path.join(fileData, "fixture.db"), files = path.join(fileData, "files");
+                    const database = path.join(fileData, "fixture.db"), files = path.join(fileData, "files"), imports = path.join(fileData, "import_staging");
                     const fileReport = `${reportPrefix}.${project}.${slot}.json`;
                     const fileEnv = { ...env, E2E_RUN_FILE: selection.file, E2E_REPORT: fileReport,
-                        E2E_ARTIFACTS: path.join(fileArtifacts, "test-results"), DATABASE_FILE: database, FILE_STORAGE_DIR: files,
+                        E2E_ARTIFACTS: path.join(fileArtifacts, "test-results"), DATABASE_FILE: database, FILE_STORAGE_DIR: files, IMPORT_STORAGE_DIR: imports,
                         SESSION_COOKIE_NAME: `gs_hale_e2e_${serverPort}_${project}_${index}_${runId.slice(-8)}` };
                     const serverCommand = [process.execPath, "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(serverPort)];
                     // Keep all original CLI selectors. The config's exact file matcher intersects them;
                     // adding another positional file here would instead OR the user's file filters.
                     const testCommand = [process.execPath, "node_modules/@playwright/test/cli.js", "test", ...forwarded, `--project=${project}`];
                     const fileResult: Record<string, unknown> = { file: selection.file, selected_identities: selection.identities,
-                        cwd: process.cwd(), started_at: now(), port: serverPort, database, file_storage: files,
+                        cwd: process.cwd(), started_at: now(), port: serverPort, database, file_storage: files, import_storage: imports,
                         cookie_name: fileEnv.SESSION_COOKIE_NAME, app_origin: env.APP_ORIGIN, report: fileReport,
                         artifacts: fileEnv.E2E_ARTIFACTS, server_command: serverCommand, test_command: testCommand,
                         server_log: path.join(fileArtifacts, "server.log"), runner_log: path.join(fileArtifacts, "runner.log") };

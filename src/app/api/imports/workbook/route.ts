@@ -1,0 +1,4 @@
+import { route } from '@/server/http/identity';
+import { ImportService } from '@/server/imports/service';
+import { enumValue } from '@/domain/tasks/validate';
+export function GET(request: Request) { return route(request, async (identity, token) => { const q = new URL(request.url).searchParams, kind = enumValue(q.get('kind') ?? 'template', ['template', 'export']), bytes = await new ImportService(identity).workbook(token, q.get('context') ?? '', kind, q.get('internal') === '1'); return new Response(new Uint8Array(bytes), { headers: { 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Content-Disposition': `attachment; filename="gs-hale-${kind}.xlsx"`, 'Cache-Control': 'no-store, private', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer' } }); }); }

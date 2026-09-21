@@ -1,3 +1,5 @@
+import type { EvidenceData, EvidenceVersionData, EvidenceLinkData, EvidenceAssessmentData } from './evidence/types';
+import type { ImportBatchData } from './imports/types';
 import type { NoticeData, NoticeVersionData, NoticeReadData } from './notices/types';
 import type { SubmissionData, SubmissionDraftData } from './submissions/types';
 import type { CommonProductExtension, ProductVersionData, ContextProductData, ContextProductVersionData, PriceData, RetailPriceVersionData, InternalPriceVersionData, ProductUseSnapshotData } from "./products/types";
@@ -95,6 +97,11 @@ export interface ProductData extends CommonProductExtension {
     missingMaterials: number;
 }
 export interface RecordDataMap {
+    evidence: EvidenceData;
+    evidenceVersion: EvidenceVersionData;
+    evidenceLink: EvidenceLinkData;
+    evidenceAssessment: EvidenceAssessmentData;
+    importBatch: ImportBatchData;
     notice: NoticeData;
     noticeVersion: NoticeVersionData;
     noticeRead: NoticeReadData;

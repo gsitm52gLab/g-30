@@ -2,7 +2,7 @@
 export interface ResourceScope {
     id: string;
     contextId: string | null;
-    kind: "notice" | "context" | "membership" | "task" | "product" | "inquiry" | "file" | "search" | "export" | "notification" | "audit" | "ai_input" | "ai_result" | "account";
+    kind: "evidence" | "notice" | "context" | "membership" | "task" | "product" | "inquiry" | "file" | "search" | "export" | "notification" | "audit" | "ai_input" | "ai_result" | "account";
     visibility: "public" | "internal" | "draft";
     assigneeUserId?: string;
     coAssigneeUserIds?: readonly string[];
@@ -17,6 +17,7 @@ export interface ResourceScope {
 }
 
 export const actionKinds = {
+    "evidence.read": "evidence", "evidence.edit": "evidence", "evidence.assess": "evidence",
     "notice.read": "notice", "notice.manage": "notice",
     "context.read": "context", "context.create": "context",
     "membership.manage": "membership", "account.manage": "account",
