@@ -1,3 +1,4 @@
+import { resolveNotice } from '@/server/notices/access';
 import { randomUUID, createHash } from "node:crypto";
 import { mkdir, writeFile, readFile, unlink } from "node:fs/promises";
 import path from "node:path";
@@ -14,11 +15,12 @@ import { resolveProduct } from "@/server/products/access";
 const text = (v: unknown) => typeof v === "string" ? v : "";
 export const fileMetadata = (f: StoredRecord<"fileVersion">) => ({ id: f.id, name: text(f.data.originalName), bytes: typeof f.data.bytes === "number" ? f.data.bytes : 0, mime: text(f.data.mime), sha256: text(f.data.sha256), preview: f.data.preview === true, visibility: f.data.visibility === "internal" ? "internal" as const : "public" as const });
 export function fileUrls(file: StoredRecord<"fileVersion">, reference: FileReference) {
-    const query = typeof reference === "string" ? new URLSearchParams({ taskId: reference }) : new URLSearchParams({ productId: reference.productId, contextId: reference.contextId });
+    const query = typeof reference === "string" ? new URLSearchParams({ taskId: reference }) : reference.kind==='notice'?new URLSearchParams({noticeId:reference.noticeId,...reference.versionId?{versionId:reference.versionId}:{}}):new URLSearchParams({ productId: reference.productId, contextId: reference.contextId });
     const base = `/api/files/${encodeURIComponent(file.id)}?${query}`;
     return { originalUrl: `${base}&mode=original`, downloadUrl: `${base}&mode=download`, previewUrl: file.data.preview === true ? `${base}&mode=preview` : null };
 }
 export function sourceReference(file: StoredRecord<"fileVersion">): FileReference {
+    if(file.data.owner?.kind==='notice')return {kind:'notice',noticeId:file.data.owner.noticeId};
     if (file.data.owner?.kind === "product" && file.contextId)
         return { kind: "product", productId: file.data.owner.productId, contextId: file.contextId };
     if (!file.data.taskId)
@@ -38,6 +40,10 @@ export class FileService {
             const task = s.get("task", reference)!;
             const versions = s.list("requestVersion", task.contextId!).filter(v => v.data.taskId === task.id);
             included = decide(s,p,"submission.write",taskScope(task),this.identity.clock).allowed && s.list("submissionDraft",task.contextId!).some(d=>d.data.taskId===task.id && contentFiles(d.data).includes(file.id)) || versions.some(v => v.data.content.referenceFileIds.includes(file.id)) || s.list("submission", task.contextId!).some(v => v.data.taskId === task.id && v.data.fileVersionIds.includes(file.id)) || canReadTemporarySubmissionFile(s,p,file,target,this.identity.clock) || p.user.data.role === "gsg" && (task.data.draft?.referenceFileIds.includes(file.id) === true || task.id === file.data.taskId);
+        }
+        else if(reference.kind==='notice') {
+            const r=resolveNotice(s,p,reference.noticeId,this.identity.clock,false,reference.versionId);
+            included=!!r.version?.data.content.fileIds.includes(file.id) || p.user.data.role==='gsg' && !reference.versionId && (r.notice.data.draft.fileIds.includes(file.id) || file.data.owner?.kind==='notice'&&file.data.owner.noticeId===r.notice.id);
         }
         else {
             const r = resolveProduct(s, p, reference.contextId, reference.productId, this.identity.clock);
@@ -74,7 +80,7 @@ export class FileService {
                 const p = this.identity.principal(s, token), scope = referenceScope(s, p, reference, this.identity.clock, true);
                 if (visibility === "internal" && p.user.data.role !== "gsg")
                     fail("FORBIDDEN", 403, "내부 자료를 만들 권한이 없습니다.");
-                const owner: FileOwner = typeof reference === "string" ? { kind: "task", taskId: reference } : { kind: "product", productId: reference.productId, contextProductId: resolveProduct(s, p, reference.contextId, reference.productId, this.identity.clock, true).relation.id };
+                const owner: FileOwner = typeof reference === "string" ? { kind: "task", taskId: reference } : reference.kind==='notice'?{kind:'notice',noticeId:reference.noticeId}: { kind: "product", productId: reference.productId, contextProductId: resolveProduct(s, p, reference.contextId, reference.productId, this.identity.clock, true).relation.id };
                 const rows = prepared.map(f => s.create("fileVersion", { id: f.id, contextId: scope.contextId, data: { taskId: typeof reference === "string" ? reference : null, owner, storageKey: f.id, originalName: f.name, mime: f.mime, bytes: f.buffer.length, sha256: f.sha256, uploaderId: p.user.id, visibility, preview: f.preview } }));
                 this.fault?.();
                 return { files: rows.map(fileMetadata) };

@@ -199,3 +199,31 @@ SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
 `SUBMISSIONS_HTTP_ROOT`는 새 고유 DB/파일 런타임 디렉터리의 부모(기본 `.local/g05-http`), `SUBMISSIONS_HTTP_REPORT`는 요청 상태·응답 hash·assertion 결과·프로세스 종료 보고서 경로입니다. 과거 보고서를 덮어쓰지 않게 새 경로를 사용하세요. SQLite 검사의 private fixture는 실제 생성된 레코드의 읽기·해시 대조만 하며, mock은 같은 읽기 전용 관찰을 IPC로 수행합니다. 실제 UI·브라우저·복구 및 독립 검증은 별도 실행 증거로 구분합니다.
 
 저장된 공개 요청의 항목 구조가 손상된 경우 `REQUEST_INVALID`409로 답변 쓰기를 거부합니다. 읽기 평가는 `needs_reconfirmation`, `canSubmitFull:false`, 요청 구조 확인 필요를 표시합니다. 비정상 상품 범위를 공통 항목으로 바꿔 제출을 허용하지 않습니다. GSG가 실제 요청 편집에서 규칙을 확인·정정한 뒤 다시 공개하고, 작성자는 유지한 답변을 명시적으로 비교·재적용합니다. 정상 값의 알 수 없는 추가 키는 공개 출력에서 제외하지만 합법적인 제출은 유지합니다. 이 답변 구조 검사는 후행 GSG 수동 완료의 강제 승인 게이트가 아닙니다.
+
+## G08 공지·가이드 서버 계약 후보
+
+현재 G08은 서버 계약 후보이며 공지 UI·브랜드 홈·PC/모바일 통합과 독립 수용은 아직 완료되지 않았습니다. 공지 1건은 명시적인 컨텍스트 1개를 소유합니다. GSG는 공지·FAQ·업무 가이드·양식을 초안으로 저장하고 브랜드 보기의 공개 내용 투영을 확인한 뒤 새 불변 버전으로 공개합니다. 개정은 과거 본문·첨부·읽음을 덮어쓰지 않습니다.
+
+전체 대상은 해당 컨텍스트의 활성 브랜드 사용자라는 규칙이며 나중에 합류한 활성 사용자도 읽을 수 있습니다. 선택 대상의 빈 목록은 대상 없음입니다. 공개 당시 알림용 사용자 목록은 저장하지만 읽기 권한으로 고정하지 않습니다. 과거 버전과 파일도 현재 대상 권한 및 해당 과거 버전의 대상 권한을 함께 확인합니다. 읽음은 서버의 사용자·버전·시각 기록이며 업무 수락·제출·완료를 변경하지 않습니다. GSG만 대상/확인 명단을 받고 브랜드는 본인의 확인 사실을 받습니다.
+
+`GET/POST /api/notices`, `GET/POST /api/notices/:id`가 목록·생성·조회·명령이며 `?version=...`은 정확한 과거 공개본, `?preview=1`은 GSG의 저장된 초안 미리보기입니다. 같은 컨텍스트의 별도 업무 ID는 초안 `content.taskIds`에 연결하고 공개합니다. 생성·기한·배정·답변은 기존 업무 API의 책임입니다. 공지 공개본의 업무 표시는 원본의 읽음/수락/제출/완료 사실을 구분하며 비공개 업무는 브랜드 공개 투영에 포함하지 않습니다.
+
+파일 API는 기존 경로에 `?noticeId=...`와 선택 `versionId=...` 참조를 추가합니다. 기존 25MiB/10개와 private 저장소 규칙을 유지합니다. 업로드된 초안 파일은 공개 버전에 포함되기 전 브랜드가 읽거나 다른 자료에 재사용할 수 없습니다. 과거 버전에서 제거된 파일은 허용된 과거 공지 주소에서 정확한 바이트로 조회하며, 비동기 읽기 전후 권한을 다시 검사합니다. 공지 전용 파일 owner 추가는 기존 task/product 파일 원장을 다시 쓰지 않습니다.
+
+새 `0007-notices.sql`은 G07의 예약된 0006 뒤 번호입니다. 이 독립 분기는 선행 승인 5개 migration과 0007을 적용하며 G07과 직렬 통합되면 둘 다 적용합니다. 공개 버전·읽음은 불변이고 공개 pointer/event/audit/receipt는 하나의 transaction입니다. `NOTICE_PUBLISHED`/`NOTICE_REVISED` 사건은 G13 알림 소비 계약이며 실제 전달 완료를 뜻하지 않습니다.
+
+```sh
+npm ci
+npm run check
+npm run build
+npx vitest run tests/unit/notices.test.ts
+```
+
+G08 서버 실제 API 검사기는 다음 명령으로 실행합니다. 두 포트는 비어 있는 자신 소유 슬롯을 지정하며, 실행마다 새 합성 DB/파일/쿠키를 만듭니다. SQLite는 두 프로세스의 CAS·멱등 공개, 실제 종료·새 PID 재시작·재로그인을 포함합니다.
+
+```sh
+NOTICES_MODE=mock E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notices-http.ts
+NOTICES_MODE=sqlite E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notices-http.ts
+```
+
+`NOTICES_HTTP_ROOT`는 런타임 부모(기본 `.local/g08-http`), `NOTICES_HTTP_REPORT`는 새 결과 경로입니다. 보고서는 실제 요청·응답 본문 파일/hash, assertion 단위 결과, PID/종료와 저장소 경로를 기록합니다. 원 보고서를 보존하려면 새 경로를 쓰세요. HTTP로 실제 업무와 제출을 만든 뒤 공지 읽음 전후 업무·요청·활동·제출·상품 캡처·파일 원장을 비교합니다. 공지 파일의 상품/다른 공지 재사용과 원본·참조 양측 권한도 검사합니다. 신규 멤버/알 수 없는 저장 확장 키 준비는 제품 endpoint가 없는 private IPC/저장소 fixture이며 읽기 권한은 실제 HTTP로 검사합니다. late fault와 비동기 파일 읽기 중 철회는 양 adapter 단위 검사, 기존 데이터 migration은 별도 `notices-migration.test.ts`가 확인합니다. UI·HTML/RSC·독립 검증은 별도 증거가 필요합니다.
