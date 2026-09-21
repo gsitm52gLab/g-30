@@ -10,7 +10,7 @@ import { createMockRepository } from "@/server/repositories/mock";
 import type { RecordRepository } from "@/domain/records";
 import { seed } from "@/server/db/seed";
 import { DEMO_PASSWORD } from "@/domain/catalog";
-import { blankContent } from "@/domain/tasks/types";
+import { blankContent, blankRequirement } from "@/domain/tasks/types";
 import type { TaskDetail } from "@/server/tasks/service";
 import { inquiryFixture, type InquiryFixtureInput, type InquiryFixtureSnapshot } from "./verify-inquiries-fixtures";
 const hash = (value: unknown) => createHash("sha256").update(typeof value === "string" ? value : JSON.stringify(value)).digest("hex");
@@ -263,7 +263,7 @@ try {
     check('G09-H23 changed same client body rejected',(await brand.mutate(url(id),{...send,idempotencyKey:randomUUID(),content:{...send.content,body:'different'}})).status===409,['A20']);
     const read={command:'read',throughMessageId:sentLost.messageId,idempotencyKey:randomUUID()};await command(gsg,id,read);await command(gsg,id,{...read,idempotencyKey:randomUUID()});
     check('G09-H24 read records identical canonical target once',(await active(brand,id)).reads.filter(r=>r.throughMessageId===sentLost.messageId).length===1,['AC-09-02']);
-    const beforeLink=await fixture<InquiryFixtureSnapshot>({conversationId:id}),c={...blankContent(),title:'문의에서 실제 생성한 업무',description:'별도 공개 필요',deadline:{...blankContent().deadline,responsibleUserId:'user-gsg'}};
+    const beforeLink=await fixture<InquiryFixtureSnapshot>({conversationId:id}),c={...blankContent(),title:'문의에서 실제 생성한 업무',description:'별도 공개 필요',requirements:[{...blankRequirement('followup'),label:'연결 업무 답변'}],deadline:{...blankContent().deadline,responsibleUserId:'user-gsg'}};
     const created=await admin.mutate('/api/tasks',{targets:[{contextId:A,ownerId:'user-gsg',assigneeId:'user-team',coAssigneeIds:[],productIds:[]}],category:'spot',content:c,idempotencyKey:randomUUID()});assert.equal(created.status,201,await created.clone().text());const taskId=(await created.json()).ids[0] as string;
     const revision=(await active(gsg,id)).revision;check('G09-H25 failed stale association preserves created task',(await gsg.mutate(url(id),{command:'link_task',taskId,expectedRevision:revision-1,idempotencyKey:randomUUID()})).status===409&&(await admin.send(`/api/tasks/${taskId}`)).status===200,['AC-09-04']);
     await command(gsg,id,{command:'link_task',taskId,expectedRevision:revision});check('G09-H26 unpublished linked task hidden without changing original messages',(await active(brand,id)).task===null&&hash((await fixture<InquiryFixtureSnapshot>({conversationId:id})).messages)===hash(beforeLink.messages),['AC-09-04']);
