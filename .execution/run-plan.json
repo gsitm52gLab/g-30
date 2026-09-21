@@ -465,6 +465,35 @@
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/task.json",
       "ownership_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ownership-addendum-1.json"
+      ],
+      "subtasks": [
+        {
+          "id": "G04-SERVER",
+          "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
+          "state": "IMPLEMENTING",
+          "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-impl",
+          "ownership_note": "Existing lease except UI paths transferred to G04-UI",
+          "contract_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f"
+        },
+        {
+          "id": "G04-UI",
+          "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+          "state": "IMPLEMENTING",
+          "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-ui",
+          "owned_paths": [
+            "src/features/tasks/**",
+            "src/features/projects/**",
+            "src/app/tasks/**",
+            "src/app/projects/**",
+            "src/components/navigation.tsx"
+          ],
+          "base_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
+          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ui/task.json"
+        }
+      ],
+      "implementer_session_ids": [
+        "01a0c307-c975-75b1-b96a-5a5c4e448aec",
+        "01a0c307-9b54-7b83-b5eb-1b12b9a8553c"
       ]
     },
     {
@@ -1210,8 +1239,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
   "current_goal": "G04",
-  "next_action": "Implement complete G04 and actual reference-file foundation; return candidate and evidence for independent verification",
-  "state_version": 29,
+  "next_action": "G04 server/UI isolated implementation; main serial subtask merge then full exact candidate independent verification",
+  "state_version": 30,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1238,7 +1267,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T10:54:52.196573+00:00",
+  "updated_at": "2026-09-21T10:58:29.266622+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
