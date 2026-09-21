@@ -224,8 +224,8 @@ async function taskCommand(id: string, command: string) {
     assert.equal(r.status, 200, await r.clone().text());
 }
 async function actualSubmission() {
-    const c = { ...blankContent(), title: '공지에서 연결할 실제 제출 업무', description: '합성 제출', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('answer'), label: '답변' }] };
-    const created = await admin.mutate('/api/tasks', { targets: [{ contextId: A, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: [], productIds: [] }], content: c, category: 'spot', idempotencyKey: randomUUID() });
+    const c = { ...blankContent(), title: '공지에서 연결할 실제 제출 업무', description: '합성 제출', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('answer'), label: '답변' }, { ...blankRequirement('remaining'), label: '남은 답변' }] };
+    const created = await admin.mutate('/api/tasks', { targets: [{ contextId: A, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: [], productIds: ['product-serum'] }], content: c, category: 'spot', idempotencyKey: randomUUID() });
     assert.equal(created.status, 201, await created.clone().text());
     const id = (await created.json()).ids[0] as string;
     await taskCommand(id, 'publish');
@@ -241,10 +241,11 @@ async function actualSubmission() {
     assert.equal(item.state, 'ready');
     if (item.state !== 'ready') throw Error('synthetic upload failed');
     const fileId = item.file.id;
-    const saved = await brand.mutate(`/api/tasks/${id}/submission-draft`, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: 0, content: { ...blankDraft(), answers: [{ requestId: w.request.id, requirementKey: 'answer', productId: null, type: 'long_text', input: { text: '실제 HTTP 합성 답변' } }], artifacts: [{ fileVersionId: fileId, role: 'editable_original', answer: null }] }, idempotencyKey: randomUUID() });
+    const product = await brand.get<ProductDetail>(`/api/products/product-serum?context=${A}`);
+    const saved = await brand.mutate(`/api/tasks/${id}/submission-draft`, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: 0, content: { ...blankDraft(), answers: [{ requestId: w.request.id, requirementKey: 'answer', productId: null, type: 'long_text', input: { text: '실제 HTTP 합성 답변' } }], artifacts: [{ fileVersionId: fileId, role: 'editable_original', answer: null }], productSelections: [{ productId: 'product-serum', expectedCommonRevision: product.commonRevision, expectedContextRevision: product.contextRevision, bindingIds: [], retailPriceVersionId: null, asOfDate: '2026-09-21' }] }, idempotencyKey: randomUUID() });
     assert.equal(saved.status, 200, await saved.clone().text());
     w = await brand.get<SubmissionWorkspace>(`/api/tasks/${id}/submissions`);
-    const submitted = await brand.mutate(`/api/tasks/${id}/submissions`, { baseRequestId: w.request.id, expectedDraftRevision: w.draft!.revision, expectedTaskRevision: w.taskRevision, mode: 'full', idempotencyKey: randomUUID() });
+    const submitted = await brand.mutate(`/api/tasks/${id}/submissions`, { baseRequestId: w.request.id, expectedDraftRevision: w.draft!.revision, expectedTaskRevision: w.taskRevision, mode: 'partial', idempotencyKey: randomUUID() });
     assert.equal(submitted.status, 201, await submitted.clone().text());
     return { id, fileId };
 }
@@ -280,7 +281,7 @@ try {
     check('altered same-key body conflicts', (await admin.mutate(`/api/notices/${id}`, { ...publishInput, versionId: 'different' })).status === 409, ['AC-08-03']);
     const public1 = await detail(brand, id), selected = public1.selected!;
     check('brand projection contains no draft roster internal file', !('draft' in public1) && !('roster' in public1) && !JSON.stringify(public1).includes(internal.id));
-    check('source task status remains independently submitted', selected.content.tasks[0].id === actual.id && selected.content.tasks[0].status === 'submitted' && !selected.content.tasks[0].completed && selected.content.tasks[0].ownAcceptedAt === null && !!selected.content.tasks[0].latestSubmittedAt, ['AC-08-02']);
+    check('source task status remains independently partial with actual submission', selected.content.tasks[0].id === actual.id && selected.content.tasks[0].status === 'partial' && !selected.content.tasks[0].completed && selected.content.tasks[0].ownAcceptedAt === null && !!selected.content.tasks[0].latestSubmittedAt, ['AC-08-02']);
     check('foreign context detail and list deny neutrally', (await foreign.send(`/api/notices/${id}`)).status === 404 && (await foreign.send(`/api/notices?context=${A}`)).status === 404);
     check('type category and unread filters consume real records', (await list(brand, '&type=form&q=입점&state=unread')).items.some(n => n.id === id) && !(await list(brand, '&type=faq')).items.some(n => n.id === id));
     check('invalid type and ambiguous exact version rejected', (await brand.send(`/api/notices?context=${A}&type=bad`)).status === 422 && (await brand.send(`/api/notices/${id}?version=${v1}&version=${v1}`)).status === 422 && (await brand.send(`/api/notices/${id}?version=`)).status === 422);
@@ -290,6 +291,7 @@ try {
     }
     check('internal file and mixed reference denied', (await brand.send(`/api/files/${internal.id}?noticeId=${id}&versionId=${v1}&mode=original`)).status === 404 && (await brand.send(`/api/files/${f1.id}?noticeId=${id}&taskId=${actual.id}&mode=original`)).status === 422, ['D02']);
     const beforeRead = await fixture<NoticeFixtureSnapshot>({ noticeId: id }); persist('before-read', beforeRead);
+    check('read invariance baseline includes an actual submission product capture', beforeRead.business.find(r => r.kind === 'productUseSnapshot')!.rows.length === 1 && beforeRead.business.find(r => r.kind === 'submission')!.rows.length === 1, ['AC-08-02'], 'DB_FIXTURE');
     const readInput = { command: 'read', versionId: v1, idempotencyKey: randomUUID() };
     const read = await brand.mutate(`/api/notices/${id}`, readInput); assert.equal(read.status, 200);
     const readIds = (await read.json()).ids;
