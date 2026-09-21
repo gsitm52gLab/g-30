@@ -65,7 +65,7 @@ for (const mode of ["mock", "sqlite"] as const)
             expect(d.common.ingredients.classification).toBeNull();
             expect(d.local.jan).toBe("");
             expect(d.local.launchDate.value).toBeNull();
-            expect(d.materialCounts).toEqual({ connected: false, requested: null, missing: null, unconfirmed: null });
+            expect(d.materialCounts).toEqual({ connected: true, requested: 0, missing: 0, unconfirmed: 0 });
             const full = { ...blankCommon(), name: "수정 상품", code: "001-Ab-C", localNames: [{ language: "ja", name: "合成商品" }], category: "합성분류", capacity: { amount: "030.50", unit: "mL", raw: "30.50 mL" }, variants: { color: "색", scent: "향", other: "변형" }, description: "설명", usage: "사용법", originCountry: "원산지", manufacturer: "제조사", manufacturingDetails: "제조 정보", ingredients: { text: "합성 전성분 원문", language: "ko", submittedAt: "2026-09-21", classification: null }, packaging: { container: "용기", packaging: "포장", label: "라벨", box: "박스", itf: "0000123" } };
             await command(d.productId, "save_common", { common: full, expectedCommonRevision: d.commonRevision });
             const fields = { ...blankContext(), localName: "현지명", sku: "000-A", jan: "000012345", registrationStatus: "registered", salesStatus: "planned", launchDate: { value: "2027-01-02T10:30:00+09:00", precision: "datetime", certainty: "expected", timezone: "Asia/Tokyo", source: "합성 협의", raw: "원문 예정일" } };

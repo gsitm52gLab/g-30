@@ -1,3 +1,4 @@
+import { productMaterialCounts } from "@/server/evidence/table";
 import type { Clock, StoredRecord, UnitOfWork } from "@/domain/records";
 import type { Principal } from "@/server/auth/service";
 import { decide, activeMember } from "@/server/policy/policy";
@@ -9,7 +10,6 @@ import { commonDTO, commonDiff, contextDTO, bindingDTO, retailDTO, internalDTO, 
 import { readProductUse } from "./capture";
 import { sharedCommonNotice, type ProductFileBinding } from "@/domain/products/types";
 export type ResolvedProduct = ReturnType<typeof resolveProduct>;
-export const materialCounts = () => ({ connected: false as const, requested: null, missing: null, unconfirmed: null });
 function label(s: UnitOfWork, p: Principal, contextId: string, userId: string) {
     if (userId === p.user.id || activeMember(s, userId, contextId)) {
         const name = s.get("user", userId)?.data.name;
@@ -63,7 +63,7 @@ function privatePrice(s: UnitOfWork, p: Principal, r: ResolvedProduct) {
 export function productItem(s: UnitOfWork, p: Principal, r: ResolvedProduct, clock: Clock) {
     const common = commonDTO(r.common.data.common), local = contextDTO(r.local.data.fields), files = projectedBindings(s, p, r, clock, r.local.data.files);
     const related = s.list("task", r.context.id).filter(t => t.data.productIds.includes(r.product.id) && decide(s, p, "task.read", taskScope(t), clock).allowed);
-    return { productId: r.product.id, contextProductId: r.relation.id, context: projectContext(r.context), commonRevision: r.product.revision, contextRevision: r.relation.revision, common, local, archived: r.common.data.archived === true, image: files.find(f => f.purpose === "image" && f.file.mime.startsWith("image/"))?.file ?? null, materialCounts: materialCounts(), relatedTaskCount: related.length, retailPrice: publicPrice(s, p, r).current };
+    return { productId: r.product.id, contextProductId: r.relation.id, context: projectContext(r.context), commonRevision: r.product.revision, contextRevision: r.relation.revision, common, local, archived: r.common.data.archived === true, image: files.find(f => f.purpose === "image" && f.file.mime.startsWith("image/"))?.file ?? null, materialCounts: productMaterialCounts(s,p,r.context.id,r.product.id,clock), relatedTaskCount: related.length, retailPrice: publicPrice(s, p, r).current };
 }
 export function productDetail(s: UnitOfWork, p: Principal, r: ResolvedProduct, clock: Clock) {
     const scope = productContextScope(r.context.id, r.product.id), reference = { kind: "product" as const, productId: r.product.id, contextId: r.context.id };
@@ -97,6 +97,6 @@ export function productDetail(s: UnitOfWork, p: Principal, r: ResolvedProduct, c
         taskChoices: canManageTasks ? tasks.filter(t => !t.data.productIds.includes(r.product.id)).map(t => ({ id: t.id, title: typeof t.data.title === "string" ? t.data.title : "", revision: t.revision, status: t.data.status })) : [],
         projects: s.list("project", r.context.id).filter(project => canManageTasks || project.data.taskIds.some(id => tasks.some(t => t.id === id))).map(project => ({ id: project.id, title: typeof project.data.title === "string" ? project.data.title : "" })),
         linkedContextChoices: s.list("context").filter(c => c.data.brandId === r.product.data.brandId && !s.list("contextProduct", c.id).some(cp => cp.data.productId === r.product.id) && decide(s, p, "product.edit", productContextScope(c.id, r.product.id), clock).allowed).map(projectContext),
-        materialVerification: { connected: false as const, message: "자료별 적용·확인 상태와 집계는 증빙 기능 연결 후 제공됩니다." },
+        materialVerification: { connected: true as const, message: "공개 요청과 실제 제출을 바탕으로 자료별 상태를 집계합니다. 적용 확인은 인증 승인을 뜻하지 않습니다." },
     };
 }

@@ -199,3 +199,24 @@ SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
 `SUBMISSIONS_HTTP_ROOT`는 새 고유 DB/파일 런타임 디렉터리의 부모(기본 `.local/g05-http`), `SUBMISSIONS_HTTP_REPORT`는 요청 상태·응답 hash·assertion 결과·프로세스 종료 보고서 경로입니다. 과거 보고서를 덮어쓰지 않게 새 경로를 사용하세요. SQLite 검사의 private fixture는 실제 생성된 레코드의 읽기·해시 대조만 하며, mock은 같은 읽기 전용 관찰을 IPC로 수행합니다. 실제 UI·브라우저·복구 및 독립 검증은 별도 실행 증거로 구분합니다.
 
 저장된 공개 요청의 항목 구조가 손상된 경우 `REQUEST_INVALID`409로 답변 쓰기를 거부합니다. 읽기 평가는 `needs_reconfirmation`, `canSubmitFull:false`, 요청 구조 확인 필요를 표시합니다. 비정상 상품 범위를 공통 항목으로 바꿔 제출을 허용하지 않습니다. GSG가 실제 요청 편집에서 규칙을 확인·정정한 뒤 다시 공개하고, 작성자는 유지한 답변을 명시적으로 비교·재적용합니다. 정상 값의 알 수 없는 추가 키는 공개 출력에서 제외하지만 합법적인 제출은 유지합니다. 이 답변 구조 검사는 후행 GSG 수동 완료의 강제 승인 게이트가 아닙니다.
+
+## G07 증빙·표준 Excel 서버 계약 후보
+
+G07 서버 계약 구현 단계입니다. 자료·Excel UI의 통합 및 독립 수용은 아직 진행 전입니다. 현업 원본 Excel 검증은 원본 미확보로 `NOT_RUN`이며, 합성 표준 `.xlsx`의 실제 검증과 구분합니다.
+
+증빙은 공개 요청/실제 제출/상품 자료의 정확한 파일 버전을 참조합니다. 파일을 복제하지 않고 상품별 적용 상태와 이력을 분리합니다. 적용 확인은 인증 승인·유효성 판단이 아닙니다. 업로드/증빙 등록만으로 제출하지 않으며, 증빙의 해당 없음은 공개 요청의 필수 항목을 면제하지 않습니다. 상품 자료 수는 현재 공개 요청과 실제 제출을 같은 표 projector로 집계합니다.
+
+Excel은 `GET /api/imports?context=ID`의 허용 열/한도를 받아 표준 양식을 사용합니다. `GET /api/imports/workbook?context=ID&kind=template|export`로 새 workbook을 생성합니다. `POST /api/imports/source?context=ID`에 multipart `file` 하나 → `POST /api/imports/preview`의 시트/헤더/열/행 선택 → `POST /api/imports/apply`의 명시적 반영 순서입니다. 한 배치는 선택한 컨텍스트 하나이며 모든 행의 `contextKey`가 일치해야 합니다. 숫자로 저장한 제품 코드·SKU·JAN·ITF의 손실된 0은 복구하지 않습니다. 업데이트의 빈 셀은 기존 값을 유지하고 `clearFields`로만 명시적으로 비웁니다.
+
+미리보기는 업무 DB를 변경하지 않고 권한을 확인한 비공개 임시 분석본만 저장합니다. `IMPORT_STORAGE_DIR`(기본 `.data/imports`)는 사용자별 최대 50개, 24시간 정리 대상이며 미리보기 적용 유효 시간은 30분입니다. 성공 배치·출처·버전·재시도 영수증은 DB에 영속됩니다. 동기 단일 트랜잭션에서 전체 CAS와 오류를 확인한 뒤 전부 반영합니다. 인증/가격 권한은 재시도 때도 현재 상태로 확인합니다.
+
+분석은 `exceljs@4.4.0`, `yauzl@3.4.0`와 설치된 `tsx`를 별도 Node 프로세스에서 사용합니다. 10MiB 원본, ZIP 512개 항목/항목 32MiB/총 64MiB, 20시트/300,000 실제 셀, 선택 자료 5,000행·100열, 셀 32,767문자, 10초 제한과 256MiB V8 old-space 한도를 적용합니다. V8 한도는 프로세스 총 RSS 한도가 아닙니다. 암호화·매크로·수식 계산·외부 workbook/OLE 연결은 지원하지 않으며 링크를 실행하거나 가져오지 않습니다. `.xls` 보관은 기존 첨부 기능으로 가능하지만 Excel 가져오기는 `.xlsx`만 지원합니다.
+
+계약 검사는 작업 worktree 루트에서 다음과 같이 실행합니다. 실제 실행 결과와 실패 원본은 별도의 비공개 실행 증거에 남깁니다.
+
+```sh
+npm ci
+npm run check
+npm run build
+npx vitest run tests/unit/evidence.test.ts tests/unit/imports.test.ts tests/unit/products.test.ts tests/unit/repositories.test.ts
+```
