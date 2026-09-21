@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "note": "Scheduled integration assertions keep cross-module obligations visible. Their originating foundation acceptance is limited to its stated stage; final Goal requires these actual flows. None executed yet.",
+  "note": "Cross-module obligations remain pending until actual producers and consumers are independently verified. Current-stage evidence is linked separately; a NOT_RUN full status does not erase recorded partial-path or contract-fixture evidence.",
   "checks": [
     {
       "id": "D01",
