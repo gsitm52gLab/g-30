@@ -1,3 +1,9 @@
+# State141 latest — repaired AI candidate under independent closure
+
+Accepted246 remains11/19 GoalACTIVE. G15 originalb1dd FAIL89773 retained:71P1F/72 plus deterministic DEF-G15-V01. Root1373artifacts573sources85CRC19cmd review3105; dedup f2f243 corrects raw aggregatealiases142P2F to72actual71P1F. Narrowrepair d8d0 author449f result/21ea manifest; rootacf79 review369artifacts575Git/cwd10cmd40CRC40rawPASS,425check/build. Formal983250 independentai_verify newdetachedg15-verification-repair1 ports4235/36. Server/parser/history unchangedsourceboundfresh0; no acceptance yet.
+
+G11 fc82 UI product/ad3ad testonly freeze, goals8journeys validating. Originalmock4P4F harness distinctions preserved; current rendered protection+freshdeniedSSR/API/clickedRSC required, initialauthorizedSSR bytes not retroactively erasable. Root potential execute/refresh readticket concern sent for actual boundedrepro, not yetdefect. PrdG15repair leasesreleased, G16readonlycontract preparationonly. Need wholeG11 nonauthorverification thenserialintegration. G17 actualcallNOT_RUN.
+
 # State140 latest — independent G15 readiness race repair assigned
 
 Accepted246 remains11/19 GoalACTIVE. Ai_verify exactb1dd fresh425/check/build; actual72browser71PASS1FAIL (mockdesktopU14). Single narrowrerunPASS doesnoterase: DEF-G15-V01 high deterministic SQLite390 unknownV1 GET200held, stillenabledreadiness sendsoldknownV2runID→200allowedtrue, afterGETrelease unknownV1text+allowednotice. Provider0. Root6hash+ZIPCRC/actualPNGviewreviewe80e… currentb1ddcannotaccept. Formalrepairfa4a7… prdnewg15-readiness-fix b1dd ports4229/30 owns screen+newdeterministicrace only; server/API/schemafrozen. Ai_verifycontinues8groups onunchangedb1dd; newcandidateclosurelater.
