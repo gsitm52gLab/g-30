@@ -1298,9 +1298,9 @@
         "G05",
         "G06"
       ],
-      "state": "REPAIRING",
+      "state": "VERIFYING",
       "required_for_product_completion": true,
-      "candidate_commit": "dd77e9b4bb876ebdd9d6084b6de61c282e8eb63a",
+      "candidate_commit": "f2e615c84db547c42b2e756685c9c79e11c7c420",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
@@ -1368,7 +1368,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd resolving6conflicts andactualmigrationcounts ondd77+accepted3c4e; sharedleaseexclusive. Newpopulatedtwodirection check + fullauthorchecks thenindependentcandidate. Release sharedlease atfrozencommit toallowG09server.",
+      "next_action": "workflow exact f2e615 independent union; root review raw result then serial integration+regression; priorV01/V02 not independently closed yet",
       "contract_integration_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/contract-integration-preparation.md",
       "main_preparation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/main-contract-preparation-review.json",
       "preparation_status": "CONSUMED_BY_SERVER_ASSIGNMENT",
@@ -1498,7 +1498,7 @@
       "main_server_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-final-review.json",
       "verification_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/verification-task-draft.json",
       "mobile_presentation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-mobile-presentation-review.json",
-      "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verification-task.json",
+      "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/verification-task.json",
       "main_combined_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-combined-selfcheck-review.json",
       "repair_base_commit": "e21f196e933231d18a762eda05555e2070716124",
       "repair_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/task.json",
@@ -1513,7 +1513,10 @@
       "union_preflight": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/union-preflight.json",
       "accepted_sibling_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
       "shared_lease": "RELEASED_BY_AUTHOR_AT_F2E615",
-      "author_union_frozen_commit": "f2e615c84db547c42b2e756685c9c79e11c7c420"
+      "author_union_frozen_commit": "f2e615c84db547c42b2e756685c9c79e11c7c420",
+      "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/implementation-result.json",
+      "main_author_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-author-review.json",
+      "regression_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/regression-task-draft.json"
     },
     {
       "id": "G08",
@@ -1785,7 +1788,8 @@
       "internal_domain_assembly": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/server/internal-assembly.json",
       "verification_preparation_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/verification-preparation-task.json",
       "verification_preparation_status": "ROOT_REVIEWED_NOT_RUN",
-      "main_verification_preparation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verifier-preparation-review.json"
+      "main_verification_preparation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verifier-preparation-review.json",
+      "ui_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/ui-task-draft.json"
     },
     {
       "id": "G10",
@@ -1922,15 +1926,19 @@
         "G05",
         "G06"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": null,
+      "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": null,
-      "attempt": 0,
-      "owned_paths": [],
-      "actual_worktree_cwd": null,
+      "attempt": 1,
+      "owned_paths": [
+        "src/domain/campaigns/types.ts",
+        "src/domain/campaigns/validate.ts",
+        "tests/unit/campaigns-domain.test.ts"
+      ],
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g12-contract",
       "evidence_root": ".execution/private/runs/<run-id>/G12/<attempt>/",
       "acceptance": [
         {
@@ -1964,9 +1972,26 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
+      "next_action": "prd standalone pure campaign/menu/physical domain only; no runtimeAC claimed; server/UI stillNOT_ASSIGNED",
       "domain_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/domain-contract-task-draft.json",
-      "prepared_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-contract"
+      "prepared_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-contract",
+      "base_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/domain-contract-task.json",
+      "subtasks": {
+        "domain_contract": {
+          "state": "IMPLEMENTING",
+          "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/domain-contract-task.json",
+          "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-contract",
+          "base_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
+          "agent": "/root/prd"
+        },
+        "server": {
+          "state": "NOT_ASSIGNED"
+        },
+        "ui": {
+          "state": "NOT_ASSIGNED"
+        }
+      }
     },
     {
       "id": "G13",
@@ -2312,8 +2337,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
   "current_goal": "G07",
-  "next_action": "G07 f2e615 author checks then independent workflow. G09 server goals common-wiring owner. Root review G09 plan and G07 author artifacts.",
-  "state_version": 110,
+  "next_action": "workflow G07 exactunion verify. goals G09server implementation. prd G12standalone domain independent3files. Root evidence review/typedcontract and serial integration.",
+  "state_version": 111,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2340,7 +2365,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T17:54:30.574206+00:00",
+  "updated_at": "2026-09-21T18:01:21.175396+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
