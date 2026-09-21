@@ -1961,7 +1961,7 @@
           "evidence": []
         }
       ],
-      "next_action": "goals actual combinedcheck345P1migrationfixtureF, narrowtest-onlyrepair/newSHA thenownchecks. workflow independent exactcandidate onlyafterownresult/rootreview.",
+      "next_action": "prd actual G10 UI normalcontrols/individualreflection/private-review; finalcandidate selfchecks then differentverifier.",
       "preparation_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/preparation-task.json",
       "preparation_status": "ACTUAL20SOURCE8INPUT_ROOT_REVIEWED",
       "base_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
@@ -2018,24 +2018,7 @@
       "main_server_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-server-final-review.json",
       "server_implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/server/implementation-result.json",
       "server_state": "AUTHOR_FINAL_ROOT_REVIEWED_RELEASED",
-      "ui_worktree_prepared": "/Users/evan/workspace/gs-hale/.worktrees/g10-ui",
-      "ui_candidate": "4f582875301c955767a3cf49bc9dbaecb5d34257",
-      "ui_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/ui/implementation-result.json",
-      "ui_main_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-ui-final-review.json",
-        "sha256": "961ffc743308d8a4642e3476133af33d94b3c13b777bd2cb03d9cdb0bc9ec653"
-      },
-      "ui_visual_channel_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-ui-visual-channel-addendum.json",
-        "sha256": "da763efc8378f10001ee4f1b2e4ad0fd0ca60a2efed57445b20a8415a8665f41"
-      },
-      "combined_packet": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/combined-task.json",
-        "sha256": "65f99b203bcd0f7d6c0d33d281ff2236cb2297c492ba726d4fd6fdfff236a583"
-      },
-      "combined_candidate": "b2141a5b738b55fbafdf824a64ba3d9ab2447786",
-      "combined_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g10-combined",
-      "combined_implementer_session": "01a0c307-c975-75b1-b96a-5a5c4e448aec"
+      "ui_worktree_prepared": "/Users/evan/workspace/gs-hale/.worktrees/g10-ui"
     },
     {
       "id": "G11",
@@ -2146,7 +2129,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd actual campaignUI uses repaired976 typedserver, fullnarrowentrylease released; allACindependentnotrun.",
+      "next_action": "Close real G04/G05 unselected missing mismatch with authorized immutable request projection; send exact narrowfiles then typedfreeze.",
       "domain_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/domain-contract-task-draft.json",
       "prepared_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-contract",
       "base_commit": "c71d3873e80a297b7a52c1b099e7b2b8c8b145ac",
@@ -2183,22 +2166,6 @@
         "sha256": "bd8dcff4bcdbab2e118a2b7b2fc97454f0d516bc0bbbe2beeb36d1437d293c0e",
         "state": "GRANTED_IMPL_UNFROZEN",
         "current_missing_semantics": "Unselected/declined material requirements excluded from current request; applied externalfacts and cancellationholdrequirements retained separately; no reminders or automatic cancellation. G05 own300unit reported, unreviewed."
-      },
-      "server_candidate": "976525205b45d77b557df1cc9fa3ef70838c3243",
-      "server_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/server/implementation-result.json",
-      "server_main_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-server-final-review.json",
-        "sha256": "aa84ff567d84e4c39f090c3d9f5c754588fb730a526027d943fcfd2c2a3dd4aa"
-      },
-      "ui_packet": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/ui-task.json",
-        "sha256": "bd100275ebf162606e24c8f1c66d4bf6506852593e5969faffc03fe023fd4104"
-      },
-      "ui_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-ui",
-      "ui_implementer_session": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
-      "ui_entry_lease": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/ui-entry-lease-release.json",
-        "sha256": "6afeef94bbdb0f0056f4f18ae10f591cde3cd4d6b2d77bb5b3ea79112c81483b"
       }
     },
     {
@@ -2563,8 +2530,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "92a463e57e58e4f569304d045e9bbe1f7a0ccd7b",
   "current_goal": "G10",
-  "next_action": "G09 accepted9/19. goals G10combined test-onlymigrationrepair/checks; prd G12UI actual; workflow G15 extraction actualfixtures+OCR. No actualOpenAI yet.",
-  "state_version": 126,
+  "next_action": "G09 ACCEPTED9/19. prd G10UI repair/selfcheck; goals G12 repaired b3bb contract checks/remaining HTTP; workflow G15 actual extraction isolated authoring. G17 mandatory NOT_RUN.",
+  "state_version": 125,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2595,7 +2562,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T19:28:44.769548+00:00",
+  "updated_at": "2026-09-21T19:17:00.162115+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
