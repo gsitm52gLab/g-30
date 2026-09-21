@@ -98,6 +98,21 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G13 persisted 
         const task = (await repo.get('task', taskId))!; await complete.command(admin, { command: 'reopen', taskId, completionId: done.ids[0], expectedTaskRevision: task.revision, reason: '자료 보완', idempotencyKey: randomUUID() }); await service.sync(brand, contextId);
         expect((await repo.list('notification')).filter(n => n.data.source.kind === 'reminder')).toHaveLength(4);
     });
+    it('N13-08 SA-52 explicit task-assigned brand shipping gets next action; arbitrary team member rejected', async () => {
+        await setup(); const scheduling = new SchedulingService(identity), notifications = new NotificationService(identity);
+        const input = content({ kind: 'shipping', deadline: { ...content().deadline, responsibleUserId: 'user-luna' } });
+        const id = (await scheduling.command(admin, save(input))).ids[0];
+        const detail = await scheduling.detail(brand, id);
+        expect(detail.calendar).toMatchObject({ recipientState: 'current_recipient', reminder: { eligible: true, recipientId: 'user-luna' } });
+        await notifications.sync(brand, contextId);
+        expect((await repo.list('notification')).filter(n => n.data.source.kind === 'reminder' && n.data.source.logicalKey === `manual:${id}`).map(n => n.data.recipientId)).toEqual(['user-luna']);
+        await expect(scheduling.command(admin, save({ ...input, deadline: { ...input.deadline, responsibleUserId: 'user-team' } }))).rejects.toMatchObject({ status: 422 });
+    });
+    it('N13-09 SA-52 submission recipients are current task assignees; confirmation actor policy is explicit', async () => {
+        await setup(); const scheduling = new SchedulingService(identity), id = (await scheduling.command(admin, save(content({ kind: 'submission' })))).ids[0];
+        for (const token of [brand, co]) expect((await scheduling.detail(token, id)).calendar).toMatchObject({ recipientPolicy: 'task_assignees', recipientState: 'current_recipient', deadline: { responsibleUserId: 'user-gsg' } });
+        expect((await scheduling.detail(gsg, id)).calendar).toMatchObject({ recipientPolicy: 'task_assignees', recipientState: 'other_recipient' });
+    });
     it('N13-07 actual G04 activity identity and external wait GSG-only source remain separate', async () => {
         await setup(); const task = (await repo.get('task', taskId))!;
         await new TaskService(identity).command(brand, taskId, { command: 'schedule', expectedRevision: task.revision, reason: '일정 조정', deadline: { ...blankContent().deadline, value: '2026-09-25', responsibleUserId: 'user-luna' }, idempotencyKey: randomUUID() });
