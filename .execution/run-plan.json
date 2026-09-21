@@ -2883,7 +2883,12 @@
       "notice_history_source_clarification": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/notice-history-source-clarification.json",
         "sha256": "6c869e2227c5d5be6b6bae3090c42ac27d0d2d0a956d2d9d46f024d534014140"
-      }
+      },
+      "current_preparation_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/current-preparation-task.json",
+        "sha256": "e68a8f12ce9ef1f0a185092023063ee5fd257d12a0955166df7782db71573940"
+      },
+      "current_preparation_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g14-preparation"
     },
     {
       "id": "G15",
@@ -3551,7 +3556,19 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verifier-preparation-task.json",
         "sha256": "8ca7c67151be6805af82be3aad4078926a1ffdecaea5c09071af865ea0c6bd78"
       },
-      "verifier_preparation_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g17-verifier-preparation"
+      "verifier_preparation_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g17-verifier-preparation",
+      "verifier_preparation_plan": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verifier-preparation/plan.json",
+        "sha256": "66edc6f4f0b4bdacdeb5aa1680400aa6649143aa0650d282644afc77fa2f0a8a"
+      },
+      "verifier_preparation_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verifier-preparation/main-review.json",
+        "sha256": "984fc46be39dc65f5cd93acef4276678294ef1dcec9ec351d63876b01a3a5238"
+      },
+      "test_contract_lease": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/test-contract-lease-addendum.json",
+        "sha256": "25059ec5762ac738755963981c1d5a56ebfc05a1d6901a4e46ccfd9e23071503"
+      }
     },
     {
       "id": "G18",
@@ -3645,8 +3662,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "60b99ce05639278a221a96d7a3c575344cb7e08e",
   "current_goal": "G17",
-  "next_action": "G13 workflow independentexact390b ports4245/46; goalsG17fullstack common0015/package, ai_verifyG17readonlyplan. Accepted60b99 fourteen checkpoints, G14/G03/G18 remain gated.",
-  "state_version": 157,
+  "next_action": "G13workflow exact390b independent; G17goals fullstackcommon0015/package; G14prd readonly390b source/audit ownership update. G17independentplan66ed root984f ready; realAPI still NOT_RUN. Accepted14/19.",
+  "state_version": 158,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3678,7 +3695,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T23:22:11.344023+00:00",
+  "updated_at": "2026-09-21T23:24:39.469534+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

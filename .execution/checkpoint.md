@@ -1,3 +1,7 @@
+# Current checkpoint — state158
+
+2026-09-21T23:24:39.469534+00:00; G13workflow exact390b independent; G17goals fullstackcommon0015/package; G14prd readonly390b source/audit ownership update. G17independentplan66ed root984f ready; realAPI still NOT_RUN. Accepted14/19. Root G17narrowtest49lease2505 approved (explicitmissingconfig, no network), oldG16 authority/history assertions intact. G17doc32132ca root3610; currentmodelgpt-6 astra alias, officialbasevalid/keyPresent only notkeyvalid. G14currentpreptaske68 sourcephaseonly noimplementationbeforeG13accepted. Independent G17 actualminimalconfiguredcall once requiredafterfinalfreeze; no callnow. Alluserenv/untrackedv2 preserved.
+
 # Current checkpoint — state157
 
 2026-09-21T23:22:11.344023+00:00; G13 workflow independentexact390b ports4245/46; goalsG17fullstack common0015/package, ai_verifyG17readonlyplan. Accepted60b99 fourteen checkpoints, G14/G03/G18 remain gated. G13combinedroot71bc:701sources/13artifacts/559prior/31UI27moduleSQL14parentidentical; READMEonlymanualmerge. Authorfresh608/46/build, broad50UI2skip6restartfresh0reused. Formalverificationpacket issued, ownreadonlyprep36b9groups linked. Noacceptancebyselfcheck.
