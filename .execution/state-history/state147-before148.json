@@ -2689,7 +2689,7 @@
           "evidence": []
         }
       ],
-      "next_action": "goals own existingproducer read adapters while G16 exclusivecommon; puref54744PASS authorstage only",
+      "next_action": "goals ownpuredate/types/eligibility withmeaningfulunit first; sharedserverregistration afterG16earlyfreeze.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/task-draft.json",
         "sha256": "96ae325b75e6aecb15b0face92814167bad7aa1658aa8165c35df4708f9750f4"
@@ -2708,14 +2708,6 @@
       "server_contract_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-server-contract-preparation-review.json",
         "sha256": "af6baba9cfcafde042a1c537acd159a87c58d94270cd3721b9163a4dd2073fd4"
-      },
-      "pure_phase_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/pure/main-pure-review.json",
-        "sha256": "081d61ce60e89f8b6f9d3b35ac7c4c683503df930e1fe1fade0bc939e3735c5c"
-      },
-      "own_read_adapter_lease": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/own-source-adapter-lease.json",
-        "sha256": "eac3d4755254186e8d6358e79c54e232a45c5fcf08d518d5a80a0a69b10f2b37"
       }
     },
     {
@@ -3160,7 +3152,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd fullserver exclusivecommon +workflow purepresentation onfrozenpuretypes; fullUI/G13common after typedfreeze",
+      "next_action": "prd finishpurefreeze thenmergeaccepted0804 andfullserver/corpus/syntheticengine+G10/G11 actualconnectors; earlytypedfreeze releasecommon forG13.",
       "source_discovery": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/source-discovery/discovery-result.json",
         "sha256": "4c7d03ae48d90a142f0c0b707a304203a4d381097c9a694ddf4f9c4958de8410",
@@ -3228,13 +3220,7 @@
       "full_server_lease_addendum": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/full-server-lease-addendum-1.json",
         "sha256": "6fcc5f57a618bc5cfe6d907f4e54cebf918e521ff2484e3bd92a8eeb6d4bdeb0"
-      },
-      "ui_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui-task.json",
-        "sha256": "77d9f107f2d67f45a86e98b634f9508186e8be493a4c8f18cb6b99c8293c7921"
-      },
-      "ui_implementer_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
-      "ui_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-ui"
+      }
     },
     {
       "id": "G17",
@@ -3380,7 +3366,7 @@
   "accepted_commit": "0804a4a1a750ab4dee149036659e212480230242",
   "current_goal": "G16",
   "next_action": "G16 exclusive full-server in progress; G13 own pure checks. Review typed G16 freeze then assign G16 UI and release shared server lease for G13. G17 real API remains mandatory NOT_RUN.",
-  "state_version": 148,
+  "state_version": 147,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3411,7 +3397,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T22:16:33.840620+00:00",
+  "updated_at": "2026-09-21T22:12:49.700703+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -3442,9 +3428,5 @@
   "evidence_tooling_review": {
     "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/evidence-tooling-compatibility-review.json",
     "sha256": "8a202e6243444210492150010c88f27b562556e8bf4cce14107f1ae91129ff93"
-  },
-  "cross_module_copy_census": {
-    "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/cross-module-copy-census-state148.json",
-    "sha256": "0df9cd3360e5cf8a704234200430610a73a2a63af7621dc45c490461ca601179"
   }
 }
