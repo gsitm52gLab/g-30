@@ -6,10 +6,10 @@ import path from "node:path";
 import { openDatabase, migrate } from "@/server/db/database";
 import { createSqliteRepository } from "@/server/repositories/sqlite";
 import { seed } from "@/server/db/seed";
+import { addCounts, assertSelection, emptyCounts, reportCounts, selectedFiles, type Report } from "./e2e-runner-selection";
 
 const projectNames = ["desktop", "mobile"] as const;
 type Project = typeof projectNames[number];
-type Counts = { unit: "test"; pass: number; fail: number; skip: number; flaky: number };
 type ProcessResult = { code: number | null; signal: NodeJS.Signals | null };
 const now = () => new Date().toISOString();
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
@@ -76,12 +76,6 @@ async function ready(server: ChildProcess, serverPort: number) {
     }
     throw new Error("Owned E2E server did not become ready within 60 seconds.");
 }
-function reportCounts(filename: string): Counts {
-    const { stats } = JSON.parse(readFileSync(filename, "utf8"));
-    if (!stats || ["expected", "unexpected", "skipped", "flaky"].some(k => !Number.isInteger(stats[k]) || stats[k] < 0))
-        throw new Error("Playwright report has no valid test counts.");
-    return { unit: "test", pass: stats.expected, fail: stats.unexpected, skip: stats.skipped, flaky: stats.flaky };
-}
 
 async function main() {
     const input = process.argv.slice(2), { projects, forwarded } = argumentsForProjects(input);
@@ -102,7 +96,7 @@ async function main() {
         summary_path: summaryPath, artifacts_root: artifactsRoot, data_root: dataRoot, listing_only: listingOnly, projects: [],
     };
     let exitCode = 0;
-    const aggregate: Counts = { unit: "test", pass: 0, fail: 0, skip: 0, flaky: 0 };
+    const aggregate = emptyCounts();
     const save = () => writeFileSync(summaryPath, JSON.stringify(summary, null, 2) + "\n", { mode: 0o600 });
     console.log(JSON.stringify({ event: "isolated-e2e-run", mode, projects, summary: summaryPath }));
     save();
@@ -110,59 +104,106 @@ async function main() {
         if (interrupted) break;
         const serverPort = project === "desktop" ? primaryPort : mobilePort;
         const artifactDirectory = path.join(artifactsRoot, project), dataDirectory = path.join(dataRoot, project);
-        mkdirSync(artifactDirectory, { recursive: true }); mkdirSync(dataDirectory, { recursive: true });
-        const database = path.join(dataDirectory, "fixture.db"), files = path.join(dataDirectory, "files");
-        const report = `${reportPrefix}.${project}.json`;
-        const env = { ...process.env, E2E_RUN_PROJECT: project, E2E_PORT: String(serverPort), E2E_DATA_SOURCE: mode,
-            E2E_REPORT: report, E2E_ARTIFACTS: path.join(artifactDirectory, "test-results"),
-            DATA_SOURCE: mode, DATABASE_FILE: database, FILE_STORAGE_DIR: files,
-            OPENAI_API_KEY: "", OPENAI_MODEL: "", OPENAI_BASE_URL: "https://api.openai.com/v1", NEXT_TELEMETRY_DISABLED: "1",
-            APP_ORIGIN: `http://127.0.0.1:${serverPort}`, SESSION_COOKIE_NAME: `gs_hale_e2e_${serverPort}_${project}_${runId.slice(-8)}` };
-        const serverCommand = [process.execPath, "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(serverPort)];
-        const testCommand = [process.execPath, "node_modules/@playwright/test/cli.js", "test", ...forwarded, `--project=${project}`];
-        const result: Record<string, unknown> = { project, cwd: process.cwd(), started_at: now(), port: serverPort,
-            database, file_storage: files, cookie_name: env.SESSION_COOKIE_NAME, app_origin: env.APP_ORIGIN,
-            report, artifacts: env.E2E_ARTIFACTS, server_command: serverCommand, test_command: testCommand,
-            server_log: path.join(artifactDirectory, "server.log"), runner_log: path.join(artifactDirectory, "runner.log") };
-        summary.projects.push(result);
-        let server: ReturnType<typeof start> | undefined;
+        mkdirSync(artifactDirectory, { recursive: true });
+        const report = `${reportPrefix}.${project}.json`, discoveryReport = `${reportPrefix}.${project}.discovery.json`;
+        const env = { ...process.env, E2E_RUN_PROJECT: project, E2E_RUN_FILE: "", E2E_PORT: String(serverPort), E2E_DATA_SOURCE: mode,
+            E2E_REPORT: discoveryReport, E2E_ARTIFACTS: path.join(artifactDirectory, "discovery"),
+            DATA_SOURCE: mode, OPENAI_API_KEY: "", OPENAI_MODEL: "", OPENAI_BASE_URL: "https://api.openai.com/v1", NEXT_TELEMETRY_DISABLED: "1",
+            APP_ORIGIN: `http://127.0.0.1:${serverPort}` };
+        const helpOnly = forwarded.some(a => ["--help", "-h"].includes(a));
+        const discoveryCommand = [process.execPath, "node_modules/@playwright/test/cli.js", "test", ...forwarded, `--project=${project}`,
+            ...(!listingOnly ? ["--list"] : [])];
+        const projectCounts = emptyCounts(), completedReports: Report[] = [];
+        const result: Record<string, unknown> & { files: Record<string, unknown>[] } = {
+            project, cwd: process.cwd(), started_at: now(), port: serverPort, report, artifacts: artifactDirectory,
+            discovery_report: discoveryReport, discovery_command: discoveryCommand,
+            discovery_log: path.join(artifactDirectory, "discovery.log"), files: [], counts: listingOnly ? null : projectCounts,
+        };
+        summary.projects.push(result); save();
+        let projectExit = 0;
         try {
-            if (!listingOnly) {
-                if (await listening(serverPort)) throw new Error(`Port ${serverPort} is already in use; no existing process was reused or stopped.`);
-                if (mode === "sqlite") {
-                    const db = openDatabase(database, true);
-                    try { result.migration = migrate(db); result.seed = await seed(createSqliteRepository(db)); }
-                    finally { db.close(); }
+            const discovery = start(discoveryCommand, env, result.discovery_log as string, true); activeRunner = discovery.child;
+            result.discovery_pid = discovery.child.pid;
+            const discovered = await discovery.done; activeRunner = undefined;
+            result.discovery_exit = discovered;
+            if (discovered.code !== 0) throw new Error(`Playwright selection discovery failed (exit ${discovered.code}).`);
+            if (!helpOnly) {
+                const plan = selectedFiles(JSON.parse(readFileSync(discoveryReport, "utf8")), project);
+                result.selected_files = plan; result.selected_test_count = plan.reduce((n, f) => n + f.identities.length, 0);
+                if (!listingOnly) for (const [index, selection] of plan.entries()) {
+                    if (interrupted) break;
+                    const slot = `${String(index + 1).padStart(2, "0")}-${path.basename(selection.file).replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+                    const fileArtifacts = path.join(artifactDirectory, slot), fileData = path.join(dataDirectory, slot);
+                    mkdirSync(fileArtifacts, { recursive: true }); mkdirSync(fileData, { recursive: true });
+                    const database = path.join(fileData, "fixture.db"), files = path.join(fileData, "files");
+                    const fileReport = `${reportPrefix}.${project}.${slot}.json`;
+                    const fileEnv = { ...env, E2E_RUN_FILE: selection.file, E2E_REPORT: fileReport,
+                        E2E_ARTIFACTS: path.join(fileArtifacts, "test-results"), DATABASE_FILE: database, FILE_STORAGE_DIR: files,
+                        SESSION_COOKIE_NAME: `gs_hale_e2e_${serverPort}_${project}_${index}_${runId.slice(-8)}` };
+                    const serverCommand = [process.execPath, "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(serverPort)];
+                    // Keep all original CLI selectors. The config's exact file matcher intersects them;
+                    // adding another positional file here would instead OR the user's file filters.
+                    const testCommand = [process.execPath, "node_modules/@playwright/test/cli.js", "test", ...forwarded, `--project=${project}`];
+                    const fileResult: Record<string, unknown> = { file: selection.file, selected_identities: selection.identities,
+                        cwd: process.cwd(), started_at: now(), port: serverPort, database, file_storage: files,
+                        cookie_name: fileEnv.SESSION_COOKIE_NAME, app_origin: env.APP_ORIGIN, report: fileReport,
+                        artifacts: fileEnv.E2E_ARTIFACTS, server_command: serverCommand, test_command: testCommand,
+                        server_log: path.join(fileArtifacts, "server.log"), runner_log: path.join(fileArtifacts, "runner.log") };
+                    result.files.push(fileResult); save();
+                    let server: ReturnType<typeof start> | undefined;
+                    try {
+                        if (await listening(serverPort)) throw new Error(`Port ${serverPort} is already in use; no existing process was reused or stopped.`);
+                        if (mode === "sqlite") {
+                            const db = openDatabase(database, true);
+                            try { fileResult.migration = migrate(db); fileResult.seed = await seed(createSqliteRepository(db)); }
+                            finally { db.close(); }
+                        }
+                        server = start(serverCommand, fileEnv, fileResult.server_log as string); fileResult.server_pid = server.child.pid;
+                        await ready(server.child, serverPort);
+                        const runner = start(testCommand, fileEnv, fileResult.runner_log as string, true); activeRunner = runner.child;
+                        fileResult.runner_pid = runner.child.pid;
+                        const ended = await runner.done; activeRunner = undefined;
+                        fileResult.exit_code = ended.code; fileResult.signal = ended.signal;
+                        if (ended.code !== 0) projectExit = ended.code || 1;
+                        const actual: Report = JSON.parse(readFileSync(fileReport, "utf8"));
+                        completedReports.push(actual);
+                        const counts = reportCounts(actual); fileResult.counts = counts;
+                        addCounts(projectCounts, counts); addCounts(aggregate, counts);
+                        assertSelection(selection, selectedFiles(actual, project)); fileResult.selection_verified = true;
+                    } catch (error) {
+                        fileResult.error = error instanceof Error ? error.message : String(error);
+                        fileResult.exit_code = 1; projectExit = 1; console.error(`${project}/${slot}: ${fileResult.error}`);
+                    } finally {
+                        activeRunner = undefined;
+                        if (server) {
+                            fileResult.server_exit = await stop(server);
+                            fileResult.port_released = !await listening(serverPort);
+                            if (!fileResult.port_released) { fileResult.cleanup_error = "Owned port remains in use after server exit."; projectExit = 1; }
+                        }
+                        fileResult.finished_at = now(); save();
+                    }
                 }
-                server = start(serverCommand, env, result.server_log as string); result.server_pid = server.child.pid;
-                await ready(server.child, serverPort);
-            }
-            const runner = start(testCommand, env, result.runner_log as string, true); activeRunner = runner.child;
-            result.runner_pid = runner.child.pid;
-            const ended = await runner.done; activeRunner = undefined;
-            result.exit_code = ended.code; result.signal = ended.signal;
-            if (ended.code !== 0) exitCode = ended.code || 1;
-            if (!listingOnly) {
-                const counts = reportCounts(report); result.counts = counts;
-                for (const key of ["pass", "fail", "skip", "flaky"] as const) aggregate[key] += counts[key];
             }
         } catch (error) {
-            result.error = error instanceof Error ? error.message : String(error);
-            result.exit_code ??= 1; exitCode = 1;
+            result.error = error instanceof Error ? error.message : String(error); projectExit = 1;
             console.error(`${project}: ${result.error}`);
         } finally {
             activeRunner = undefined;
-            if (server) {
-                result.server_exit = await stop(server);
-                result.port_released = !await listening(serverPort);
-                if (!result.port_released) { result.cleanup_error = "Owned port remains in use after server exit."; exitCode = 1; }
-            }
-            result.finished_at = now(); save();
+            if (completedReports.length) writeFileSync(report, JSON.stringify({
+                ...completedReports[0], suites: completedReports.flatMap(r => r.suites ?? []), errors: completedReports.flatMap(r => r.errors ?? []),
+                stats: { startTime: result.started_at, duration: Date.now() - Date.parse(result.started_at as string),
+                    expected: projectCounts.pass, unexpected: projectCounts.fail, skipped: projectCounts.skip, flaky: projectCounts.flaky },
+                isolation: { kind: "project-and-spec", reports: result.files.map(f => f.report) },
+            }, null, 2) + "\n", { mode: 0o600 });
+            result.exit_code = projectExit; result.completed_files = result.files.length;
+            result.not_run_test_count = listingOnly ? null : Math.max(0, Number(result.selected_test_count ?? 0) - completedReports.reduce((n, r) => n + selectedFiles(r, project).reduce((m, f) => m + f.identities.length, 0), 0));
+            result.port_released = result.files.every(f => f.port_released !== false);
+            result.finished_at = now(); if (projectExit) exitCode = projectExit; save();
         }
     }
     if (interrupted) exitCode = interrupted === "SIGINT" ? 130 : 143;
     Object.assign(summary, { finished_at: now(), exit_code: exitCode, interrupted: interrupted ?? null,
-        counts: listingOnly ? null : aggregate, completed_projects: summary.projects.length });
+        counts: listingOnly ? null : aggregate, not_run_test_count: listingOnly ? null : summary.projects.reduce((n, p) => n + Number(p.not_run_test_count ?? 0), 0), completed_projects: summary.projects.length });
     save();
     console.log(JSON.stringify({ event: "isolated-e2e-finished", exit_code: exitCode, counts: summary.counts, summary: summaryPath }));
     process.exitCode = exitCode;

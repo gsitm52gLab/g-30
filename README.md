@@ -59,9 +59,9 @@ npm run test:e2e:db
 
 `npm run verify`는 브라우저 설치를 제외한 위 검사를 순서대로 수행합니다. `check`는 lint·typecheck·단위 테스트이며 mock/SQLite의 정상·반례·시간 경계·권한·원자 rollback을 포함합니다. `identity:races`는 서로 다른 네 자식 프로세스로 SQLite 중복 이메일 초대와 동일 초대 수락을 경합시킵니다. `identity:restart`는 production 서버 A를 실제 종료한 뒤 같은 DB의 서버 B에서 새 로그인·멤버십·대기/소비 초대·철회 쿠키·재배정/작성자/감사 보존을 HTTP로 확인합니다. `db:restart`는 별도의 G00 최소 adapter 검사입니다.
 
-`test:e2e`와 `test:e2e:db`는 `scripts/run-e2e.ts`를 통해 desktop → mobile을 별도 Playwright 프로세스로 순차 실행합니다. 각 프로젝트는 새 production 서버·DB/메모리 fixture·파일 저장 경로·쿠키 이름을 사용합니다. 두 프로젝트의 정상 로그인 횟수가 한 서버의 인증 제한에 누적되지 않으며 제품의 인증 제한과 테스트 assertion은 그대로입니다. `verify`도 이 격리 명령을 사용합니다. `npm run build`와 Chromium 설치를 먼저 완료하세요.
+`test:e2e`와 `test:e2e:db`는 `scripts/run-e2e.ts`를 통해 desktop → mobile 순서로 실행합니다. 설치된 Playwright CLI의 `--list`로 실제 선택된 테스트를 먼저 확인한 뒤, 각 프로젝트의 테스트 파일(spec)마다 새 production 서버·DB/메모리 fixture·파일 저장 경로·쿠키 이름을 사용합니다. 서로 다른 파일의 정상 로그인 횟수가 한 서버의 인증 제한에 누적되지 않으며 제품의 인증 제한과 테스트 assertion은 그대로입니다. 기존 파일/줄 번호·grep·grep-invert 선택을 유지한 채 설정의 정확한 파일 조건을 교집합으로 적용하고, 실행 결과의 test ID를 최초 선택과 대조하여 누락·중복·추가 선택이면 실패합니다. `verify`도 이 격리 명령을 사용합니다. `npm run build`와 Chromium 설치를 먼저 완료하세요.
 
-기본 `E2E_PORT=4111`을 각 프로젝트가 순서대로 사용하고, `E2E_AUX_PORT`를 지정하면 mobile은 그 포트를 사용합니다. 지정하지 않으면 `E2E_PORT`와 같습니다. 사용 중인 서버를 재사용하거나 종료하지 않습니다. 테스트마다 다른 사용자의 작업 서버와 충돌하지 않는 예약 포트를 지정하세요. 각 서버의 `APP_ORIGIN`과 고유 쿠키 이름은 실행기가 포트/프로젝트로 설정하며 제품 기본 포트 3000은 유지됩니다. DB는 `.local/e2e-<mode>-<run-id>/<project>/fixture.db`, 파일은 같은 디렉터리의 `files/`에 보존됩니다(mock의 DB 경로는 예약만 하고 DB 파일을 만들지 않음).
+기본 `E2E_PORT=4111`을 각 프로젝트가 순서대로 사용하고, `E2E_AUX_PORT`를 지정하면 mobile은 그 포트를 사용합니다. 지정하지 않으면 `E2E_PORT`와 같습니다. 사용 중인 서버를 재사용하거나 종료하지 않습니다. 테스트마다 다른 사용자의 작업 서버와 충돌하지 않는 예약 포트를 지정하세요. 각 서버의 `APP_ORIGIN`과 고유 쿠키 이름은 실행기가 포트/프로젝트로 설정하며 제품 기본 포트 3000은 유지됩니다. DB는 `.local/e2e-<mode>-<run-id>/<project>/<순번-spec>/fixture.db`, 파일은 같은 디렉터리의 `files/`에 보존됩니다(mock의 DB 경로는 예약만 하고 DB 파일을 만들지 않음).
 
 CLI는 `--project=desktop`, `--project mobile`을 지원하며 반복 옵션으로 둘을 선택할 수 있습니다. 프로젝트를 생략하면 둘 다 실행합니다. 테스트 파일/행, `--grep`/`--grep-invert`, `--list`, `--headed` 등 나머지 인자는 shell 조합 없이 Playwright에 전달합니다. 잘못된 프로젝트·옵션·무일치 필터와 테스트 실패는 nonzero exit입니다. 격리를 우회하는 `--config/-c`, `--reporter`, `--output`과 상주 `--ui`는 명시 거부합니다. 보고서/산출물은 환경변수로 지정하세요. 직접 `npx playwright test` 대신 아래 wrapper 명령을 사용합니다.
 
@@ -77,7 +77,7 @@ npm run test:e2e -- --project desktop --list
 E2E_PORT=4149 E2E_AUX_PORT=4150 E2E_REPORT=.local/review/e2e.json E2E_ARTIFACTS=.local/review/artifacts npm run test:e2e
 ```
 
-`run-id`는 UTC 시각+무작위 접미사입니다. `E2E_REPORT=/path/e2e.json`이면 `/path/e2e.<run-id>.summary.json`에 명령·cwd·exit·건수·서버 PID/종료·DB/파일/쿠키 경로를 기록하고, 원본 Playwright JSON은 `e2e.<run-id>.desktop.json`과 `e2e.<run-id>.mobile.json`입니다. 기본 prefix는 `.local/e2e-results.json`입니다. 콘솔이 정확한 summary 절대경로를 출력합니다. `E2E_ARTIFACTS=/path/artifacts`이면 `/path/artifacts/<run-id>/<project>/test-results/`에 trace/화면을, 그 상위에 `runner.log`·`server.log`를 남깁니다(기본 root `test-results`). 프로젝트와 재실행 사이에 원본을 덮어쓰지 않습니다. summary의 test 건수는 command 건수와 별개이며 `--list`는 실행 통과로 세지 않습니다.
+`run-id`는 UTC 시각+무작위 접미사입니다. `E2E_REPORT=/path/e2e.json`이면 `/path/e2e.<run-id>.summary.json`에 명령·cwd·exit·건수·서버 PID/종료·DB/파일/쿠키 경로를 기록하고, 프로젝트 집계 JSON은 `e2e.<run-id>.desktop.json`과 `e2e.<run-id>.mobile.json`입니다. 원본 CLI 선택은 `.<project>.discovery.json`, 파일별 원본 결과는 `.<project>.<순번-spec>.json`에 보존합니다. summary의 `projects[].files[]`에는 파일별 명령·선택 ID·PID·종료·실행 건수와 selection 검증을 기록하며, 실행 전 실패로 보고되지 않은 선택 항목은 `not_run_test_count`로 남깁니다. 기본 prefix는 `.local/e2e-results.json`입니다. 콘솔이 정확한 summary 절대경로를 출력합니다. `E2E_ARTIFACTS=/path/artifacts`이면 `/path/artifacts/<run-id>/<project>/<순번-spec>/test-results/`에 trace/화면을, 그 상위에 `runner.log`·`server.log`를 남깁니다(기본 root `test-results`). 프로젝트·파일·재실행 사이에 원본을 덮어쓰지 않습니다. summary의 test 건수는 command 건수와 별개이며 `--list`는 실제 CLI 선택만 기록하고 서버를 시작하지 않으며 실행 통과로 세지 않습니다. CLI 선택이 실행 중 달라지거나 파일 실행이 실패하면 전체 명령도 실패합니다.
 
 기본 trace/자동 screenshot 설정은 꺼져 있습니다. G04 여정은 로그인 후 명시 trace·화면과 실패 DOM을 private 산출물로 남깁니다. 보고서는 환경 덤프/인증 헤더/DB 원문을 출력하지 않습니다. 증거는 합성 자료여도 비공개 보관하며 실패 로그를 삭제하거나 성공으로 재명명하지 않습니다. `RESTART_REPORT`, `IDENTITY_RESTART_REPORT`, `IDENTITY_RACES_REPORT`는 해당 검사기의 선택 출력입니다. 구현자 자기검증과 독립 검증/통합 회귀는 별개입니다.
 
