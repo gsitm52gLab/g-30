@@ -1,6 +1,6 @@
 # Execution checkpoint
 
-State version: 47
+State version: 48
 Updated: 2026-09-21T12:14:18.930222+00:00
 Active Goal: existing user Goal, ACTIVE
 Accepted product commit: `cec612fbeb3795e233d07121a54db9ac96adbf4b`
@@ -14,3 +14,5 @@ Remaining gate: independent own V03/current+history/nestedDTO/API/SSR/actualnavi
 G06 beforeG05 afterG04 ACCEPTED. Draftrevision3 contains commonedit policy: one allowed ContextProduct permits publiccommonedit, context SKU/status/prices/files stay local; no hidden context counts. Product/file owner/consumer contract prepared. prd planned server/sharedsinglewriter; goals UI only after fixed contract; no G06 implementation yet.
 
 Preserve .env/main/origin/untracked docs/execution-v2, raw private evidence and actual session logs. Original logprefixes refreshed12:03:13UTC; final archive/sanitization pending.
+
+Update 2026-09-21T12:19:22.512326+00:00: finalfb independentlyPASS, main264hashes/14metadata-log-report/157source/24validtraces checked. Root serial merge `cc59987fc70f2799cf1703950e5932b7b4b64ada` complete with product bytes identical tofb, main/origin/user untracked preserved. Detachedg04-regression created; workflow assigned G04/4/regression-task.json on4143/4146. G04 INTEGRATION_TESTING, accepted commit stillcec612f. No G06start until regression accepted.
