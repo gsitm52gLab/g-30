@@ -15,15 +15,15 @@
       "prd_id": "PRD-00",
       "title": "환경과 저장구조",
       "dependencies": [],
-      "state": "READY",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": null,
+      "implementer_session_id": "/root/prd",
       "verifier_session_id": null,
-      "attempt": 0,
+      "attempt": 1,
       "owned_paths": [],
-      "actual_worktree_cwd": null,
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g00-impl",
       "evidence_root": ".execution/private/runs/<run-id>/G00/<attempt>/",
       "acceptance": [
         {
@@ -1013,7 +1013,7 @@
   "accepted_commit": null,
   "current_goal": "G00",
   "next_action": "G00 implementation in isolated worktree then independent candidate verification",
-  "state_version": 1,
+  "state_version": 3,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1032,5 +1032,11 @@
   "latest_user_clarifications": [
     "When implementing pharmaceutical-law AI, first refer to relevant material on repository main and reuse as needed. No git fetch was requested during the earlier prompt-only edit.",
     "Current attached Goal and execution-v1 govern execution. Unpublished execution-v2 draft is not a new binding contract."
-  ]
+  ],
+  "integration_branch": "run/integration",
+  "integration_worktree": "/Users/evan/workspace/gs-hale",
+  "implementation_branch": "run/g00-impl",
+  "initial_commit": "1f108fe",
+  "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
+  "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json"
 }
