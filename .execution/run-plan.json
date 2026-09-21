@@ -921,7 +921,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Finish G06 UI and server migration diagnostic selfchecks; freeze and serially assemble combined candidate, then independent verification.",
+      "next_action": "Review frozen G06 server/UI author packets; assign exact51339b combined selfchecks, then independent verification.",
       "base_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/task.json",
       "ownership_addenda": [
@@ -994,6 +994,15 @@
           "runtime_status": "STATIC_CONTRACT_GAP",
           "owner": "prd/goals",
           "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-3.json"
+        },
+        {
+          "id": "G06-CR06",
+          "severity": "P3",
+          "title": "Mobile product section navigation wraps Korean labels character by character",
+          "status": "IMPLEMENTER_REPAIR_MAIN_VISUAL_CHECK_PENDING",
+          "source": "Mobile screenshot and CSS .tabs a flex basis",
+          "owner": "goals",
+          "repair_candidate": "8019017947f2e394447a093b0d2ea03ef95ecdc3"
         }
       ],
       "implementer_session_ids": [
@@ -1039,7 +1048,7 @@
         "runtime": "NOT_RUN",
         "tool_limit": "Prior reviewer turn stopped by tool content classification; only evidence preservation completed afterward."
       },
-      "latest_server_candidate": "93b0fce4bab394b0f14d0a29a5b4dd5d757bc230",
+      "latest_server_candidate": "cd5e43abedb8bef58355d8315b46640094f0e070",
       "main_contract_fix1_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json",
       "main_contract_fix2_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix2-review.json",
       "contract_delta2": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/contract-delta-2.md",
@@ -1051,7 +1060,12 @@
         "candidate": "b5d2c8d",
         "runner_modified": true,
         "note": "Author reports source identical to93b, two helper failures preserved; final exactSHA packet pending."
-      }
+      },
+      "latest_ui_candidate": "8019017947f2e394447a093b0d2ea03ef95ecdc3",
+      "assembly_candidate": "51339b4e435818a8bdb63dd7d0310ff9b5ca0719",
+      "assembly_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-assembly",
+      "assembly_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/assembly/assembly-record.json",
+      "assembly_state": "ASSEMBLED_AUTHOR_PACKETS_PENDING"
     },
     {
       "id": "G07",
@@ -1693,8 +1707,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
-  "next_action": "Finish G06 UI and server migration diagnostic selfchecks; freeze and serially assemble combined candidate, then independent verification.",
-  "state_version": 59,
+  "next_action": "Review frozen G06 server/UI author packets; assign exact51339b combined selfchecks, then independent verification.",
+  "state_version": 60,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1721,7 +1735,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T13:09:02.294338+00:00",
+  "updated_at": "2026-09-21T13:14:51.057976+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

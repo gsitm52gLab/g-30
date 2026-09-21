@@ -16,3 +16,7 @@ Workflow prepares independent verifier harness under G06/1/verifier-preparation 
 Next: finish/freeze server+UI, serial internal assembly, author combined selfcheck, independent exactcandidate, main review, root integration, exactintegrated regression, then G06accepted. G05 draft and file/capture bridge prepared, do not start until G06accepted.
 
 Preserve .env/main/origin/user untracked docs/execution-v2. No push/fetch/API calls. Private original evidence/failures and actual session logs preserved; final log archive/sanitized derivatives pending.
+
+## State 60 — internal G06 assembly
+
+Root serially assembled frozen server cd5e43a + UI8019017 into isolated `.worktrees/g06-assembly` exact51339b4e435818a8bdb63dd7d0310ff9b5ca0719. No overlapping changed paths/conflicts, source blobs checked. Author result packets pending review, combined selfcheck draft prepared but not assigned. Root accepted remainscc59987; no G06 acceptance. CR05 safe original uploader/time added and CR06 mobile nav wrap refined; exact combined independent verification remains required.
