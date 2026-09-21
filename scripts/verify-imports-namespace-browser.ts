@@ -14,9 +14,11 @@ export async function namespaceBrowser(origin: string, contextId: string, report
             await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
             try {
                 await login(page.request, 'luna@example.test');
+                await page.goto(`/products/import?context=${contextId}`);
                 for (const fixture of ['standard', 'formula-cached', 'numeric-identifier']) {
                     const bytes = readFileSync(`tests/fixtures/imports-${fixture}-prefixed.xlsx`);
-                    await page.goto(`/products/import?context=${contextId}`);
+                    const reset = page.getByRole('button', { name: '다른 원본 가져오기', exact: true });
+                    if (await reset.count()) await reset.click();
                     await page.getByLabel('상품 Excel 원본', { exact: true }).setInputFiles({ name: `${fixture}.xlsx`, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: bytes });
                     await page.getByRole('button', { name: '원본 읽기 · 다시 시도', exact: true }).click();
                     await expect(page.getByRole('status')).toContainText('원본을 읽었습니다.');
