@@ -18,8 +18,8 @@ const workspace=(r:APIRequestContext,id:string)=>get<SubmissionWorkspace>(r,`/ap
 async function command(r:APIRequestContext,id:string,command:string,extra:Record<string,unknown>={}){const t=await get<TaskDetail>(r,`/api/tasks/${id}`);return post(r,`/api/tasks/${id}`,{command,expectedRevision:t.task.revision,idempotencyKey:randomUUID(),...extra});}
 const bytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a+ZkAAAAASUVORK5CYII=','base64');
 async function fixture(page:Page){
- await login(page.request,'admin@example.test');
- const admin=await apiRequest.newContext({baseURL:origin(),storageState:await page.context().storageState()});
+ const admin=await apiRequest.newContext({baseURL:origin()});
+ await login(admin,'admin@example.test');
  try{
  const products:string[]=[];for(const name of ['A','B']){const created=await post<{ids:string[]}>(admin,'/api/products',{contextId,brandId:'brand-luna',common:{...blankCommon(),name:`링크 상품 ${name}`,code:`LINK-${randomUUID()}`},idempotencyKey:randomUUID()},201);products.push(created.ids[0]);}
  const csrf=await get<{csrfToken:string}>(admin,'/api/auth/csrf');const uploaded=await admin.post(`/api/files?contextId=${contextId}&productId=${products[0]}`,{headers:{Origin:origin(),'X-CSRF-Token':csrf.csrfToken},multipart:{visibility:'public',files:{name:'원문-S1.png',mimeType:'image/png',buffer:bytes}}});expect(uploaded.status()).toBe(201);const fileId=(await uploaded.json()).files[0].id as string;
