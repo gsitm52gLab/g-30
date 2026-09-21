@@ -23,7 +23,7 @@ results = []
 errors = []
 for manifest in args.manifests:
     document = json.loads(manifest.read_text())
-    entries = document.get('artifacts', [])
+    entries = document.get('artifacts', document.get('files', []))
     local_errors = []
     if not entries:
         local_errors.append('manifest has no artifacts')
