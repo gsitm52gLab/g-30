@@ -1,3 +1,9 @@
+# State137 latest — G11 campaign consumer assigned, G15 early freeze
+
+Accepted24636458b6fab6b93c6b215d9a627a5d84b26b98 stays11/19 GoalACTIVE. G15combined63430 sourcefreeze rootearlyreviewdbcf3b…151sourcepairs raw425unit/build PASS0errors, independentpending. Sharedlease released; authorhistoryhelper first17migrationassertionsPASS thenCSRF403 because pre-CSRFcookieheader harnessoracle, originalretained/test-onlyrepair pending. Goalsactualproof continues4233/34.
+
+Prd formalG11campaign-taskca19db… newworktreeg11-campaign ataccepted246 inputab313, exclusive narrowsharedunion0011+0010; actualsafeG12residual/CAS/immutablehistory connector, earlytypedfreeze then goalsUI, prdwholeG15independent afterward. RootG11serverfinal reviewed68f36… integrity4271…634artifacts424sources27commands; rawHTTPaddendum2a97…396responses, historical38/10originalfiles unchanged. Campaignprepb638…/verifierprep4314… completedreadonly. Workflow G14prep8d2e… read-only currentACL/searchproducer census, noimplementation. G12scopeaddendum1294…stale regression prose correctedappendonly. G17actualOpenAI mandatory stillNOT_RUN.
+
 # State136 latest — G12 ACCEPTED, G15 assembly assigned
 
 **Accepted24636458b6fab6b93c6b215d9a627a5d84b26b98, 11/19.** G12exactregression8a07296… PASS rootreview746448…581artifacts/9commands/15CRC0errors. Fresh391unit, mock6/SQLite6UI incl20geometry, own18HTTP+9browserchannel+5general/newPID assertions. Oldbroad/race/history fresh0. Original74eFAIL/B04invalid preserved; repaired5229 thenintegration246 all478nonledger bytesidentical. main-acceptance.json holdsstageboundaries G13reminders/G11residual/G03home/G14search/G18 mandatorypending. Regression copiedscope_limits staleNOTRUN integrationtext explicitly superseded by actualproof/rootreview; workflowaddendum requested, originalsunchanged.
