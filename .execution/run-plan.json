@@ -932,7 +932,8 @@
       ],
       "contract_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-1.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-2.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-2.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-3.json"
       ],
       "contract_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064",
       "contract_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/contract-result.json",
@@ -984,6 +985,15 @@
           "owner": "prd",
           "repair_candidate": "93b0fce4bab394b0f14d0a29a5b4dd5d757bc230",
           "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix2-review.json"
+        },
+        {
+          "id": "G06-CR05",
+          "severity": "P2",
+          "title": "Product file view omits original uploader/time required by U06-08 and AC06-05",
+          "status": "REPAIR_ASSIGNED",
+          "runtime_status": "STATIC_CONTRACT_GAP",
+          "owner": "prd/goals",
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-3.json"
         }
       ],
       "implementer_session_ids": [
@@ -1684,7 +1694,7 @@
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
   "next_action": "Finish G06 UI and server migration diagnostic selfchecks; freeze and serially assemble combined candidate, then independent verification.",
-  "state_version": 58,
+  "state_version": 59,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1711,7 +1721,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T13:04:01.257311+00:00",
+  "updated_at": "2026-09-21T13:09:02.294338+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
