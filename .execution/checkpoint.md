@@ -1,3 +1,7 @@
+# State147 latest — G16 full server and G13 pure checks
+
+Accepted0804 remains13/19. G16 pure e108 root673e review450unit/build; full server prd exclusive0013/G10/G11 continues. Narrow seed corpus report and forged missing-run NOT_FOUND test expectation addendum authorized. G13 prep28refs matched; requested/expected guidance retains certainty, app-open normal sync approved with no closed-app/email delivery claim. G13 pure f547732 checks underway, common lease NOT_GRANTED. G16 typed freeze needed for UI and G13 shared lease. G17 actual OpenAI NOT_RUN mandatory.
+
 # State146 latest — G11 ACCEPTED; G16 full server and G13 pure module authorized
 
 Accepted0804a4a 13/19. G11regression52f5 rootf286review546artifacts593Git/cwd9exit0/31CRC3clickedRSC/461unit28browser12HTTP14UI. Historical233rows unchanged migration1/repeat0total12,5originalfilesunchanged. G16prd ownpuree1087ce check450 thenbuild; full-server-lease nowexclusive afteradditivemergeaccepted0804,0013/G10exactfinding/G11actualAIresidual. G13goals formalserver-task ownpuretypes/date/eligibility only on0804,0014reserved NO commonlease untilG16typedfreeze. G16independentai_verifyprepared94fa root915a review19refs all13evalcasesNOT_RUN. G17actualAPI stillmandatoryNOT_RUN.

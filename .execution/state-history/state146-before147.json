@@ -2704,10 +2704,6 @@
       "server_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/server-task.json",
         "sha256": "682f0cc500a1d274b0c497c527eade5dc9ef9a0073c9037406efa40066544f17"
-      },
-      "server_contract_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-server-contract-preparation-review.json",
-        "sha256": "af6baba9cfcafde042a1c537acd159a87c58d94270cd3721b9163a4dd2073fd4"
       }
     },
     {
@@ -3212,14 +3208,6 @@
       "verifier_preparation_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/main-verifier-preparation-review.json",
         "sha256": "915a737ebbce51c1b8d44d70bec10a5c31087ff828afb1ce31b21eb1c850559a"
-      },
-      "pure_phase_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/server/main-pure-review.json",
-        "sha256": "673e12746e2a3028782e70fe8d94269f34bee10bd6ae30ce50fe8e3b89b897fc"
-      },
-      "full_server_lease_addendum": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/full-server-lease-addendum-1.json",
-        "sha256": "6fcc5f57a618bc5cfe6d907f4e54cebf918e521ff2484e3bd92a8eeb6d4bdeb0"
       }
     },
     {
@@ -3364,9 +3352,9 @@
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "0804a4a1a750ab4dee149036659e212480230242",
-  "current_goal": "G16",
-  "next_action": "G16 exclusive full-server in progress; G13 own pure checks. Review typed G16 freeze then assign G16 UI and release shared server lease for G13. G17 real API remains mandatory NOT_RUN.",
-  "state_version": 147,
+  "current_goal": "G15",
+  "next_action": "G11accepted13/19. G16prdexclusivefullserver afterpurefreeze/merge0804; G13goalsownpurephase0014reserved no sharedlease. G16UI+G13server nextwhenG16typedfreeze.",
+  "state_version": 146,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3397,7 +3385,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T22:12:49.700703+00:00",
+  "updated_at": "2026-09-21T22:08:09.648153+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
