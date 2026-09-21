@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import type { RecordRepository, RecordKind } from '@/domain/records';
+import type { RecordRepository, RecordKind, UnitOfWork, StoredRecord } from '@/domain/records';
 import { createMockRepository } from '@/server/repositories/mock';
 import { createSqliteRepository } from '@/server/repositories/sqlite';
 import { openDatabase, migrate } from '@/server/db/database';
@@ -27,8 +27,11 @@ for (const mode of ['mock', 'sqlite'] as const)
         async function command(id: string, command: string, extra: Record<string, unknown> = {}) { return service.command(admin, id, { command, expectedRevision: (await repo.get('notice', id))!.revision, idempotencyKey: randomUUID(), ...extra }); }
         async function publish(id: string) { return (await command(id, 'publish')).ids[1]; }
         const business = async () => Promise.all((['notice', 'noticeVersion', 'noticeRead', 'commandReceipt', 'audit', 'domainEvent'] as RecordKind[]).map(k => repo.list(k)));
-        afterEach(async () => { repo?.close(); if (dir)
-            await rm(dir, { recursive: true, force: true }); });
+        afterEach(async () => {
+            repo?.close();
+            if (dir)
+                await rm(dir, { recursive: true, force: true });
+        });
         it('AC08-01 private drafts and foreign scopes deny; own receipt is server attributed and roster GSG only', async () => {
             await setup();
             const id = await create();
@@ -85,6 +88,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             await command(other, 'save', { content: { ...blankNotice(), title: '전체 공개', body: '새 본문' } });
             await publish(other);
             expect((await service.detail(team, other)).versions).toHaveLength(1);
+            expect(JSON.stringify(await service.detail(team, other))).not.toContain(v1);
             await expect(service.detail(team, other, v1)).rejects.toMatchObject({ status: 404 });
             await command(other, 'save', { content: { ...blankNotice(), title: '아무도 없음', body: '선택 없음', audience: { mode: 'selected', userIds: [] } } });
             await publish(other);
@@ -125,14 +129,45 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect((await service.detail(brand, id)).selected?.content.tasks[0]).toMatchObject({ id: taskId, status: 'submitted', ownAcceptedAt: null, completed: false });
             expect((await files.download(brand, uploaded.file.id, { kind: 'notice', noticeId: id, versionId: v }, 'original')).bytes).toEqual(png);
         });
+        it('corrupted known sequence never crosses read projections; valid unknown extensions retain immutable history', async () => {
+            await setup();
+            const id = await create(), v = await publish(id), original = (await repo.get('noticeVersion', v))!;
+            await expect(repo.transaction(s => s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } as unknown as typeof original.data }))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
+            // Native write guards are not weakened. Simulate an adapter read corruption below the service boundary.
+            const corrupt = (r: StoredRecord | null) => r?.kind === 'noticeVersion' && r.id === v ? { ...r, data: { ...r.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } } : r;
+            const wrapped: RecordRepository = { ...repo, transaction: async (operation) => repo.transaction(s => operation(new Proxy(s, { get(target, prop: keyof UnitOfWork) { return (...args: unknown[]) => { const result = Reflect.apply(target[prop], target, args); return prop === 'get' ? corrupt(result) : prop === 'list' ? result.map(corrupt) : result; }; } }))) };
+            const faulty = new NoticeService(new IdentityService(wrapped, () => NOW));
+            await expect(faulty.detail(brand, id)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+            await expect(faulty.list(brand, A)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+            expect(await repo.get('noticeVersion', v)).toEqual(original);
+            const extended = await repo.transaction(s => { const n = s.get('notice', id)!, version = s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: 2, previousId: v, extra: { secret: 'G08_EXTRA_CANARY' } } as typeof original.data }); s.update('notice', id, n.revision, { ...n.data, currentVersionId: version.id }); return version; });
+            expect(JSON.stringify(await service.detail(brand, id))).not.toContain('G08_EXTRA_CANARY');
+            expect(await repo.get('noticeVersion', extended.id)).toEqual(extended);
+        });
+        it('brand public metadata and ordering do not change on a private draft save', async () => {
+            await setup();
+            const id = await create();
+            identity.clock = () => new Date(Date.parse(NOW) + 60000).toISOString();
+            await publish(id);
+            const before = (await service.list(brand, A)).items.find(n => n.id === id)!;
+            expect(before.updatedAt).toBe(before.publishedAt);
+            expect(before.revision).toBe(before.sequence);
+            await command(id, 'save', { content: { ...blankNotice(), title: 'PRIVATE_DRAFT_TITLE', body: 'PRIVATE_DRAFT_BODY' } });
+            expect((await service.list(brand, A)).items.find(n => n.id === id)).toEqual(before);
+            expect((await service.detail(brand, id)).revision).toBe(before.sequence);
+        });
         it('notice file bytes require current authorization both before and after asynchronous file IO', async () => {
             await setup();
             const id = await create(), ref = { kind: 'notice' as const, noticeId: id }, file = (await files.upload(admin, ref, [{ name: 'file.png', type: 'image/png', bytes: png }], 'public')).files[0];
             await command(id, 'save', { content: { ...blankNotice(), title: '파일', body: '확인', fileIds: [file.id] } });
             const versionId = await publish(id);
             let calls = 0;
-            const wrapped: RecordRepository = { ...repo, transaction: async (op) => { const result = await repo.transaction(op); if (++calls === 1)
-                    await repo.transaction(s => { const m = s.list('membership', A).find(x => x.data.userId === 'user-luna')!; s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' }); }); return result; } };
+            const wrapped: RecordRepository = { ...repo, transaction: async (op) => {
+                    const result = await repo.transaction(op);
+                    if (++calls === 1)
+                        await repo.transaction(s => { const m = s.list('membership', A).find(x => x.data.userId === 'user-luna')!; s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' }); });
+                    return result;
+                } };
             await expect(new FileService(new IdentityService(wrapped, () => NOW), dir).download(brand, file.id, { ...ref, versionId }, 'original')).rejects.toMatchObject({ status: 404 });
             expect(calls).toBe(1);
         });

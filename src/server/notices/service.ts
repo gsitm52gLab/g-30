@@ -11,7 +11,7 @@ import { projectContext, taskScope } from '@/server/policy/projection';
 import { newId, receipt, fresh, audit } from '@/server/products/store';
 import { canReferenceFile, visibleFile } from '@/server/files/access';
 import { resolveNotice, noticeScope, noticeVersionScope } from './access';
-import { actorLabel, fileDTO, publicContent, versionDTO, nullableText } from './projection';
+import { actorLabel, fileDTO, publicContent, versionDTO, nullableText, noticeSequence } from './projection';
 function manageContext(s: UnitOfWork, p: Principal, contextId: string, clock: Clock) {
     authorize(s, p, 'notice.manage', { ...contextResource(contextId), kind: 'notice' }, clock);
 }
@@ -58,7 +58,7 @@ export class NoticeService {
                     return [];
                 const ownReadAt = v ? nullableText(s.list('noticeRead', contextId).find(r => r.data.versionId === v.id && r.data.userId === p.user.id)?.data.readAt) : null;
                 const state = !v ? 'draft' as const : canManage && JSON.stringify(n.data.draft) !== JSON.stringify(v.data.content) ? 'revised' as const : 'published' as const;
-                return [{ id: n.id, revision: n.revision, title: typeof content.title === 'string' ? content.title : '', type: noticeTypes.includes(content.type) ? content.type : 'notice' as const, category: typeof content.category === 'string' ? content.category : '', documentVersion: typeof content.documentVersion === 'string' ? content.documentVersion : '', state, currentVersionId: v?.id ?? null, sequence: v?.data.sequence ?? null, publishedAt: nullableText(v?.data.publishedAt), updatedAt: n.updatedAt, ownReadAt }];
+                return [{ id: n.id, revision: canManage ? n.revision : v ? noticeSequence(v) : 0, title: typeof content.title === 'string' ? content.title : '', type: noticeTypes.includes(content.type) ? content.type : 'notice' as const, category: typeof content.category === 'string' ? content.category : '', documentVersion: typeof content.documentVersion === 'string' ? content.documentVersion : '', state, currentVersionId: v?.id ?? null, sequence: v ? noticeSequence(v) : null, publishedAt: nullableText(v?.data.publishedAt), updatedAt: canManage ? n.updatedAt : nullableText(v?.data.publishedAt) ?? '', ownReadAt }];
             }).filter(n => (!query.q || `${n.title} ${n.category}`.toLowerCase().includes(query.q.toLowerCase())) && (!query.type || n.type === query.type) && (!query.state || query.state === 'unread' ? !query.state || !!n.currentVersionId && !n.ownReadAt : n.state === query.state)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id));
             return { context: projectContext(s.get('context', contextId)!), actorId: p.user.id, canManage, items, total: items.length };
         });
@@ -101,7 +101,7 @@ export class NoticeService {
                 }
                 const content = noticeInput(n.data.draft, true);
                 validateReferences(s, p, n, content, this.clock, true);
-                const previous = r.current, version = s.create('noticeVersion', { id: newId(), contextId: n.contextId, data: { noticeId: id, sequence: (previous?.data.sequence ?? 0) + 1, previousId: previous?.id ?? null, content, publishedBy: p.user.id, publishedAt: this.clock(), publishedRecipientUserIds: activeBrands(s,n.contextId!).filter(u=>content.audience.mode==='all'||content.audience.userIds.includes(u.id)).map(u=>u.id) } });
+                const previous = r.current, version = s.create('noticeVersion', { id: newId(), contextId: n.contextId, data: { noticeId: id, sequence: (previous ? noticeSequence(previous) : 0) + 1, previousId: previous?.id ?? null, content, publishedBy: p.user.id, publishedAt: this.clock(), publishedRecipientUserIds: activeBrands(s, n.contextId!).filter(u => content.audience.mode === 'all' || content.audience.userIds.includes(u.id)).map(u => u.id) } });
                 s.update('notice', id, n.revision, { ...n.data, currentVersionId: version.id });
                 s.create('domainEvent', { id: newId(), contextId: n.contextId, data: { eventType: previous ? 'NOTICE_REVISED' : 'NOTICE_PUBLISHED', targetId: id, sourceVersionId: version.id, actorId: p.user.id, at: this.clock() } });
                 audit(s, p, this.clock, n.contextId!, 'notice.published', id, { versionId: previous?.id ?? null }, { versionId: version.id });
@@ -114,7 +114,7 @@ export class NoticeService {
             const p = this.identity.principal(s, token), r = resolveNotice(s, p, id, this.clock, false, versionId), n = r.notice, canManage = decide(s, p, 'notice.manage', r.scope, this.clock).allowed;
             const versions = s.list('noticeVersion', n.contextId!).filter(v => v.data.noticeId === id && decide(s, p, 'notice.read', noticeVersionScope(s, n, v), this.clock).allowed).sort((a, b) => b.data.sequence - a.data.sequence);
             const selected = r.version ? versionDTO(s, p, n, r.version, this.clock) : null;
-            const basic = { id, context: projectContext(s.get('context', n.contextId!)!), actorId: p.user.id, revision: n.revision, createdAt: n.createdAt, authorLabel: actorLabel(s, n.data.createdBy, n.contextId!, p), currentVersionId: r.current?.id ?? null, selected, versions: versions.map(v => versionDTO(s, p, n, v, this.clock)), capabilities: { manage: canManage, read: !!r.version } };
+            const basic = { id, context: projectContext(s.get('context', n.contextId!)!), actorId: p.user.id, revision: canManage ? n.revision : r.current ? noticeSequence(r.current) : 0, createdAt: n.createdAt, authorLabel: actorLabel(s, n.data.createdBy, n.contextId!, p), currentVersionId: r.current?.id ?? null, selected, versions: versions.map(v => versionDTO(s, p, n, v, this.clock)), capabilities: { manage: canManage, read: !!r.version } };
             if (!canManage)
                 return basic;
             const members = activeBrands(s, n.contextId!).map(u => ({ id: u.id, name: typeof u.data.name === 'string' ? u.data.name : '' }));

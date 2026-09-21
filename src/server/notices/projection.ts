@@ -1,3 +1,4 @@
+import { fail } from '@/server/auth/errors';
 import type { Clock, StoredRecord, UnitOfWork } from '@/domain/records';
 import type { Principal } from '@/server/auth/service';
 import type { NoticeContent } from '@/domain/notices/types';
@@ -8,7 +9,7 @@ import { fileMetadata, fileUrls } from '@/server/files/service';
 import { visibleFile } from '@/server/files/access';
 import { noticeScope, noticeVersionScope } from './access';
 const text = (v: unknown) => typeof v === 'string' ? v : '';
-export const nullableText=(v:unknown)=>typeof v==='string'?v:null;
+export const nullableText = (v: unknown) => typeof v === 'string' ? v : null;
 export function actorLabel(s: UnitOfWork, id: string, contextId: string, p: Principal) {
     const u = s.get('user', id);
     return u && (id === p.user.id || activeMember(s, id, contextId)) ? text(u.data.name) : '작성자 정보 비공개';
@@ -29,6 +30,13 @@ export function publicContent(s: UnitOfWork, p: Principal, notice: StoredRecord<
     });
     return { title: text(content.title), body: text(content.body), type: noticeTypes.includes(content.type) ? content.type : 'notice' as const, category: text(content.category), documentVersion: text(content.documentVersion), changeSummary: text(content.changeSummary), files, tasks };
 }
+export function noticeSequence(v: StoredRecord<'noticeVersion'>): number {
+    if (!Number.isSafeInteger(v.data.sequence) || v.data.sequence < 1)
+        fail('STORAGE_UNAVAILABLE', 503, '공지 버전 정보를 확인할 수 없습니다. 관리자에게 확인을 요청해 주세요.');
+    return v.data.sequence;
+}
 export function versionDTO(s: UnitOfWork, p: Principal, n: StoredRecord<'notice'>, v: StoredRecord<'noticeVersion'>, clock: Clock) {
-    return { id: v.id, sequence: v.data.sequence, previousId: nullableText(v.data.previousId), publishedAt: text(v.data.publishedAt), authorLabel: actorLabel(s, v.data.publishedBy, n.contextId!, p), content: publicContent(s, p, n, v.data.content, clock, v), ownReadAt: nullableText(s.list('noticeRead', n.contextId!).find(r => r.data.versionId === v.id && r.data.userId === p.user.id)?.data.readAt) };
+    const previous = typeof v.data.previousId === 'string' ? s.get('noticeVersion', v.data.previousId) : null;
+    const previousId = previous && decide(s, p, 'notice.read', noticeVersionScope(s, n, previous), clock).allowed ? previous.id : null;
+    return { id: v.id, sequence: noticeSequence(v), previousId, publishedAt: text(v.data.publishedAt), authorLabel: actorLabel(s, v.data.publishedBy, n.contextId!, p), content: publicContent(s, p, n, v.data.content, clock, v), ownReadAt: nullableText(s.list('noticeRead', n.contextId!).find(r => r.data.versionId === v.id && r.data.userId === p.user.id)?.data.readAt) };
 }
