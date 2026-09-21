@@ -15,7 +15,7 @@ it('G09 migration preserves populated accepted G08 notice and all old rows; repe
         expect(migrate(db,dir)).toEqual({applied:7,total:7});repo=createSqliteRepository(db);const identity=await policyFixture(repo),notice=new NoticeService(identity),admin=tokenFor('user-admin');
         const id=(await notice.create(admin,{contextId:'ctx-jp-a-luna',content:{...blankNotice(),title:'Existing published notice',body:'Keep original'},idempotencyKey:'g09-migration-notice'})).ids[0];
         await notice.command(admin,id,{command:'publish',expectedRevision:1,idempotencyKey:'g09-migration-publication'});
-        const before=db.prepare('SELECT * FROM records ORDER BY kind,id').all();expect(migrate(db)).toEqual({applied:2,total:9});expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
-        expect(migrate(db)).toEqual({applied:0,total:9});expect((await seed(repo)).inserted).toBe(0);expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
+        const before=db.prepare('SELECT * FROM records ORDER BY kind,id').all();expect(migrate(db)).toEqual({applied: 3, total: 10});expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
+        expect(migrate(db)).toEqual({applied: 0, total: 10});expect((await seed(repo)).inserted).toBe(0);expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
     }finally{if(repo)repo.close();else db.close();rmSync(dir,{recursive:true,force:true});}
 });

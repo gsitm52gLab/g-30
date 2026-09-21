@@ -138,6 +138,7 @@ export class TaskService {
             a.data.taskId === row.id && a.data.requestId === row.data.currentRequestId && a.data.kind === "accept") ? "in_progress" : "requested";
     }
     private publish(s: UnitOfWork, p: Principal, row: StoredRecord<"task">, c: RequestContent, templateVersionId = row.data.templateVersionId ?? null, preservedDraft?: RequestContent) {
+        if (row.data.status === "completed") fail("REOPEN_REQUIRED", 409, "완료 이력을 보존하고 사유를 입력해 재개한 뒤 새 요청을 공개해 주세요.");
         if (!row.contextId || row.data.schemaVersion !== 2) fail("VALIDATION", 422, "새 요청 업무에서 공개해 주세요.");
         const target = this.target(s, p, { contextId: row.contextId, ownerId: row.data.ownerId, assigneeId: row.data.assigneeId, coAssigneeIds: row.data.coAssigneeIds ?? [], productIds: row.data.productIds });
         this.validateContent(s, p, target, c, row.id);
@@ -272,7 +273,7 @@ export class TaskService {
                 activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)).map(projectedActivity),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
                 requirementStatus: current && live ? safeEvaluation(current.data.content,live.data.answers,liveRequest?.data.content??null,true).items.map(projectedRequirementStatus) : current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
-                submissionConnection: current ? "공개 요청에 답변을 저장하고 제출할 수 있습니다" : "요청 공개 후 답변할 수 있습니다", submissionSummary: live ? { id:live.id,sequence:live.data.sequence,requestId:live.data.requestId,mode:live.data.mode,submittedAt:live.data.submittedAt,isCurrentRequest:live.data.requestId===current?.id } : null, completionConnection: "업무 완료는 준비 중입니다", notificationConnection: "앱 알림은 준비 중입니다" };
+                submissionConnection: current ? "공개 요청에 답변을 저장하고 제출할 수 있습니다" : "요청 공개 후 답변할 수 있습니다", submissionSummary: live ? { id:live.id,sequence:live.data.sequence,requestId:live.data.requestId,mode:live.data.mode,submittedAt:live.data.submittedAt,isCurrentRequest:live.data.requestId===current?.id } : null, completionConnection: "GSG가 잔여 상태를 확인하고 수동 완료할 수 있습니다", notificationConnection: "앱 알림은 준비 중입니다" };
         });
     }
     async catalog(token: string | undefined, contextId: string) {
