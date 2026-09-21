@@ -132,7 +132,7 @@ import type { NotificationList, NotificationSync } from '@/server/notifications/
 import type { CompletionWorkspace } from '@/server/completion/service';
 import { localCalendarDay } from '@/domain/scheduling/calendar';
 const contextId = 'ctx-jp-a-luna', admin = new Client(), brand = new Client(), co = new Client(), gsg = new Client();
-const checksExpected = ['H01','H02','H03','H04','H05','H06','H07','H08','H09','H10','H11','H12','H13','H14','H15','H16','H17','H18','H19','H20','H21','H22','H23','H24','H25','H26','H27'];
+const checksExpected = ['H01','H02','H03','H04','H05','H06','H07','H08','H09','H10','H11','H12','H13','H14','H15','H16','H17','H18','H19','H20','H21','H22','H23','H24','H25','H26','H27','H28'];
 const skipped: string[] = []; let reachedEnd = false;
 const q = `?context=${contextId}`;
 async function ids(response: Response, status = 200): Promise<string[]> { assert.equal(response.status, status, await response.clone().text()); return (await response.json()).ids; }
@@ -144,7 +144,7 @@ async function createTask(publish = true) { const taskId = (await ids(await admi
 try {
     if (mode === 'sqlite') { const db = openDatabase(database, true); migrate(db); const repo = createSqliteRepository(db); await seed(repo); repo.close(); }
     await start(); const anon = new Client(); check('H01', (await anon.send('/api/notifications'+q)).status === 401, ['A19']);
-    await admin.login('admin@example.test'); await brand.login('luna@example.test'); await co.login('co@example.test'); await gsg.login('gsg@example.test');
+    await admin.login('admin@example.test'); await brand.login('luna@example.test'); await co.login('co@example.test'); await gsg.login('operator@example.test');
     check('H02', (await admin.get<NotificationList>('/api/notifications?context=ctx-empty')).total === 0, ['AC-13-02']);
     check('H03', (await brand.send('/api/notifications/sync','POST',{contextId})).status === 403 && (await brand.mutate('/api/notifications/sync',{contextId,userId:'user-gsg'})).status === 422, ['A19']);
     const taskId = await createTask(false); check('H04', (await sync()).total === 0, ['AC-13-02']);
@@ -173,6 +173,8 @@ try {
     const internal={...content,visibility:'internal' as const,title:'PRIVATE_G13_SCHEDULE'};await ids(await admin.mutate('/api/schedule',{...intent,scheduleId:id,expectedRevision:detail.revision,content:internal,idempotencyKey:randomUUID()}));
     check('H16',(await brand.send(`/api/schedule/${id}`)).status===404&&!JSON.stringify(await brand.get('/api/schedule'+q)).includes('PRIVATE_G13_')&&!(await brand.get<NotificationList>('/api/notifications'+q)).items.some(n=>n.title==='G13 실제 발송 확인'),['A19']);
     const taskDetail=await admin.get<TaskDetail>(`/api/tasks/${taskId}`);check('H17',taskDetail.activities.length===0&&!(await brand.get<NotificationList>('/api/notifications'+q)).items.some(n=>JSON.stringify(n).includes('PRIVATE_G13_HTTP')),['AC-13-02','A19']);
+    await ids(await brand.mutate(`/api/tasks/${taskId}`,{command:'schedule',expectedRevision:taskDetail.task.revision,reason:'실제 일정 조정',deadline:{...content.deadline,value:dueDay},idempotencyKey:randomUUID()}));
+    const ownerAlerts=await sync(gsg);check('H28',ownerAlerts.items.filter(n=>n.actionUrl.includes(taskId)&&n.message==='일정 조정 요청을 확인해 주세요.').length===1,['AC-13-02','SA-52']);
     const w=await admin.get<CompletionWorkspace>(`/api/completion?taskId=${taskId}`);await ids(await admin.mutate('/api/completion',{command:'complete',taskId,expectedTaskRevision:w.taskRevision,expectedBasisHash:w.preview!.basisHash,memo:'',idempotencyKey:randomUUID()}));
     const taskRow=(await brand.get<ScheduleList>('/api/schedule'+q)).items.find(r=>r.source.kind==='task_request'&&r.taskId===taskId)!;check('H18',!taskRow.reminder.eligible&&taskRow.actionOwners.map(x=>x.id).sort().join(',')==='user-co,user-luna',['AC-13-04']);
     if(mode==='sqlite'){
