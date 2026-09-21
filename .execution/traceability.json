@@ -148,11 +148,13 @@
         "G07"
       ],
       "summary": "독립 상품 CRUD·업무/증빙 연결",
-      "status": "PARTIAL_G06_ACCEPTED",
+      "status": "PARTIAL_G06_G07_ACCEPTED",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
+      "remaining": "G18 final regression, specified future consumers and operational limits remain. PARTIAL_G06_G07_ACCEPTED; independentproduct/evidence/excelcomplete, finalhomeG03/navG18pending",
+      "current_g07_stage": "PARTIAL_G06_G07_ACCEPTED; independentproduct/evidence/excelcomplete, finalhomeG03/navG18pending"
     },
     {
       "id": "A11",
@@ -163,11 +165,13 @@
         "G07"
       ],
       "summary": "공통 증빙·제품별 적용·인증 오인 방지",
-      "status": "PARTIAL_G06_ACCEPTED",
+      "status": "PASS_CURRENT_G06_G07_SCOPE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
+      "remaining": "G18 final regression, specified future consumers and operational limits remain. PASS_CURRENT_G06_G07_SCOPE, standardexactcommonfiles/per-productapplicability/certificationhonesty; G18regression later",
+      "current_g07_stage": "PASS_CURRENT_G06_G07_SCOPE, standardexactcommonfiles/per-productapplicability/certificationhonesty; G18regression later"
     },
     {
       "id": "A12",
@@ -178,11 +182,13 @@
         "G07"
       ],
       "summary": "Excel 매핑/미리보기/명시 반영·가격 권한",
-      "status": "PARTIAL_G06_PRICE_PERMISSION_ONLY_EXCEL_NOT_RUN",
+      "status": "PASS_STANDARD_SYNTHETIC_EXCEL",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
+      "remaining": "G18 final regression, specified future consumers and operational limits remain. PASS_STANDARD_SYNTHETIC_EXCEL, operationalbusinessExcel NOT_RUN separately",
+      "current_g07_stage": "PASS_STANDARD_SYNTHETIC_EXCEL, operationalbusinessExcel NOT_RUN separately"
     },
     {
       "id": "A13",
@@ -276,16 +282,18 @@
         "G14"
       ],
       "summary": "서버 전 경로 권한·가격/파일/AI 격리",
-      "status": "PARTIAL_THROUGH_G08_ACCEPTED",
+      "status": "PARTIAL_THROUGH_CURRENT_IMPLEMENTED_CHANNELS",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "remaining": "Current G05 channels verified; evidence/Excel/notices/messages/notification/search/export/AI later channels mandatory.",
-      "current_g08_stage": "PASS:notice/guide/form/currentcontext/versionedread+files/eventproducer; futureglobal/delivery consumers notimplied"
+      "remaining": "G18 final regression, specified future consumers and operational limits remain. PARTIAL_THROUGH_CURRENT_IMPLEMENTED_CHANNELS; currentExcel/API/SSR/actualRSC/file/price scopes nowadded, futuremessages/notification/search/AI mandatory",
+      "current_g08_stage": "PASS:notice/guide/form/currentcontext/versionedread+files/eventproducer; futureglobal/delivery consumers notimplied",
+      "current_g07_stage": "PARTIAL_THROUGH_CURRENT_IMPLEMENTED_CHANNELS; currentExcel/API/SSR/actualRSC/file/price scopes nowadded, futuremessages/notification/search/AI mandatory"
     },
     {
       "id": "A20",
@@ -298,16 +306,18 @@
         "G14"
       ],
       "summary": "동시 변경·멱등성·DB 영속성",
-      "status": "PARTIAL_G05_ACCEPTED",
+      "status": "PARTIAL_CURRENT_IMPLEMENTED_RECORDS",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "remaining": "Actual tasks/products/submissions/audit/receipts CAS/idempotency/restart verified; inquiries/completion and later records pending."
+      "remaining": "G18 final regression, specified future consumers and operational limits remain. PARTIAL_CURRENT_IMPLEMENTED_RECORDS; evidence/import2PID/replay/restart nowadded, inquiry/completion/laterrecords pending",
+      "current_g07_stage": "PARTIAL_CURRENT_IMPLEMENTED_RECORDS; evidence/import2PID/replay/restart nowadded, inquiry/completion/laterrecords pending"
     },
     {
       "id": "A21",
@@ -389,8 +399,12 @@
         "G18"
       ],
       "summary": "실연동·현업 양식·운영/복구 증거",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_STANDARD_EXCEL_EVIDENCE_ONLY",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
+      ],
+      "current_g07_stage": "PARTIAL_STANDARD_EXCEL_EVIDENCE_ONLY; actualbusinessExcel/email/backup operationalNOT_RUN, configuredOpenAIG17mandatoryNOT_RUN",
+      "remaining": "G18 final regression, specified future consumers and operational limits remain. PARTIAL_STANDARD_EXCEL_EVIDENCE_ONLY; actualbusinessExcel/email/backup operationalNOT_RUN, configuredOpenAIG17mandatoryNOT_RUN"
     }
   ],
   "ai_evaluations": [

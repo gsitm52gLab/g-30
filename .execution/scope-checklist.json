@@ -290,11 +290,14 @@
       "owner_note": "G05+G07",
       "requirement": "정확한 파일버전 참조 재사용, GSG 공개범위와 원본범위 확인. 새원본≠과거업무자동갱신. BR-003·022·023",
       "verification_idea": "공통증빙v1을2업무에참조후원본v2등록. 과거2업무v1유지. 같은브랜드다른context비공개원본은재사용거부",
-      "status": "PASS_CURRENT_G05_STAGE",
+      "status": "PASS_CURRENT_G07_SCOPE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "scope_note": "Exact immutable file reuse and original+reference current auth in tasks/products/submissions; actual Evidence consumer G07 pending."
+      "scope_note": "Exact immutable file reuse and original+reference current auth in tasks/products/submissions; actual Evidence consumer G07 pending.",
+      "current_g07_stage": "PASS_CURRENT_G05_G07 exacthistoricalsource+reference and originalANDreference access",
+      "remaining": "G18 final regression; actual business Excel remains operational NOT_RUN where applicable."
     },
     {
       "id": "SA-22",
@@ -304,11 +307,14 @@
       "owner_note": "G06",
       "requirement": "독립 상품목록의 이미지·브랜드·이름·SKU/코드·용량/변형·카테고리·컨텍스트상태·요청/부족/미확인자료수. 원안7.1/FR-023",
       "verification_idea": "이름만있는CRUD로끝내지않고목록필드/필터(국가·리테일러·브랜드·상품명·SKU)와DB집계비교. 상품에서관련업무생성/연결·Excel진입실행",
-      "status": "PASS_CURRENT_G06_STAGE",
+      "status": "PASS_CURRENT_G07_SCOPE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "scope_note": "G07 requested/missing/unconfirmed actual counts and Excel entry remain; null connected=false until implemented"
+      "scope_note": "G07 requested/missing/unconfirmed actual counts and Excel entry remain; null connected=false until implemented",
+      "current_g07_stage": "G07 realrequested/missing/unconfirmed5/2/2 andExcelentry nowverified, removeobsolete nullconnectedfalse note",
+      "remaining": "G18 final regression; actual business Excel remains operational NOT_RUN where applicable."
     },
     {
       "id": "SA-23",
@@ -389,12 +395,15 @@
       "owner_note": "G06",
       "requirement": "자료/인증/시험·수상증빙, 업무/검토사용처/언어/매체, 변경자/전후/출처·상품/파일버전. FR-023/BR-003·004",
       "verification_idea": "상품에서자료·정확한제출/검토로탐색. 공통정보변경시영향context표시, 현재최신/과거검토스냅샷불변. 보관/판매중단해도기존이력/연결조회가능",
-      "status": "PASS_CURRENT_G05_STAGE",
+      "status": "PARTIAL_CURRENT_G07_ACCEPTED",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "scope_note": "Actual G05 capture/historical product/file navigation now verified; G07 evidence/G10 review consumers still pending."
+      "scope_note": "Actual G05 capture/historical product/file navigation now verified; G07 evidence/G10 review consumers still pending.",
+      "current_g07_stage": "actualevidence +oldG05linksnowverified; G10 review exactconsumer remains",
+      "remaining": "G10 exact review consumer and G18 remain."
     },
     {
       "id": "SA-29",
@@ -404,8 +413,12 @@
       "owner_note": "G07",
       "requirement": "행=상품, 열=요청자료유형; 미제출/제출됨/내용확인필요/적용확인/보완필요/해당없음. FR-023/BR-009·022",
       "verification_idea": "2상품×3자료6상태fixture. 셀에서정확한파일버전/요청이동. 파일존재가적용확인으로승격되지않고해당없음은부족집계제외",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G07_SCOPE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
+      ],
+      "current_g07_stage": "PASS_CURRENT_G07 matrix/exactlinks notcertification",
+      "remaining": "G18 final regression; actual business Excel remains operational NOT_RUN where applicable."
     },
     {
       "id": "SA-30",
@@ -415,8 +428,12 @@
       "owner_note": "G07",
       "requirement": "SDS/MSDS·서명질문지·보증/확인서·갱신청구서·제품목록·실제인증서 구분. 발행/서명일·명시기간·제품별적용. BR-009·022",
       "verification_idea": "공통제품목록하나를2제품에연결하되적용상태별개. 질문지서명·청구기간이certified=true를만들지않음. 원문없는만료일생성0, 확인기간있는자료만갱신알림대상",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_CURRENT_G07_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
+      ],
+      "current_g07_stage": "PASS_CURRENT_G07 sourceclassification/period/applicability, actualrenewalnotificationG13 stilllater",
+      "remaining": "G13 actual renewal notification and G18 remain."
     },
     {
       "id": "SA-31",
@@ -426,8 +443,12 @@
       "owner_note": "G07",
       "requirement": "표준양식 제공부터 파일/시트/헤더/열매핑/오류·중복·가격미리보기/명시반영/결과·실패행. FR-016",
       "verification_idea": "다중sheet·header가첫행아닌합성xlsx로모든단계수행. 미리보기만으로DB변경0. 반영후batchId/출처/행결과조회·재시작유지",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G07_SCOPE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
+      ],
+      "current_g07_stage": "PASS_CURRENT_G07 standardoriginal file/source/sheet/header/mapping/preview/apply/batch",
+      "remaining": "G18 final regression; actual business Excel remains operational NOT_RUN where applicable."
     },
     {
       "id": "SA-32",
@@ -437,8 +458,12 @@
       "owner_note": "G07",
       "requirement": "제품코드+context키로중복, 신규/업데이트/건너뛰기선택, 오류1행이면전체차단. FR-016/BR-027",
       "verification_idea": "기존1/신규1/오류1파일에서전체반영0. 오류수정후선택한신규/갱신만저장, skip불변. 동일batch재시도중복없음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G07_SCOPE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
+      ],
+      "current_g07_stage": "PASS_CURRENT_G07 atomicallrows/CAS/duplicateclear/replay",
+      "remaining": "G18 final regression; actual business Excel remains operational NOT_RUN where applicable."
     },
     {
       "id": "SA-33",
@@ -448,8 +473,12 @@
       "owner_note": "G07",
       "requirement": "가격권한이import preview/반영/export모두동일, brand내보내기는내부가격열자체제외. FR-016/BR-023",
       "verification_idea": "직접payload에내부가격을추가한import거부, CSV/XLSX의header/hidden sheet/metadata에누출없음. 정상표준양식완료와현업Excel미제공상태별도",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G07_SCOPE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
+      ],
+      "current_g07_stage": "PASS_CURRENT_G07 brand/nonprice import/exportandallZIPallowlist; operational businessExcel NOT_RUN",
+      "remaining": "G18 final regression; actual business Excel remains operational NOT_RUN where applicable."
     },
     {
       "id": "SA-34",
