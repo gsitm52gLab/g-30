@@ -1,3 +1,7 @@
+# State144 latest — G15 ACCEPTED, G16 owned pure implementation authorized
+
+Acceptedcd7c434 12/19. Rootregressionb16d8a review445artifacts581Git/cwd9cmd32CRC425unit28rawbrowser44own+1mockskip. OriginalhelperSSR404fail2 preserved, narrowtailvalidNextstreamed200+404digest/canaryabsence. G17actualAPI NOT_RUN. G16prd formalserver-task ownedpurecorpus/types/validators only, commonleaseNOT_GRANTED pendingrootG11union. G11ce049 independentffb24 PASS received1722artifacts rootreviewnext, 9expectedconflicts thenworkflowregression. GoalACTIVE.
+
 # State143 latest — G15 integrated, bounded regression assigned
 
 Root serialintegration cd7c434432dc92d393f6036981c2aadc8e508e29 preserveslatestledger and543nonledgerpaths byteidentical d8d0, binding9621…. Accepted246 remains11/19 untilregression. Independent repaired28662 PASS rootb2f09 review1397artifacts575Git/cwd16cmd106CRC337HTTP76raw425+222P1mockskip, sourcebound22+54fresh0. DEFclosedexactd8d0; original8977FAIL+8helpererrors remain. Four helpernumericHTTPstatus collisions rawrechecked. Genericchecker --candidate metadataflag failed becauseartifactmanifestnocandidatefield, actualmanualstartup/commands/Gitbindingsverified, nofilehashmismatch. Formalregression1a2c… ai_verify detachedg15-regression4235/36 bounded20G15+G12/G10union/ownminimal/newPID notwholecore repeat.

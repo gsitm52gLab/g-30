@@ -795,8 +795,11 @@
       "owner_note": "G15",
       "requirement": "context·상품·업무·제출버전/독립검토, 분류/사용처/매체/언어, 실제읽을범위미리보기. FR-031·032/BR-028",
       "verification_idea": "입력대상버전과선택페이지동일. 일본일반화장품/일본어POP·리플렛만지원, 약용/불명/패키지·SDS는사람업무로남고AI정상실행안함",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G15_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+      ],
+      "current_g15_stage": "PASS_CURRENT_INPUT_EXTRACTION_PROVENANCE_AND_LOCAL_TRANSFER_BOUNDARY"
     },
     {
       "id": "SA-58",
@@ -806,8 +809,11 @@
       "owner_note": "G15",
       "requirement": "텍스트10,000자,PDF10MiB/선택10쪽,이미지4개/합계10MiB,토큰사전검사; OCR미확인/제외쪽. FR-035",
       "verification_idea": "각한도정확/초과·잠금/손상/빈입력·저품질OCR검사. 일반25MiB첨부와AI한도를분리. 미선택/못읽은쪽완료표시0",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G15_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+      ],
+      "current_g15_stage": "PASS_CURRENT_INPUT_EXTRACTION_PROVENANCE_AND_LOCAL_TRANSFER_BOUNDARY"
     },
     {
       "id": "SA-59",

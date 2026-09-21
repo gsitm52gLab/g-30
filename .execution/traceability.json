@@ -364,7 +364,10 @@
       ],
       "summary": "AI 범위·OCR·위치·근거·미확인",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+      ],
+      "current_g15_stage": "PASS_CURRENT_INPUT_EXTRACTION_PROVENANCE_AND_LOCAL_TRANSFER_BOUNDARY"
     },
     {
       "id": "A22",
@@ -377,7 +380,10 @@
       ],
       "summary": "injection·격리·명시적 오류·기본 업무 유지",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+      ],
+      "current_g15_stage": "PASS_CURRENT_INPUT_EXTRACTION_PROVENANCE_AND_LOCAL_TRANSFER_BOUNDARY"
     },
     {
       "id": "A23",
@@ -390,7 +396,10 @@
       ],
       "summary": "입력/모델/corpus/번역/비용·제외 범위",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json"
+      ],
+      "current_g15_stage": "PASS_CURRENT_INPUT_EXTRACTION_PROVENANCE_AND_LOCAL_TRANSFER_BOUNDARY"
     },
     {
       "id": "A24",
