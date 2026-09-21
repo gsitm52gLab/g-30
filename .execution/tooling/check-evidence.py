@@ -25,6 +25,10 @@ for manifest in args.manifests:
     document = json.loads(manifest.read_text())
     entries = document.get('artifacts', document.get('files', document.get('entries', [])))
     local_errors = []
+    if isinstance(entries, dict):
+        entries = [dict(value, path=path) if isinstance(value, dict)
+                   else {'path': path, 'sha256': value}
+                   for path, value in entries.items()]
     if not entries:
         local_errors.append('manifest has no artifacts')
     if args.candidate:

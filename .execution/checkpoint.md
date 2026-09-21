@@ -1,3 +1,9 @@
+# State139 latest — G11 actual campaign contract reviewed, UI queued
+
+G11fe2e17e04d25d618e4b9c861b16fed3fc85cfd8e rootreview6efc11…29artifacts482Git/worktreesources9commands0errors, raw427unit/build andactual12newproducerunit subset. ExistingSQL1..11 unchanged; currentmaterial0/cancelhold/receiptunknown separated,6kindbasisCAS/currentauth/immutablehistory. PrdserverruntimeHTTP/FS-copyproof continues, newscript4614 first3P1F checker.error.code field error retained; productfe2eunchanged. GoalsUInewworktreeg11-ui exactfe2e formalqueuedb66cd… startsafterG15finalpacket, ownsUI+entry/README narrowlease. WorkflowwholeG11verifier; prd afterwardG16author whenG15ACCEPTED.
+
+G15b1dd independentai_verify running4235/36; goalsfinal72browser/54history authorreported HTTPpending, notaccepted. Rootaccepted24611/19. G18draft549761… 8finalauditgroups/all91AC stagedclosure preparedNOTASSIGNED. Evidencechecker nowaccepts dict/list manifests; actual29and581 hashchecks0errors, onewrongcandidateflag invocation preserved/rejected beforecorrectsource5229+integration246. No product test countchange.
+
 # State138 latest — G15 independent assigned to new nonauthor
 
 Accepted246 stays11/19. Newnonimplementer /root/ai_verify UUID01a0c5c7-c60d-7eb0-b570-b5b65a92cbde independentlyvalidates exactb1ddba38fdce0b871549fe7d8a364fe71057004a innewdetachedg15-verification4235/36, formal32febb… sourceimmutable/noenv. Actualsession_meta/privateprefixbindingdf9c… verified. WorkflowG14doneidle; active root+goals+prd+ai_verify=4. PriorprdG15verification superseded; prdcontinueG11campaign thenUI, workflowwholeG11verifier.
