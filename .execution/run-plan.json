@@ -1377,11 +1377,12 @@
       "subtasks": [
         {
           "id": "G07-SERVER",
-          "state": "CONTRACT_FROZEN_COMPLETING_SERVER_VALIDATION",
+          "state": "FINAL_CANDIDATE_AUTHOR_VALIDATION_PACKAGING",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g07-server",
           "session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
           "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/server/task.json",
-          "contract_commit": "a8f6f28c27a8820874b82516969e5abcba64e1b4"
+          "contract_commit": "a8f6f28c27a8820874b82516969e5abcba64e1b4",
+          "provisional_final_candidate": "db7c164f9e8a810b7004d4892587af7bbb80f21a"
         },
         {
           "id": "G07-UI",
@@ -1431,6 +1432,12 @@
           "severity": "P1",
           "status": "OPEN_AUTHOR_REPAIR_IN_PROGRESS",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-finding-01.json"
+        },
+        {
+          "id": "G07-SRV-02",
+          "severity": "P2",
+          "status": "OPEN_AUTHOR_REPAIR_AWAITING_INDEPENDENT_VERIFICATION",
+          "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-finding-02.json"
         }
       ],
       "dependency_audit": {
@@ -2035,7 +2042,7 @@
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G07",
   "next_action": "G07 full UI goals on internalf5e21b2, server prd completing HTTP/adversarial/newPID, verifier workflow binding helpers only on frozena8. Review final author candidates, assemble then assign exact combined independent verification.",
-  "state_version": 92,
+  "state_version": 93,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2062,7 +2069,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T16:18:28.016074+00:00",
+  "updated_at": "2026-09-21T16:24:07.293819+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
