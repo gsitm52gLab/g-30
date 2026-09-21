@@ -24,8 +24,11 @@
       "owner_note": "G01",
       "requirement": "신원/멤버십·초대 대기/활성/중지·소속 변경·담당 교체와 과거 작성자. 원안3절, FR-020·025, BR-015·021",
       "verification_idea": "신원1개+멤버십2개, 한 곳 중지/전역 중지 구분, 만료 초대 복구, 기존 세션 차단. 독립 행사에는 국가/브랜드/행사명, 표준에는3요소. 검토기관을 retailer나 계정으로 자동 생성하지 않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G01_CONTRACT",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json"
+      ],
+      "remaining": "D01 actual submission/file author integration in G04/G05/G18"
     },
     {
       "id": "SA-03",
