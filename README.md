@@ -94,10 +94,10 @@ E2E_PORT=4121 APP_ORIGIN=http://127.0.0.1:4121 npm run test:e2e
 E2E_PORT=4121 APP_ORIGIN=http://127.0.0.1:4121 npm run test:e2e:db
 E2E_PORT=4121 node --import tsx scripts/verify-policy-http.ts
 E2E_PORT=4121 node --import tsx scripts/verify-policy-browser.ts
-node --import tsx scripts/verify-policy-isolation.ts
+E2E_PORT=4121 E2E_AUX_PORT=4124 node --import tsx scripts/verify-policy-isolation.ts
 ```
 
-권한 HTTP 검사기는 합성 전용 DB와 4121 서버를 직접 생성해 중첩 비공개 marker·실제 cookie/CSRF·HTML/RSC·권한 철회·재시작·DB 오류를 검사합니다. isolation 검사는 **예약된 4121/4124 두 포트**와 독립 DB/쿠키를 사용합니다. 다른 서버가 쓰는 포트라면 실행하지 말고 슬롯을 다시 지정하도록 검사기를 조정하세요. 기본 제품 APP_ORIGIN은 3000으로 유지하며 검증 포트를 제품 기본값으로 바꾸지 않습니다. 미래 API는 harness 검사로만 기록합니다.
+권한 HTTP 검사기는 합성 전용 DB와 `E2E_PORT` 서버(기본 4121)를 직접 생성해 중첩 비공개 marker·실제 cookie/CSRF·HTML/RSC·권한 철회·재시작·DB 오류를 검사합니다. isolation 검사는 `E2E_PORT`(기본 4121)와 `E2E_AUX_PORT`(기본 4124)에 독립 DB/쿠키를 생성합니다. 다른 슬롯을 배정받았다면 위 명령의 두 환경변수 값만 바꾸세요. 검사기 소스를 수정할 필요가 없습니다. APP_ORIGIN, Client 요청, 쿠키 이름(`gs_hale_g02_<주 포트>` / `gs_hale_g02_aux_<보조 포트>`), 검사와 결과 보고가 지정한 두 포트를 따릅니다. 서로 다른 1~65535 정수만 허용하며 사용 중인 포트에서는 실행하지 마세요. 기본 제품 APP_ORIGIN은 3000으로 유지하며 검증 포트를 제품 기본값으로 바꾸지 않습니다. 미래 API는 harness 검사로만 기록합니다.
 
 HTTP 검사의 직접 `_rsc` 요청은 프로토콜 probe입니다. 별도 browser 검사는 비공개 합성 marker를 저장한 SQLite에서 PC/모바일의 실제 Link 이동·prefetch가 만든 RSC 응답과 화면을 확인합니다. 로그인 요청/인증 헤더는 수집하지 않고 응답의 안전한 본문·경로·hash·비공개 필드 부재를 기록합니다. 각 서버 검사는 같은 포트를 사용하므로 순서대로 실행하세요.
 

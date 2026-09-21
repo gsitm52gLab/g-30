@@ -7,13 +7,24 @@ import { createSqliteRepository } from "@/server/repositories/sqlite";
 import { seed } from "@/server/db/seed";
 import { DEMO_PASSWORD } from "@/domain/catalog";
 
+function configuredPort(name: string, fallback: number): number {
+    const value = process.env[name] ?? String(fallback);
+    const port = Number(value);
+    if (!/^\d+$/.test(value) || !Number.isSafeInteger(port) || port < 1 || port > 65535) {
+        throw new Error(`${name} must be an integer port from 1 to 65535`);
+    }
+    return port;
+}
+const primaryPort = configuredPort("E2E_PORT", 4121);
+const auxiliaryPort = configuredPort("E2E_AUX_PORT", 4124);
+assert.notEqual(primaryPort, auxiliaryPort, "E2E_PORT and E2E_AUX_PORT must be different");
+const slots = [
+    { port: primaryPort, cookie: `gs_hale_g02_${primaryPort}` },
+    { port: auxiliaryPort, cookie: `gs_hale_g02_aux_${auxiliaryPort}` },
+];
 const root = path.resolve(process.env.EVIDENCE_ROOT || ".local/g02-evidence");
 mkdirSync(root, { recursive: true }); mkdirSync(".local", { recursive: true });
 const directory = mkdtempSync(path.resolve(".local/g02-isolation-"));
-const slots = [
-    { port: 4121, cookie: "gs_hale_g02_4121" },
-    { port: 4124, cookie: "gs_hale_g02_aux_4124" },
-];
 const processes: { port: number; cookie: string; pid?: number; cwd: string; command: string[]; exitCode?: number | null }[] = [];
 const servers: ChildProcess[] = [];
 const checks: string[] = [];
@@ -51,13 +62,13 @@ try {
         }
         check(`slot ${slot.port} ready`, ready);
     }
-    const primary = new Client(4121); const auxiliary = new Client(4124);
+    const primary = new Client(primaryPort); const auxiliary = new Client(auxiliaryPort);
     for (const client of [primary, auxiliary]) check(`login ${client.port}`, (await client.send("/api/auth/login", "POST", { email: "luna@example.test", password: DEMO_PASSWORD })).status === 200);
     const primaryCookie = primary.cookie; const auxiliaryCookie = auxiliary.cookie;
-    check("separate cookie names", primaryCookie.startsWith("gs_hale_g02_4121=") && auxiliaryCookie.startsWith("gs_hale_g02_aux_4124="));
+    check("separate cookie names", primaryCookie.startsWith(`${slots[0].cookie}=`) && auxiliaryCookie.startsWith(`${slots[1].cookie}=`));
     auxiliary.cookie = primaryCookie;
     check("primary namespace rejected by auxiliary", (await auxiliary.send("/api/auth/me")).status === 401);
-    auxiliary.cookie = primaryCookie.replace("gs_hale_g02_4121=", "gs_hale_g02_aux_4124=");
+    auxiliary.cookie = primaryCookie.replace(`${slots[0].cookie}=`, `${slots[1].cookie}=`);
     check("renamed primary token rejected by independent auxiliary DB", (await auxiliary.send("/api/auth/me")).status === 401);
     auxiliary.cookie = auxiliaryCookie;
     primary.cookie = auxiliaryCookie;
@@ -76,7 +87,7 @@ finally {
     }));
     const reportPath = path.join(root, `policy-isolation-${Date.now()}.json`);
     const report = { status: failure ? "FAIL" : "PASS", requirements: ["A19", "G02-T13"],
-        counts: { unit: "assertion", pass: checks.length, fail: failure ? 1 : 0, skip: 0, not_run: 0 }, checks, failure, processes,
+        counts: { unit: "assertion", pass: checks.length, fail: failure ? 1 : 0, skip: 0, not_run: 0 }, checks, failure, slots, processes,
         secrets: "real cookies/tokens retained only in memory; separate synthetic databases" };
     writeFileSync(reportPath, JSON.stringify(report, null, 2));
     console.log(JSON.stringify({ status: report.status, counts: report.counts, report: reportPath, failure }));
