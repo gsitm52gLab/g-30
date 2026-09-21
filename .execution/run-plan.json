@@ -798,12 +798,12 @@
       "dependencies": [
         "G04"
       ],
-      "state": "COMBINED_CANDIDATE_SELF_CHECKING",
+      "state": "INDEPENDENT_VERIFICATION_ASSIGNED",
       "required_for_product_completion": true,
       "candidate_commit": "9988cf48d9774af22aef1dc2f29b8efd30c6ca3d",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
-      "verifier_session_id": null,
+      "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
       "owned_paths": [
         "src/domain/submissions/**",
@@ -870,7 +870,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd exact9988combined check/build/defaultmock+DB/G05HTTP+projection/UIrestart; then root reviews result and assigns independentworkflow detachedcandidate. goals G07 readonlyprep only.",
+      "next_action": "workflow independently verifies exact9988detached g05-verify4163/4164 using14boundgroups. Main reviews rawresult, assigns repairifneeded; serialrootintegration and exactimpactregression required beforeG05ACCEPTED.",
       "base_commit": "7f409a2a14266776001f6b7910e80e402a5b7717",
       "execution_dependencies": [
         "G04",
@@ -958,7 +958,11 @@
       "ui_candidate_commit": "ed9b6fdf65445f175629c7eec06f522afc2ece90",
       "ui_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-ui-final-review.json",
       "runner_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-runner-review.json",
-      "combined_selfcheck_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/assembly/combined-selfcheck-task.json"
+      "combined_selfcheck_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/assembly/combined-selfcheck-task.json",
+      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g05-verify",
+      "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/verification-task.json",
+      "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/assembly/selfcheck/result.json",
+      "combined_selfcheck_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-combined-selfcheck-review.json"
     },
     {
       "id": "G06",
@@ -1885,8 +1889,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "7f409a2a14266776001f6b7910e80e402a5b7717",
   "current_goal": "G06",
-  "next_action": "prd exact9988combined check/build/defaultmock+DB/G05HTTP+projection/UIrestart; then root reviews result and assigns independentworkflow detachedcandidate. goals G07 readonlyprep only.",
-  "state_version": 79,
+  "next_action": "workflow independently verifies exact9988detached g05-verify4163/4164 using14boundgroups. Main reviews rawresult, assigns repairifneeded; serialrootintegration and exactimpactregression required beforeG05ACCEPTED.",
+  "state_version": 80,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1913,7 +1917,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T14:59:37.329715+00:00",
+  "updated_at": "2026-09-21T15:06:19.216679+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
