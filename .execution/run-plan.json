@@ -850,10 +850,10 @@
         "G02",
         "G04"
       ],
-      "state": "VERIFYING",
+      "state": "INTEGRATED_REGRESSION_PENDING",
       "required_for_product_completion": true,
       "candidate_commit": "51339b4e435818a8bdb63dd7d0310ff9b5ca0719",
-      "integration_commit": null,
+      "integration_commit": "7f409a2a14266776001f6b7910e80e402a5b7717",
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
@@ -921,7 +921,7 @@
           "evidence": []
         }
       ],
-      "next_action": "workflow independently verifies exact51339b in detachedg06-verify4162/4165; root reviews results then serial integration/regression. G05 remains preparation only.",
+      "next_action": "workflow runs exact7f409a2 integration impact regression; main reviews before current-stage acceptance. G05 remains preparation only.",
       "base_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/task.json",
       "ownership_addenda": [
@@ -944,35 +944,38 @@
           "severity": "P2",
           "title": "Nonfinite pagination becomes Infinity/null rather than validation error",
           "source": "src/server/products/service.ts ProductService.list",
-          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
+          "status": "INDEPENDENT_VERIFIED_INTEGRATION_REGRESSION_PENDING",
           "runtime_status": "NOT_RUN_BY_MAIN",
           "owner": "prd",
           "repair_candidate": "139c72424f30b3266037c3817a28691223743441",
-          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json"
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json",
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-result.json"
         },
         {
           "id": "G06-CR02",
           "severity": "P1",
           "title": "Idempotent replay returns stored receipt.result without explicit output DTO",
           "source": "src/server/products/store.ts receipt",
-          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
+          "status": "INDEPENDENT_VERIFIED_INTEGRATION_REGRESSION_PENDING",
           "runtime_status": "NOT_RUN_BY_MAIN",
           "owner": "prd",
           "repair_candidate": "139c72424f30b3266037c3817a28691223743441",
-          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json"
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json",
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-result.json"
         },
         {
           "id": "G06-CR03",
           "severity": "P1",
           "title": "Task-origin file reuse checks task visibility but not published reference inclusion",
           "source": "src/server/files/access.ts canReferenceFile; product save_files",
-          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
+          "status": "INDEPENDENT_VERIFIED_INTEGRATION_REGRESSION_PENDING",
           "runtime_status": "NOT_RUN_BY_VERIFIER",
           "owner": "prd",
           "finder_session": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
           "independent_static_alias": "G06-SR01",
           "repair_candidate": "139c72424f30b3266037c3817a28691223743441",
-          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json"
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json",
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-result.json"
         },
         {
           "id": "G06-CR04",
@@ -980,30 +983,33 @@
           "title": "Legacy product view DTO returns stored null context and home links lose selected context",
           "source_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064",
           "source": "src/server/policy/projection.ts projectProduct + readWorkspace + home ProductCards",
-          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
+          "status": "INDEPENDENT_VERIFIED_INTEGRATION_REGRESSION_PENDING",
           "runtime_status": "NOT_RUN_BY_MAIN",
           "owner": "prd",
           "repair_candidate": "93b0fce4bab394b0f14d0a29a5b4dd5d757bc230",
-          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix2-review.json"
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix2-review.json",
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-result.json"
         },
         {
           "id": "G06-CR05",
           "severity": "P2",
           "title": "Product file view omits original uploader/time required by U06-08 and AC06-05",
-          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
+          "status": "INDEPENDENT_VERIFIED_INTEGRATION_REGRESSION_PENDING",
           "runtime_status": "STATIC_CONTRACT_GAP",
           "owner": "prd/goals",
           "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-3.json",
-          "repair_candidate": "cd5e43abedb8bef58355d8315b46640094f0e070"
+          "repair_candidate": "cd5e43abedb8bef58355d8315b46640094f0e070",
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-result.json"
         },
         {
           "id": "G06-CR06",
           "severity": "P3",
           "title": "Mobile product section navigation wraps Korean labels character by character",
-          "status": "IMPLEMENTER_REPAIR_MAIN_VISUAL_REVIEWED_INDEPENDENT_PENDING",
+          "status": "INDEPENDENT_VERIFIED_INTEGRATION_REGRESSION_PENDING",
           "source": "Mobile screenshot and CSS .tabs a flex basis",
           "owner": "goals",
-          "repair_candidate": "8019017947f2e394447a093b0d2ea03ef95ecdc3"
+          "repair_candidate": "8019017947f2e394447a093b0d2ea03ef95ecdc3",
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-result.json"
         }
       ],
       "implementer_session_ids": [
@@ -1013,14 +1019,14 @@
       "subtasks": [
         {
           "id": "G06-SERVER",
-          "state": "IMPLEMENTING_FIXES_AND_HTTP",
+          "state": "IMPLEMENTATION_DONE_INDEPENDENT_VERIFIED_REGRESSION_PENDING",
           "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-impl",
           "contract_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064"
         },
         {
           "id": "G06-UI",
-          "state": "IMPLEMENTING",
+          "state": "IMPLEMENTATION_DONE_INDEPENDENT_VERIFIED_REGRESSION_PENDING",
           "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-ui",
           "base_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064",
@@ -1075,7 +1081,11 @@
       "main_combined_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-combined-selfcheck-review.json",
       "verification_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-addendum-1.json"
-      ]
+      ],
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-result.json",
+      "main_candidate_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-candidate-review.json",
+      "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g06-regression",
+      "regression_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/regression-task.json"
     },
     {
       "id": "G07",
@@ -1717,8 +1727,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
-  "next_action": "workflow independently verifies exact51339b in detachedg06-verify4162/4165; root reviews results then serial integration/regression. G05 remains preparation only.",
-  "state_version": 63,
+  "next_action": "workflow runs exact7f409a2 integration impact regression; main reviews before current-stage acceptance. G05 remains preparation only.",
+  "state_version": 64,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1745,7 +1755,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T13:31:08.371022+00:00",
+  "updated_at": "2026-09-21T13:51:13.956594+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

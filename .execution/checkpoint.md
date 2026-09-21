@@ -24,3 +24,6 @@ Root serially assembled frozen server cd5e43a + UI8019017 into isolated `.worktr
 ## State62 - G06 independent verification
 
 Combined exact51339b author selfcheck reviewed:279artifact hashes,56source blobs,11command/log pairs,unit160,defaultmock40pass2SQL-onlyskip/SQLite42pass,productHTTP58/63,additionalUIAPIoriginal-file28assertions. Three private helper failures preserved; actual clicked RSC stillNOT_RUN. Workflow assigned `.worktrees/g06-verify` exactdetached51339b ports4162/4165 via G06/1/verification-task.json.18groups and7UIedge obligations remain. Root accepted cc59987 unchanged, no G06 acceptance. G05 submission-contract-preparation103lines and main preparation decisions reviewed, no G05 implementation.
+
+
+State64: G06 independent exact51339b PASS reviewed (518 artifacts,191 source hashes,17 commands). Serial root integration7f409a2 product168 blobs equal. Exact integrated regression assigned workflow in g06-regression4163/4166; accepted remainscc59987 until reviewed PASS. G05 preparation only.
