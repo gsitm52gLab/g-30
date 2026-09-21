@@ -52,3 +52,12 @@ Original7.1 requests material counts, not a substitute task count. Before the ac
 
 
 G05 delegated defaults (state66): exact requestId/requirementKey/productId identity, shared draft CAS and consumed-draft uniqueness; one canonical typed evaluator; providedBy/recordedBy/uploader separate. Paused draft save permitted, explicit submit waits resume; GSG manual completion remains unblocked. Request OR immutable-submission file release plus original AND reference authorization; upload/draft is not publication. Scoped sessionStorage recovery required for failed-save+refresh, no raw file bytes/auth secrets. Preparation decisions and formal packet hold complete rationale.
+
+
+## G07 evidence and Excel implementation decisions
+
+- Accepted37b baseline. Immutable Evidence metadata/source and independent per-product assessment. Current inventory, actual G05 submission, and human application assessment are distinct. Human N/A notes cannot waive canonical required requests; explicit request change required.
+- Standard XLSX batch has one explicitly selected context verified in every row; other contexts use separate batches, no implicit relationship creation. Any row error blocks the entire batch. New/update/skip, preview and explicit apply are distinct.
+- Single synchronous UoW product mutation adapter preserves common/context/price versions, provenance, audit, batch and one receipt. Current price permission is separate. Export constructs a new allowlisted workbook.
+- External workbook/OLE, macros and formula execution unsupported. Ordinary hyperlink display/URL is read without execution/fetch and validated by mapped field. Actual business Excel NOT_RUN remains distinct from standard functionality.
+- One server schema/migration/policy/lockfile writer. Root reviews actual typed contract commit before separate UI assignment; internal contract freeze is not checkpoint acceptance.
