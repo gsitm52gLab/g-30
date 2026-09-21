@@ -925,7 +925,8 @@
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/task.json",
       "ownership_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-1.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-2.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-2.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-3.json"
       ],
       "contract_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-1.json"
@@ -960,7 +961,8 @@
           "status": "OPEN_STATIC_FINDING_REPAIR_ASSIGNED",
           "runtime_status": "NOT_RUN_BY_VERIFIER",
           "owner": "prd",
-          "finder_session": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a"
+          "finder_session": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
+          "independent_static_alias": "G06-SR01"
         }
       ],
       "implementer_session_ids": [
@@ -994,7 +996,18 @@
             "scripts/verify-products-ui*"
           ]
         }
-      ]
+      ],
+      "server_ownership_exclusions": [
+        "tests/unit/products-ui*.test.ts",
+        "scripts/verify-products-ui*",
+        "tests/e2e/products*.spec.ts"
+      ],
+      "contract_static_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-static-review.json",
+        "sha256": "52fb23a716e7faca9b0341c7cd214dbb50d985e4089deecc99ff4da3d48a2041",
+        "runtime": "NOT_RUN",
+        "tool_limit": "Prior reviewer turn stopped by tool content classification; only evidence preservation completed afterward."
+      }
     },
     {
       "id": "G07",
@@ -1637,7 +1650,7 @@
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
   "next_action": "Parallel G06 UI on fixed cab contract and server CR01-03 repair/HTTP; review exact combined candidate after serial internal assembly.",
-  "state_version": 54,
+  "state_version": 55,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1664,7 +1677,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T12:49:51.365842+00:00",
+  "updated_at": "2026-09-21T12:50:52.183520+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
