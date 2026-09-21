@@ -1,0 +1,1036 @@
+{
+  "schema_version": 1,
+  "product": "GS HALE",
+  "project_root": "/Users/evan/workspace/gs-hale",
+  "source_revision": "DP-20260921-03",
+  "plan_status": "ACTIVE",
+  "active_goal_count": 1,
+  "intended_active_goal_count": 1,
+  "runtime_state_path": ".execution/run-plan.json",
+  "max_sessions_including_main": 4,
+  "initial_git": "reinitialized by user; main unborn; origin exists; recheck on execution",
+  "tasks": [
+    {
+      "id": "G00",
+      "prd_id": "PRD-00",
+      "title": "환경과 저장구조",
+      "dependencies": [],
+      "state": "READY",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G00/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-00-01",
+          "expected": "clean install 후 키 없이 mock 모드의 홈·업무·상품으로 이동한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-00-02",
+          "expected": "G00 기반 완료는 DB migration/seed와 저장소 adapter로 합성 최소 레코드를 저장하고 프로세스 재시작 후 다시 읽는 것으로 검증한다. 아직 구현하지 않은 상품·문의·완료 UI나 재로그인을 G00 완료 조건으로 요구하지 않는다. 각 실제 기능의 영속성은 해당 모듈에서 검증하고 전체 사용자 여정·재로그인 영속성은 G18에서 통합 검증한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-00-03",
+          "expected": "mock/DB가 같은 도메인 계약을 사용하며 화면 저장 방식 변경으로 필드 의미가 달라지지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-00-04",
+          "expected": "다른 scaffold의 버전·의존성·라이선스·실행 가능 범위를 확인하고 대상 경로에서 재검증한 결과만 기록한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-00-05",
+          "expected": "기존 main/origin을 보존하고 최초 커밋에 `.env` 등 비밀파일이 포함되지 않은 것을 확인한 뒤 worktree를 생성한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G01",
+      "prd_id": "PRD-01",
+      "title": "컨텍스트와 사용자",
+      "dependencies": [
+        "G00"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G01/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-01-01",
+          "expected": "같은 브랜드의 다른 국가/리테일러 및 같은 리테일러의 다른 브랜드를 각각 생성하고 동일 조합 중복은 거부한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-01-02",
+          "expected": "기존 이메일을 두 컨텍스트에 연결해 신원 1개·멤버십 2개를 확인한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-01-03",
+          "expected": "중지 직후 기존 세션의 접근도 거부하며 과거 제출 작성자와 재배정 이력은 남는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-01-04",
+          "expected": "표준 컨텍스트에서 세 요소 누락을 거부하고 독립 행사 예외는 별도 유형으로 표시한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G02",
+      "prd_id": "PRD-02",
+      "title": "서버 권한과 컨텍스트 격리",
+      "dependencies": [
+        "G01"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G02/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-02-01",
+          "expected": "다른 컨텍스트의 ID를 읽기/쓰기 API에 넣으면 거부하고 제목·본문·개수도 노출하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-02-02",
+          "expected": "브랜드 응답/내보내기/검색에서 내부 가격·원문 필드가 제거된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-02-03",
+          "expected": "파일 URL을 아는 비회원도 원본·미리보기·다운로드에 접근할 수 없다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-02-04",
+          "expected": "같은 컨텍스트의 비담당 팀원은 공개 업무 조회만 가능하고 제출 변경은 거부된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-02-05",
+          "expected": "권한 변경 후 검색·알림·AI 결과까지 새 권한이 적용된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G03",
+      "prd_id": "PRD-03",
+      "title": "양측 홈과 내비게이션",
+      "dependencies": [
+        "G07",
+        "G08",
+        "G09",
+        "G11",
+        "G12",
+        "G13",
+        "G14"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G03/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-03-01",
+          "expected": "신규 배정 업무가 해당 브랜드 홈과 GSG 홈에 같은 담당·기한으로 나타난다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-03-02",
+          "expected": "모든 주요 메뉴에서 목록→상세→관련 업무/상품으로 실제 이동한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-03-03",
+          "expected": "상품정보가 독립 메뉴로 표시되고 등록/수정 동작에 연결된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-03-04",
+          "expected": "모바일·키보드로 요청 확인→답변→첨부→문의 흐름을 완료한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-03-05",
+          "expected": "로그인·홈·앱 헤더·메타데이터와 발표 표지/도입/대본에서 지정 문구의 철자·띄어쓰기·내용이 원문과 일치한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G04",
+      "prd_id": "PRD-04",
+      "title": "신규 입점·스팟 업무 생성과 배정",
+      "dependencies": [
+        "G02"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G04/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-04-01",
+          "expected": "병렬 신규 입점 업무와 독립 스팟 업무를 생성해 최상위 분류·담당 사용자·다음 행동이 저장된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-04-02",
+          "expected": "설명·참고 양식·제출 항목·기한을 공개하면 브랜드가 필요한 내용만 확인한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-04-03",
+          "expected": "다중 컨텍스트 생성 후 한 업무의 답변·마감 수정이 다른 업무에 영향을 주지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-04-04",
+          "expected": "필수 요건 추가 시 요청 새 버전·변경 알림·추가 필요 항목이 나타나며 이전 답변은 유지된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-04-05",
+          "expected": "브랜드의 읽음·수락·일정 조정 요청이 구분되고 조정 요청만으로 마감이 변경되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-04-06",
+          "expected": "개별 업무 완료가 프로젝트 전체 완료를 자동으로 바꾸지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G05",
+      "prd_id": "PRD-05",
+      "title": "답변·파일·제출 버전",
+      "dependencies": [
+        "G04"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G05/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-05-01",
+          "expected": "필수 항목 일부만 제출해도 저장되고 남은 항목이 정확히 표시된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-05-02",
+          "expected": "v2에서 줄글/파일을 바꿔도 v1의 내용·파일 참조·검토는 변하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-05-03",
+          "expected": "저장/업로드 실패와 새로고침 후 입력을 복구하며 재시도·중복 클릭으로 제출 버전이 중복 생성되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-05-04",
+          "expected": "서버가 금지 형식·크기·권한을 검사하고 실패 파일별 재시도/삭제를 제공한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-05-05",
+          "expected": "파일명 ‘최종’ 또는 업로드만으로 제출·승인·수령 상태가 변경되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G06",
+      "prd_id": "PRD-06",
+      "title": "상품 CRUD·가격·상품 버전",
+      "dependencies": [
+        "G02",
+        "G04"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G06/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-06-01",
+          "expected": "등록·수정·검색·상세·업무 연결·보관이 실제 저장되고 다시 조회된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-06-02",
+          "expected": "동일 상품의 두 리테일러 SKU·상태·가격 적용 정보를 독립 관리한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-06-03",
+          "expected": "상품 수정 뒤 현재 화면은 최신값, 기존 제출/검토는 당시 스냅샷을 표시한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-06-04",
+          "expected": "브랜드의 화면/API/검색/Excel에 내부 공급가·공급률이 나타나지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-06-05",
+          "expected": "보관/판매 중단 후 기존 자료·업무·작성자 이력을 조회할 수 있다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G07",
+      "prd_id": "PRD-07",
+      "title": "증빙 제출표와 Excel",
+      "dependencies": [
+        "G05",
+        "G06"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G07/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-07-01",
+          "expected": "공통 파일 1개를 복수 상품에 연결해 파일 버전은 공유하되 적용 확인 상태는 개별 유지한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-07-02",
+          "expected": "청구서/질문지를 연결해도 인증 승인으로 자동 변환되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-07-03",
+          "expected": "정상·오류·중복 파일에서 반영 전 미리보기와 행별 오류를 확인하고 오류 상태에서는 저장하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-07-04",
+          "expected": "브랜드 가져오기에서 내부 가격 변경을 거부하고 내보내기에도 해당 열을 포함하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-07-05",
+          "expected": "표준 가져오기 통과와 현업 양식 미검증을 서로 다른 결과로 기록한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G08",
+      "prd_id": "PRD-08",
+      "title": "공지와 가이드",
+      "dependencies": [
+        "G04",
+        "G05"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G08/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-08-01",
+          "expected": "지정 컨텍스트에만 공지와 양식이 표시되고 읽음 사용자/시각이 저장된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-08-02",
+          "expected": "공지 읽음 후 연결 업무의 수락·제출·완료 상태는 유지된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-08-03",
+          "expected": "공지 개정 시 이전 공개본·변경 시각을 보존하며 새 공개 알림을 구분한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G09",
+      "prd_id": "PRD-09",
+      "title": "문의와 실시간 팝업",
+      "dependencies": [
+        "G04",
+        "G05"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G09/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-09-01",
+          "expected": "질문 5개 중 4개 답변 후 남은 1개와 다음 확인일이 양측 화면·GSG 홈에 유지된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-09-02",
+          "expected": "팝업과 상세에서 메시지·첨부·읽음이 같은 기록으로 나타난다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-09-03",
+          "expected": "연결 끊김 후 재연결하면 누락 메시지를 수신하고 재전송으로 중복 메시지가 생기지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-09-04",
+          "expected": "문의를 업무로 전환해도 원 대화와 연결 이력이 유지된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-09-05",
+          "expected": "해결 후 새 질문을 등록하면 과거 해결 시각은 남고 답변 대기로 재개된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G10",
+      "prd_id": "PRD-10",
+      "title": "수정 취합과 사람 검토",
+      "dependencies": [
+        "G05"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G10/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-10-01",
+          "expected": "v1의 내부 원문은 숨기고 선별한 공개 설명만 브랜드에 노출한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-10-02",
+          "expected": "v2 일부 반영 후 해당 항목만 반영 상태이며 재업로드만으로 모든 항목이 해소되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-10-03",
+          "expected": "늦은 의견·상충 의견·잘못 보낸 파일을 후속 묶음/확인 필요로 재현한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-10-04",
+          "expected": "새 버전에 과거 검토 의견을 참고 연결하되 승인 상태는 자동 승계하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G11",
+      "prd_id": "PRD-11",
+      "title": "외부 진행과 GSG 수동 완료",
+      "dependencies": [
+        "G05",
+        "G06",
+        "G09",
+        "G10"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G11/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-11-01",
+          "expected": "미해결·외부 대기·AI 실패가 남은 업무도 GSG가 수동 완료할 수 있다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-11-02",
+          "expected": "완료 시 최신 잔여 상태를 정확히 고정하고 브랜드/AI의 완료 변경은 거부한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-11-03",
+          "expected": "전달 기록을 저장해도 실제 발송·외부 승인·납품 상태가 자동 변경되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-11-04",
+          "expected": "재개/후속 업무 생성 뒤에도 기존 완료 시각·완료 당시 잔여 항목을 조회한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-11-05",
+          "expected": "동시 완료·중복 클릭은 완료 이벤트 하나만 생성한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G12",
+      "prd_id": "PRD-12",
+      "title": "PR 행사와 실물",
+      "dependencies": [
+        "G04",
+        "G05",
+        "G06"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G12/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-12-01",
+          "expected": "불참/미선택 메뉴에는 준비물 누락과 제출 독촉이 발생하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-12-02",
+          "expected": "참여·신청·선정·진행을 독립 변경하며 이미 신청한 불참은 취소 협의가 된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-12-03",
+          "expected": "촬영/배포 실물의 목적지·수량·발송/수령을 각각 저장한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-12-04",
+          "expected": "PDF 또는 송장 등록만으로 납품/수령 완료가 되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-12-05",
+          "expected": "메뉴 번호·일정·가격의 상충 원문과 확인 상태를 함께 조회한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G13",
+      "prd_id": "PRD-13",
+      "title": "일정과 알림",
+      "dependencies": [
+        "G08",
+        "G09",
+        "G10",
+        "G11",
+        "G12"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G13/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-13-01",
+          "expected": "서로 다른 확정 수준·시간대·출처를 저장하고 변경 이력을 표시한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-13-02",
+          "expected": "내부 취합 중에는 알림이 없고 공개 묶음 하나에 수신자별 알림 하나가 생성된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-13-03",
+          "expected": "이벤트ID+수신자 중복 방지로 재시도에도 알림이 중복되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-13-04",
+          "expected": "종료·불참·외부 대기 사례에 잘못된 브랜드 독촉이 발생하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-13-05",
+          "expected": "실제 메일 미연동 상태를 발송 성공으로 표시하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G14",
+      "prd_id": "PRD-14",
+      "title": "검색·감사·동시 변경",
+      "dependencies": [
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "G11",
+        "G12",
+        "G13"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G14/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-14-01",
+          "expected": "권한 없는 컨텍스트 키워드 검색에서 제목·본문·개수 누출이 없다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-14-02",
+          "expected": "동시 수정 시 한쪽의 변경을 조용히 덮어쓰지 않고 충돌을 알린다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-14-03",
+          "expected": "중요 작업 재시도 후 단일 변경/감사 이벤트가 남고 DB 재로그인 후 유지된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-14-04",
+          "expected": "6개월 이전 fixture의 업무/상품 버전과 변경자를 검색할 수 있다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G15",
+      "prd_id": "PRD-15",
+      "title": "AI 입력·OCR·지원 범위",
+      "dependencies": [
+        "G05",
+        "G06"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G15/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-15-01",
+          "expected": "약용/분류 불명/지원 외 매체를 일반 화장품으로 추정해 실행하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-15-02",
+          "expected": "PDF 일부 선택 시 선택 범위와 실제 읽은 범위만 결과에 표시한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-15-03",
+          "expected": "초과·잠금·손상·빈 파일·OCR 불명확을 명시하고 읽지 못한 구간을 검토 완료로 표시하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-15-04",
+          "expected": "공개/합성 데이터만 외부 호출에 사용하고 실제 기밀 입력은 전송하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G16",
+      "prd_id": "PRD-16",
+      "title": "AI 근거·corpus·결과·사람 검토",
+      "dependencies": [
+        "G15"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G16/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-16-01",
+          "expected": "정상/위험/근거 부족에서 원문 위치와 공식 근거 또는 명시적 미확인을 출력한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-16-02",
+          "expected": "법적 근거와 보조 지침, 위험 수준과 확신도를 별도 필드로 표시한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-16-03",
+          "expected": "원문 개정 뒤 stale 번역은 현행 결과에 사용되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-16-04",
+          "expected": "후보 수락/수정/기각 이력이 남고 외부 전문가 승인으로 표시되지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-16-05",
+          "expected": "injection·타 컨텍스트 참조 시도에도 실행 지시/권한 경계가 유지된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-16-06",
+          "expected": "입력·모델·프롬프트·corpus 버전으로 실행을 추적하며 평가셋 없이 정확도 수치를 주장하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G17",
+      "prd_id": "PRD-17",
+      "title": "AI 연동·비용·오류",
+      "dependencies": [
+        "G16"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G17/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-17-01",
+          "expected": "키 없음·timeout·429·파싱 오류를 주입하면 각각 명시적 실패가 표시된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-17-02",
+          "expected": "동일 실행 재시도에서 중복 작업을 방지하고 영구 오류를 무한 재시도하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-17-03",
+          "expected": "AI 비활성/장애 중에도 상품·제출·문의·사람 검토·GSG 완료가 동작한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-17-04",
+          "expected": "모델/가격 기준일·토큰·비용 추정을 남기고 $10 등 프로젝트 금액 차단은 존재하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-17-05",
+          "expected": "G17 ACCEPTED에는 mock/fault 검증뿐 아니라 합성 또는 사용 가능한 공개 자료를 이용한 **실제 OpenAI 호출 성공**이 필수다. 실제 응답의 schema 적합성, 입력/읽은 범위, 근거 또는 명시적 근거 부족, 모델/실행 식별자와 제공되는 usage 증거를 남긴다. mock을 실호출 증거로 대체하지 않는다. 실호출 성공과 전문가에 의한 법률 정확도 검증은 구분하며, 키/네트워크 등으로 실호출하지 못하면 G17은 미완료다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    },
+    {
+      "id": "G18",
+      "prd_id": "PRD-18",
+      "title": "최종 통합과 운영",
+      "dependencies": [
+        "G00",
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "G11",
+        "G12",
+        "G13",
+        "G14",
+        "G15",
+        "G16",
+        "G17"
+      ],
+      "state": "PLANNED",
+      "required_for_product_completion": true,
+      "candidate_commit": null,
+      "integration_commit": null,
+      "implementer_session_id": null,
+      "verifier_session_id": null,
+      "attempt": 0,
+      "owned_paths": [],
+      "actual_worktree_cwd": null,
+      "evidence_root": ".execution/private/runs/<run-id>/G18/<attempt>/",
+      "acceptance": [
+        {
+          "id": "AC-18-01",
+          "expected": "두 업무 분류의 전체 여정을 GSG/브랜드 계정과 DB 모드로 재현하고 주요 기록이 재로그인 후 유지된다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-18-02",
+          "expected": "A01~A25의 해당 필수 기준에 결과/증거를 연결하며 G17의 실제 OpenAI 응답 검증을 포함한 모든 필수 모듈이 완료돼야 전체 완료로 표시한다. G02에서 시작한 권한 행렬을 파일·검색·알림·Excel·감사·AI까지 확장해 전 채널 회귀를 통과한다. 미구현 기준 또는 미수행 AI 실호출이 있으면 전체 완료가 아니다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-18-03",
+          "expected": "AI 13개 평가 관점(분류 불명·범위 밖·위치·근거/지침·locator 부족·risk/confidence·번역 정렬·stale·사람 판정/FP/FN·injection·격리·오류 미판정·버전 재현)을 실행한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-18-04",
+          "expected": "실제 OpenAI 호출은 G17 필수 완료 기준으로 검증한다. 미확보 상태에서 별도 미검증으로 남길 수 있는 운영 항목은 실제 메일, 현업 Excel 양식 적합성, 전문가 법률 평가, 운영 백업/복구이며 수행한 항목에만 성공을 기록하고 각각의 미검증 사유를 남긴다. 이 유보를 AI 실호출이나 기본 기능의 누락에 적용하지 않는다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "AC-18-05",
+          "expected": "설치/build/필수 테스트·모바일/접근성 결과와 다음 운영 설정을 인계한다.",
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+    }
+  ],
+  "mandatory_external_integration": [
+    "OpenAI: synthetic or permitted public input, actual response/schema/grounding contract/usage evidence"
+  ],
+  "operational_unverified_allowed": [
+    "actual business Excel compatibility",
+    "actual external email delivery",
+    "expert legal validation",
+    "production backup restore"
+  ],
+  "completion_policy": "all required task states ACCEPTED, independent verification and integrated regression evidence; no silent scope deletion",
+  "secret_policy": "env runtime only; no values in packets/logs/Git",
+  "run_id": "RUN-20260921-01",
+  "started_at": "2026-09-21T08:28:39.078082+00:00",
+  "accepted_commit": null,
+  "current_goal": "G00",
+  "next_action": "G00 implementation in isolated worktree then independent candidate verification",
+  "state_version": 1,
+  "source_hashes": {
+    "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
+    "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
+    "docs/execution-v1/build_execution_package.py": "6df984d2092f06488b189dbd57de4c333ae4f7cdc60182e76d24c6a8f219b012",
+    "docs/execution-v1/00-execution-contract.md": "79aba15a1a389c7e3e30c6df5a0fcd7319a2510c6cce66ed21a9be86238e8730",
+    "docs/execution-v1/NOTION.md": "b0ffbe8d8c004bb060c2fa2dd1249886b62bd4a8033d5d0e7b8cf267eb0be340",
+    "docs/execution-v1/04-run-plan.json": "56cce505397dc7dc8dd77c8f81f7858ffe6424083f2e4a108da0109a6cdc0259",
+    "docs/execution-v1/03-agent-workflow.md": "5c25f4ea19314e0c98d73b03bd041addd46974b390c48622d483d6a45b7d48d6",
+    "docs/execution-v1/source-planning-v3.md": "017f392ae2f11aa509c0e29131de9cbe80fe6a3762621258820f44c71c10acc9",
+    "docs/execution-v1/README.md": "c929ed17b6c3e1a4253978c53d41e18264be289a9f7ea4dabafb5ae8b772db97",
+    "docs/execution-v1/01-detailed-prd.md": "a911e13ff757aeaaf75910952c5d13fec71c86d02b0a04ebcafe6939ae4ac7a1",
+    "docs/execution-v1/publication-verification.json": "ff7688975817ce3db260cf52af434ca848e56ae786e9d78115b4eba25e2b650b",
+    "docs/execution-v1/notion-content.md": "2bbf06ed0ab1b66c9227d4e6504f661322d1c88ca88b74f2942a12cf0dd507d2",
+    "docs/execution-v1/05-goal-prompt.md": "eecc68c4a182499d455deab6a5b88e6bca15a977c3986f82424c26e08ead4a09"
+  },
+  "latest_user_clarifications": [
+    "When implementing pharmaceutical-law AI, first refer to relevant material on repository main and reuse as needed. No git fetch was requested during the earlier prompt-only edit.",
+    "Current attached Goal and execution-v1 govern execution. Unpublished execution-v2 draft is not a new binding contract."
+  ]
+}

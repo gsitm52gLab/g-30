@@ -1,0 +1,1 @@
+{"event": "run_started", "run_id": "RUN-20260921-01", "state_version": 1, "goal": "G00", "classification": "progress", "reason": "Read active objective and current source state; created authoritative task ledger"}

@@ -1,0 +1,15 @@
+{
+  "document_check": "PASS",
+  "prd_modules": 19,
+  "acceptance_criteria": 91,
+  "goals": 19,
+  "original_A_coverage": 26,
+  "dependency_graph": "acyclic",
+  "tables": 26,
+  "content_chars": 67827,
+  "product_tests_run": false,
+  "goal_activated": false,
+  "cross_review_P1_fixed": 3,
+  "source_sha256": "017f392ae2f11aa509c0e29131de9cbe80fe6a3762621258820f44c71c10acc9",
+  "secret_values_present": false
+}
