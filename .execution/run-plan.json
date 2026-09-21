@@ -850,12 +850,12 @@
         "G02",
         "G04"
       ],
-      "state": "IMPLEMENTING",
+      "state": "VERIFYING",
       "required_for_product_completion": true,
       "candidate_commit": "51339b4e435818a8bdb63dd7d0310ff9b5ca0719",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
-      "verifier_session_id": null,
+      "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
       "owned_paths": [
         "src/domain/records.ts",
@@ -921,7 +921,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd runs exact51339b combined author checks; workflow independent assignment after results reviewed.",
+      "next_action": "workflow independently verifies exact51339b in detachedg06-verify4162/4165; root reviews results then serial integration/regression. G05 remains preparation only.",
       "base_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/task.json",
       "ownership_addenda": [
@@ -1066,9 +1066,13 @@
       "assembly_candidate": "51339b4e435818a8bdb63dd7d0310ff9b5ca0719",
       "assembly_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-assembly",
       "assembly_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/assembly/assembly-record.json",
-      "assembly_state": "COMBINED_AUTHOR_SELF_CHECK_ASSIGNED",
+      "assembly_state": "SELF_CHECK_MAIN_REVIEWED",
       "main_author_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-author-packet-review.json",
-      "combined_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/assembly/selfcheck-task.json"
+      "combined_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/assembly/selfcheck-task.json",
+      "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-task.json",
+      "verification_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-verify",
+      "combined_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/assembly/selfcheck/result.json",
+      "main_combined_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-combined-selfcheck-review.json"
     },
     {
       "id": "G07",
@@ -1710,8 +1714,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
-  "next_action": "prd runs exact51339b combined author checks; workflow independent assignment after results reviewed.",
-  "state_version": 61,
+  "next_action": "workflow independently verifies exact51339b in detachedg06-verify4162/4165; root reviews results then serial integration/regression. G05 remains preparation only.",
+  "state_version": 62,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1738,7 +1742,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T13:17:14.788057+00:00",
+  "updated_at": "2026-09-21T13:28:51.649724+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

@@ -20,3 +20,7 @@ Preserve .env/main/origin/user untracked docs/execution-v2. No push/fetch/API ca
 ## State 60 — internal G06 assembly
 
 Root serially assembled frozen server cd5e43a + UI8019017 into isolated `.worktrees/g06-assembly` exact51339b4e435818a8bdb63dd7d0310ff9b5ca0719. No overlapping changed paths/conflicts, source blobs checked. Author result packets pending review, combined selfcheck draft prepared but not assigned. Root accepted remainscc59987; no G06 acceptance. CR05 safe original uploader/time added and CR06 mobile nav wrap refined; exact combined independent verification remains required.
+
+## State62 - G06 independent verification
+
+Combined exact51339b author selfcheck reviewed:279artifact hashes,56source blobs,11command/log pairs,unit160,defaultmock40pass2SQL-onlyskip/SQLite42pass,productHTTP58/63,additionalUIAPIoriginal-file28assertions. Three private helper failures preserved; actual clicked RSC stillNOT_RUN. Workflow assigned `.worktrees/g06-verify` exactdetached51339b ports4162/4165 via G06/1/verification-task.json.18groups and7UIedge obligations remain. Root accepted cc59987 unchanged, no G06 acceptance. G05 submission-contract-preparation103lines and main preparation decisions reviewed, no G05 implementation.
