@@ -50,10 +50,10 @@ export function fileDTO(s: UnitOfWork, p: Principal, task: StoredRecord<'task'>,
     return { ...fileMetadata(f), ...fileUrls(f, task.id), uploaderLabel: userLabel(s, p, task.contextId!, f.data.uploaderId), uploadedAt: f.createdAt };
 }
 /** Sanitize stored legacy/extensions before deriving a public evaluation, too. */
-export function safeEvaluation(current: RequestContent, answers: AnswerInput[], previous: RequestContent | null = current, prior = false) {
+export function safeEvaluation(current: RequestContent, answers: AnswerInput[], previous: RequestContent | null = current, prior = false, approvedEmpty = false) {
     const content = (value: RequestContent): RequestContent => ({ ...projectedRequest(value, false, []), internalOriginal: '', internalMemo: '' });
     const result = evaluateAnswers(content(current), answers.map(answerDTO), previous ? content(previous) : null, prior);
-    if (!requestRequirementsValid(current))
+    if (!requestRequirementsValid(current, approvedEmpty))
         return { ...result, satisfied: 0, missing: result.required, invalid: Math.max(1, result.invalid), canSubmitFull: false, humanReviewPending: true, items: result.items.map(item => ({ ...item, status: 'needs_reconfirmation' as const, humanReviewPending: true, warnings: [...item.warnings, '공개 요청 구조 확인 필요'] })) };
     return result;
 }

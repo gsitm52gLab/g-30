@@ -1,0 +1,44 @@
+import { test, expect } from '@playwright/test';
+import { seeded, chooseOne, actualSubmission, login, ctx, json, journeys, open, tab, saved } from '../fixtures/campaigns-ui';
+import { seedBatch } from '../fixtures/corrections-ui';
+import { referenceHref } from '@/features/submissions/reference';
+import type { SubmissionSnapshot, SubmissionWorkspace } from '@/server/submissions/contracts';
+journeys();
+test('G12 UNION exact G05 history retains G10 unresolved review with current campaign no-material; G09 and both task entries coexist', async ({ page }, info) => {
+    test.setTimeout(90000);
+    const x = await seeded(page);
+    await chooseOne(page, x.taskId, x.id);
+    const actual = await actualSubmission(page, x.taskId), original = actual.w.latest!;
+    await login(page);
+    const batch = await seedBatch(page, original, 1);
+    await login(page, 'luna@example.test');
+    const reviewed = await json<SubmissionSnapshot>(page.request, `/api/submissions/${original.id}`);
+    expect(reviewed.review).toMatchObject({ connected: true, unresolved: 1 });
+    expect(reviewed.review.batchVersionIds).toContain(batch.id);
+    for (const id of [x.taskId, 'task-onboarding']) {
+        await page.goto(`/tasks/${id}?context=${ctx}`);
+        await expect(page.getByRole('region', { name: '업무 연결 문의', exact: true })).toBeVisible();
+        await expect(page.getByRole('link', { name: '수정 취합·검토 기록 ↗', exact: true })).toBeVisible();
+        await page.getByRole('link', { name: 'PR·행사 참여와 실물 ↗', exact: true }).click();
+        await expect(page.getByRole('heading', { name: '이 업무의 행사', exact: true })).toBeVisible();
+    }
+    await open(page, x.taskId, x.id);
+    await tab(page, '참여·사실 기록');
+    await page.getByRole('combobox', { name: '참여 회신', exact: true }).selectOption('decline');
+    await page.getByRole('button', { name: '참여 회신 저장', exact: true }).click();
+    await saved(page);
+    const current = await json<SubmissionWorkspace>(page.request, `/api/tasks/${x.taskId}/submissions`);
+    expect(current.request.source?.noMaterials).toBe(true);
+    expect(current.request.id).not.toBe(original.requestId);
+    expect(current.submittedEvaluation?.evaluation.required).toBe(0);
+    expect(current.latest?.review).toMatchObject({ connected: true, unresolved: 1 });
+    expect(current.latest?.products).toEqual(original.products);
+    expect(current.latest?.request.source?.noMaterials).toBe(false);
+    await page.goto(referenceHref({ taskId: x.taskId, contextId: ctx, requestId: original.requestId, submissionId: original.id, requirementKey: 'proof', productId: null }));
+    await expect(page.getByRole('region', { name: '링크로 선택한 과거 자료', exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: '제출 v1 상세', exact: true })).not.toContainText('이 요청 버전의 자동 제출 대상 항목은 없습니다.');
+    await expect(page.getByRole('region', { name: '업무 연결 문의', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'PR·행사 참여와 실물 ↗', exact: true })).toBeVisible();
+    await page.screenshot({ path: info.outputPath('campaign-correction-exact-history-private.png'), fullPage: true });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

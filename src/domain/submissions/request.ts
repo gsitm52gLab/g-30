@@ -2,7 +2,7 @@ import type { RequestContent } from '../tasks/types';
 import { blankContent } from '../tasks/types';
 import { content } from '../tasks/validate';
 /** Strip only unknown extension keys. Never coerce/filter known authoritative rule values. */
-export function requestRequirementsValid(request: RequestContent): boolean {
+export function requestRequirementsValid(request: RequestContent, approvedEmpty = false): boolean {
     const pick = (value: unknown, keys: string[]) => {
         if (!value || typeof value !== 'object' || Array.isArray(value))
             throw new Error('invalid rule');
@@ -10,7 +10,7 @@ export function requestRequirementsValid(request: RequestContent): boolean {
         return Object.fromEntries(keys.map(key => [key, source[key]]));
     };
     try {
-        if (!Array.isArray(request.requirements) || !request.requirements.length)
+        if (!Array.isArray(request.requirements) || !request.requirements.length && !approvedEmpty)
             return false;
         const requirements = request.requirements.map(raw => {
             const q = pick(raw, ['key', 'label', 'type', 'required', 'help', 'unit', 'options', 'productIds', 'condition', 'specifications']);

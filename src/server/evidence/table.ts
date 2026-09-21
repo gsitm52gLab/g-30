@@ -1,3 +1,4 @@
+import { campaignRequestSource, materialProductIds } from '@/server/tasks/campaign-request';
 import type { Clock, UnitOfWork } from '@/domain/records';
 import { assessmentStatuses, type CellStatus, type MaterialCounts } from '@/domain/evidence/types';
 import type { RequirementEvaluation } from '@/domain/submissions/types';
@@ -49,13 +50,14 @@ export function materialTable(s: UnitOfWork, p: Principal, contextId: string, cl
         if (!request || request.data.taskId !== task.id)
             return [];
         const latest = s.list('submission', contextId).filter(v => v.data.taskId === task.id).sort((a, b) => b.data.sequence - a.data.sequence)[0] ?? null;
-        const previous = latest ? s.get('requestVersion', latest.data.requestId) : null, evaluation = safeEvaluation(request.data.content, latest?.data.answers ?? [], previous?.data.content ?? request.data.content);
-        return evaluation.items.map(item => ({ task, request, latest, item }));
+        const previous = latest ? s.get('requestVersion', latest.data.requestId) : null, evaluation = safeEvaluation(request.data.content, latest?.data.answers ?? [], previous?.data.content ?? request.data.content, false, campaignRequestSource(s, request)?.noMaterials === true);
+        const scopedProductIds = materialProductIds(s, task, request);
+        return evaluation.items.map(item => ({ task, request, latest, item, scopedProductIds }));
     });
     const columnDTO = [...new Map(columns.map(({ task, request, item }) => [JSON.stringify([task.id, request.id, item.requirementKey]), { id: JSON.stringify([task.id, request.id, item.requirementKey]), taskId: task.id, taskTitle: text(task.data.title), taskStatus: task.data.status, requestId: request.id, requirementKey: item.requirementKey, label: item.label, type: item.type, documentBearing: ['file', 'link', 'physical_record'].includes(item.type), required: item.required }])).values()];
     const rows = products.map(r => {
         const cells: MaterialCell[] = columnDTO.map(column => {
-            const candidates = columns.filter(c => c.task.id === column.taskId && c.item.requirementKey === column.requirementKey), match = candidates.find(c => c.task.data.productIds.includes(r.product.id) && (c.item.productId === null || c.item.productId === r.product.id));
+            const candidates = columns.filter(c => c.task.id === column.taskId && c.item.requirementKey === column.requirementKey), match = candidates.find(c => c.scopedProductIds.includes(r.product.id) && (c.item.productId === null || c.item.productId === r.product.id));
             const example = candidates[0], item = match?.item, requestId = column.requestId, answerProductId = item?.productId ?? null, latest = match?.latest ?? null;
             const answer = latest?.data.answers.find(a => a.requirementKey === column.requirementKey && a.productId === answerProductId), fileIds = answer ? answerFiles([answerDTO(answer)]) : [];
             const evidenceLinks = s.list('evidenceLink', contextId).filter(l => l.data.active && l.data.productId === r.product.id).flatMap(l => {
