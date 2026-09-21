@@ -1,3 +1,7 @@
+# Current checkpoint — state157
+
+2026-09-21T23:22:11.344023+00:00; G13 workflow independentexact390b ports4245/46; goalsG17fullstack common0015/package, ai_verifyG17readonlyplan. Accepted60b99 fourteen checkpoints, G14/G03/G18 remain gated. G13combinedroot71bc:701sources/13artifacts/559prior/31UI27moduleSQL14parentidentical; READMEonlymanualmerge. Authorfresh608/46/build, broad50UI2skip6restartfresh0reused. Formalverificationpacket issued, ownreadonlyprep36b9groups linked. Noacceptancebyselfcheck.
+
 # Current checkpoint — state156
 
 2026-09-21T23:19:39.145158+00:00; accepted60b99 remains14/19. CorrectedG16 ledgerpathschema only; readinessoriginalstate155failurepreserved5ea7b05, proof unchanged. Root+goalsG17fullstackcommon0015/package+prdG13union+ai_verifyG17readonlyindependentprep8ca7 active. WorkflowG13 independentawaitingcombinedfreeze. G17actualAPI NOT_RUN.
