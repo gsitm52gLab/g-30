@@ -26,7 +26,7 @@ for (const mode of ["mock", "sqlite"] as const)
         ] as const)
             it(`${reason} leaves all original rows and no partial migrated versions`, async () => {
                 await setup();
-                await repo.transaction(s => s.create("product", { id: "zz-invalid-legacy", contextId, data: { ...s.get("product", "product-serum")!.data, name: marker, code: "LEGACY-UNIQUE", privateRaw: marker, ...data } as ProductData }));
+                await repo.transaction(s => s.create("product", { id: "zz-invalid-legacy", contextId, data: { ...s.get("product", "product-serum")!.data, name: marker, code: "LEGACY-UNIQUE", privateRaw: marker, ...data } as unknown as ProductData }));
                 const before = await repo.list("product"), tasks = await repo.list("task");
                 const error = await repo.transaction(s => migrateLegacyProducts(s)).catch(e => e);
                 expect(productMigrationDiagnostic(error)).toEqual({ module: "G06", productID: "zz-invalid-legacy", sourceContextID: contextId, reason });
