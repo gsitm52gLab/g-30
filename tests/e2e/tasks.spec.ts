@@ -53,3 +53,24 @@ test("G04 AC01/04/06 SA07/08/14 projects dependency failure template selective r
         await page.goto("/tasks?context=ctx-empty"); await expect(page.getByRole("heading",{name:"아직 등록된 업무가 없습니다",exact:true})).toBeVisible(); await page.screenshot({path:info.outputPath("empty-task-list.png")}); expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     } finally { await page.context().tracing.stop({path:info.outputPath("project-template-private-trace.zip")}); }
 });
+
+test("G04-V02 AC-04-05 SA-15 UI nested hold cancel resume preserves accepted work", async ({page,browser},info)=>{
+    await login(page); const id=await makePublished(page,`V02 상태복원 ${info.project.name}`); const brandContext=await browser.newContext({viewport:info.project.name==="mobile"?{width:390,height:844}:{width:1280,height:900}});
+    await page.context().tracing.start({screenshots:true,snapshots:true,sources:true});
+    try {
+        const brand=await brandContext.newPage();await login(brand,"luna@example.test");await brand.goto(`/tasks/${id}?context=${ctx}`);
+        await brand.getByRole("button",{name:"작업 수락",exact:true}).click();await expectStatus(brand,"작업 수락을 기록했습니다");
+        const before:TaskDetail=await(await brand.request.get(`/api/tasks/${id}`)).json();expect(before.task.data.status).toBe("in_progress");
+        await page.goto(`/tasks/${id}?context=${ctx}`);await page.getByText("보류·취소·재개",{exact:true}).click();
+        await page.getByRole("textbox",{name:"상태 변경 사유",exact:true}).fill("수락한 진행 상태를 보존하는 합성 확인");
+        for(const [button,status] of [["보류","on_hold"],["취소","cancelled"],["보류","on_hold"],["재개","in_progress"]]){
+            const response=page.waitForResponse(r=>r.url().endsWith(`/api/tasks/${id}`)&&r.request().method()==="POST");
+            await page.getByRole("button",{name:button,exact:true}).click();expect((await response).status()).toBe(200);
+            await expectStatus(page,"저장했습니다");expect((await(await page.request.get(`/api/tasks/${id}`)).json()).task.data.status).toBe(status);
+        }
+        await brand.reload();await expect(brand.locator("main").getByText("진행 중",{exact:true})).toBeVisible();
+        await brand.getByRole("button",{name:"작업 수락",exact:true}).click();await expectStatus(brand,"작업 수락을 기록했습니다");
+        const after:TaskDetail=await(await brand.request.get(`/api/tasks/${id}`)).json();expect(after.task.data.status).toBe("in_progress");expect(after.activities).toEqual(before.activities);expect(after.versions).toEqual(before.versions);
+        await page.screenshot({path:info.outputPath("state-resumed-private.png"),fullPage:true});await brand.screenshot({path:info.outputPath("brand-state-resumed-private.png"),fullPage:true});
+    } finally {await brandContext.close();await page.context().tracing.stop({path:info.outputPath("state-resume-private-trace.zip")});}
+});

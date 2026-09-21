@@ -125,6 +125,13 @@ export class TaskService {
             });
         });
     }
+    private resumeStatus(s: UnitOfWork, row: StoredRecord<"task">): "requested" | "in_progress" | "partial" {
+        if (row.data.resumeStatus) return row.data.resumeStatus;
+        // Legacy paused rows have no saved progress. Only the current version's actual
+        // acceptance can restore in_progress; old versions never imply new acceptance.
+        return row.data.currentRequestId && s.list("taskActivity", row.contextId!).some(a =>
+            a.data.taskId === row.id && a.data.requestId === row.data.currentRequestId && a.data.kind === "accept") ? "in_progress" : "requested";
+    }
     private publish(s: UnitOfWork, p: Principal, row: StoredRecord<"task">, c: RequestContent, templateVersionId = row.data.templateVersionId ?? null, preservedDraft?: RequestContent) {
         if (!row.contextId || row.data.schemaVersion !== 2) fail("VALIDATION", 422, "새 요청 업무에서 공개해 주세요.");
         const target = this.target(s, p, { contextId: row.contextId, ownerId: row.data.ownerId, assigneeId: row.data.assigneeId, coAssigneeIds: row.data.coAssigneeIds ?? [], productIds: row.data.productIds });
@@ -157,8 +164,14 @@ export class TaskService {
                 } else if (["hold", "cancel", "resume"].includes(cmd)) {
                     const reason = str(input.reason, 2000, true);
                     if (row.data.status === "completed" || row.data.status === "draft") fail("CONFLICT", 409, "현재 상태에서는 변경할 수 없습니다.");
-                    const status = cmd === "hold" ? "on_hold" : cmd === "cancel" ? "cancelled" : "requested";
-                    s.update("task", row.id, row.revision, { ...row.data, status }); this.audit(s, p, row.contextId!, "task.state", row.id, { status: row.data.status }, { status, reason }); this.event(s, p, row.contextId!, `TASK_${cmd.toUpperCase()}`, row.id, row.data.currentRequestId ?? null);
+                    const paused = row.data.status === "on_hold" || row.data.status === "cancelled";
+                    if (cmd === "resume" && !paused) fail("CONFLICT", 409, "보류 또는 취소한 업무만 재개할 수 있습니다.");
+                    const status = cmd === "hold" ? "on_hold" : cmd === "cancel" ? "cancelled" : this.resumeStatus(s, row);
+                    if (status === row.data.status) return { ids: [row.id] };
+                    const resumeStatus = cmd === "resume" ? null : paused ? this.resumeStatus(s, row) : row.data.status as "requested" | "in_progress" | "partial";
+                    s.update("task", row.id, row.revision, { ...row.data, status, resumeStatus });
+                    this.audit(s, p, row.contextId!, "task.state", row.id, { status: row.data.status, resumeStatus: row.data.resumeStatus ?? null }, { status, resumeStatus, reason });
+                    this.event(s, p, row.contextId!, `TASK_${cmd.toUpperCase()}`, row.id, row.data.currentRequestId ?? null);
                 } else if (cmd === "duplicate") {
                     const cycle = object(input.cycle, ["label", "start", "end"]), start = dateValue(cycle.start), end = dateValue(cycle.end);
                     if (end < start) fail("VALIDATION", 422, "대상 기간 순서를 확인해 주세요.");
@@ -169,7 +182,15 @@ export class TaskService {
                     const fresh = s.get("task", tid)!; s.update("task", tid, fresh.revision, { ...fresh.data, cycle: { sourceTaskId: row.id, label: str(cycle.label, 100, true), start, end } }); return { ids: [tid] };
                 } else {
                     if (!row.data.currentRequestId || ["cancelled", "completed", "on_hold"].includes(row.data.status)) fail("CONFLICT", 409, "공개된 진행 업무에서 사용해 주세요.");
-                    if (["read","accept"].includes(cmd) && s.list("taskActivity",row.contextId!).some(a=>a.data.taskId===row.id && a.data.requestId===row.data.currentRequestId && a.data.userId===p.user.id && a.data.kind===cmd)) return { ids:[row.id] };
+                    if (["read","accept"].includes(cmd) && s.list("taskActivity",row.contextId!).some(a=>a.data.taskId===row.id && a.data.requestId===row.data.currentRequestId && a.data.userId===p.user.id && a.data.kind===cmd)) {
+                        // Repair rows left inconsistent by the former resume=requested behavior,
+                        // without fabricating a second acceptance activity or notification event.
+                        if (cmd === "accept" && row.data.status === "requested") {
+                            s.update("task", row.id, row.revision, { ...row.data, status: "in_progress" });
+                            this.audit(s, p, row.contextId!, "task.acceptance_restored", row.id, { status: "requested" }, { status: "in_progress", requestVersionId: row.data.currentRequestId });
+                        }
+                        return { ids: [row.id] };
+                    }
                     let proposed = null, decision: "apply" | "keep" | null = null, resultingRequestId: string | null = null; const reason = str(input.reason ?? "", 2000, cmd === "schedule");
                     if (cmd === "schedule") { proposed = deadline(input.deadline); if (!activeMember(s, proposed.responsibleUserId, row.contextId!)) fail("VALIDATION", 422, "확인 담당자를 확인해 주세요."); }
                     if (cmd === "schedule_decide") {

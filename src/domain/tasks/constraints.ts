@@ -22,6 +22,7 @@ export function taskRelations<K extends RecordKind>(s: UnitOfWork, kind: K, inpu
     }
     if (kind === "task") {
         const d = input.data as import("../records").TaskData;
+        if (d.resumeStatus != null && (!["requested", "in_progress", "partial"].includes(d.resumeStatus) || !["on_hold", "cancelled"].includes(d.status))) throw new StoreError("INVALID_RECORD");
         if (d.schemaVersion === 2 && (d.projectId && s.get("project", d.projectId)?.contextId !== input.contextId || d.currentRequestId && s.get("requestVersion", d.currentRequestId)?.data.taskId !== input.id)) throw new StoreError("INVALID_RECORD");
     }
     if (kind === "commandReceipt") {

@@ -25,6 +25,8 @@ export interface RequestContent {
 }
 export interface TaskExtension {
     schemaVersion?: 2; visibility?: "draft" | "public";
+    /** Progress before hold/cancel; separate from per-request acceptance history. */
+    resumeStatus?: "requested" | "in_progress" | "partial" | null;
     subtype?: string; projectId?: string | null; coAssigneeIds?: string[];
     draft?: RequestContent; currentRequestId?: string | null;
     templateVersionId?: string | null;
