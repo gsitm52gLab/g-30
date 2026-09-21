@@ -1298,13 +1298,13 @@
         "G05",
         "G06"
       ],
-      "state": "VERIFYING",
+      "state": "REPAIRING",
       "required_for_product_completion": true,
       "candidate_commit": "e21f196e933231d18a762eda05555e2070716124",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
-      "attempt": 1,
+      "attempt": 2,
       "owned_paths": [
         "src/domain/evidence/**",
         "src/domain/imports/**",
@@ -1334,7 +1334,7 @@
         "README.md",
         "tests/unit/repositories.test.ts (migration count 5->6 only; existing behavior assertions retained)"
       ],
-      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g07-server",
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g07-fix2",
       "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1",
       "acceptance": [
         {
@@ -1368,7 +1368,7 @@
           "evidence": []
         }
       ],
-      "next_action": "workflow independent exacte21 on detachedg07verify; rootreview rawresult thenserialintegration andfreshregression, G07 notyetaccepted.",
+      "next_action": "prd combined V01 stale test + V02 namespace compatibility repair in g07-fix2; workflow retains exacte21 independent remaining checks/results. Root reviews new candidate and assigns exact independent rerun before integration.",
       "contract_integration_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/contract-integration-preparation.md",
       "main_preparation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/main-contract-preparation-review.json",
       "preparation_status": "CONSUMED_BY_SERVER_ASSIGNMENT",
@@ -1417,6 +1417,14 @@
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g07-assembly",
           "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/assembly/selfcheck-task.json",
           "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/assembly/selfcheck/result.json"
+        },
+        {
+          "id": "G07-V01-V02-REPAIR",
+          "state": "IMPLEMENTING",
+          "session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+          "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g07-fix2",
+          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/v02-task.json",
+          "v01_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/implementation-result.json"
         }
       ],
       "verification_preparation": {
@@ -1453,6 +1461,19 @@
           "severity": "P2",
           "status": "AUTHOR_FIXED_ROOT_REVIEWED_INDEPENDENT_PENDING",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-finding-02.json"
+        },
+        {
+          "id": "G07-V01",
+          "severity": "P1",
+          "status": "AUTHOR_FIXED_INDEPENDENT_PENDING",
+          "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/main-v01-review.json",
+          "author_candidate": "e2d367491704b441de383c4886394e21d3d61ea7"
+        },
+        {
+          "id": "G07-V02",
+          "severity": "P1",
+          "status": "REPAIR_ASSIGNED",
+          "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/main-v02-review.json"
         }
       ],
       "dependency_audit": {
@@ -1467,7 +1488,10 @@
       "verification_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verification-task-draft.json",
       "mobile_presentation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-mobile-presentation-review.json",
       "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verification-task.json",
-      "main_combined_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-combined-selfcheck-review.json"
+      "main_combined_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-combined-selfcheck-review.json",
+      "repair_base_commit": "e21f196e933231d18a762eda05555e2070716124",
+      "repair_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/task.json",
+      "repair_addendum": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/v02-task.json"
     },
     {
       "id": "G08",
@@ -1530,7 +1554,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd actualserverHTTP/currentfiles/newPID; goals fullUI onf972 in g08-ui. Rootlater combineswithacceptedG07 andserverdelta before independentverification.",
+      "next_action": "goals full notice UI on frozen contract; server7dc root reviewed/released. Await acceptedG07 for serial full assembly, then independent verifier exact candidate.",
       "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/task-draft.json",
       "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-task.json",
       "dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-review.json",
@@ -1567,10 +1591,13 @@
       "subtasks": [
         {
           "id": "G08-SERVER",
-          "state": "TYPED_CONTRACT_FROZEN_COMPLETING_HTTP",
+          "state": "AUTHOR_SELF_CHECKED_ROOT_REVIEWED_LEASE_RELEASED",
           "session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g08-impl",
-          "contract_commit": "f972b9ee040dc7948e7cabbbcf98db0743a5be19"
+          "contract_commit": "f972b9ee040dc7948e7cabbbcf98db0743a5be19",
+          "candidate_commit": "7dc2a7a3f70064970ab4cba0d628a9cb9b836b3c",
+          "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/implementation-result.json",
+          "main_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-server-final-review.json"
         },
         {
           "id": "G08-UI",
@@ -1583,7 +1610,8 @@
       ],
       "requirement_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/requirements-addendum-d04.json"
-      ]
+      ],
+      "main_server_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-server-final-review.json"
     },
     {
       "id": "G09",
@@ -2134,8 +2162,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G07",
-  "next_action": "workflow independent exacte21 on detachedg07verify; rootreview rawresult thenserialintegration andfreshregression, G07 notyetaccepted. G08 splitserver/UI implementing inparallel.",
-  "state_version": 98,
+  "next_action": "prd combined V01 stale test + V02 namespace compatibility repair in g07-fix2; workflow retains exacte21 independent remaining checks/results. Root reviews new candidate and assigns exact independent rerun before integration.",
+  "state_version": 99,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2162,7 +2190,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T16:49:46.488241+00:00",
+  "updated_at": "2026-09-21T16:58:14.941286+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

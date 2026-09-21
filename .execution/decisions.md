@@ -67,3 +67,8 @@ G07 pre-freeze clarification: only complete exact historical submission addresse
 ## G08 notice target eligibility — 2026-09-21
 
 One notice has one explicit country×retailer×brand context. “All active brand members” is a current eligibility rule; a publish-time recipient snapshot does not permanently exclude legitimate members who join later. Every read/file path still requires current context membership and eligibility under both current publication and the requested historical version. Target changes publish a new immutable version. A selected-user mode is not mandatory; if supplied, an empty selection means no recipients, never all. Version-specific read receipts do not mark the next revision read. This is a delegated design decision applying PRD-08, not completed verification.
+
+
+## G07 independent OOXML namespace compatibility repair — state99
+
+Valid prefix aliases with identical namespace URI/local names and equal expanded XML trees remain standard XLSX input. Eight original/diagnostic pairs preserve ZIP entries, expanded XML tags/attributes/text/children. The root reviewed original HTTP422 and ExcelJS failure; namespace-only diagnosis passes but does not close original fixture. Repair must use namespace semantics consistently in guards, raw numerical/formula/resource accounting and decoder, preserving security/precision limits and original source hash. This is a supported input compatibility correction, not a native Excel operational compatibility claim. Primary reference: https://www.w3.org/TR/xml-names/ sections2.1/6.
