@@ -1,3 +1,7 @@
+# Current checkpoint — state154
+
+2026-09-21T23:08:42.730964+00:00; G16 exact60b99 integration bounded regression ai_verify; G13 prd final UI9a8 evidence/next full union, G17 goals read-only latest configuration/documentation preflight. Accepted13/19 pending regression. G16root f3cf verified1571artifacts/693sources/18cmd/66ZIP/476HTTP+53own valid,72authorcollision excluded; integration productallbyteidentical839c sourcebinding2a8. G17prep42source root505d decisions approved, no implementation before G16accepted. G13 repair lease5259, verifier plan36b/rootddcd now ledger. G14 notice exact version alreadysupported sourceclarification6c86. Allcommonleases free. User execution-v2 preserved.
+
 # Current checkpoint — state153
 
 2026-09-21T22:57:14.300184+00:00; accepted0804a4a1a750ab4dee149036659e212480230242 still13/19. G16 ai_verify exact839c independent fresh514/check/build/HTTP22+6skip/28/history10 reportedlypass, ownbrowsercountercases ongoing, no finalpacket/acceptance yet. G13 serverebc final rootreview12865:729artifacts/459Gitproductpairs/17cmd/231HTTP/25historicalresponse; normalold176rows DB24P, extraintentionalG12corruption15P+executionfailure1+9NOTRUN separate. prd fullUI and workflow readonly independentprep de45; .worktrees/g13-verification atserverebc, ports4245/46reservedbutruntimependingfinalUI. New G14drafte11e and G03nav/homeaddendum63e6; no dependency bypass. Allcommonserverleasefree. G17 actualconfiguredprovider still mandatoryNOT_RUN.

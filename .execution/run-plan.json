@@ -2775,7 +2775,19 @@
         "sha256": "de45b9f3dacd535f760e4425b5f063d9e199667924a9a9fd2990bbb3ddc3aa5b"
       },
       "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g13-verification",
-      "server_lease_status": "ALL_SERVER_AND_OWN_SCRIPTS_FROZEN_RELEASED"
+      "server_lease_status": "ALL_SERVER_AND_OWN_SCRIPTS_FROZEN_RELEASED",
+      "navigation_repair_lease": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/ui-navigation-repair-lease.json",
+        "sha256": "5259c28639d3f8334b42cdee99d22db5703be1eecbb7358b88b42404dfe9b323"
+      },
+      "verifier_preparation_plan": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/verifier-preparation/plan.json",
+        "sha256": "36b127f11789375e41015fc56c0401c68b141f90cec8767afd48d7858d19509a"
+      },
+      "verifier_preparation_root_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-verifier-preparation-review.json",
+        "sha256": "ddcd82510ccff7fa68461e990b4379022be709d47173915be812acccd8f8dde1"
+      }
     },
     {
       "id": "G14",
@@ -2842,6 +2854,10 @@
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/task-draft.json",
         "sha256": "e11e55058f830263dbb8513c952f35e3494ed0d8516b5a71c51da01981869553"
+      },
+      "notice_history_source_clarification": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/notice-history-source-clarification.json",
+        "sha256": "6c869e2227c5d5be6b6bae3090c42ac27d0d2d0a956d2d9d46f024d534014140"
       }
     },
     {
@@ -3175,10 +3191,10 @@
       "dependencies": [
         "G15"
       ],
-      "state": "VERIFYING",
+      "state": "INTEGRATION_REGRESSION",
       "required_for_product_completion": true,
       "candidate_commit": "839c972eea15a6634910d08579b3cddc4ee03cc4",
-      "integration_commit": null,
+      "integration_commit": "60b99ce05639278a221a96d7a3c575344cb7e08e",
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c5c7-c60d-7eb0-b570-b5b65a92cbde",
       "attempt": 0,
@@ -3355,7 +3371,24 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/verifier-oracle-clarification.json",
         "sha256": "3496b320fa7cf6f42fb2074be1cdf8224eb88868a67e45822132ffb4e3d0dd53"
       },
-      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-verification"
+      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-verification",
+      "independent_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/1/verification-result.json",
+        "sha256": "e6fb545ee4724296c807f049965c28ecdbbd5332a6ff7ab87c5d504ac30151a2"
+      },
+      "independent_root_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/1/main-verification-review.json",
+        "sha256": "f3cf520e76c89ae984c5590955303b2f659ba4cc5b27b2f98032869b4e080fc4"
+      },
+      "integration_source_binding": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/integration-source-binding.json",
+        "sha256": "2a8f32fa9815c2c7ba6a3055824f3e98eaa977c86ec5918b84e7ea24f1eee712"
+      },
+      "regression_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/integration-regression-task.json",
+        "sha256": "89f11adddce4231bb334417bc1a3160b0fa146fa997a2d8947230796bcee3a48"
+      },
+      "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-regression"
     },
     {
       "id": "G17",
@@ -3414,6 +3447,22 @@
       "provider_call_fact_addendum": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/provider-call-fact-addendum.json",
         "sha256": "d40bdf9f84599046c183ed031d108e0f13180b978e08d281484e92a0d06bc6b6"
+      },
+      "preparation_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/preparation-task.json",
+        "sha256": "cc10e350b8a591f2dfcd87934ffef8ad3fda43bd20ccc31080039243568a0a5e"
+      },
+      "prepared_contract": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/preparation/contract.json",
+        "sha256": "eb6c12e414c8ff1e66b4bc9ad8d4cf45f53472e3b595b56f951f887205fb3ef4"
+      },
+      "preparation_root_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/preparation/main-preparation-review.json",
+        "sha256": "505d7e78cc9c1faa4d7cf5f5507fdad4fa4518495c135a828da53516bc74a9d7"
+      },
+      "documentation_preflight_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/documentation-preflight-task.json",
+        "sha256": "adbf107e3fbc97022e42b69039d42df26dd2fbd60f2eddbb5080c0a0fa8965b8"
       }
     },
     {
@@ -3508,8 +3557,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "0804a4a1a750ab4dee149036659e212480230242",
   "current_goal": "G16",
-  "next_action": "G16 ai_verify exact839c independent runtime; G13 prd fullUI and workflow nonauthor preparation. Root finalserver review12865 done; G14/G03 drafts ready, gateddependencies. Accepted13/19 unchanged.",
-  "state_version": 153,
+  "next_action": "G16 exact60b99 integration bounded regression ai_verify; G13 prd final UI9a8 evidence/next full union, G17 goals read-only latest configuration/documentation preflight. Accepted13/19 pending regression.",
+  "state_version": 154,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3528,7 +3577,8 @@
   "latest_user_clarifications": [
     "When implementing pharmaceutical-law AI, first refer to relevant material on repository main and reuse as needed. No git fetch was requested during the earlier prompt-only edit.",
     "Current attached Goal and execution-v1 govern execution. Unpublished execution-v2 draft is not a new binding contract.",
-    "2026-09-21: User explicitly requested continuing the existing Goal through completion. Existing subagents resumed without resetting worktrees or evidence."
+    "2026-09-21: User explicitly requested continuing the existing Goal through completion. Existing subagents resumed without resetting worktrees or evidence.",
+    "2026-09-22: User again explicitly requested continuing existing active Goal to full completion; no scope or acceptance relaxation."
   ],
   "integration_branch": "run/integration",
   "integration_worktree": "/Users/evan/workspace/gs-hale",
@@ -3540,7 +3590,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T22:57:14.300184+00:00",
+  "updated_at": "2026-09-21T23:08:42.730964+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
