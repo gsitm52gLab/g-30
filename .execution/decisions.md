@@ -45,3 +45,7 @@
 - 모든 연결 관계의 코드 중복·동시 변경은 원자적으로 검사하되 숨긴 충돌 정보 없이 중립적 conflict를 반환한다. 공유 데이터 변경이나 제약 성공/실패를 통한 모든 추론 가능성까지 차단했다고 주장하지 않는다.
 - 원본/참조 파일 권한은 모두 현재 검사하며 같은 브랜드/새 컨텍스트 연결만으로 공유하지 않는다. 모든 새 응답은 중첩 객체까지 명시 allowlist로 구성한다. G04-V03의 저장된 확장필드 반례를 상품 출력 검증에도 포함한다.
 - 세부 제안 및 근거는 private G06/common-edit-decision-options.md와 task-draft revision3. 아직 G06 구현·검증은 NOT_RUN이고 G04 ACCEPTED 뒤 실제 기준 SHA/소유권을 고정한다.
+
+## G06 material counts and document/capture boundary
+
+Original7.1 requests material counts, not a substitute task count. Before the actual G07 evidence producer, requested/missing/unconfirmed material counts are null and explicitly unconnected. Related task count can be separately labeled. SA22 aggregate completion remains G07/G18. G06 retains supplied basic document metadata in versioned context bindings; applicability decisions and certification status are G07. Exact product-use capture must describe retail effective intervals and explicit version selection, without private supply metadata. This is an implementation sequencing decision, not a product PASS. See private G06/1/contract-clarification-1.json.
