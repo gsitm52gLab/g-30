@@ -209,11 +209,11 @@ export class TaskService {
                         resultingRequestId = decision === "apply" ? this.publish(s, p, row, { ...published.data.content, deadline: request.data.proposedDeadline! }, row.data.templateVersionId, JSON.stringify(row.data.draft) === JSON.stringify(published.data.content) ? undefined : row.data.draft).id : published.id;
                     }
                     const sequence = 1 + Math.max(0, ...s.list("taskActivity",row.contextId!).filter(a=>a.data.taskId===row.id).map(a=>a.data.sequence ?? 0));
-                    s.create("taskActivity", { id: id(), contextId: row.contextId, data: { taskId: row.id, requestId: row.data.currentRequestId, userId: p.user.id, kind: cmd === "schedule_decide" ? "schedule_resolved" : cmd as "read" | "accept" | "schedule", at: this.clock(), sequence, reason, proposedDeadline: proposed, respondsTo: cmd === "schedule_decide" ? str(input.activityId, 160, true) : null, decision, resultingRequestId } });
+                    const activity = s.create("taskActivity", { id: id(), contextId: row.contextId, data: { taskId: row.id, requestId: row.data.currentRequestId, userId: p.user.id, kind: cmd === "schedule_decide" ? "schedule_resolved" : cmd as "read" | "accept" | "schedule", at: this.clock(), sequence, reason, proposedDeadline: proposed, respondsTo: cmd === "schedule_decide" ? str(input.activityId, 160, true) : null, decision, resultingRequestId } });
                     if (cmd === "accept" && row.data.status === "requested") s.update("task", row.id, row.revision, { ...row.data, status: "in_progress" });
                     this.audit(s, p, row.contextId!, `task.${cmd}`, row.id, {}, { requestVersionId: row.data.currentRequestId, decision, resultingRequestId });
                     if (cmd === "accept") this.event(s, p, row.contextId!, "TASK_ACCEPTED", row.id, row.data.currentRequestId);
-                    if (cmd === "schedule") this.event(s, p, row.contextId!, "TASK_SCHEDULE_CHANGE_REQUESTED", row.id, row.data.currentRequestId);
+                    if (cmd === "schedule") this.event(s, p, row.contextId!, "TASK_SCHEDULE_CHANGE_REQUESTED", row.id, activity.id);
                 }
                 return { ids: [row.id] };
             });
@@ -274,7 +274,7 @@ export class TaskService {
                 activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)).map(projectedActivity),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
                 requirementStatus: current && live ? safeEvaluation(current.data.content,live.data.answers,liveRequest?.data.content??null,true,campaignRequestSource(s,current)?.noMaterials===true).items.map(projectedRequirementStatus) : current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
-                submissionConnection: current ? "공개 요청에 답변을 저장하고 제출할 수 있습니다" : "요청 공개 후 답변할 수 있습니다", submissionSummary: live ? { id:live.id,sequence:live.data.sequence,requestId:live.data.requestId,mode:live.data.mode,submittedAt:live.data.submittedAt,isCurrentRequest:live.data.requestId===current?.id } : null, completionConnection: "GSG가 잔여 상태를 확인하고 수동 완료할 수 있습니다", notificationConnection: "앱 알림은 준비 중입니다" };
+                submissionConnection: current ? "공개 요청에 답변을 저장하고 제출할 수 있습니다" : "요청 공개 후 답변할 수 있습니다", submissionSummary: live ? { id:live.id,sequence:live.data.sequence,requestId:live.data.requestId,mode:live.data.mode,submittedAt:live.data.submittedAt,isCurrentRequest:live.data.requestId===current?.id } : null, completionConnection: "GSG가 잔여 상태를 확인하고 수동 완료할 수 있습니다", notificationConnection: "앱을 열 때 현재 권한과 진행을 확인해 알림을 동기화합니다" };
         });
     }
     async catalog(token: string | undefined, contextId: string) {

@@ -1,3 +1,4 @@
+import { manualSchedule } from '@/server/scheduling/manual';
 import type { Clock, UnitOfWork } from '@/domain/records';
 import type { Principal } from '@/server/auth/service';
 import { unavailable } from '@/server/auth/errors';
@@ -21,6 +22,12 @@ import type { NotificationEventFact } from './types';
 export function notificationEventSource(s: UnitOfWork, principal: Principal, eventId: string, clock: Clock): NotificationEventFact {
     const event = s.get('domainEvent', eventId); if (!event?.contextId) unavailable();
     const p = currentActor(s, principal, event.contextId, clock), { eventType: type, targetId, sourceVersionId: versionId } = event.data;
+    if (type === 'SCHEDULE_CHANGED') {
+        if (!versionId) unavailable();
+        const v = manualSchedule(s, p, targetId, clock, versionId);
+        if (v.row.contextId !== event.contextId || v.content.visibility !== 'public') unavailable();
+        return { ...eventFact(event, p, 'schedule', v.content.title, v.source.actionUrl, v.source.recipient ? [v.source.recipient.id] : [], v.version.id !== v.row.data.currentVersionId ? 'superseded' : v.source.recipientState === 'other_recipient' ? 'other_recipient' : undefined), certainty: v.content.deadline.certainty };
+    }
     if (type.startsWith('NOTICE_')) {
         if (!['NOTICE_PUBLISHED', 'NOTICE_REVISED'].includes(type) || !versionId) unavailable();
         const { notice, version } = resolveNotice(s, p, targetId, clock, false, versionId); if (!version || notice.contextId !== event.contextId) unavailable();

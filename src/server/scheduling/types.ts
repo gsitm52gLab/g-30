@@ -7,6 +7,7 @@ export interface SourceSchedule {
     contextId: string;
     taskId: string | null;
     title: string;
+    nextAction?: string;
     kind: string;
     source: ScheduleSource;
     sourceRevision: number;

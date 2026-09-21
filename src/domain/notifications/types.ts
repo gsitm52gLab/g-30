@@ -10,7 +10,8 @@ export interface CurrentRecipient {
 }
 export type CurrentNeed =
     { kind: 'brand_submission'; taskStatus: TaskData['status']; sourceAvailable: boolean; required: boolean; remaining: number; participation: 'ordinary' | 'selected' | 'unselected' | 'declined' | 'cancellation_discussion' } |
-    { kind: 'gsg_external_check'; sourceAvailable: boolean; state: 'external_waiting' | 'resolved' | 'other' };
+    { kind: 'gsg_external_check'; sourceAvailable: boolean; state: 'external_waiting' | 'resolved' | 'other' } |
+    { kind: 'responsible_action'; taskStatus: TaskData['status']; sourceAvailable: boolean; pending: boolean };
 export type SuppressionReason = 'inactive_schedule' | 'source_unavailable' | 'task_inactive' | 'not_required' | 'no_remaining' | 'participation_inactive' | 'external_wait_ended' | 'needs_assignment' | 'recipient_inactive' | 'source_denied' | 'wrong_recipient_role' | 'unresolved_conflict' | 'undated' | 'needs_confirmation' | 'not_due';
 export type ReminderDecision = { eligible: true; recipientId: string; calendar: CalendarPosition } | { eligible: false; reason: SuppressionReason };
 export interface ReminderFacts { timing: ScheduleTiming; need: CurrentNeed; recipient: CurrentRecipient | null }

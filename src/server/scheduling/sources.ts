@@ -36,7 +36,7 @@ export function taskSchedules(s: UnitOfWork, principal: Principal, taskId: strin
     for (const m of request.data.content.milestones) {
         if (m.visibility !== 'public' && m.visibility !== 'internal') unavailable();
         if (m.visibility === 'internal' && p.user.data.role !== 'gsg') continue;
-        result.push({ ...base, logicalKey: `task:${task.id}:milestone:${m.id}`, kind: m.kind, source: { kind: 'task_milestone', targetId: task.id, versionId: request.id, itemKey: sourceText(m.id) }, deadline: sourceDeadline(m.deadline), visibility: m.visibility, need: null, ...recipientFacts(p, activeRecipientIds(s, task.contextId!, [m.deadline.responsibleUserId], 'gsg')), reminderSupport: 'source_schedule_only' });
+        result.push({ ...base, logicalKey: `task:${task.id}:milestone:${m.id}`, kind: m.kind, source: { kind: 'task_milestone', targetId: task.id, versionId: request.id, itemKey: sourceText(m.id) }, deadline: sourceDeadline(m.deadline), visibility: m.visibility, nextAction: '외부 일정 진행 확인', need: { kind: 'responsible_action', taskStatus: task.data.status, sourceAvailable: true, pending: true }, ...recipientFacts(p, activeRecipientIds(s, task.contextId!, [m.deadline.responsibleUserId], 'gsg')), reminderSupport: 'current_need' });
     }
     return result;
 }
@@ -57,9 +57,19 @@ export function campaignSchedules(s: UnitOfWork, principal: Principal, campaignI
             ...menu.followups.map(x => ({ key: `followup:${x.key}`, kind: x.kind, deadline: x.deadline })),
         ];
         for (const item of rows) {
-            // The canonical task request already covers submission obligations. Calendar-only
-            // campaign rows never invent a second nag or infer delivery/receipt completion.
-            result.push({ ...base, logicalKey: `campaign:${row.id}:${key}:${item.key}`, kind: item.kind, source: { kind: 'campaign', targetId: row.id, versionId: v.id, itemKey: `${key}:${item.key}` }, deadline: sourceDeadline(item.deadline), need: null, ...recipientFacts(p, activeRecipientIds(s, task.contextId!, [item.deadline.responsibleUserId], 'gsg')), reminderSupport: 'source_schedule_only' });
+            // Canonical task submission owns brand reminders. Operational observations are
+            // separate GSG next actions; recorded dispatch/receipt is never inferred fulfillment.
+            let pending = true, nextAction = '행사 일정 진행 확인';
+            if (item.kind === 'application') { pending = state.state.application === 'not_applied'; nextAction = '외부 신청 확인'; }
+            if (item.kind === 'review') { pending = state.state.selection === 'pending'; nextAction = '외부 검토 결과 확인'; }
+            if (item.kind === 'publication_use') { pending = state.state.execution !== 'finished'; nextAction = '게시·사용 진행 확인'; }
+            for (const physical of state.physical) {
+                if (item.key === `physical:${physical.definition.key}:ship`) { pending = physical.facts.every(f => f.kind !== 'dispatch'); nextAction = '발송 기록 확인 · 수령과 별도'; }
+                if (item.key === `physical:${physical.definition.key}:arrival`) { pending = physical.receiptFacts === 0; nextAction = '수령 관측 확인 · 이행 완료 추정 없음'; }
+            }
+            for (const followup of state.followups) if (item.key === `followup:${followup.definition.key}`) { pending = followup.status === 'pending'; nextAction = '행사 후속 자료 수령 확인'; }
+            const duplicateSubmission = item.key === 'request';
+            result.push({ ...base, logicalKey: `campaign:${row.id}:${key}:${item.key}`, kind: item.kind, source: { kind: 'campaign', targetId: row.id, versionId: v.id, itemKey: `${key}:${item.key}` }, deadline: sourceDeadline(item.deadline), nextAction: duplicateSubmission ? '업무의 현재 제출 요청에서 안내' : nextAction, need: duplicateSubmission ? null : { kind: 'responsible_action', taskStatus: task.data.status, sourceAvailable: true, pending }, ...recipientFacts(p, activeRecipientIds(s, task.contextId!, [item.deadline.responsibleUserId], 'gsg')), reminderSupport: duplicateSubmission ? 'source_schedule_only' : 'current_need' });
         }
     }
     return result;
