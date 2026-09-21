@@ -22,7 +22,8 @@ const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR
 for (const mode of ['mock', 'sqlite'] as const)
     describe(`${mode} G08 notice invariants`, () => {
         let repo: RecordRepository, identity: IdentityService, service: NoticeService, files: FileService, dir: string;
-        async function setup() { repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); identity = await policyFixture(repo); service = new NoticeService(identity); dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-notice-')); files = new FileService(identity, dir); }
+        let now = NOW;
+        async function setup() { now = NOW; repo = mode === 'mock' ? createMockRepository(() => now) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => now); })(); identity = await policyFixture(repo); identity.clock = () => now; service = new NoticeService(identity); dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-notice-')); files = new FileService(identity, dir); }
         async function create(content: NoticeContent = { ...blankNotice(), title: '합성 공지', body: '자료와 별도 업무 안내' }, contextId = A) { return (await service.create(admin, { contextId, content, idempotencyKey: randomUUID() })).ids[0]; }
         async function command(id: string, command: string, extra: Record<string, unknown> = {}) { return service.command(admin, id, { command, expectedRevision: (await repo.get('notice', id))!.revision, idempotencyKey: randomUUID(), ...extra }); }
         async function publish(id: string) { return (await command(id, 'publish')).ids[1]; }
@@ -147,14 +148,24 @@ for (const mode of ['mock', 'sqlite'] as const)
         it('brand public metadata and ordering do not change on a private draft save', async () => {
             await setup();
             const id = await create();
-            identity.clock = () => new Date(Date.parse(NOW) + 60000).toISOString();
+            now = new Date(Date.parse(NOW) + 60000).toISOString();
             await publish(id);
-            const before = (await service.list(brand, A)).items.find(n => n.id === id)!;
+            now = new Date(Date.parse(NOW) + 90000).toISOString();
+            const second = await create({ ...blankNotice(), title: '더 최근 공개', body: '두 번째 안내' });
+            await publish(second);
+            const beforeList = (await service.list(brand, A)).items, before = beforeList.find(n => n.id === id)!, managedBefore = await service.detail(admin, id);
             expect(before.updatedAt).toBe(before.publishedAt);
             expect(before.revision).toBe(before.sequence);
+            expect(beforeList[0].id).toBe(second);
+            now = new Date(Date.parse(NOW) + 120000).toISOString();
             await command(id, 'save', { content: { ...blankNotice(), title: 'PRIVATE_DRAFT_TITLE', body: 'PRIVATE_DRAFT_BODY' } });
-            expect((await service.list(brand, A)).items.find(n => n.id === id)).toEqual(before);
+            expect((await service.list(brand, A)).items).toEqual(beforeList);
             expect((await service.detail(brand, id)).revision).toBe(before.sequence);
+            const managed = (await service.list(admin, A)).items.find(n => n.id === id)!;
+            expect(managed.revision).toBe(managedBefore.revision + 1);
+            expect(managed.updatedAt).toBe(now);
+            expect(managed.updatedAt).not.toBe(before.publishedAt);
+            expect(managed.title).toBe('PRIVATE_DRAFT_TITLE');
         });
         it('notice file bytes require current authorization both before and after asynchronous file IO', async () => {
             await setup();
