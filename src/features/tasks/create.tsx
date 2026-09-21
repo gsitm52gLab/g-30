@@ -8,8 +8,8 @@ import { ContentEditor } from "./content-editor";
 import { TargetEditor,initialTarget,type Target } from "./target-editor";
 import { request,useCommand } from "./client";
 import s from "./ui.module.css";
-export function CreateTask({ catalog,contextId,initialProjectId="" }: {catalog:TaskCatalog;contextId:string;initialProjectId?:string}) {
-    const router=useRouter(),command=useCommand();const [targets,setTargets]=useState<Target[]>([initialTarget(contextId,catalog)]),[catalogs,setCatalogs]=useState<Record<string,TaskCatalog>>({[contextId]:catalog});
+export function CreateTask({ catalog,contextId,initialProjectId="",initialProductIds=[] }: {catalog:TaskCatalog;contextId:string;initialProjectId?:string;initialProductIds?:string[]}) {
+    const router=useRouter(),command=useCommand();const [targets,setTargets]=useState<Target[]>([{...initialTarget(contextId,catalog),productIds:initialProductIds.filter(id=>catalog.products.some(p=>p.id===id))}]),[catalogs,setCatalogs]=useState<Record<string,TaskCatalog>>({[contextId]:catalog});
     const [content,setContent]=useState<RequestContent>(()=>({...blankContent(),deadline:{...blankContent().deadline,responsibleUserId:initialTarget(contextId,catalog).ownerId}}));
     const [category,setCategory]=useState<"spot"|"onboarding">(initialProjectId?"onboarding":"spot"),[projectId,setProjectId]=useState(initialProjectId),[templateId,setTemplateId]=useState(""),[subtype,setSubtype]=useState("직접 작성"),[adding,setAdding]=useState(false);
     async function addContext(id:string){if(!id)return;setAdding(true);command.setError("");try{const other=await request<TaskCatalog>(`/api/tasks?context=${encodeURIComponent(id)}`);if(!other.canManage)throw new Error("이 컨텍스트의 업무 생성 권한이 없습니다.");setCatalogs(v=>({...v,[id]:other}));setTargets(v=>[...v,initialTarget(id,other)]);}catch(e){command.setError(e instanceof Error?e.message:"대상을 불러오지 못했습니다.");}finally{setAdding(false);}}
