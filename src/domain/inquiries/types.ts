@@ -10,20 +10,19 @@ export interface ExternalWait {
     timezone: string;
     latestResult: string;
 }
-export interface ConversationData {
-    title: string;
+interface ConversationBase {
     initiatorId: string;
     taskId: string | null;
-    /** Public CAS value; never expose the repository revision after an internal-only write. */
-    publicRevision: number;
-    publicSequence: number;
-    internalSequence: number;
     createdBy: string;
     createdAt: string;
-    publicUpdatedAt: string;
     lastResolvedAt: string | null;
     lastReopenedAt: string | null;
 }
+/** Draft has no public question/event/counter. Its private CAS is the StoredRecord revision. */
+export type ConversationData = ConversationBase & (
+    { phase: 'draft'; title: ''; activatedAt: null; publicRevision: 0; publicSequence: 0; internalSequence: 0; publicUpdatedAt: null } |
+    { phase: 'active'; title: string; activatedAt: string; publicRevision: number; publicSequence: number; internalSequence: number; publicUpdatedAt: string }
+);
 export interface QuestionData {
     conversationId: string;
     openingMessageId: string;
@@ -94,6 +93,12 @@ export interface InquiryFileDTO {
     downloadUrl: string;
     previewUrl: string | null;
 }
+/** Multipart item; validating/writing bytes and current-owner authorization is server work. */
+export interface InquiryUploadItem { clientItemId: string; name: string; type: string; bytes: Uint8Array }
+export type InquiryUploadResult =
+    { clientItemId: string; state: 'ready'; file: InquiryFileDTO } |
+    { clientItemId: string; state: 'failed'; error: { code: string; message: string; retryable: boolean } };
+export interface CreateConversationDraftResult { conversationId: string; phase: 'draft'; revision: number }
 export interface PublicMessageDTO {
     id: string;
     conversationId: string;
@@ -124,6 +129,7 @@ export interface QuestionCounts {
     externalWaiting: number;
 }
 export interface ConversationSummaryDTO {
+    phase: 'active';
     id: string;
     contextId: string;
     title: string;
@@ -142,7 +148,18 @@ export type InquiryHistoryDTO = { id: string; actorLabel: string; at: string } &
     { action: 'question_state'; questionId: string; from: QuestionState | null; to: QuestionState; reason: string; sourceMessageId: string | null } |
     { action: 'task_link'; previousTask: { id: string; title: string } | null; task: { id: string; title: string } | null }
 );
-export interface ConversationDetailDTO extends ConversationSummaryDTO {
+export interface DraftConversationDetailDTO {
+    phase: 'draft';
+    id: string;
+    contextId: string;
+    /** Positive private StoredRecord revision, even though publicRevision is zero. */
+    revision: number;
+    taskId: string | null;
+    /** Only this currently authorized actor's ready files; no message publication implied. */
+    files: InquiryFileDTO[];
+    capabilities: { upload: boolean; publishFirst: boolean };
+}
+export interface ActiveConversationDetailDTO extends ConversationSummaryDTO {
     questions: QuestionDTO[];
     messages: PublicMessageDTO[];
     reads: InquiryReadDTO[];
@@ -151,9 +168,10 @@ export interface ConversationDetailDTO extends ConversationSummaryDTO {
     cursor: string;
 }
 /** Staff-only fields must be constructed separately, never filtered in a client. */
-export interface StaffConversationDetailDTO extends ConversationDetailDTO {
+export interface StaffConversationDetailDTO extends ActiveConversationDetailDTO {
     internalMessages: InternalMessageDTO[];
 }
+export type ConversationDetailDTO = DraftConversationDetailDTO | ActiveConversationDetailDTO | StaffConversationDetailDTO;
 export interface InquiryCommandResult {
     conversationId: string;
     questionId: string | null;

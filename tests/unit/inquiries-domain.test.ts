@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { AuthError } from '@/server/auth/errors';
-import { inquiryId, inquiryLimits, parseCreateConversation, parseInquiryCommand, parseInquiryEventsQuery, parseInquiryListQuery } from '@/domain/inquiries/validate';
+import { inquiryId, inquiryLimits, parseCreateConversationDraft, parsePublishFirst, parseInquiryCommand, parseInquiryEventsQuery, parseInquiryListQuery } from '@/domain/inquiries/validate';
 const content = () => ({ clientMessageId: 'client-message-1', body: '  답변 원문\n둘째 줄  ', fileVersionIds: ['file-1'] });
-const create = () => ({ contextId: 'ctx-jp-a-luna', taskId: null, title: '독립 질문', question: content(), idempotencyKey: 'create-1' });
+const create = () => ({ contextId: 'ctx-jp-a-luna', taskId: null, idempotencyKey: 'create-1' });
+const first = () => ({ command: 'publish_first', expectedRevision: 1, title: '독립 질문', content: content(), idempotencyKey: 'first-1' });
 const answer = () => ({ command: 'answer', questionId: 'question-1', expectedQuestionRevision: 1, content: content(), idempotencyKey: 'answer-1' });
 const wait = () => ({ command: 'state', questionId: 'question-5', expectedQuestionRevision: 2, state: 'external_waiting', reason: '기관 회신 대기', externalWait: { counterparty: '합성 검토 담당', sentAt: '2026-09-21T09:30:00+09:00', responsibleUserId: 'user-gsg', nextCheckDate: '2026-09-25', timezone: 'Asia/Seoul', latestResult: '회신 대기' }, idempotencyKey: 'wait-1' });
 function invalid(run: () => unknown) {
@@ -13,10 +14,29 @@ function invalid(run: () => unknown) {
     expect((error as Error).message).not.toContain('PRIVATE_CANARY');
 }
 describe('G09 domain input boundary — no auth/storage/runtime claim', () => {
-    it('SA35 preserves an independent question with no task or assignee and exact original body', () => {
-        const input = create(), parsed = parseCreateConversation(input);
-        expect(parsed).toEqual(input); expect(parsed.question.body).toBe('  답변 원문\n둘째 줄  ');
-        parsed.question.fileVersionIds.push('file-2'); expect(input.question.fileVersionIds).toEqual(['file-1']);
+    it('SA35 creates only an independent draft without a task, assignee or premature first question', () => {
+        const input = create(); expect(parseCreateConversationDraft(input)).toEqual(input);
+        for (const extra of [{ title: 'old title' }, { question: content() }, { phase: 'active' }, { fileVersionIds: ['file-1'] }]) invalid(() => parseCreateConversationDraft({ ...input, ...extra }));
+    });
+    it('AC09-02 explicit first publish preserves original body and copies only selected file IDs', () => {
+        const input = first(), parsed = parsePublishFirst(input);
+        expect(parsed).toEqual(input); expect(parsed.content.body).toBe('  답변 원문\n둘째 줄  ');
+        parsed.content.fileVersionIds.push('file-2'); expect(input.content.fileVersionIds).toEqual(['file-1']);
+        expect(parseInquiryCommand(input)).toEqual(input);
+    });
+    it('AC09-02 first attachment-only publish requires title plus a nonempty supported payload', () => {
+        const input = { ...first(), content: { ...content(), body: '' } };
+        expect(parsePublishFirst(input)).toEqual(input);
+        invalid(() => parsePublishFirst({ ...input, title: ' ' }));
+        invalid(() => parsePublishFirst({ ...input, content: { ...input.content, fileVersionIds: [] } }));
+        invalid(() => parsePublishFirst({ ...input, content: { ...input.content, body: ' ', fileVersionIds: [] } }));
+        invalid(() => parsePublishFirst({ ...input, content: {} }));
+    });
+    it('A20 first publish requires positive private draft CAS and rejects forged phase/counters', () => {
+        for (const expectedRevision of [0, -1, 1.5, '1', Number.MAX_SAFE_INTEGER + 1]) invalid(() => parsePublishFirst({ ...first(), expectedRevision }));
+        for (const extra of [{ phase: 'active' }, { activatedAt: '2026-09-22T00:00:00Z' }, { publicRevision: 1 }, { initiatorId: 'foreign' }, { questionId: 'foreign' }]) invalid(() => parseInquiryCommand({ ...first(), ...extra }));
+        invalid(() => parsePublishFirst({ ...first(), command: 'question' }));
+        invalid(() => parseInquiryCommand({ ...first(), command: 'question' }));
     });
     it('AC09-01 allows an explicit targeted answer with supported attachment-only content', () => {
         const a = answer(); a.content.body = ' ';
@@ -35,10 +55,10 @@ describe('G09 domain input boundary — no auth/storage/runtime claim', () => {
         expect(parseInquiryCommand({ ...answer(), command: 'supplement' }).command).toBe('supplement');
     });
     it('A19 rejects client supplied identity, visibility, timestamps and arbitrary nested values', () => {
-        for (const field of ['actorId', 'createdAt', 'visibility', 'initiatorId', 'publicRevision', 'participants']) invalid(() => parseCreateConversation({ ...create(), [field]: 'PRIVATE_CANARY' }));
+        for (const field of ['actorId', 'createdAt', 'visibility', 'initiatorId', 'publicRevision', 'participants']) invalid(() => parseCreateConversationDraft({ ...create(), [field]: 'PRIVATE_CANARY' }));
         invalid(() => parseInquiryCommand({ ...answer(), content: { ...content(), visibility: 'internal' } }));
         invalid(() => parseInquiryCommand({ ...answer(), content: { ...content(), body: { secret: 'PRIVATE_CANARY' } } }));
-        invalid(() => parseCreateConversation(Object.create(create())));
+        invalid(() => parseCreateConversationDraft(Object.create(create())));
     });
     it('A19 keeps internal note as a distinct command and disallows public kind overrides', () => {
         const input = { command: 'internal_note', questionId: null, content: content(), idempotencyKey: 'internal-1' };
@@ -47,17 +67,17 @@ describe('G09 domain input boundary — no auth/storage/runtime claim', () => {
         invalid(() => parseInquiryCommand({ ...input, visibility: 'public' }));
     });
     it('A20 accepts exact text/count bounds and rejects over-limit or duplicate files without coercion', () => {
-        const c = create(); c.title = '가'.repeat(inquiryLimits.title); c.question.body = '나'.repeat(inquiryLimits.body); c.question.fileVersionIds = Array.from({ length: 10 }, (_, i) => `file-${i}`);
-        expect(parseCreateConversation(c)).toEqual(c);
-        invalid(() => parseCreateConversation({ ...c, title: c.title + 'a' }));
-        invalid(() => parseCreateConversation({ ...c, question: { ...c.question, body: c.question.body + 'a' } }));
-        for (const fileVersionIds of [['file-1', 'file-1'], [...c.question.fileVersionIds, 'file-11'], [{ id: 'PRIVATE_CANARY' }]]) invalid(() => parseCreateConversation({ ...c, question: { ...content(), fileVersionIds } }));
+        const c = first(); c.title = '가'.repeat(inquiryLimits.title); c.content.body = '나'.repeat(inquiryLimits.body); c.content.fileVersionIds = Array.from({ length: 10 }, (_, i) => `file-${i}`);
+        expect(parsePublishFirst(c)).toEqual(c);
+        invalid(() => parsePublishFirst({ ...c, title: c.title + 'a' }));
+        invalid(() => parsePublishFirst({ ...c, content: { ...c.content, body: c.content.body + 'a' } }));
+        for (const fileVersionIds of [['file-1', 'file-1'], [...c.content.fileVersionIds, 'file-11'], [{ id: 'PRIVATE_CANARY' }]]) invalid(() => parsePublishFirst({ ...c, content: { ...content(), fileVersionIds } }));
     });
     it('A20 rejects unknown discriminants and branch-confused command bodies', () => {
         invalid(() => parseInquiryCommand({ ...answer(), command: 'complete_task' }));
         invalid(() => parseInquiryCommand({ ...answer(), expectedRevision: 1 }));
         invalid(() => parseInquiryCommand({ command: 'read', throughMessageId: 'message-1', idempotencyKey: 'read-1', content: content() }));
-        invalid(() => parseCreateConversation({ ...create(), taskId: '' }));
+        invalid(() => parseCreateConversationDraft({ ...create(), taskId: '' }));
     });
     it('AC09-01 validates external wait with actual non-UTC offset and date-only next check', () => {
         expect(parseInquiryCommand(wait())).toEqual(wait());

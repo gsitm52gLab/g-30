@@ -1,6 +1,6 @@
 import { fail } from '@/server/auth/errors';
 import { dateValue } from '../tasks/validate';
-import type { CreateConversationInput, InquiryCommand, InquiryEventsQuery, InquiryListQuery, MessageInput } from './commands';
+import type { CreateConversationDraftInput, InquiryCommand, InquiryEventsQuery, InquiryListQuery, MessageInput, PublishFirstCommand } from './commands';
 import type { ExternalWait } from './types';
 /** Technical input limits, not operating policy or a monetary cap. */
 export const inquiryLimits = { title: 200, body: 20000, files: 10, id: 160, reason: 2000, cursor: 512, page: 100, offset: 100000, requestBytes: 262144 } as const;
@@ -49,14 +49,21 @@ function external(value: unknown): ExternalWait {
     try { new Intl.DateTimeFormat('en', { timeZone: timezone }); } catch { invalid(); }
     return { counterparty: text(d.counterparty, 500), sentAt: d.sentAt === null ? null : timestamp(d.sentAt), responsibleUserId: inquiryId(d.responsibleUserId), nextCheckDate: dateValue(d.nextCheckDate), timezone, latestResult: text(d.latestResult, inquiryLimits.reason, false) };
 }
-export function parseCreateConversation(value: unknown): CreateConversationInput {
-    const d = record(value, ['contextId', 'taskId', 'title', 'question', 'idempotencyKey']);
-    return { contextId: inquiryId(d.contextId), taskId: nullableId(d.taskId), title: text(d.title, inquiryLimits.title), question: message(d.question), idempotencyKey: inquiryId(d.idempotencyKey) };
+export function parseCreateConversationDraft(value: unknown): CreateConversationDraftInput {
+    const d = record(value, ['contextId', 'taskId', 'idempotencyKey']);
+    return { contextId: inquiryId(d.contextId), taskId: nullableId(d.taskId), idempotencyKey: inquiryId(d.idempotencyKey) };
+}
+/** Validates shape only; the server must verify the draft phase/current owner and CAS. */
+export function parsePublishFirst(value: unknown): PublishFirstCommand {
+    const d = record(value, ['command', 'expectedRevision', 'title', 'content', 'idempotencyKey']);
+    if (d.command !== 'publish_first') invalid();
+    return { command: 'publish_first', expectedRevision: revision(d.expectedRevision), title: text(d.title, inquiryLimits.title), content: message(d.content), idempotencyKey: inquiryId(d.idempotencyKey) };
 }
 export function parseInquiryCommand(value: unknown): InquiryCommand {
-    const base = record(value, ['command', 'idempotencyKey', 'expectedRevision', 'expectedQuestionRevision', 'questionId', 'content', 'kind', 'state', 'reason', 'externalWait', 'taskId', 'throughMessageId']);
+    const base = record(value, ['command', 'idempotencyKey', 'expectedRevision', 'expectedQuestionRevision', 'questionId', 'title', 'content', 'kind', 'state', 'reason', 'externalWait', 'taskId', 'throughMessageId']);
     const intent = { idempotencyKey: inquiryId(base.idempotencyKey) };
     switch (base.command) {
+        case 'publish_first': return parsePublishFirst(base);
         case 'question': {
             const d = record(base, ['command', 'idempotencyKey', 'expectedRevision', 'content']);
             return { ...intent, command: 'question', expectedRevision: revision(d.expectedRevision), content: message(d.content) };
