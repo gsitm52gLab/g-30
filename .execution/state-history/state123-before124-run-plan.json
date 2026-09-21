@@ -1721,10 +1721,10 @@
         "G04",
         "G05"
       ],
-      "state": "REGRESSION",
+      "state": "VERIFYING",
       "required_for_product_completion": true,
       "candidate_commit": "80704869ab1aa0c66058e8ef178138d6bd59ec20",
-      "integration_commit": "92a463e57e58e4f569304d045e9bbe1f7a0ccd7b",
+      "integration_commit": null,
       "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
@@ -1754,50 +1754,35 @@
         {
           "id": "AC-09-01",
           "expected": "질문 5개 중 4개 답변 후 남은 1개와 다음 확인일이 양측 화면·GSG 홈에 유지된다.",
-          "status": "PASS_INDEPENDENT_INTEGRATION_PENDING",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verification-review.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         },
         {
           "id": "AC-09-02",
           "expected": "팝업과 상세에서 메시지·첨부·읽음이 같은 기록으로 나타난다.",
-          "status": "PASS_INDEPENDENT_INTEGRATION_PENDING",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verification-review.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         },
         {
           "id": "AC-09-03",
           "expected": "연결 끊김 후 재연결하면 누락 메시지를 수신하고 재전송으로 중복 메시지가 생기지 않는다.",
-          "status": "PASS_INDEPENDENT_INTEGRATION_PENDING",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verification-review.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         },
         {
           "id": "AC-09-04",
           "expected": "문의를 업무로 전환해도 원 대화와 연결 이력이 유지된다.",
-          "status": "PASS_INDEPENDENT_INTEGRATION_PENDING",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verification-review.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         },
         {
           "id": "AC-09-05",
           "expected": "해결 후 새 질문을 등록하면 과거 해결 시각은 남고 답변 대기로 재개된다.",
-          "status": "PASS_INDEPENDENT_INTEGRATION_PENDING",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verification-review.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         }
       ],
-      "next_action": "workflow freshbounded exactintegrated92a regression ports4225/26; fullunfilteredsame352source reusefresh0. Root review thenACCEPTED.",
+      "next_action": "Await independent exact807; both ownfinal and root source/raw evidence review complete. Integrate only after independent review.",
       "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/task-draft.json",
       "participant_policy_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/participant-policy-decision.json",
       "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/dor-task.json",
@@ -1859,19 +1844,6 @@
           "result_sha256": "313c217e33d861ce745abf308a9632f9c62a6a1b441ed60cbc044c88d20da674",
           "main_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-combined-review.json",
           "lease": "RELEASED"
-        },
-        "independent_verification": {
-          "state": "PASS_ROOT_REVIEWED",
-          "candidate": "80704869ab1aa0c66058e8ef178138d6bd59ec20",
-          "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g09-verify",
-          "session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
-          "report_entries": 21,
-          "distinct_commands": 20,
-          "raw_default_reports": 100,
-          "artifact_hashes": 2972,
-          "source_blobs": 352,
-          "trace_crc": 228,
-          "original_helper_failures": 9
         }
       },
       "initial_attachment_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/initial-attachment-decision-proposal.json",
@@ -1898,12 +1870,7 @@
       "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g09-verify",
       "main_union_freeze_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-union-freeze-review.json",
       "main_combined_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-combined-review.json",
-      "main_combined_review_sha256": "5e298262cf62d0afc9801082f9d0cf9df17ac732d4f68bcaa04777c51e0e560c",
-      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/verification-result.json",
-      "verification_result_sha256": "5dbcf921f9203fdbb07349e05b0a2651d5085b00e87787581291e1a365839862",
-      "main_verification_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verification-review.json",
-      "main_verification_review_sha256": "c893977274d85e0581dd988d4452d3161179db12c707378e34adec0ed2471079",
-      "regression_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/regression-task.json"
+      "main_combined_review_sha256": "5e298262cf62d0afc9801082f9d0cf9df17ac732d4f68bcaa04777c51e0e560c"
     },
     {
       "id": "G10",
@@ -2150,13 +2117,7 @@
         }
       },
       "shared_lease": "EXCLUSIVE_G12_SERVER_AFTER_G09_RELEASE",
-      "shared_lease_addendum": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/shared-lease-release.json",
-      "canonical_request_lease": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/canonical-request-lease.json",
-        "sha256": "bd8dcff4bcdbab2e118a2b7b2fc97454f0d516bc0bbbe2beeb36d1437d293c0e",
-        "state": "GRANTED_IMPL_UNFROZEN",
-        "current_missing_semantics": "Unselected/declined material requirements excluded from current request; applied externalfacts and cancellationholdrequirements retained separately; no reminders or automatic cancellation. G05 own300unit reported, unreviewed."
-      }
+      "shared_lease_addendum": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/shared-lease-release.json"
     },
     {
       "id": "G13",
@@ -2308,17 +2269,7 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
-      "extraction_task_draft": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/extraction-task-draft.json",
-        "sha256": "74a2797771a8160647c0d48485a4d85d182354497ff999fe173cc0a3b51dbe78",
-        "state": "NOT_ASSIGNED"
-      },
-      "official_api_docs_preflight": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/openai-docs-preflight.json",
-        "sha256": "bc26546fec4060f273e8257a35fe207d942eb1dd5c76eb7aa20193b766efd923",
-        "state": "READ_ONLY_NOT_API_TEST"
-      }
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
     },
     {
       "id": "G16",
@@ -2375,12 +2326,7 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
-      "source_discovery": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/source-discovery/discovery-result.json",
-        "sha256": "4c7d03ae48d90a142f0c0b707a304203a4d381097c9a694ddf4f9c4958de8410",
-        "state": "PRIMARY_INDEX_AND_SELECTED_HTML_READ_NOT_CORPUS_REVIEWED"
-      }
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
     },
     {
       "id": "G17",
@@ -2517,8 +2463,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "31cbb38ac3aef0d8bf345d67db67dc009f616d49",
   "current_goal": "G09",
-  "next_action": "workflow G09 exact92a boundedintegrationregression; prd G10 actualUI; goals G12 canonicalmenu request materialization build/freeze. Root reviewfuturepackets, afterG09accept assignworkflow G15 extraction with disjointlocklease.",
-  "state_version": 124,
+  "next_action": "workflow G09 exact807 independent; root authorcombinedreview complete. prd G10 UI exactc872base implements; goals G12 actual selection→canonical request version integration under narrow additional lease. Independent G09 result then root serial integration/exactregression.",
+  "state_version": 123,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2549,7 +2495,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T19:07:45.884158+00:00",
+  "updated_at": "2026-09-21T18:59:29.689526+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
