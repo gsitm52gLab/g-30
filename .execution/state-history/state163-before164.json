@@ -377,10 +377,6 @@
       "home_navigation_addendum": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/navigation-home-review-addendum.json",
         "sha256": "63e650e8fa6ac08cd199778746dee4ed3c66e74f0d49ab494c6173d8017f8241"
-      },
-      "current_source_addendum": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/current-source-addendum-state164.json",
-        "sha256": "7e2eff0b9dec7ae68004c5c204999ac74b5d7cff66bffd3bac82e52c2562cac5"
       }
     },
     {
@@ -2994,15 +2990,7 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-preparation-task.json",
         "sha256": "b9f48edd20cf249ed1512d706302af1b158327fbdf55675d43d51cb9dfdbd3f5"
       },
-      "ui_preparation_agent": "/root/workflow",
-      "ui_preparation_plan": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-preparation/plan.json",
-        "sha256": "460c581f89a44877fff72400fabe382346b82086ed6150424f4499d153135460"
-      },
-      "ui_preparation_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-preparation/main-review.json",
-        "sha256": "339fd2d60978893761320412f07c27e6f050dcd3b03e132f4404a5e5252a5730"
-      }
+      "ui_preparation_agent": "/root/workflow"
     },
     {
       "id": "G15",
@@ -3626,7 +3614,7 @@
           "evidence": []
         }
       ],
-      "next_action": "goals final PC390 both-mode/provider repair UI then candidate. Workflow non-author readonly117b repair mapping while G14 typed pending. Authorfirstlive1 retained; final independent actualcall mandatory.",
+      "next_action": "goals explicitcredentialrecovery/responseusageparsefailure repairs +UI/runtime. Author07cactualAPI1verified7assertions; independentfinalcallmandatorynotdone.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/task-draft.json",
         "sha256": "acf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3"
@@ -3723,14 +3711,6 @@
       "verification_v2_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verification-task-draft-v2.json",
         "sha256": "7783157a7beb0d2c5697ed2c4fcbbab02c58efce594b84c06471b8801590081b"
-      },
-      "readonly_repair_preparation_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verifier-repair-preparation-workflow-task.json",
-        "sha256": "e9382cad2d4b25355b9d191a96f81f4df54ce5fa488acdecd62ff2d8fd54c01d"
-      },
-      "verifier_activation_failure": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verifier-repair-preparation-assignment-failure.json",
-        "sha256": "d78134e2b90bdeb2d172c2a71f17d56fcadf2c186e3b4bf909a239b3701f34be"
       }
     },
     {
@@ -3825,8 +3805,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "f48e3487544f46d46118f856d823111fd953f073",
   "current_goal": "G14",
-  "next_action": "prd G14server/common0016; goalsG17finalUI; workflowboundedG17readonlyrepairpreparation thenG14typedUI orG17independent asresourceallows. Root G03currentreadiness only. Accepted15/19f48e.",
-  "state_version": 164,
+  "next_action": "G14prd server/common0016; workflowG14 readonlyUIprep, noimplbeforetypedhandoff. G17goalsHTTP/UI/history on117b repairedprovider; independentdraft7783 waitsfinal. Accepted15/19f48e.",
+  "state_version": 163,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3858,7 +3838,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T23:53:33.292470+00:00",
+  "updated_at": "2026-09-21T23:47:37.748962+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

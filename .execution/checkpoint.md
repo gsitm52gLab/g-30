@@ -1,3 +1,7 @@
+# Current checkpoint — state164
+
+2026-09-21T23:53:33.292470+00:00; prd G14server/common0016; goalsG17finalUI; workflowboundedG17readonlyrepairpreparation thenG14typedUI orG17independent asresourceallows. Root G03currentreadiness only. Accepted15/19f48e. G14UIprep460c/root339f5inputs21sources verified. ai_verify followup tool thread-limit failed beforework; exactfailure retained, existingworkflow readonlyrepair taske938 assigned(no runtime). G03sourceaddendum has18sourcebindings: existingkanban/coassignment/timeline retained; ProductCards placeholder currentlyunused, avoidfalsevisibledefect. Goal ACTIVE, userenv/v2 unchanged.
+
 # Current checkpoint — state163
 
 2026-09-21T23:47:37.748962+00:00; G14prd server/common0016; workflowG14 readonlyUIprep, noimplbeforetypedhandoff. G17goalsHTTP/UI/history on117b repairedprovider; independentdraft7783 waitsfinal. Accepted15/19f48e. G14ui taskb9f4 owncreatedreadonlyf48e worktree. G17rootread117b delta: explicitconfigrestart/currentbasis/unknownack andsafeparsemetadata; author560check/build source toreviewfinalpacket, red5green18 retained. Authorlive07c remains1call, finalindependent1required. No additionalcommonG17edits whileG14leaseactive.
