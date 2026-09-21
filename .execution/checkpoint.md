@@ -1,17 +1,15 @@
 # GS HALE execution checkpoint
 
-State 70; Goal ACTIVE. Authoritative task state: `.execution/run-plan.json`; prior decisions and attempts remain in events/traceability/private evidence.
+State 76; Goal ACTIVE. Authoritative `.execution/run-plan.json`; prior decisions/attempts preserved.
 
-Accepted product commit: `7f409a2a14266776001f6b7910e80e402a5b7717`. G00/G01/G02/G04/G06 accepted current stages; mandatory later consumers and whole-product completion remain pending.
+Accepted product commit: `7f409a2a14266776001f6b7910e80e402a5b7717`. G00/G01/G02/G04/G06 accepted current stages. Whole-product and later consumers remain pending.
 
-G05 server: prd in `.worktrees/g05-server`, branch run/g05-server, base accepted7f409a2, ports4151/4154. Sole shared schema/files/policy/evaluator writer. Formal packet G05/1/server/task.json and ownership addenda1(taskLabels only),2(product reusable task-file predicate only). Typed contract after meaningful unit/build first, exhaustive HTTP can continue after disjoint UI starts. No frozen candidate yet.
+G05 server43b53508b35d05c5c117ddfb18c6dd5350d0bb55 frozen/main-reviewed:287artifact/38command-log/36Gitblob hashes checked. Exact188unit/build, mock57/DB61 HTTP, malformed-rule4each, G04impact94/130. Original failures retained; older373 G06/G02 NOT_RERUN on43. REQUEST_INVALID409 preserves input and rejects malformed authoritative rules. No G05 acceptance.
 
-G05 UI: goals completed 55-line actual TaskDetail/recovery/accessibility prep, main reviewed. Waiting frozen contract and formal isolated worktree assignment; no implementation/runtime. Preparation paths G05/1/ui-task-preparation.json and ui-flow-preparation.md. Server taskLabels lease releases at contract freeze; then UI may own narrow TaskList display.
+G05 UI goals in g05-ui4159/4160: intermediate8f exactG05 mock14/DB14/newPID12 passed; original SQLite product label regression2failed retained. Final ed9 narrow original synthetic label restoration/mobile button layout selfchecks underway. G05-UI-01 coauthor provider and G05-SRV-01 nested evaluation leaks author-repaired, independent/integration closure pending.
 
-G05 independent verifier: workflow completed 14-group plan, main reviewed; candidate null, all NOT_RUN. Bind exact contract then combined candidate, independent execution, main evidence review, serial root integration and exact integrated impact regression before acceptance.
+Root created isolated internal assembly e44d481 (43b+interimUI8f) in g05-assembly. This is not root product integration/acceptance. prd only reproduces default full mock E2E login-limit static concern,4151/4154; no source-edit lease. Final UI merge after both leases released. Auth limits/test expectations must not weaken.
 
-Recovery: bounded sessionStorage of actual user/context/task/baseRequest text and ready file refs after fresh authorized read. Failed/unuploaded File bytes require reselection. Shared409 preserves local inputs; explicit rebase for new requests; partial/full/approval/receipt/completion distinct.
+Workflow independent verifier idle with main-reviewed14group plan bound to d89; wait formal exact final combined candidate. Candidate independent execution then root review, serial root integration, exact impacted regression before acceptance. No later dependent module implementation yet.
 
-Preserve .env, main/origin and user untracked docs/execution-v2. No fetch/push/deploy/API calls so far. Existing failure evidence and actual session log prefixes preserved; final tails and sanitized derivatives still pending. Root orchestrates, no product source edits in this checkpoint.
-
-State72: G05 server contractd89c3b8 main-reviewed:30artifact hashes/32Gitblobs/13command logs, exact18unit/typecheck/build; precommit178 only. goals formal UI assigned g05-ui4159/4160, server continues HTTP. No G05 acceptance. Task G05/1/ui/task.json. Session original log prefixes archived20260921T142417Z; final tails/sanitized stillpending.
+Preserve .env, main/origin, untracked docs/execution-v2. No fetch/push/deploy/API calls. Actual session prefix archives20260921T142417Z, final tails/sanitized derivatives pending. Root orchestrates and reviews; no product edits.
