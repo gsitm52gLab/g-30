@@ -414,7 +414,11 @@
         "scripts/verify-files*",
         "package.json",
         "package-lock.json",
-        "README.md"
+        "README.md",
+        "src/domain/requirements/**",
+        "src/domain/events/**",
+        "src/server/config.ts",
+        ".gitignore"
       ],
       "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-impl",
       "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1",
@@ -458,7 +462,10 @@
       ],
       "next_action": "Implement complete G04 and actual reference-file foundation; return candidate and evidence for independent verification",
       "base_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
-      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/task.json"
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/task.json",
+      "ownership_addenda": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ownership-addendum-1.json"
+      ]
     },
     {
       "id": "G05",
@@ -1204,7 +1211,7 @@
   "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
   "current_goal": "G04",
   "next_action": "Implement complete G04 and actual reference-file foundation; return candidate and evidence for independent verification",
-  "state_version": 27,
+  "state_version": 28,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1231,7 +1238,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T10:50:09.785645+00:00",
+  "updated_at": "2026-09-21T10:51:14.266869+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
