@@ -24,6 +24,12 @@ export interface ProductListQuery {
     page?: string;
     pageSize?: string;
 }
+function pageNumber(value: string | undefined, fallback: number) {
+    if (value === undefined) return fallback;
+    const parsed = Number(value);
+    if (!value.trim() || !Number.isSafeInteger(parsed) || parsed < 1) fail("VALIDATION", 422, "페이지와 페이지 크기를 양의 정수로 지정해 주세요.");
+    return parsed;
+}
 export class ProductService {
     constructor(public identity: IdentityService, private fault?: (command: string) => void) { }
     get clock() { return this.identity.clock; }
@@ -82,7 +88,7 @@ export class ProductService {
             if (query.context)
                 authorize(s, p, "product.read", productContextScope(query.context, "products"), this.clock);
             const contexts = s.list("context").filter(c => decide(s, p, "product.read", productContextScope(c.id, "products"), this.clock).allowed).map(projectContext);
-            const page = Math.max(1, Math.floor(Number(query.page) || 1)), pageSize = Math.min(100, Math.max(1, Math.floor(Number(query.pageSize) || 24))), search = (query.q ?? "").trim().toLocaleLowerCase();
+            const page = pageNumber(query.page, 1), pageSize = Math.min(100, pageNumber(query.pageSize, 24)), search = (query.q ?? "").trim().toLocaleLowerCase();
             const rows = visibleProductRelations(s, p, this.clock, query.context).map(cp => resolveProduct(s, p, cp.contextId!, cp.data.productId, this.clock)).map(r => productItem(s, p, r, this.clock)).filter(item => {
                 const c = item.context.data;
                 const statusMatches = !query.status || (query.status === "archived" ? item.archived : !item.archived && item.local.salesStatus === query.status);

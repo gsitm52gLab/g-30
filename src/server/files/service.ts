@@ -7,7 +7,7 @@ import type { Principal, IdentityService } from "@/server/auth/service";
 import { authorize } from "@/server/policy/policy";
 import { fail, unavailable } from "@/server/auth/errors";
 import { MAX_BATCH_FILES, validateFile } from "@/domain/files/validate";
-import { originalScope, referenceScope, type FileReference } from "./access";
+import { originalScope, referenceScope, canReferenceFile, type FileReference } from "./access";
 import { resolveProduct } from "@/server/products/access";
 const text = (v: unknown) => typeof v === "string" ? v : "";
 export const fileMetadata = (f: StoredRecord<"fileVersion">) => ({ id: f.id, name: text(f.data.originalName), bytes: typeof f.data.bytes === "number" ? f.data.bytes : 0, mime: text(f.data.mime), sha256: text(f.data.sha256), preview: f.data.preview === true, visibility: f.data.visibility === "internal" ? "internal" as const : "public" as const });
@@ -43,6 +43,7 @@ export class FileService {
         }
         if (!included)
             unavailable();
+        canReferenceFile(s,p,file,target,this.identity.clock);
         authorize(s, p, `file.${mode}`, { id: file.id, contextId: file.contextId, kind: "file", visibility: file.data.visibility, originalScope: origin, referenceScope: target }, this.identity.clock);
         if (mode === "preview" && !file.data.preview)
             fail("VALIDATION", 422, "이 형식은 원본 다운로드로 확인해 주세요.");

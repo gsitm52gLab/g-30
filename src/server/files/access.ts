@@ -1,7 +1,7 @@
 import type { Clock, StoredRecord, UnitOfWork } from "@/domain/records";
 import type { Principal } from "@/server/auth/service";
 import { fail, unavailable } from "@/server/auth/errors";
-import { authorize, decide } from "@/server/policy/policy";
+import { authorize } from "@/server/policy/policy";
 import { taskScope } from "@/server/policy/projection";
 import { resolveProduct, productContextScope } from "@/server/products/access";
 import type { ResourceScope } from "@/server/policy/types";
@@ -52,16 +52,13 @@ export function canReferenceFile(s: UnitOfWork, p: Principal, file: StoredRecord
         unavailable();
     const origin = originalScope(s, p, file, clock);
     authorize(s, p, "file.original", { id: file.id, contextId: file.contextId, kind: "file", visibility: file.data.visibility, originalScope: origin, referenceScope: target }, clock);
-    if (file.data.visibility === "public" && origin.visibility !== "public" && origin.id !== target.id)
-        fail("VALIDATION", 422, "다른 업무의 참고자료는 원본 업무 공개 후 연결해 주세요.");
+    const ownTask = origin.kind === "task" && target.kind === "task" && origin.id === target.id;
+    if (file.data.visibility === "public" && origin.kind === "task" && !ownTask) {
+        const published = origin.visibility === "public" && s.list("requestVersion", file.contextId!).some(version => version.data.taskId === origin.id && version.data.content.referenceFileIds.includes(file.id));
+        if (!published) fail("VALIDATION", 422, "다른 업무의 참고자료는 원본 공개 요청에 포함된 뒤 연결해 주세요.");
+    }
     return origin;
 }
 export function visibleFile(s: UnitOfWork, p: Principal, file: StoredRecord<"fileVersion">, target: ResourceScope, clock: Clock): boolean {
-    try {
-        const origin = originalScope(s, p, file, clock);
-        return file.contextId === target.contextId && decide(s, p, "file.original", { id: file.id, contextId: file.contextId, kind: "file", visibility: file.data.visibility, originalScope: origin, referenceScope: target }, clock).allowed;
-    }
-    catch {
-        return false;
-    }
+    try { canReferenceFile(s,p,file,target,clock); return true; } catch { return false; }
 }

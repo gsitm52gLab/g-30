@@ -1,5 +1,5 @@
 import { resolveProduct, visibleProductRelations } from "@/server/products/access";
-import { canReferenceFile, originalScope } from "@/server/files/access";
+import { canReferenceFile } from "@/server/files/access";
 import { createHash, randomUUID } from "node:crypto";
 import type { UnitOfWork, StoredRecord } from "@/domain/records";
 import type { RequestContent, PriorSubmissionData } from "@/domain/tasks/types";
@@ -247,7 +247,7 @@ export class TaskService {
     private projectedContent(s: UnitOfWork, p: Principal, c: RequestContent, internal: boolean, prospectiveTaskId?:string) {
         const referenceFileIds = stringList(c.referenceFileIds).filter(fid => {
             const file=s.get("fileVersion",fid); if(!file)return false;
-            try { const origin=originalScope(s,p,file,this.clock); return internal || file.data.visibility === "public" && (origin.visibility === "public" || origin.id===prospectiveTaskId); } catch { return false; }
+            try { const origin=canReferenceFile(s,p,file,{id:prospectiveTaskId??"request-projection",contextId:file.contextId,kind:"task",visibility:internal?"draft":"public"},this.clock); return internal || file.data.visibility === "public" && (origin.visibility === "public" || origin.id===prospectiveTaskId); } catch { return false; }
         });
         return projectedRequest(c, internal, referenceFileIds);
     }
@@ -261,7 +261,7 @@ export class TaskService {
             const projectedVersions = versions.map(v => projectedVersion(v, this.projectedContent(s,p,v.data.content,internal)));
             const fileIds = new Set([...projectedVersions.flatMap(v=>v.content.referenceFileIds), ...(internal ? row.data.draft?.referenceFileIds ?? [] : [])]);
             const files = s.list("fileVersion", row.contextId!).filter(f => fileIds.has(f.id) || internal && f.data.taskId === taskId).filter(f => internal || f.data.visibility === "public").map(f => ({ id: f.id, name: f.data.originalName, bytes: f.data.bytes, mime: f.data.mime, sha256: f.data.sha256, preview: f.data.preview, visibility: f.data.visibility }));
-            return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal && row.data.draft ? projectedRequest(row.data.draft, true, this.projectedContent(s,p,row.data.draft,true).referenceFileIds) : null, request,
+            return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal && row.data.draft ? projectedRequest(row.data.draft, true, this.projectedContent(s,p,row.data.draft,true,row.id).referenceFileIds) : null, request,
                 versions: projectedVersions,
                 activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)).map(projectedActivity),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,

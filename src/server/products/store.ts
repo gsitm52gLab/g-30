@@ -26,7 +26,7 @@ export function receipt(s: UnitOfWork, p: Principal, contextId: string, command:
     if (old) {
         if (old.data.bodyHash !== bodyHash)
             fail("CONFLICT", 409, "같은 재시도 키에 다른 내용을 사용할 수 없습니다.");
-        return old.data.result;
+        return { ids: Array.isArray(old.data.result?.ids) ? old.data.result.ids.filter((value): value is string => typeof value === "string") : [] };
     }
     const result = action();
     fault?.();
