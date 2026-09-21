@@ -124,3 +124,42 @@ test("UI reassigns brand and GSG responsibility while preserving original author
     await form.getByRole("button", { name: "재배정", exact: true }).click();
     await expect(form).toContainText("GSG 책임자: 가상 운영자");
 });
+
+test("G01-D01 scoped members expose identity fields only and retain own login capabilities", async ({page}, info) => {
+    await login(page);
+    const request = page.context().request;
+    const before = await (await request.get("/api/contexts/ctx-jp-a-luna/members")).json();
+    if (!before.members.some((m: {user:{id:string}}) => m.user.id === "user-admin")) {
+        const invitation = await mutation(request,"/api/contexts/ctx-jp-a-luna/invitations","POST",{email:"admin@example.test",name:"GSG 관리자",role:"operator"});
+        expect(invitation.status()).toBe(201);
+        const invited = await invitation.json();
+        expect((await mutation(request,"/api/invitations/accept","POST",{token:invited.token})).status()).toBe(200);
+    }
+    const [loginResponse] = await Promise.all([
+        page.waitForResponse(r => new URL(r.url()).pathname === "/api/auth/login" && r.request().method() === "POST"),
+        login(page,"selected@example.test"),
+    ]);
+    const ownGrant = {scope:"selected",contextIds:["ctx-jp-a-luna"],internalPriceAccess:false};
+    expect((await loginResponse.json()).user.adminGrant).toEqual(ownGrant);
+    const me = await (await request.get("/api/auth/me")).json();
+    expect(me.user.adminGrant).toEqual(ownGrant);
+    expect(me.contexts.map((c:{id:string})=>c.id)).toEqual(["ctx-jp-a-luna"]);
+    const response = await request.get("/api/contexts/ctx-jp-a-luna/members");
+    expect(response.status()).toBe(200);
+    const members = await response.json();
+    const target = members.members.find((m:{user:{id:string}})=>m.user.id==="user-admin");
+    expect(target).toBeDefined();
+    for (const member of members.members) expect(Object.keys(member.user).sort()).toEqual(["email","id","name","revision","role","status"]);
+    expect(JSON.stringify(members)).not.toContain("adminGrant");
+    expect(JSON.stringify(members)).not.toContain("ctx-jp-b-luna");
+    expect((await request.get("/api/contexts/ctx-jp-b-luna/members")).status()).toBe(404);
+    expect(members.canManageAccounts).toBe(false);
+    await page.goto("/contexts");
+    await expect(page.locator("article.member-row").filter({hasText:"admin@example.test"})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"사용자 초대"})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"진행 업무 재배정"})).toBeVisible();
+    await expect(page.getByRole("button",{name:"계정 전체 중지",exact:true})).toHaveCount(0);
+    expect(await page.content()).not.toContain("ctx-jp-b-luna");
+    await page.screenshot({path:info.outputPath("scoped-member-projection.png"),fullPage:true});
+    await info.attach("scoped-member-projection",{contentType:"application/json",body:JSON.stringify({fix:"G01-D01",allowedStatus:response.status(),forbiddenStatus:404,identityKeys:Object.keys(target.user).sort(),ownGrantPreserved:true,globalGrantExcluded:true})});
+});

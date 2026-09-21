@@ -6,7 +6,15 @@ export class AuthError extends Error {
     constructor(public code: string, public status: number, message: string) { super(message); this.name = "AuthError"; }
 }
 export function fail(code: string, status: number, message: string): never { throw new AuthError(code, status, message); }
-export const safeUser = (u: StoredRecord<"user">) => ({ id: u.id, revision: u.revision, name: u.data.name, email: u.data.email, role: u.data.role, status: u.data.status, adminGrant: u.data.adminGrant ?? null });
+/** Identity fields needed for member management; never serialize another user's grants. */
+const memberIdentity = (u: StoredRecord<"user">) => ({
+    id: u.id, revision: u.revision, name: u.data.name,
+    email: u.data.email, role: u.data.role, status: u.data.status,
+});
+/** Capability details are returned only to the authenticated account itself. */
+const sessionUser = (u: StoredRecord<"user">) => ({
+    ...memberIdentity(u), adminGrant: u.data.adminGrant ?? null,
+});
 export type Principal = {
     user: StoredRecord<"user">;
     session: StoredRecord<"session">;
@@ -50,14 +58,14 @@ export class IdentityService {
         fail("RATE_LIMITED", 429, "시도가 많습니다. 잠시 후 다시 시도해 주세요."); const user = (await this.repo.list("user")).find(u => u.data.normalizedEmail === email); const credential = user ? (await this.repo.list("credential")).find(c => c.data.userId === user.id) : undefined; const valid = await verifyPassword(password, credential?.data); if (!valid || !user)
         fail("LOGIN_FAILED", 401, "이메일 또는 비밀번호를 확인해 주세요."); return this.repo.transaction(s => { const current = s.get("user", user.id); const currentCredential = credential ? s.get("credential", credential.id) : null; if (!current || current.data.status !== "active" || current.data.authVersion !== user.data.authVersion || currentCredential?.revision !== credential?.revision)
         fail("LOGIN_FAILED", 401, "이메일 또는 계정 상태를 확인해 주세요."); const old = this.session(s, token); if (old)
-        s.update("session", old.id, old.revision, { ...old.data, revokedAt: this.clock() }); return { ...this.issue(s, current), user: safeUser(current) }; }); }
+        s.update("session", old.id, old.revision, { ...old.data, revokedAt: this.clock() }); return { ...this.issue(s, current), user: sessionUser(current) }; }); }
     async logout(token?: string) { return this.repo.transaction(s => { const session = this.session(s, token); if (session)
         s.update("session", session.id, session.revision, { ...session.data, revokedAt: this.clock() }); }); }
-    async me(token?: string) { return this.repo.transaction(s => { const p = this.principal(s, token); const contexts = s.list("context").filter(c => hasScope(s, p, c.id)); return { storageMode: this.repo.mode, user: safeUser(p.user), contexts, memberships: s.list("membership").filter(m => m.data.userId === p.user.id), canCreateContext: canAdmin(p.user) }; }); }
+    async me(token?: string) { return this.repo.transaction(s => { const p = this.principal(s, token); const contexts = s.list("context").filter(c => hasScope(s, p, c.id)); return { storageMode: this.repo.mode, user: sessionUser(p.user), contexts, memberships: s.list("membership").filter(m => m.data.userId === p.user.id), canCreateContext: canAdmin(p.user) }; }); }
     async createContext(token: string | undefined, input: Record<string, unknown>) { const type = input.type; if (type !== "retail" && type !== "event")
         fail("VALIDATION", 422, "컨텍스트 유형을 확인해 주세요."); const country = catalog.countries.find(x => x.id === input.countryId); const brand = catalog.brands.find(x => x.id === input.brandId); const retailer = catalog.retailers.find(x => x.id === input.retailerId); if (!country || !brand || type === "retail" && !retailer || type === "event" && input.retailerId)
         fail("VALIDATION", 422, "국가·브랜드·리테일러를 확인해 주세요."); const eventName = type === "event" ? text(input.eventName, "행사명") : undefined; const data: ContextData = { country: country.name, brand: brand.name, retailer: type === "event" ? "리테일러 미지정" : retailer!.name, type, countryId: country.id, brandId: brand.id, retailerId: type === "event" ? null : retailer!.id, eventName, combinationKey: type === "event" ? `event:${country.id}:${brand.id}:${eventName}` : `retail:${country.id}:${retailer!.id}:${brand.id}` }; return this.repo.transaction(s => { const p = this.principal(s, token); needAdmin(p); const row = s.create("context", { id: id(), contextId: null, data }); this.audit(s, p, "context.created", row.id, row.id, {}, data as unknown as Record<string, unknown>); this.fault?.("context"); return row; }); }
-    async members(token: string | undefined, contextId: string) { return this.repo.transaction(s => { const p = this.principal(s, token); needScope(s, p, contextId); needAdmin(p, contextId); return { context: s.get("context", contextId), members: s.list("membership", contextId).map(m => ({ ...m, user: safeUser(s.get("user", m.data.userId)!) })), invitations: s.list("invitation", contextId).map(r => ({ id: r.id, revision: r.revision, userId: r.data.userId, membershipId: r.data.membershipId, expiresAt: r.data.expiresAt, consumedAt: r.data.consumedAt, revokedAt: r.data.revokedAt })), tasks: s.list("task", contextId), history: s.list("audit").filter(a => a.contextId === contextId || a.contextId === null && s.list("membership", contextId).some(m => m.data.userId === a.data.targetId)), canManageAccounts: canAdmin(p.user) }; }); }
+    async members(token: string | undefined, contextId: string) { return this.repo.transaction(s => { const p = this.principal(s, token); needScope(s, p, contextId); needAdmin(p, contextId); return { context: s.get("context", contextId), members: s.list("membership", contextId).map(m => ({ ...m, user: memberIdentity(s.get("user", m.data.userId)!) })), invitations: s.list("invitation", contextId).map(r => ({ id: r.id, revision: r.revision, userId: r.data.userId, membershipId: r.data.membershipId, expiresAt: r.data.expiresAt, consumedAt: r.data.consumedAt, revokedAt: r.data.revokedAt })), tasks: s.list("task", contextId), history: s.list("audit").filter(a => a.contextId === contextId || a.contextId === null && s.list("membership", contextId).some(m => m.data.userId === a.data.targetId)), canManageAccounts: canAdmin(p.user) }; }); }
     async invite(token: string | undefined, contextId: string, input: Record<string, unknown>) { const email = emailValue(input.email); const name = text(input.name, "이름"); const role = input.role; if (role !== "brand" && role !== "operator")
         fail("VALIDATION", 422, "브랜드 또는 GSG 운영자 역할만 지원합니다."); const scope = typeof input.scope === "string" ? input.scope.trim().slice(0, 500) : ""; const raw = randomToken(); return this.repo.transaction(s => { const p = this.principal(s, token); needScope(s, p, contextId); needAdmin(p, contextId); let user = s.list("user").find(u => u.data.normalizedEmail === email); if (user && ((user.data.role === "gsg") !== (role === "operator")))
         fail("CONFLICT", 409, "기존 계정의 유형과 역할이 다릅니다."); if (user?.data.status === "suspended")
@@ -92,7 +100,7 @@ export class IdentityService {
         fail("CONFLICT", 409, "현재 관리자 자신의 계정은 이 화면에서 중지할 수 없습니다."); if (user.data.status === "invited")
         fail("CONFLICT", 409, "초대 수락으로 계정을 활성화해 주세요."); const updated = s.update("user", user.id, expected, { ...user.data, status, authVersion: (user.data.authVersion ?? 0) + 1 }); for (const session of s.list("session").filter(r => r.data.userId === userId && !r.data.revokedAt))
         s.update("session", session.id, session.revision, { ...session.data, revokedAt: this.clock() }); if (status === "suspended")
-        this.markAssignments(s, userId); this.audit(s, p, "user.status", userId, null, { status: user.data.status }, { status }); this.fault?.("suspend"); return safeUser(updated); }); }
+        this.markAssignments(s, userId); this.audit(s, p, "user.status", userId, null, { status: user.data.status }, { status }); this.fault?.("suspend"); return memberIdentity(updated); }); }
     private markAssignments(s: UnitOfWork, userId: string, contextId?: string) { for (const task of s.list("task", contextId).filter(t => (t.data.assigneeId === userId || t.data.ownerId === userId) && t.data.status !== "completed"))
         s.update("task", task.id, task.revision, { ...task.data, assignmentNeedsAttention: true }); }
     async setMembership(token: string | undefined, contextId: string, memberId: string, input: Record<string, unknown>) { const expected = revision(input.expectedRevision); const status = input.status; if (status !== "active" && status !== "suspended")

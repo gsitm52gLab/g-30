@@ -48,6 +48,36 @@ for (const mode of ["mock", "sqlite"] as const)
         expect(legacy?.data.status).toBeUndefined(); expect(legacy?.data.adminGrant).toBeUndefined();
         await expect(new IdentityService(repo).login(undefined,{email:"legacy@example.test",password:DEMO_PASSWORD})).rejects.toMatchObject({status:401});
     });
+    it("G01-D01 projects other-member identity without global grants while preserving own capabilities", async () => {
+        await setup();
+        const privateGrant = { scope: "selected" as const, contextIds: [ctx, ctx2], internalPriceAccess: true };
+        await repo.transaction(s => {
+            const target = s.get("user", "user-gsg")!;
+            s.update("user", target.id, target.revision, { ...target.data, adminGrant: privateGrant });
+        });
+        const viewer = await login("selected@example.test");
+        const members = await service.members(viewer.token, ctx);
+        const target = members.members.find(m => m.user.id === "user-gsg")!;
+        expect(Object.keys(target.user).sort()).toEqual(["email", "id", "name", "revision", "role", "status"]);
+        expect(JSON.stringify(members)).not.toContain(ctx2);
+        expect(JSON.stringify(members)).not.toContain("adminGrant");
+        expect(target.data.internalPriceAccess).toBe(false);
+        await expect(service.members(viewer.token, ctx2)).rejects.toMatchObject({status:404});
+        const ownGrant = {scope:"selected",contextIds:[ctx],internalPriceAccess:false};
+        expect(viewer.user.adminGrant).toEqual(ownGrant);
+        expect((await service.me(viewer.token)).user.adminGrant).toEqual(ownGrant);
+        const targetLogin = await login("operator@example.test");
+        expect(targetLogin.user.adminGrant).toEqual(privateGrant);
+        expect((await service.me(targetLogin.token)).user.adminGrant).toEqual(privateGrant);
+    });
+    it("G01-D01 status mutation returns target identity only and does not change grants", async () => {
+        const admin = await setup();
+        const before = (await repo.get("user", "user-selected-admin"))!;
+        const result = await service.setUserStatus(admin, before.id, {status:"suspended",expectedRevision:before.revision});
+        expect(Object.keys(result).sort()).toEqual(["email", "id", "name", "revision", "role", "status"]);
+        expect(result.status).toBe("suspended");
+        expect((await repo.get("user",before.id))?.data.adminGrant).toEqual(before.data.adminGrant);
+    });
     it("rate limiting and database relation checks fail closed", async () => { await setup(); for (let i = 0; i < 20; i++)
             expect(await service.throttle("test-key")).toBe(true); expect(await service.throttle("test-key")).toBe(false); await expect(repo.transaction(s => s.create("membership", { id: "invalid", contextId: "unknown", data: { userId: "user-luna", role: "brand", status: "active", scope: "", internalPriceAccess: false, activatedAt: now, suspendedAt: null } }))).rejects.toMatchObject({ code: "INVALID_RECORD" }); });
     });
