@@ -88,3 +88,6 @@ G09 dependencies G04/G05 already ACCEPTED at37b. Only new domain types/actual pu
 
 ## 2026-09-21T17:29:20.688527+00:00 — Parallel isolated G10 domain and union preflight
 G10 depends on acceptedG05, so implementer may add only standalone corrections types/validators on37b while G09 has disjoint new files. Neither edits shared schema/policy/lock. G10 domain packet phrase intentional answer status means explicit reflection/resolution, not inquiry answers; clarified to author. Actual readonly G07/G08 union exposes6 source conflicts and clean-merge migration-count6 needs7; author resolution and populated both-direction upgrade required afterG08acceptance.
+
+## 2026-09-21T17:32:28.408403+00:00 — G08 independent PASS integrated, not yet accepted
+Root reviewed raw7groups, source and evidence hashes, default test IDs and current-version screenshot. Serial merge3c4e is product-identical to verified6460 across230 files. workflow assigned exact3c4e freshregression in separate g08-regression/4201/4202; no G08ACCEPTED or G07consumption before this gate. G09/G10 standalone source only stilldisjoint.

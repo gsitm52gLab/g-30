@@ -1519,10 +1519,10 @@
         "G04",
         "G05"
       ],
-      "state": "VERIFYING",
+      "state": "INTEGRATING",
       "required_for_product_completion": true,
       "candidate_commit": "6460de707f870068bf4b682a83d872e53de84ff0",
-      "integration_commit": null,
+      "integration_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
@@ -1572,7 +1572,7 @@
           "evidence": []
         }
       ],
-      "next_action": "workflow exact6460 independent7groups/defaultbothmodes; rootrawreview result thenserialintegration/exactregression onlyafterPASS. G07 repair continues independently.",
+      "next_action": "workflow actualexact integrated3c4e freshregression running; rootrawreview thenACCEPTED ifPASS. Candidate independentPASS/currentG08findingsclosedbut finalacceptancepending.",
       "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/task-draft.json",
       "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-task.json",
       "dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-review.json",
@@ -1590,13 +1590,13 @@
         {
           "id": "G08-PRE-01",
           "severity": "P1",
-          "status": "AUTHOR_REPAIR_REPORTED_INDEPENDENT_PENDING",
+          "status": "INDEPENDENTLY_VERIFIED_INTEGRATION_REGRESSION_PENDING",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-provisional-projection-review.json"
         },
         {
           "id": "G08-PRE-02",
           "severity": "P2",
-          "status": "AUTHOR_REPAIR_REPORTED_INDEPENDENT_PENDING",
+          "status": "INDEPENDENTLY_VERIFIED_INTEGRATION_REGRESSION_PENDING",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-provisional-projection-review.json"
         }
       ],
@@ -1654,7 +1654,13 @@
       "verification_checkout_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-checkout.json",
       "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-task.json",
       "main_combined_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-combined-review.json",
-      "regression_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/regression-task-draft.json"
+      "regression_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/regression-task-draft.json",
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/verification-result.json",
+      "main_candidate_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-candidate-review.json",
+      "integration_record": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/integration-merge.json",
+      "integration_source_check": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/integration-source-check.json",
+      "regression_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/regression-task.json",
+      "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g08-regression"
     },
     {
       "id": "G09",
@@ -2253,8 +2259,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G08",
-  "next_action": "workflow G08 exact6460 independent; goals G09 standalone domain only accepted37b; prd G10 readonly prep. Root review G08 outcomes thenserialintegration/regression; afteracceptG07authorunion. No wholeGoalcomplete.",
-  "state_version": 105,
+  "next_action": "workflow actualexact integrated3c4e freshregression running; rootrawreview thenACCEPTED ifPASS. Candidate independentPASS/currentG08findingsclosedbut finalacceptancepending. G09/G10 standalone author stages continue; afterG08accepted assignG07union priority.",
+  "state_version": 106,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2281,7 +2287,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T17:29:20.688527+00:00",
+  "updated_at": "2026-09-21T17:32:28.408403+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
