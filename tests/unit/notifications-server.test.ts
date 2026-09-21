@@ -147,6 +147,25 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G13 persisted 
         for (const token of [brand, co]) { await notifications.sync(token, contextId); await notifications.sync(token, contextId); const list = await notifications.list(token, contextId); expect(list.items.filter(n => n.title === '공개 보완 묶음')).toHaveLength(1); expect(list.items.filter(n => n.title === '공지 수신')).toHaveLength(token === brand ? 1 : 0); }
         expect(await repo.list('noticeRead')).toHaveLength(0); expect(JSON.stringify(await notifications.list(brand, contextId))).not.toContain('PRIVATE_NOTIFICATION');
     });
+    it.each(['task', 'campaign'] as const)('N13-12 SA-52 actual %s brand date confirmer does not replace GSG next-action owner', async producer => {
+        await setup(); const tasks = new TaskService(identity), scheduling = new SchedulingService(identity);
+        let targetTask = taskId;
+        if (producer === 'task') {
+            const row = (await repo.get('task', taskId))!, draft = row.data.draft!;
+            await tasks.command(admin, taskId, { command: 'save', expectedRevision: row.revision, content: { ...draft, milestones: [{ id: 'dispatch', kind: 'printing_delivery', visibility: 'public', counterpart: '기관', deadline: { ...draft.deadline, responsibleUserId: 'user-luna' } }] }, idempotencyKey: randomUUID() });
+            await tasks.command(admin, taskId, { command: 'publish', expectedRevision: row.revision + 1, idempotencyKey: randomUUID() });
+        } else {
+            const f = await completionCampaign(identity); targetTask = f.taskId;
+            const draft = { ...f.draft, menus: f.draft.menus.map(m => ({ ...m, physical: m.physical.map(x => ({ ...x, plannedShip: { ...content().deadline, responsibleUserId: 'user-luna' } })) })) };
+            await f.command('save', { draft }); const versionId = (await f.command('publish')).ids[1];
+            await f.command('participate', { campaignVersionId: versionId, response: 'participate', selectedMenus: [draft.menus[0].identity], providedBy: person, note: '' }, brand);
+        }
+        const relevant = (rows: Awaited<ReturnType<SchedulingService['list']>>['items']) => rows.find(r => r.taskId === targetTask && (producer === 'task' ? r.source.kind === 'task_milestone' : r.source.kind === 'campaign' && r.source.itemKey.endsWith(':physical:shoot:ship')))!;
+        expect(relevant((await scheduling.list(gsg, contextId)).items)).toMatchObject({ recipientState: 'current_recipient', recipientPolicy: 'external_gsg', confirmationParty: { id: 'user-luna' }, actionOwners: [{ id: 'user-gsg' }], reminder: { eligible: true, recipientId: 'user-gsg' } });
+        expect(relevant((await scheduling.list(brand, contextId)).items)).toMatchObject({ recipientState: 'other_recipient' });
+        await repo.transaction(s => { const m = s.list('membership', contextId).find(m => m.data.userId === 'user-gsg')!; s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' }); });
+        expect(relevant((await scheduling.list(admin, contextId)).items)).toMatchObject({ recipientState: 'needs_assignment', actionOwners: [] });
+    });
     it('N13-07 actual G04 activity identity and external wait GSG-only source remain separate', async () => {
         await setup(); const task = (await repo.get('task', taskId))!;
         await new TaskService(identity).command(brand, taskId, { command: 'schedule', expectedRevision: task.revision, reason: '일정 조정', deadline: { ...blankContent().deadline, value: '2026-09-25', responsibleUserId: 'user-luna' }, idempotencyKey: randomUUID() });
