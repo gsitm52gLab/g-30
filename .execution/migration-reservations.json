@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "rule": "Root allocates new migration filename; immutable accepted SQL bytes stay unchanged. File count is actual checkout migrations, never inferred from highest reserved number. Reservation does not grant schema lease or mark implementation complete.",
-  "at": "2026-09-21T19:09:27.169928+00:00",
+  "at": "2026-09-21T19:37:31.733053+00:00",
   "reservations": [
     {
       "id": "0001",
@@ -73,7 +73,7 @@
       "id": "0012",
       "file": "0012-ai-input.sql",
       "goal": "G15",
-      "state": "RESERVED_NOT_IMPLEMENTED"
+      "state": "G15_SERVER_LEASE_ASSIGNED"
     }
   ]
 }
