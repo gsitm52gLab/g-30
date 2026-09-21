@@ -832,8 +832,12 @@
       "owner_note": "G16",
       "requirement": "finding위치/유형·risk≠confidence·이유/추가정보·수정제안, legal_basis권위/locator/URL/시행일/범위와보조지침구분. FR-033·036",
       "verification_idea": "정상/후보/근거부족각결과schema필드대조. locator없으면human_review_required, 0후보적법확정0, 수정안자동덮어쓰기/외부공개0",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G16_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/1/verification-result.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/regression-result.json"
+      ]
     },
     {
       "id": "SA-60",
@@ -843,8 +847,12 @@
       "owner_note": "G16",
       "requirement": "일본어/사전한국어정렬·검수수준·원문개정stale·모델/프롬프트/corpus/입력hash·사람수락/수정/기각사유. FR-034",
       "verification_idea": "source버전개정뒤old번역검색제외, machine-unreviewed표시. 세사람판정행동이력보존. source_id·원본응답까지재현, 런타임번역호출0",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G16_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/1/verification-result.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/regression-result.json"
+      ]
     },
     {
       "id": "SA-61",
@@ -854,8 +862,12 @@
       "owner_note": "G16",
       "requirement": "YK-01·02·03·05·06·07·09·10·11·12, TR-01, EV-01 범위 유지. 원안12.3/FR-031",
       "verification_idea": "단어하나로위법확정하지않고맥락/이미지/각주/수치와근거를후보에연결. YK-04/08을약용정상경로로복원하지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G16_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/1/verification-result.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/regression-result.json"
+      ]
     },
     {
       "id": "SA-62",
