@@ -16,3 +16,7 @@ G06 beforeG05 afterG04 ACCEPTED. Draftrevision3 contains commonedit policy: one 
 Preserve .env/main/origin/untracked docs/execution-v2, raw private evidence and actual session logs. Original logprefixes refreshed12:03:13UTC; final archive/sanitization pending.
 
 Update 2026-09-21T12:19:22.512326+00:00: finalfb independentlyPASS, main264hashes/14metadata-log-report/157source/24validtraces checked. Root serial merge `cc59987fc70f2799cf1703950e5932b7b4b64ada` complete with product bytes identical tofb, main/origin/user untracked preserved. Detachedg04-regression created; workflow assigned G04/4/regression-task.json on4143/4146. G04 INTEGRATION_TESTING, accepted commit stillcec612f. No G06start until regression accepted.
+
+## State 49 — G04 accepted current stage
+
+G04 candidate fb493e69830461fbf3fa11be90d9b50c94b0e334 independently verified and integrated cc59987fc70f2799cf1703950e5932b7b4b64ada passed impact regression. Main reviewed actual artifacts, command records and raw counts. G06 may start; real G05/G11/G13 producer obligations remain. Goal remains active.

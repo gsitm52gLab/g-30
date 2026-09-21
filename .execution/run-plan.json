@@ -378,7 +378,7 @@
       "dependencies": [
         "G02"
       ],
-      "state": "INTEGRATION_TESTING",
+      "state": "ACCEPTED",
       "required_for_product_completion": true,
       "candidate_commit": "fb493e69830461fbf3fa11be90d9b50c94b0e334",
       "integration_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
@@ -427,41 +427,77 @@
         {
           "id": "AC-04-01",
           "expected": "병렬 신규 입점 업무와 독립 스팟 업무를 생성해 최상위 분류·담당 사용자·다음 행동이 저장된다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G04_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G04_REQUEST_TASK_FILE_PATHS",
+          "scope_note": "Current project/spot roles/actions stored and UI exercised"
         },
         {
           "id": "AC-04-02",
           "expected": "설명·참고 양식·제출 항목·기한을 공개하면 브랜드가 필요한 내용만 확인한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G04_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G04_REQUEST_TASK_FILE_PATHS",
+          "scope_note": "OriginalV03 fixed and broader actual API/SSR/RSC/output parity verified."
         },
         {
           "id": "AC-04-03",
           "expected": "다중 컨텍스트 생성 후 한 업무의 답변·마감 수정이 다른 업무에 영향을 주지 않는다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G04_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G04_REQUEST_TASK_FILE_PATHS",
+          "scope_note": "Actual3context UI/API/DB independent fields and prior-answer fixture"
         },
         {
           "id": "AC-04-04",
           "expected": "필수 요건 추가 시 요청 새 버전·변경 알림·추가 필요 항목이 나타나며 이전 답변은 유지된다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G04_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G04_REQUEST_TASK_FILE_PATHS",
+          "scope_note": "Actual selective version change/remaining requirements with prior-answer fixture"
         },
         {
           "id": "AC-04-05",
           "expected": "브랜드의 읽음·수락·일정 조정 요청이 구분되고 조정 요청만으로 마감이 변경되지 않는다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G04_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G04_REQUEST_TASK_FILE_PATHS",
+          "scope_note": "Original V02 fixed across current API/UI and restart cases"
         },
         {
           "id": "AC-04-06",
           "expected": "개별 업무 완료가 프로젝트 전체 완료를 자동으로 바꾸지 않는다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_CONTRACT_FIXTURE_ONLY",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G04_REQUEST_TASK_FILE_PATHS",
+          "scope_note": "Real repository completion fixture does not auto-complete project; G11 producer absent"
         }
       ],
-      "next_action": "Independent exact cc59987 integrated regression then main actual evidence review; only afterward G04 ACCEPTED and G06 may start.",
+      "next_action": "G06 unblocked. G05/G11/G12/G13 actual producer obligations remain; complete those before final AC PASS.",
       "base_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/projection-fix1/task.json",
       "ownership_addenda": [
@@ -472,7 +508,7 @@
         {
           "id": "G04-SERVER",
           "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
-          "state": "ASSEMBLED_IN_FINAL_CANDIDATE_INDEPENDENT_PENDING",
+          "state": "ACCEPTED_IN_INTEGRATED_G04_CURRENT_SCOPE",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-impl",
           "ownership_note": "Existing lease except UI paths transferred to G04-UI",
           "contract_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
@@ -481,7 +517,7 @@
         {
           "id": "G04-UI",
           "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
-          "state": "ASSEMBLED_IN_FINAL_CANDIDATE_INDEPENDENT_PENDING",
+          "state": "ACCEPTED_IN_INTEGRATED_G04_CURRENT_SCOPE",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-ui",
           "owned_paths": [
             "src/features/tasks/**",
@@ -504,7 +540,7 @@
         },
         {
           "id": "G04-UI-FIX1",
-          "state": "ASSEMBLED_IN_FINAL_CANDIDATE_INDEPENDENT_PENDING",
+          "state": "ACCEPTED_IN_INTEGRATED_G04_CURRENT_SCOPE",
           "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-ui-fix1",
           "base_commit": "3e8fa9236b202fa893cb569695a3c0f1f42dfffd",
@@ -518,7 +554,7 @@
         },
         {
           "id": "G04-PROJECTION-FIX1",
-          "state": "IMPLEMENTER_CHECKED_MAIN_REVIEWED_INDEPENDENT_PENDING",
+          "state": "ACCEPTED_IN_INTEGRATED_G04_CURRENT_SCOPE",
           "base_commit": "3304c5b97096699f00ea6863f30df8b715745301",
           "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-projection-fix1",
@@ -543,133 +579,155 @@
           "id": "G04-CR01",
           "severity": "P1",
           "title": "Deadline-only decision can publish unpublished draft",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
-          "execution_status": "7f independent actual current path coverage verified; final3304/current integrated closure pending",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained",
           "report": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/contract-review.md",
           "report_sha256": "9290b922a7b5d978cf45c7dc66aed9c17d8b5e44ab8b2f691aee5c82a62e7087",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
         },
         {
           "id": "G04-CR02",
           "severity": "P1",
           "title": "Schedule decision/result version missing from history",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
-          "execution_status": "7f independent actual current path coverage verified; final3304/current integrated closure pending",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained",
           "report": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/contract-review.md",
           "report_sha256": "9290b922a7b5d978cf45c7dc66aed9c17d8b5e44ab8b2f691aee5c82a62e7087",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
         },
         {
           "id": "G04-CR03",
           "severity": "P1",
           "title": "Co-assignment before/after history missing",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
-          "execution_status": "7f independent actual current path coverage verified; final3304/current integrated closure pending",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained",
           "report": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/contract-review.md",
           "report_sha256": "9290b922a7b5d978cf45c7dc66aed9c17d8b5e44ab8b2f691aee5c82a62e7087",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
         },
         {
           "id": "G04-CR04",
           "severity": "P2",
           "title": "TASK_ACCEPTED outbox missing",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
-          "execution_status": "7f independent actual current path coverage verified; final3304/current integrated closure pending",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained",
           "report": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/contract-review.md",
           "report_sha256": "9290b922a7b5d978cf45c7dc66aed9c17d8b5e44ab8b2f691aee5c82a62e7087",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
         },
         {
           "id": "G04-CR05",
           "severity": "P1",
           "title": "Nested applicability ignores inapplicable parent",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
-          "execution_status": "7f independent actual current path coverage verified; final3304/current integrated closure pending",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained",
           "report": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/contract-review.md",
           "report_sha256": "9290b922a7b5d978cf45c7dc66aed9c17d8b5e44ab8b2f691aee5c82a62e7087",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
         },
         {
           "id": "G04-CR06",
           "severity": "P2",
           "title": "Datetime calendar overflow validation missing",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "994ef5ff1e34184f6d6287961decddcad1ecd65f",
-          "execution_status": "7f independent actual current path coverage verified; final3304/current integrated closure pending",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained",
           "report": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/contract-review.md",
           "report_sha256": "9290b922a7b5d978cf45c7dc66aed9c17d8b5e44ab8b2f691aee5c82a62e7087",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
         },
         {
           "id": "G04-I01",
           "severity": "P2",
           "title": "Empty task list lost accessible original h2 heading",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "3e8fa9236b202fa893cb569695a3c0f1f42dfffd",
-          "execution_status": "7f independent actual current path coverage verified; final3304/current integrated closure pending",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained",
           "owner_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
         },
         {
           "id": "G04-I02",
           "severity": "P2",
           "title": "Task card omits existing public notes; G02 browser RSC regression",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "986511c929d4aa837cc7e76d18ee94df4e0ce1f2",
-          "execution_status": "7f independent actual current path coverage verified; final3304/current integrated closure pending",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
         },
         {
           "id": "G04-V01",
           "severity": "P2",
           "title": "README default E2E fails under shared-server cumulative login protection",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "7f958972023cf2d37127c0d8bef01f1cedd50e31",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/verification/raw/readme-e2e.json",
           "command": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/verification/commands/04-readme-e2e-both-projects.json",
           "owner_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
           "repair_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/runner-fix1/task.json",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained"
         },
         {
           "id": "G04-V02",
           "severity": "P1",
           "title": "Accepted task loses in_progress on resume; repeat accept cannot restore it",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "7f958972023cf2d37127c0d8bef01f1cedd50e31",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/verification/raw/early-findings.json",
           "evidence_sha256": "b92e467f371edac3743945e56c0af78182e7a870948e6e60d4364a54babafd8b",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
           "repair_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/state-fix1/task.json",
           "prior_verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained"
         },
         {
           "id": "G04-V03",
           "severity": "P1",
           "title": "Stored unknown/private nested request fields cross public API/SSR output boundary",
-          "status": "INDEPENDENT_FINAL_FIX_VERIFIED_INTEGRATED_REGRESSION_PENDING",
+          "status": "CLOSED_VERIFIED_INTEGRATION",
           "source_commit": "3304c5b97096699f00ea6863f30df8b715745301",
           "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification/raw/projection.json",
           "evidence_sha256": "b7b185766b580e7a8e3af924a3ba83654d2cab886b3eae06f11d1033d3d11e0c",
@@ -677,7 +735,10 @@
           "repair_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/projection-fix1/task.json",
           "scope": "Stored synthetic extension fixture tests output allowlist. Unknown public client input is still rejected; no DB write exploit claimed.",
           "repair_candidate": "5b9a68cef25c22fcd1e84f5451df9fbfa3d1b545",
-          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json"
+          "verification_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/verification-result.json",
+          "closed_at": "2026-09-21T12:26:19.572306+00:00",
+          "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+          "execution_status": "Current scope independently verified on fb493 and integrated cc59987; historical reports retained"
         }
       ],
       "internal_integration_commit": "986511c929d4aa837cc7e76d18ee94df4e0ce1f2",
@@ -725,7 +786,10 @@
       "integration_evidence": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/integration/merge-result.json",
         "sha256": "a0da7be9357600d97cf8dcb06358ade49b5bf425abfb2443a3d1047580e7bfd1"
-      }
+      },
+      "accepted_at": "2026-09-21T12:26:19.572306+00:00",
+      "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+      "regression_result_sha256": "d0c0a86edc40ac4cfb95522474a864de2effdfc641a22e0a0298cbcc9b40513b"
     },
     {
       "id": "G05",
@@ -1468,10 +1532,10 @@
   "secret_policy": "env runtime only; no values in packets/logs/Git",
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
-  "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
-  "current_goal": "G04",
-  "next_action": "Independent exact cc59987 integrated regression then main actual evidence review; only afterward G04 ACCEPTED and G06 may start.",
-  "state_version": 48,
+  "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
+  "current_goal": "G06",
+  "next_action": "Assign G06 server/shared contract at accepted cc59987, then separate UI after fixed contract; G05 waits for stable product capture contract.",
+  "state_version": 49,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1498,7 +1562,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T12:19:22.512326+00:00",
+  "updated_at": "2026-09-21T12:26:19.572306+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

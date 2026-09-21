@@ -38,11 +38,12 @@
       "owner_note": "G02",
       "requirement": "같은 컨텍스트 팀원은 공개 조회, 주/공동담당만 답변 수정. GSG 대리 기록은 제공자/기록자 분리. 원안3절, FR-020·024, BR-014·023",
       "verification_idea": "비담당 공개 조회 성공/타인 제출403, 공동담당 제출 성공. GSG 기록자가 브랜드 제공자와 다른 값으로 남음. 운영자 범위와 내부 가격권한을 각각 검사",
-      "status": "PASS_CURRENT_G02_CONTRACT",
+      "status": "PASS_CURRENT_G04_STAGE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
       ],
-      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-04",
@@ -90,8 +91,11 @@
       "owner_note": "G04",
       "requirement": "최상위는 신규입점/스팟, PR·행사·샘플·등록은 세부유형. 프로젝트 선택 작업·병렬·선행 관계·개별완료 분리. 원안5.1, FR-002·020",
       "verification_idea": "신규입점 선택3작업 중2개 병렬/1개 의존, 독립 스팟은 project=null. 업무1개 완료가 프로젝트전체를 완료시키지 않음. 추가SKU가 기존상품/진행을 초기화하지 않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-08",
@@ -101,8 +105,11 @@
       "owner_note": "G04",
       "requirement": "수동 회차 복제의 회차/대상 기간, 기본 템플릿과 직접 작성. 원안5.1·10절",
       "verification_idea": "월별 업데이트를2회 복제하여 기간/담당/마감/답변ID 독립 확인. 자동 스케줄러가 없어도 수동 회차 생성 동작. 템플릿 외 사용자 정의 요청 항목 저장 가능",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-09",
@@ -112,8 +119,11 @@
       "owner_note": "G04",
       "requirement": "GSG책임자1·브랜드주담당1·선택공동담당, 목적/줄글/산출물·제작주체·다음행동. 원안5.2, FR-020/BR-018",
       "verification_idea": "여러 담당과 실제 제작책임이 서로 다르게 저장/표시. 정지/다른context 배정 거부. '담당자' 문자열 한 칸으로 역할을 합치지 않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-10",
@@ -123,8 +133,11 @@
       "owner_note": "G04",
       "requirement": "요청 항목8종(짧은/긴글·파일·선택·숫자·날짜·링크·실물), 필수/선택·조건·제품별 적용범위. 참고자료와 결과물 분리. FR-001·003, BR-009·024",
       "verification_idea": "종류별 최소1개와 조건부 제품별 항목 입력/재조회. 참고양식 업로드만으로 요구결과물이 충족되지 않음. 미선택/해당없음은 미제출 분모에서 제외",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-11",
@@ -134,8 +147,11 @@
       "owner_note": "G04",
       "requirement": "규격 출처·버전·필수/권장, 자동검사 가능/사람확인 분리. 원안5.2·10절, FR-027/BR-024",
       "verification_idea": "PNG크기 필수 규격과 영상권장길이를 다른 항목에 적용. 권장초과는 강제반려로 바뀌지 않고 사람확인 항목을 파일존재만으로 통과시키지 않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-12",
@@ -145,8 +161,11 @@
       "owner_note": "G04",
       "requirement": "내부초안→브랜드미리보기→공개, 공개자/시각/버전; 기한미정+확인주체. FR-024, BR-023",
       "verification_idea": "내부원문을 가진 초안을 미리보기해 공개 설명만 노출. 공개실패 시브랜드알림0. 기한미정 저장 후 담당자/다음 확인주체 표시",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-13",
@@ -156,8 +175,11 @@
       "owner_note": "G04",
       "requirement": "다중 컨텍스트는 원본/템플릿만 공통, 개별 업무·담당·마감·진행·답변. FR-002/BR-007",
       "verification_idea": "같은브랜드 다른리테일러 포함3업무 생성 후1개마감/답변 변경. 다른2개 DB/화면 변동0, contextId로유일성을대체하지않고 업무ID도독립",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-14",
@@ -167,8 +189,11 @@
       "owner_note": "G04",
       "requirement": "템플릿 수정이 생성 업무에 자동전파되지 않음. 영향업무 선택적 변경분적용, 기존요청/답변보존·새로필요한부분 표시. FR-003, BR-020, T08·T22",
       "verification_idea": "템플릿v2에 SDS필수·기한·설명 변경. 기존3업무중2개만선택적용. 미선택v1유지, 선택업무v2+변경알림, 기존답변불변, 추가항목만남음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-15",
@@ -179,8 +204,11 @@
       "owner_note": "G04+G05",
       "requirement": "읽음≠수락≠일정조정≠제출≠완료; 취소/보류 및 부분제출/외부대기 배지. BR-001",
       "verification_idea": "순서별 버튼을누르고 저장상태비교. 일정조정요청만으로기존마감변화0, GSG반영후이력생성. 상태열하나로부분제출/외부대기정보를소실하지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-16",
@@ -533,8 +561,11 @@
       "owner_note": "G12+G04",
       "requirement": "기본7유형템플릿, 출처별규격·제작주체·자막/원본제공책임·사용장소, 사용자정의항목. FR-003·027",
       "verification_idea": "상품/서류,POP/리플렛,브랜드페이지,영상/교육,행사,샘플/배송,정기업데이트를생성/편집. 영상권장길이는차단아님. 특정PNG규격을모든업무에전파하지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G04_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "SA-48",

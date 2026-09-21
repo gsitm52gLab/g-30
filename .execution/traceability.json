@@ -46,8 +46,11 @@
         "G04"
       ],
       "summary": "신규 입점/스팟·사용자 배정·병렬/다음 행동",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G04_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "A04",
@@ -59,8 +62,11 @@
         "G12"
       ],
       "summary": "설명·항목·양식·기한·공개 미리보기",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G04_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "A05",
@@ -71,8 +77,11 @@
         "G05"
       ],
       "summary": "읽음/수락/조정·줄글·부분/전체 제출",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G04_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "A06",
@@ -179,8 +188,11 @@
         "G04"
       ],
       "summary": "다중 컨텍스트 독립·템플릿/요건 변경",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G04_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "A15",
@@ -214,8 +226,11 @@
         "G13"
       ],
       "summary": "일정 확정 수준·원문 충돌·외부 지연",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G04_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "A18",
@@ -240,11 +255,12 @@
         "G14"
       ],
       "summary": "서버 전 경로 권한·가격/파일/AI 격리",
-      "status": "PARTIAL_G01_G02_ACCEPTED",
+      "status": "PARTIAL_G04_ACCEPTED",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
       ],
-      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "A20",
@@ -257,13 +273,14 @@
         "G14"
       ],
       "summary": "동시 변경·멱등성·DB 영속성",
-      "status": "PARTIAL_G01_G02_ACCEPTED",
+      "status": "PARTIAL_G04_ACCEPTED",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
       ],
-      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
     },
     {
       "id": "A21",

@@ -12,7 +12,11 @@
       ],
       "expected": "Reassignment preserves original real submission/file authors after actual submission UI/API exists",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
+      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
     },
     {
       "id": "D02",
@@ -24,7 +28,11 @@
       ],
       "expected": "Initial file policy harness expands to actual upload/original/preview/download and cross-context reuse paths",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
+      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
     },
     {
       "id": "D03",
@@ -74,7 +82,11 @@
       ],
       "expected": "Actual prior submission -> new request version -> old answer/file snapshots unchanged -> added requirements only -> explicit resubmission",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
+      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
     },
     {
       "id": "D07",
@@ -85,7 +97,11 @@
       ],
       "expected": "Durable request change/outbox is consumed into real app notification with proper recipients and deduplication",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
+      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
     },
     {
       "id": "D08",
@@ -96,7 +112,11 @@
       ],
       "expected": "Actual GSG completion never auto-completes project or treats external/AI approval as a gate",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
+      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
     },
     {
       "id": "D09",
@@ -156,7 +176,11 @@
       ],
       "expected": "Adapter persistence extends to all real module records across logout/login and process restart",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+      ],
+      "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
+      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
     }
   ]
 }
