@@ -38,7 +38,7 @@ start 요청은 workspace의 실제 값으로 구성합니다. UUID와 서버 ID
 - 일본어 원문과 한국어 정렬은 별도 버전/hash입니다. 한국어 `machine_unreviewed`, `unofficial:true`를 표시합니다. `staleExcerptIds`와 `corpusIsCurrent`는 과거 결과의 현재성 표시이며 과거 결과/번역을 덮어쓰지 않습니다.
 - `availableEngines/defaultEngine/engineLabel/providerCalled`가 실제 실행을 설명합니다. 현재 합성 엔진만 존재하고 providerCalled=false입니다. G17은 실제 dispatch/attempt 근거를 기록해야 하며 engine 이름으로 호출 여부를 추론하면 안 됩니다.
 - 실행/검토 중 선택 버전 변경, 늦은 응답, 권한 철회는 UI가 generation 및 선택 ID 일치를 확인해야 합니다. 401/403/404는 보호 상태를 비우고 재요청/자동 생성으로 되살리지 않습니다.
-- 현재 G15 read/sourcePicker의 `analysis.connected:false` 문구는 별도 좁은 연결 lease 대상입니다. G16 API 존재를 G15 추출 결과 완료로 해석하지 않습니다.
+- G15 detail/sourcePicker의 analysis는 GSG에 `connected:true,status:GSG_INTERNAL,url,providerCalled:false`를 반환합니다. 상세 URL은 `/ai-review/inputs/[id]?context=...&versionId=...`, 목록은 `/ai-review?context=...`입니다. 브랜드에는 실행 유무와 무관한 `connected:true,status:RESTRICTED,url:null,providerCalled:false`만 반환합니다. 실제 분석 상태는 G16 API에서 조회하고 G15 추출 완료와 구분합니다.
 
 ## G10/G11 생산자
 
@@ -70,3 +70,17 @@ npx tsx scripts/ai-review-corpus.ts publish /absolute/path/own.sqlite CURRENT_RE
 | ENGINE_ERROR/QUEUE_FULL/STORAGE_UNAVAILABLE/CORPUS_UNAVAILABLE 503 | 안전 오류 표시와 명시 재조회. raw 내부 예외/원장 중첩값 노출 없음 |
 
 초기 계약 검증은 합성/저장 계약 검사입니다. 실제 provider, 법률 전문가 정확도, 브라우저 및 HTTP/재시작 검증은 별도 증거가 있어야 완료로 표시합니다.
+
+## 자체 검증 실행
+
+각 명령은 합성 데이터와 독립 `.local` 경로를 만들며 실행한 프로세스를 종료합니다. 포트는 명시 재할당할 수 있습니다. 실제 `.env` 및 provider를 사용하지 않습니다.
+
+```sh
+npm run check
+npm run build
+AI_REVIEW_MODE=mock E2E_PORT=4229 E2E_AUX_PORT=4230 AI_REVIEW_REPORT=/absolute/own/mock.json npx tsx scripts/verify-ai-review-http.ts
+AI_REVIEW_MODE=sqlite E2E_PORT=4229 E2E_AUX_PORT=4230 AI_REVIEW_REPORT=/absolute/own/sqlite.json npx tsx scripts/verify-ai-review-http.ts
+AI_REVIEW_HISTORY_REPORT=/absolute/own/history.json npx tsx scripts/verify-ai-review-history.ts
+```
+
+HTTP 검증의 SQLite 마지막 두 사례는 전용 DB에 unknown extra 및 손상된 scalar를 명시 주입합니다. 과거DB 검증은 accepted0804 소스를 Git export하고 그 실제 생산자로 만든 DB/파일을 닫은 다음, 파일시스템 복사가 끝난 후에만 복사본을 SQLite로 엽니다. 원본 DB/파일은 수정하지 않습니다. 정확도·전문가 검수·G17 provider·독립검증을 이 자체검사로 대체하지 않습니다.
