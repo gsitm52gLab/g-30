@@ -72,3 +72,8 @@ One notice has one explicit country×retailer×brand context. “All active bran
 ## G07 independent OOXML namespace compatibility repair — state99
 
 Valid prefix aliases with identical namespace URI/local names and equal expanded XML trees remain standard XLSX input. Eight original/diagnostic pairs preserve ZIP entries, expanded XML tags/attributes/text/children. The root reviewed original HTTP422 and ExcelJS failure; namespace-only diagnosis passes but does not close original fixture. Repair must use namespace semantics consistently in guards, raw numerical/formula/resource accounting and decoder, preserving security/precision limits and original source hash. This is a supported input compatibility correction, not a native Excel operational compatibility claim. Primary reference: https://www.w3.org/TR/xml-names/ sections2.1/6.
+
+
+## G09 1:1 participant default — state100
+
+원안8절·PRD09의 1:1 문의에 대해 브랜드 시작 사용자와 현재 해당 컨텍스트 GSG 운영팀이 참여하는 기본값을 정한다. 같은 브랜드/컨텍스트라는 이유만으로 다른 브랜드 사용자에게 대화를 공개하지 않는다. 업무 연결·담당자 변경은 문의 참여자 변경이나 G05 제출 변환이 아니다. 원 작성자/메시지/파일/해결 이력은 보존하고 비활성·권한 철회 직후 구독/재조회/파일도 제한한다. 이는 위임받은 설계 기본값이며 사용자가 별도로 승인한 정책이라고 주장하지 않는다. 구현 계약은 private G09/1/participant-policy-decision.json을 소비한다. 실제 구현·검증은 아직 NOT_RUN.
