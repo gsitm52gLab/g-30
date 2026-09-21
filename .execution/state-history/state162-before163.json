@@ -2985,12 +2985,7 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/server-task.json",
         "sha256": "c924742066dae6083cd6bc499d8b168229d1027904e32e2a72cb52754d3ffa83"
       },
-      "common_lease_status": "EXCLUSIVE_PRD_RECORDS_CONSTRAINTS_SHARED_AUDIT_AND_ENUMERATED_PRODUCERS",
-      "ui_preparation_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-preparation-task.json",
-        "sha256": "b9f48edd20cf249ed1512d706302af1b158327fbdf55675d43d51cb9dfdbd3f5"
-      },
-      "ui_preparation_agent": "/root/workflow"
+      "common_lease_status": "EXCLUSIVE_PRD_RECORDS_CONSTRAINTS_SHARED_AUDIT_AND_ENUMERATED_PRODUCERS"
     },
     {
       "id": "G15",
@@ -3703,14 +3698,6 @@
       "author_first_live_root_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/main-first-live-review.json",
         "sha256": "c326053d93433db80b62505c2bc243b492d1cf8690de960478adb1ce654e79d2"
-      },
-      "latest_author_delta": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/metadata-config-repair/delta-current.json",
-        "sha256": "c4b3dd880d423bd25666766fc8831ab2c70fe325dc982ed5ff639b81878f3474"
-      },
-      "verification_v2_draft": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verification-task-draft-v2.json",
-        "sha256": "7783157a7beb0d2c5697ed2c4fcbbab02c58efce594b84c06471b8801590081b"
       }
     },
     {
@@ -3805,8 +3792,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "f48e3487544f46d46118f856d823111fd953f073",
   "current_goal": "G14",
-  "next_action": "G14prd server/common0016; workflowG14 readonlyUIprep, noimplbeforetypedhandoff. G17goalsHTTP/UI/history on117b repairedprovider; independentdraft7783 waitsfinal. Accepted15/19f48e.",
-  "state_version": 163,
+  "next_action": "G13ACCEPTED15/19f48e. G14prd serverfirst/common0016 andnarrowproducerleases. G17goalsfullruntime afterrepairs; authoractualcallverified, independentpending. Workflow/ai_verify idleavailable.",
+  "state_version": 162,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3838,7 +3825,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T23:47:37.748962+00:00",
+  "updated_at": "2026-09-21T23:46:01.968310+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

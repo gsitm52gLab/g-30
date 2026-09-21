@@ -1,3 +1,7 @@
+# Current checkpoint — state163
+
+2026-09-21T23:47:37.748962+00:00; G14prd server/common0016; workflowG14 readonlyUIprep, noimplbeforetypedhandoff. G17goalsHTTP/UI/history on117b repairedprovider; independentdraft7783 waitsfinal. Accepted15/19f48e. G14ui taskb9f4 owncreatedreadonlyf48e worktree. G17rootread117b delta: explicitconfigrestart/currentbasis/unknownack andsafeparsemetadata; author560check/build source toreviewfinalpacket, red5green18 retained. Authorlive07c remains1call, finalindependent1required. No additionalcommonG17edits whileG14leaseactive.
+
 # Current checkpoint — state162
 
 2026-09-21T23:46:01.968310+00:00; G13ACCEPTED15/19f48e. G14prd serverfirst/common0016 andnarrowproducerleases. G17goalsfullruntime afterrepairs; authoractualcallverified, independentpending. Workflow/ai_verify idleavailable. RootG13regressiond26f verifies453artifacts707source9cmd20ZIP/1097prior; mobileactualtraceviewedreadcontrolsfit390. G14formalserver packetc924742066dae6083cd6bc499d8b168229d1027904e32e2a72cb52754d3ffa83 basef48e newworktree, depsallaccepted, UI/G17corewritesforbidden. NewSQL0016 countactual14+1 (0015reservedG17notinbase).
