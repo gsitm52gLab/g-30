@@ -1,6 +1,6 @@
 import { spawn, execFile } from "node:child_process";
 import { StringDecoder } from "node:string_decoder";
-import { fileURLToPath } from "node:url";
+import path from "node:path";
 import { INPUT_LIMITS, type Box, type IssueCode, type ReadUnit, type ExtractionSnapshot } from "../../../domain/ai-input/types";
 export type WorkerUnit = Pick<ReadUnit, "page" | "imageIndex" | "status" | "coverage"> & { segments: { text: string; method: "pdf_text" | "ocr"; confidence: number | null; box: Box }[]; unread: { code: IssueCode; box: Box | null; confidence: number | null }[] };
 export type WorkerResult = { units: WorkerUnit[]; pageCount: number | null; issue: IssueCode | null; engines: ExtractionSnapshot["engines"] | null };
@@ -12,7 +12,7 @@ export async function runLocalWorker(job: object, limits: ResourceLimits = {}): 
   const result: WorkerResult = { units: [], pageCount: null, issue: null, engines: null };
   if (!new Set(["darwin", "linux"]).has(process.platform)) return { ...result, issue: "WORKER_UNAVAILABLE" };
   return new Promise(resolve => {
-    const child = spawn(process.execPath, [`--max-old-space-size=${INPUT_LIMITS.heapMiB}`, fileURLToPath(new URL("./worker.mjs", import.meta.url))], {
+    const child = spawn(process.execPath, [`--max-old-space-size=${INPUT_LIMITS.heapMiB}`, path.resolve("src/server/ai-input/extraction/worker.mjs")], {
       env: { NODE_ENV: "production", PATH: process.env.PATH ?? "/usr/bin:/bin", LANG: "ja_JP.UTF-8", TZ: "UTC" }, stdio: ["pipe", "pipe", "pipe"],
     });
     const decoder = new StringDecoder("utf8");

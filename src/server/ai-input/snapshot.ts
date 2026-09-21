@@ -1,0 +1,16 @@
+import type { ExtractionSnapshot } from '@/domain/ai-input/types';
+import { fail } from '@/server/auth/errors';
+import { snapshotHash } from './extraction';
+type Parser=(v:unknown)=>unknown;
+const bad=():never=>fail('STORAGE_UNAVAILABLE',503,'추출 결과의 무결성을 확인할 수 없습니다.');
+const text:Parser=v=>typeof v==='string'?v:bad(),num:Parser=v=>typeof v==='number'&&Number.isFinite(v)?v:bad();
+const literal=(a:unknown[]):Parser=>v=>a.includes(v)?v:bad();
+const nullable=(p:Parser):Parser=>v=>v===null?null:p(v);
+const arr=(p:Parser):Parser=>v=>Array.isArray(v)&&v.length<=20000?v.map(p):bad();
+const shape=(fields:Record<string,Parser>):Parser=>v=>{if(!v||typeof v!=='object'||Array.isArray(v))return bad();const raw=v as Record<string,unknown>;return Object.fromEntries(Object.entries(fields).map(([key,parse])=>[key,parse(raw[key])]));};
+const box=nullable(shape({x:num,y:num,width:num,height:num,unit:literal(['px','pt'])}));
+const location=shape({sourceId:text,versionId:text,page:nullable(num),imageIndex:nullable(num),box,sourceTextStart:nullable(num),sourceTextEnd:nullable(num)});
+const source=shape({sourceId:text,versionId:text,contextId:text,sha256:text});
+const issue=literal(['SCOPE_UNKNOWN','OUT_OF_SCOPE','INVALID_INPUT','EMPTY_INPUT','SIZE_LIMIT','PAGE_LIMIT','IMAGE_LIMIT','TYPE_MISMATCH','SOURCE_CHANGED','PDF_LOCKED','PDF_CORRUPT','INVALID_SELECTION','IMAGE_CORRUPT','RESOLUTION_LIMIT','NO_TEXT','LOW_CONTRAST','LOW_CONFIDENCE','OCR_COVERAGE_UNKNOWN','TEXT_LAYER_UNCERTAIN','WORKER_TIMEOUT','WORKER_MEMORY','WORKER_UNAVAILABLE','WORKER_FAILED','TOKEN_LIMIT']);
+const bodyParser=shape({schemaVersion:literal(['gs-hale-extraction/1']),scope:shape({classification:text,language:text,media:text,use:text}),kind:literal(['text','pdf','images']),sources:arr(source),status:literal(['read','partial','unread','rejected','out_of_scope']),issues:arr(issue),selected:arr(shape({sourceId:text,pages:nullable(arr(num)),imageIndex:nullable(num)})),units:arr(shape({sourceId:text,versionId:text,page:nullable(num),imageIndex:nullable(num),status:literal(['read','partial','unread','unselected']),coverage:literal(['plain_text','pdf_text_layer','ocr_partial','none']),segmentIds:arr(text),unread:arr(shape({code:issue,location:nullable(location),confidence:nullable(num)}))})),segments:arr(shape({id:text,text,method:literal(['text','pdf_text','ocr']),confidence:nullable(num),location,textStart:num,textEnd:num})),text,textOffsets:literal(['UTF-16-code-units']),characterCount:num,tokenEstimate:shape({method:literal(['utf8-byte-conservative-estimate']),modelTokenizer:literal([null]),value:num,limit:num,modelValidationRequired:literal([true])}),engines:shape({pdf:text,raster:text,ocr:text,language:text,languageAssetSha256:nullable(text)}),requiresHumanReview:literal([true]),providerCalled:literal([false])});
+export function readSnapshot(payload:string,expectedHash:string):ExtractionSnapshot{let raw:unknown;try{raw=JSON.parse(payload);}catch{return bad();}const body=bodyParser(raw) as Omit<ExtractionSnapshot,'snapshotHash'>;if(!raw||typeof raw!=='object'||!('snapshotHash' in raw)||raw.snapshotHash!==expectedHash||snapshotHash(body)!==expectedHash)return bad();return{...body,snapshotHash:expectedHash};}

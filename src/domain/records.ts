@@ -1,3 +1,4 @@
+import type { AiInputData, AiVersionData, AiAssetData, AiRunData, AiSnapshotData } from './ai-input/records';
 import type { ConversationData, QuestionData, MessageData, InquiryReadData, QuestionTransitionData, InquiryTaskLinkData, InquiryEventData, InquiryCursorData } from './inquiries/types';
 import type { EvidenceData, EvidenceVersionData, EvidenceLinkData, EvidenceAssessmentData } from './evidence/types';
 import type { ImportBatchData } from './imports/types';
@@ -98,6 +99,11 @@ export interface ProductData extends CommonProductExtension {
     missingMaterials: number;
 }
 export interface RecordDataMap {
+    aiInput: AiInputData;
+    aiVersion: AiVersionData;
+    aiAsset: AiAssetData;
+    aiRun: AiRunData;
+    aiSnapshot: AiSnapshotData;
     conversation: ConversationData;
     inquiryQuestion: QuestionData;
     inquiryMessage: MessageData;
