@@ -50,7 +50,7 @@ export function projectProduct(store: UnitOfWork, principal: Principal, row: Sto
     const scope = legacyProductScope(store,principal,row,clock,contextId);
     const decision = authorize(store, principal, "product.read", scope, clock);
     const d = row.data;
-    return { ...metadata(row), data: {
+    return { ...metadata(row), contextId: scope.contextId, data: {
         name: typeof d.name === "string" ? d.name : "", code: typeof d.code === "string" ? d.code : "", brand: typeof d.brand === "string" ? d.brand : "", size: typeof d.size === "string" ? d.size : "", category: typeof d.category === "string" ? d.category : "",
         status: ["draft","active","archived"].includes(d.status) ? d.status : "draft", missingMaterials: typeof d.missingMaterials === "number" ? d.missingMaterials : 0, ...privateFields(d, decision),
     } };

@@ -1,3 +1,4 @@
+import { projectProduct } from "@/server/policy/projection";
 import { afterEach, describe, expect, it } from "vitest";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -28,7 +29,24 @@ for (const mode of ["mock", "sqlite"] as const)
             repo = createSqliteRepository(db, () => NOW);
         } identity = await policyFixture(repo); products = new ProductService(identity); }
         afterEach(async () => { repo?.close(); await Promise.all(dirs.map(d => rm(d, { recursive: true, force: true }))); });
-        it("R1 rejects nonfinite/noninteger/nonpositive pagination rather than serializing null or silently changing request", async () => {
+        it("explicit internal upload capability includes nonprice GSG and excludes brand without exposing a price capability", async () => {
+        await setup();
+        const gsg=await products.detail(tokenFor("user-gsg"),"product-serum",A),brandDetail=await products.detail(brand,"product-serum",A);
+        expect(gsg.capabilities.uploadInternalFile).toBe(true);expect(gsg.capabilities.editInternalPrice).toBe(false);
+        expect(brandDetail.capabilities.uploadInternalFile).toBe(false);
+    });
+    it("CR04 legacy product view carries the resolved context while the common record stays context-null", async () => {
+        await setup();
+        const detail=await products.detail(brand,"product-serum",A);
+        await products.command(brand,"product-serum",{contextId:A,command:"link_context",targetContextId:"ctx-jp-b-luna",expectedCommonRevision:detail.commonRevision,idempotencyKey:randomUUID()});
+        for(const contextId of [A,"ctx-jp-b-luna"]){
+            const view=await repo.transaction(s=>projectProduct(s,identity.principal(s,brand),s.get("product","product-serum")!,()=>NOW,contextId));
+            expect(view.contextId).toBe(contextId);
+            expect(`/products/${view.id}?context=${view.contextId}`).toBe(`/products/product-serum?context=${contextId}`);
+        }
+        expect((await repo.get("product","product-serum"))!.contextId).toBeNull();
+    });
+    it("R1 rejects nonfinite/noninteger/nonpositive pagination rather than serializing null or silently changing request", async () => {
             await setup();
             for (const value of ["Infinity", "-Infinity", "NaN", "bad", "0", "-1", "1.5", "1e100", ""]) {
                 await expect(products.list(brand, { page: value })).rejects.toMatchObject({ status: 422 });

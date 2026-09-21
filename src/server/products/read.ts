@@ -56,7 +56,7 @@ export function productItem(s: UnitOfWork, p: Principal, r: ResolvedProduct, clo
 }
 export function productDetail(s: UnitOfWork, p: Principal, r: ResolvedProduct, clock: Clock) {
     const scope = productContextScope(r.context.id, r.product.id), reference = { kind: "product" as const, productId: r.product.id, contextId: r.context.id };
-    const canEdit = decide(s, p, "product.edit", scope, clock).allowed, canPrice = decide(s, p, "price.read", { ...scope, requiresInternalPrice: true }, clock).allowed;
+    const editDecision = decide(s, p, "product.edit", scope, clock), canEdit = editDecision.allowed, canPrice = decide(s, p, "price.read", { ...scope, requiresInternalPrice: true }, clock).allowed;
     const commonHistory = s.list("productVersion").filter(v => v.data.productId === r.product.id).sort((a, b) => b.data.sequence - a.data.sequence).map(v => { const previous = v.data.previousId ? s.get("productVersion", v.data.previousId) : null; return { ...versionMeta(s, p, r.context.id, v), common: commonDTO(v.data.common), archived: v.data.archived === true, changes: previous ? commonDiff(previous.data.common, v.data.common) : [] }; });
     const contextHistory = s.list("contextProductVersion", r.context.id).filter(v => v.data.contextProductId === r.relation.id).sort((a, b) => b.data.sequence - a.data.sequence).map(v => ({ ...versionMeta(s, p, r.context.id, v), fields: contextDTO(v.data.fields), files: projectedBindings(s, p, r, clock, v.data.files) }));
     const files = projectedBindings(s, p, r, clock, r.local.data.files);
@@ -79,7 +79,7 @@ export function productDetail(s: UnitOfWork, p: Principal, r: ResolvedProduct, c
     } });
     const linkedTasks = tasks.filter(t => t.data.productIds.includes(r.product.id)).map(t => projectTask(s, p, t, clock));
     return { ...productItem(s, p, r, clock), commonVersionId: r.common.id, contextVersionId: r.local.id,
-        capabilities: { editCommon: canEdit, editContext: canEdit, editFiles: canEdit, editRetailPrice: canEdit, editInternalPrice: canPrice, linkTask: canManageTasks, archive: canEdit },
+        capabilities: { editCommon: canEdit, editContext: canEdit, editFiles: canEdit, uploadInternalFile: editDecision.allowed && editDecision.internalFields === true, editRetailPrice: canEdit, editInternalPrice: canPrice, linkTask: canManageTasks, archive: canEdit },
         sharedCommonNotice, visibleContexts: visibleContexts(s, p, r, clock), commonHistory, contextHistory, files, reusableFiles,
         uploadUrl: `/api/files?${new URLSearchParams({ productId: reference.productId, contextId: reference.contextId })}`,
         retail: publicPrice(s, p, r), ...(canPrice ? { internal: privatePrice(s, p, r) } : {}), linkedTasks, uses,
