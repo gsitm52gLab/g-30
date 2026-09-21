@@ -1119,7 +1119,7 @@
   "accepted_commit": "9e291b2b05607157f425656b12ccb24930672e0f",
   "current_goal": "G02",
   "next_action": "Implement shared policy/projection and existing route guards; return exact candidate for independent verification",
-  "state_version": 21,
+  "state_version": 23,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1137,7 +1137,8 @@
   },
   "latest_user_clarifications": [
     "When implementing pharmaceutical-law AI, first refer to relevant material on repository main and reuse as needed. No git fetch was requested during the earlier prompt-only edit.",
-    "Current attached Goal and execution-v1 govern execution. Unpublished execution-v2 draft is not a new binding contract."
+    "Current attached Goal and execution-v1 govern execution. Unpublished execution-v2 draft is not a new binding contract.",
+    "2026-09-21: User explicitly requested continuing the existing Goal through completion. Existing subagents resumed without resetting worktrees or evidence."
   ],
   "integration_branch": "run/integration",
   "integration_worktree": "/Users/evan/workspace/gs-hale",
@@ -1145,7 +1146,13 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T09:58:04.319366+00:00",
+  "updated_at": "2026-09-21T10:15:35.178189+00:00",
   "traceability_path": ".execution/traceability.json",
-  "initial_implementation_branch": "run/g00-impl"
+  "initial_implementation_branch": "run/g00-impl",
+  "platform_goal_observation": {
+    "at": "2026-09-21T10:15:35.178189+00:00",
+    "reported_status": "active",
+    "user_resume_instruction_received": true,
+    "note": "Authoritative get_goal confirms existing goal active; no new goal created."
+  }
 }
