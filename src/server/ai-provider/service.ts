@@ -42,15 +42,32 @@ export class AiProviderService {
    const saved=receipt(s,p,contextId,`ai.provider.start:${inputId}:${versionId}`,input,()=>{
     if(corpus.id!==corpusId||corpus.manifestHash!==input.corpusManifestHash)fail('CORPUS_CHANGED',409,'현행 근거 버전을 확인해 주세요.');
     const previous=s.list('aiAnalysisRun',contextId).filter(r=>r.data.inputVersionId===versionId).sort((a,b)=>b.data.attempt-a.data.attempt)[0];if((previous?.id??null)!==input.expectedRunId)fail('CONFLICT',409,'현재 실행을 다시 확인해 주세요.');
-    if(previous){const summary=runSummary(previous,this.clock),plan=s.get('aiProviderPlan',previous.id);if(['running','interrupted'].includes(summary.state))fail('RUN_ACTIVE',409,'현재 실행 또는 중단된 외부 호출 기록을 확인해 주세요.');if(plan&&previous.data.extractionRunId===extractionRunId&&previous.data.corpusReleaseId===corpus.id&&plan.data.model===(config.config?.model??'unconfigured')&&plan.data.settingRevision===setting.revision&&plan.data.promptVersion===PROMPT_VERSION)return {ids:[previous.id]};if(summary.state==='queued')fail('RUN_ACTIVE',409,'현재 대기 실행을 먼저 확인해 주세요.');}
+    if(previous){const summary=runSummary(previous,this.clock),plan=s.get('aiProviderPlan',previous.id);if(['running','interrupted'].includes(summary.state))fail('RUN_ACTIVE',409,'현재 실행 또는 중단된 외부 호출 기록을 확인해 주세요.');if(plan&&previous.data.extractionRunId===extractionRunId&&previous.data.corpusReleaseId===corpus.id&&plan.data.model===(config.config?.model??'unconfigured')&&plan.data.settingRevision===setting.revision&&plan.data.promptVersion===PROMPT_VERSION&&plan.data.baseURL===(config.config?.baseURL??'https://api.openai.com/v1'))return {ids:[previous.id]};if(summary.state==='queued')fail('RUN_ACTIVE',409,'현재 대기 실행을 먼저 확인해 주세요.');}
     if(s.list('aiAnalysisRun').filter(r=>r.data.state==='queued').length>=PROVIDER_LIMITS.queued)fail('QUEUE_FULL',503,'분석 대기 작업이 많습니다. 잠시 후 다시 시도해 주세요.');
     const run=s.create('aiAnalysisRun',{id:newId(),contextId,data:{inputId,inputVersionId:versionId,extractionRunId,extractionSnapshotId:source.snapshotRow.id,snapshotHash:source.snapshot.snapshotHash,corpusReleaseId:corpus.id,corpusManifestHash:corpus.manifestHash,engine:'provider',modelId:config.config?.model??'unconfigured',promptVersion:PROMPT_VERSION,providerCalled:false,taskId:source.content.submission?.taskId??null,createdBy:p.user.id,attempt:(previous?.data.attempt??0)+1,previousRunId:previous?.id??null,state:'queued',claimId:null,leaseUntil:null,startedAt:null,endedAt:null,resultId:null,issue:null}});
     s.create('aiProviderPlan',{id:run.id,contextId,data:{runId:run.id,settingRevision:setting.revision,settingsEnabled:setting.enabled,model:run.data.modelId,baseURL:config.config?.baseURL??'https://api.openai.com/v1',promptVersion:PROMPT_VERSION,maxOutputTokens:PROVIDER_LIMITS.maxOutputTokens,timeoutMs:PROVIDER_LIMITS.timeoutMs,pricingVersion:PRICING_VERSION}});return {ids:[run.id]};
    });return this.claim(s,token,saved.ids[0]);
   });return this.execute(token,claim);
  }
- async retry(token:string|undefined,runId:string,raw:Record<string,unknown>){const input=obj(raw,['expectedRevision','idempotencyKey']);str(input.idempotencyKey);const claim=await this.identity.repo.transaction(s=>{const p=this.identity.principal(s,token),r=resolveAnalysis(s,p,id(runId),this.clock,true);if(r.data.engine!=='provider')unavailable();let claimed:Claim={runId,attemptId:null,claimId:null};receipt(s,p,r.row.contextId!,`ai.provider.retry:${runId}`,input,()=>{fresh(r.row,input.expectedRevision);const attempts=s.list('aiProviderAttempt',r.row.contextId!).filter(a=>a.data.runId===runId).sort((a,b)=>b.data.sequence-a.data.sequence),last=attempts[0],outcome=last?.data.outcomeId?s.get('aiProviderOutcome',last.data.outcomeId):null;
-   if(!outcome)providerFail('RESPONSE_UNKNOWN');const plan=s.get('aiProviderPlan',runId);if(!plan)unavailable();const o=outcomeData(outcome.data,plan.data.model);if(r.data.state!=='failed'||!transient(o.issue)||attempts.length>=PROVIDER_LIMITS.attempts)fail('RETRY_UNAVAILABLE',409,'현재 오류는 이 실행에서 재시도할 수 없습니다.');s.update('aiAnalysisRun',runId,r.row.revision,{...r.data,state:'queued',issue:null,claimId:null,leaseUntil:null});claimed=this.claim(s,token,runId);return {ids:[runId]};});return claimed;});return this.execute(token,claim);}
+ async retry(token:string|undefined,runId:string,raw:Record<string,unknown>){
+  const input=obj(raw,['expectedRevision','idempotencyKey','acknowledgeUnknown']);str(input.idempotencyKey);if(input.acknowledgeUnknown!==undefined&&typeof input.acknowledgeUnknown!=='boolean')fail('VALIDATION',422,'불확실한 외부 처리에 대한 재시도 선택을 확인해 주세요.');
+  const claim=await this.identity.repo.transaction(s=>{
+   const p=this.identity.principal(s,token),r=resolveAnalysis(s,p,id(runId),this.clock,true);if(r.data.engine!=='provider')unavailable();let claimed:Claim={runId,attemptId:null,claimId:null};
+   receipt(s,p,r.row.contextId!,`ai.provider.retry:${runId}`,input,()=>{
+    fresh(r.row,input.expectedRevision);const attempts=s.list('aiProviderAttempt',r.row.contextId!).filter(a=>a.data.runId===runId).sort((a,b)=>b.data.sequence-a.data.sequence),last=attempts[0],outcome=last?.data.outcomeId?s.get('aiProviderOutcome',last.data.outcomeId):null,plan=s.get('aiProviderPlan',runId);if(!plan||!last)unavailable();
+    if(attempts.length>=PROVIDER_LIMITS.attempts)fail('RETRY_UNAVAILABLE',409,'이 실행의 최대 시도 횟수에 도달했습니다.');
+    if(!outcome){
+     if(r.data.state!=='running'||last.data.leaseUntil>this.clock())fail('RUN_ACTIVE',409,'현재 실행이 아직 처리 중입니다.');
+     if(input.acknowledgeUnknown!==true)providerFail('RESPONSE_UNKNOWN');
+     this.outcome(s,{runId,attemptId:last.id,claimId:last.data.claimId},emptyTransport('RESPONSE_UNKNOWN',true),false,'not_judged');
+    }else{
+     const o=outcomeData(outcome.data,plan.data.model);if(r.data.state!=='failed'||!transient(o.issue))fail('RETRY_UNAVAILABLE',409,'현재 오류는 이 실행에서 재시도할 수 없습니다.');
+     if(o.remoteOutcomeUnknown&&input.acknowledgeUnknown!==true)providerFail('RESPONSE_UNKNOWN');
+    }
+    s.update('aiAnalysisRun',runId,r.row.revision,{...r.data,state:'queued',issue:null,claimId:null,leaseUntil:null});claimed=this.claim(s,token,runId);return {ids:[runId]};
+   });return claimed;
+  });return this.execute(token,claim);
+ }
  private current(s:UnitOfWork,token:string|undefined,claim:Claim){const p=this.identity.principal(s,token),r=resolveAnalysis(s,p,claim.runId,this.clock,true),a=s.get('aiProviderAttempt',claim.attemptId!),plan=s.get('aiProviderPlan',claim.runId);if(!a||!plan)unavailable();const d=attemptData(a.data),basis=planData(plan.data),setting=providerSetting(s,r.row.contextId!),config=this.config(),corpus=loadCorpus(s);
   if(r.data.state!=='running'||r.data.claimId!==claim.claimId||d.claimId!==claim.claimId||d.leaseUntil<=this.clock())throw new ProviderFailure('INTERRUPTED');
   if(setting.revision!==basis.settingRevision)throw new ProviderFailure('SETTINGS_CHANGED');if(!setting.enabled)throw new ProviderFailure('DISABLED');if(config.issue)throw new ProviderFailure(config.issue);if(config.config!.model!==basis.model||config.config!.baseURL!==basis.baseURL)throw new ProviderFailure('SETTINGS_CHANGED');
