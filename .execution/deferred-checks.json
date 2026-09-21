@@ -102,15 +102,44 @@
       "id": "D09",
       "origin_goal": "G05",
       "required_in": [
+        "G05",
         "G07",
         "G10",
         "G11",
         "G15",
         "G18"
       ],
-      "expected": "Evidence/review/completion/AI all consume exact immutable submission and file version references",
+      "expected": "Actual G05 submission captures exact immutable common product/context product/retail price/file versions; subsequent G06 product/context/file changes leave prior submission snapshots unchanged. Evidence/review/completion/AI consume exact immutable submission/product/file references with current permissions.",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [],
+      "origin_goals": [
+        "G05",
+        "G06"
+      ],
+      "check_groups": [
+        {
+          "id": "D09-product-producer",
+          "required_in": [
+            "G05",
+            "G18"
+          ],
+          "status": "NOT_RUN",
+          "evidence": []
+        },
+        {
+          "id": "D09-downstream-consumers",
+          "required_in": [
+            "G07",
+            "G10",
+            "G11",
+            "G15",
+            "G18"
+          ],
+          "status": "NOT_RUN",
+          "evidence": []
+        }
+      ],
+      "source": "PRD-06 AC-06-03, G06/preparation.md sections6/10 and G05/preparation.md section5"
     },
     {
       "id": "D10",
