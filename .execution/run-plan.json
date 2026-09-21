@@ -2127,15 +2127,15 @@
         "G09",
         "G10"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": null,
+      "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": null,
-      "attempt": 0,
+      "attempt": 1,
       "owned_paths": [],
-      "actual_worktree_cwd": null,
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g11-server",
       "evidence_root": ".execution/private/runs/<run-id>/G11/<attempt>/",
       "acceptance": [
         {
@@ -2169,7 +2169,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Serverfirst prd after G12finalauthorpacket; latestacceptedbase and commonserverlease. UI phase later; G15 taskentry/READMEcurrentlyleased separately.",
+      "next_action": "Serverphase normalHTTP/race/restart/copyfirsthistorical, earlyAPI/schemafreeze then ownfinalsamecandidate; UI laterpossiblegoals; G15independentprd later.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/task-draft.json",
         "sha256": "3d461495e1a211d3933148e854fcbcc6edf9b2b83c0c5ab57fc7d3f98f77c654"
@@ -2181,7 +2181,18 @@
       "server_task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/server-task-draft.json",
         "sha256": "f83d8c3a825093eaabc003f3a1b35497ce0cdac052c92841d38acff6c843e6e2"
-      }
+      },
+      "base_commit": "953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6",
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/server-task.json",
+      "server_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/server-task.json",
+        "sha256": "911609858919e0b5405bd447ae3928b75b06791d830dcbd75f3f5d42e17b2215"
+      },
+      "submission_test_addendum": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/submission-test-addendum.json",
+        "sha256": "d5afbe8094a044781349a1367090eb85a61ef14f2c43afdc95d8c0d10539e476"
+      },
+      "shared_lease": "EXCLUSIVE_COMMONSERVER_SCHEMA_0011_TASKSERVICE_SUBMISSIONREAD"
     },
     {
       "id": "G12",
@@ -2238,7 +2249,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Authorfinalandindependent7groups onimmutable74e bothrequired beforeintegration. Sharedsourcelease released.",
+      "next_action": "Rootauthorfinalreviewcomplete; awaitworkflow independent74e; sourceimmutable. No fullacceptance untilintegrationregression.",
       "domain_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/domain-contract-task-draft.json",
       "prepared_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-contract",
       "base_commit": "c71d3873e80a297b7a52c1b099e7b2b8c8b145ac",
@@ -2351,6 +2362,14 @@
       "combined_early_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-combined-early-review.json",
         "sha256": "f151bbd66e1f6643fdeb3eff5c055a2eff6b9a015e24dbf1e33d16202d1f6c98"
+      },
+      "combined_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/combined/implementation-result.json",
+        "sha256": "4196ab72c587ed4bdc9fd9bacda4c172fa982b586db8878a9d59b95044acaf53"
+      },
+      "combined_final_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-combined-final-review.json",
+        "sha256": "de2dfb4ab74eb8df13aef83639a6493a0fd7ca3cd6ae6f221d0c3044e6f6cfb3"
       }
     },
     {
@@ -2503,7 +2522,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Own UI plus narrowlyauthorizedmatchingqueued continuation repair; actualoldfailure evidence first. README/taskentry granted until narrowfreeze/release. Independentprd pending.",
+      "next_action": "UIownchecks+actualqueueendpointclosure; rootreadservice narrowrepairdiff only noindependentPASS. Finalcandidate pending. Sharedtaskentry/README released; schemaG11owned.",
       "extraction_task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/extraction-task-draft.json",
         "sha256": "74a2797771a8160647c0d48485a4d85d182354497ff999fe173cc0a3b51dbe78",
@@ -2553,7 +2572,7 @@
           "candidate": "44060d35b638fac9c488f060102e5e90426ec24b"
         },
         "ui": {
-          "state": "IMPLEMENTING",
+          "state": "IMPLEMENTING_CHECKS_NOT_FINAL",
           "intended_agent": "/root/goals",
           "agent": "/root/goals",
           "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g15-ui",
@@ -2561,7 +2580,10 @@
           "ports": [
             4233,
             4234
-          ]
+          ],
+          "early_candidate": "1a97db6",
+          "queue_repair_candidate": "848397a940370654c952a8957e12810ac90c918a",
+          "entry_README_lease": "RELEASED_AUTHOR_REPORTED_at1a97db6"
         },
         "independent": {
           "state": "NOT_ASSIGNED",
@@ -2666,6 +2688,10 @@
       "current_selected_statute_read": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/source-discovery/egov-act66-reading-addendum.json",
         "sha256": "f7c095cf67da4a534f30efbe216d76b3a55df0cf5888b5617e20649f8d8aafd2"
+      },
+      "eval13_preparation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/eval13-contract-preparation.json",
+        "sha256": "96147b5d4234e5a941eaf09d35e450f83ad13b8c582970e2cb07d2a80c4c6974"
       }
     },
     {
@@ -2717,7 +2743,11 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
+      "task_draft": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/task-draft.json",
+        "sha256": "acf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3"
+      }
     },
     {
       "id": "G18",
@@ -2803,8 +2833,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6",
   "current_goal": "G12",
-  "next_action": "workflow independent G12 exact74e; prd finishes immutableG12authorchecks then G11serverphase; goals G15UI+queuedrecovery repair. IndependentwholeG15 laterprd. RequiredG17actualAPI/G18 remain.",
-  "state_version": 132,
+  "next_action": "G12 independentfull+own7groups at74e; G11server prd onaccepted953; G15 UIgoals plusqueue repair. RootreviewfinalG12 complete, nointegrationuntilindependent. G16/G17 draftsreadydependenciespending.",
+  "state_version": 133,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2835,7 +2865,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T20:17:23.744601+00:00",
+  "updated_at": "2026-09-21T20:24:47.204478+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
