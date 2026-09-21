@@ -13,6 +13,7 @@ export type FileReference = string | {kind:'notice';noticeId:string;versionId?:s
 };
 export function fileReference(params: URLSearchParams): FileReference {
     if (['taskId','productId','contextId','noticeId','versionId'].some(k=>params.getAll(k).length>1)) fail('VALIDATION',422,'자료 참조를 하나만 지정해 주세요.');
+    if(params.has('versionId')&&!params.get('versionId'))fail('VALIDATION',422,'정확한 파일 참조 버전을 지정해 주세요.');
     const taskId=params.get('taskId'),productId=params.get('productId'),contextId=params.get('contextId'),noticeId=params.get('noticeId'),versionId=params.get('versionId');
     if(noticeId&&!taskId&&!productId&&!contextId)return {kind:'notice',noticeId,...versionId?{versionId}:{}};
     if(taskId&&!productId&&!contextId&&!noticeId&&!versionId)return taskId;

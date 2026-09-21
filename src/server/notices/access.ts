@@ -2,7 +2,7 @@ import type { Clock, StoredRecord, UnitOfWork } from '@/domain/records';
 import type { Principal } from '@/server/auth/service';
 import type { ResourceScope } from '@/server/policy/types';
 import { authorize, decide } from '@/server/policy/policy';
-import { unavailable } from '@/server/auth/errors';
+import { unavailable,fail } from '@/server/auth/errors';
 import type { NoticeContent } from '@/domain/notices/types';
 function audience(content: NoticeContent): Pick<ResourceScope, 'audienceUserIds'> {
     // A rule, not a frozen membership list: later active context members can read all-member notices.
@@ -22,6 +22,7 @@ export function noticeVersionScope(s: UnitOfWork, notice: StoredRecord<'notice'>
     return { id: notice.id, contextId: notice.contextId, kind: 'notice', visibility: 'public', ...audience(version.data.content), sourceScopes: [noticeScope(s, notice)] };
 }
 export function resolveNotice(s: UnitOfWork, p: Principal, id: string, clock: Clock, edit = false, versionId?: string) {
+    if(versionId!==undefined&&(typeof versionId!=='string'||!/^[-\w]{1,160}$/.test(versionId)))fail('VALIDATION',422,'정확한 공개 버전을 지정해 주세요.');
     const notice = s.get('notice', id);
     if (!notice?.contextId)
         unavailable();

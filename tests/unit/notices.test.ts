@@ -38,6 +38,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             const id = await create();
             await expect(service.detail(brand, id)).rejects.toMatchObject({ status: 404 });
             expect((await service.list(brand, A)).items).toEqual([]);
+            await expect(service.detail(admin,id,'')).rejects.toMatchObject({status:422});
             const v = await publish(id), read = { command: 'read', versionId: v, idempotencyKey: randomUUID() };
             const first = await service.command(brand, id, read);
             expect(await service.command(brand, id, read)).toEqual(first);
