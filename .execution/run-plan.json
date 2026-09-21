@@ -2072,10 +2072,7 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/verification-repair1-addendum.json",
         "sha256": "70694313e72152a5349342a98ed79b15f4171f76199ca496a90cc0db5155c676"
       },
-      "verification_result": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/verification-result.json",
-        "sha256": "a4d04d5c17eb745183e0cbf9e347fee0028ca5dc856c021200b3938a566e66d8"
-      },
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/verification-result.json",
       "main_verification_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-verification-review.json",
         "sha256": "7478730ccbffb0fadd082e616e85a2bdb372a72f7834b0598e06a35fd2895ca8"
@@ -2088,14 +2085,8 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/integration-source-equivalence.json",
         "sha256": "da034b39df24d1fd6c0ee3cba359ad5376f690b7188d180524bd728c7ed235be"
       },
-      "main_acceptance": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json",
-        "sha256": "1828dce60a1ba4dd50b2fd17482b6f19faf96135482d0a42f2ad073108c27595"
-      },
-      "regression_result": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/regression-result.json",
-        "sha256": "20eb1e87df76e164c134a51d32183e21d152cac3163b3d9c59d21cf8b0e038b2"
-      },
+      "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json",
+      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/regression-result.json",
       "main_regression_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-regression-review.json",
         "sha256": "4780bd4d5cefa36d1e87839ebaf1fe85ae5f67901d3b12b87283a0eda3d14d54"
@@ -2112,7 +2103,19 @@
             "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json"
           ]
         }
-      ]
+      ],
+      "verification_result_ref": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/verification-result.json",
+        "sha256": "a4d04d5c17eb745183e0cbf9e347fee0028ca5dc856c021200b3938a566e66d8"
+      },
+      "regression_result_ref": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/regression-result.json",
+        "sha256": "20eb1e87df76e164c134a51d32183e21d152cac3163b3d9c59d21cf8b0e038b2"
+      },
+      "main_acceptance_ref": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json",
+        "sha256": "1828dce60a1ba4dd50b2fd17482b6f19faf96135482d0a42f2ad073108c27595"
+      }
     },
     {
       "id": "G11",
@@ -2797,5 +2800,11 @@
   "repository_main_ai_source_check": {
     "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/repository-main-source-check.json",
     "sha256": "d87e42f144047abb25002dafb52ff3d3b18c2abd23906f50b1ff19578dc7082d"
+  },
+  "metadata_correction": {
+    "at": "2026-09-21T20:07:46.309749+00:00",
+    "source_commit": "b192a21",
+    "scope": "G10 path fields restored to existing run-plan string schema, hash refs separately retained; no product/evidence/result change",
+    "original_failure": "readiness line75 TypeError PosixPath/dict; first root wrapper then JSONDecodeError because stdout empty. Original committed metadata preserved atb192a21."
   }
 }
