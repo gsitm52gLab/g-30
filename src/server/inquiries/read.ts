@@ -6,7 +6,7 @@ import { authorize, decide } from '@/server/policy/policy';
 import { contextResource } from '@/server/policy/types';
 import { inquiryScope, staff, label, visibleTask } from './access';
 import { cursor } from './events';
-import { summary, questionDTO, questions, messageDTO, readDTO, history, fileDTO } from './projection';
+import { summary, questionDTO, questions, messageDTO, readDTO, history, fileDTO, messages as messageRows } from './projection';
 import * as safe from './stored';
 export interface InquiryList {items:ConversationSummaryDTO[];total:number;counts:QuestionCounts;capabilities:{create:boolean}}
 /** Sync composable helper for the real home/task UI. No nested transaction or network. */
@@ -23,7 +23,7 @@ export function listDTO(s:UnitOfWork,p:Principal,q:InquiryListQuery,clock:Clock)
 export function detailDTO(s:UnitOfWork,p:Principal,c:StoredRecord<'conversation'>,clock:Clock):ConversationDetailDTO {
     const ownFiles=s.list('fileVersion',c.contextId!).filter(f=>f.data.owner?.kind==='inquiry'&&f.data.owner.conversationId===c.id&&f.data.uploaderId===p.user.id).map(f=>fileDTO(s,p,f,c,clock));
     if(c.data.phase==='draft')return {phase:'draft',id:c.id,contextId:c.contextId!,revision:safe.count(c.revision,1),taskId:visibleTask(s,p,c.data.taskId,c.contextId!,clock)?.id??null,files:ownFiles,capabilities:{upload:true,publishFirst:true}};
-    const isStaff=p.user.data.role==='gsg',messages=s.list('inquiryMessage',c.contextId!).filter(m=>m.data.conversationId===c.id&&m.data.visibility==='public').sort((a,b)=>safe.count(a.data.sequence,1)-safe.count(b.data.sequence,1)).map(m=>messageDTO(s,p,m,c,clock) as PublicMessageDTO);
+    const isStaff=p.user.data.role==='gsg',messages=messageRows(s,c).map(m=>messageDTO(s,p,m,c,clock) as PublicMessageDTO);
     const result:ActiveConversationDetailDTO={...summary(s,p,c,clock),questions:questions(s,c).map(q=>questionDTO(s,p,q,c)),messages,reads:s.list('inquiryRead',c.contextId!).filter(r=>r.data.conversationId===c.id).map(r=>readDTO(s,p,r,c)),history:history(s,p,c,clock),capabilities:{send:true,ask:!isStaff,answer:isStaff,supplement:!isStaff,manageState:isStaff,linkTask:isStaff,upload:true,uploadInternal:isStaff,internalNote:isStaff},cursor:cursor(s,p,c),readyFiles:ownFiles,staffOptions:isStaff?staff(s,c.contextId!).map(u=>({id:u.id,label:label(s,p,u.id,c.contextId!)})):[]};
-    return isStaff?{...result,internalMessages:s.list('inquiryMessage',c.contextId!).filter(m=>m.data.conversationId===c.id&&m.data.visibility==='internal').sort((a,b)=>safe.count(a.data.sequence,1)-safe.count(b.data.sequence,1)).map(m=>messageDTO(s,p,m,c,clock) as InternalMessageDTO)}:result;
+    return isStaff?{...result,internalMessages:messageRows(s,c,true).map(m=>messageDTO(s,p,m,c,clock) as InternalMessageDTO)}:result;
 }

@@ -14,6 +14,14 @@ G09 서버 구현은 UI·독립 검증 및 전체 모듈 수용과 구분합니�
 
 `0008-inquiries.sql`은 이 분기의 7번째 migration입니다(0006 G07은 아직 포함되지 않음). 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
 
+```sh
+npm run build
+INQUIRIES_MODE=mock E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inquiries-http.ts
+INQUIRIES_MODE=sqlite E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inquiries-http.ts
+```
+
+검사 포트는 자신이 소유한 빈 두 포트로 바꿉니다. `INQUIRIES_HTTP_ROOT`는 매 실행 새 DB/파일 폴더를 만들 부모 경로(기본 `.local/g09-http`), `INQUIRIES_HTTP_REPORT`는 새 보고서 경로입니다. 응답 원문·해시·실제 SSE 프레임·PID 종료를 private 증거로 보존하므로 과거 보고서와 같은 경로를 덮어쓰지 마세요. mock 검사는 private IPC 저장소 관찰을 위해 별도 자식 부팅을 사용하고, SQLite는 일반 `next start` 두 프로세스와 새 PID/실제 재로그인을 검사합니다. 제품의 테스트 전용 endpoint는 없습니다. 브라우저 문의 화면·홈·팝업의 검증과 독립 수용은 이 서버 검사와 별개입니다.
+
 **Healthcare & Aesthetic Launch Enablement** · **해외 헬스케어 진출의 모든 일**
 
 현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.

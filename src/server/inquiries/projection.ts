@@ -5,6 +5,7 @@ import { fileUrls } from '@/server/files/service';
 import { canReferenceFile } from '@/server/files/access';
 import { label, inquiryScope, inquiryFileIncluded, visibleTask } from './access';
 import * as safe from './stored';
+export function messages(s:UnitOfWork,c:StoredRecord<'conversation'>,internal=false) {return s.list('inquiryMessage',c.contextId!).filter(m=>m.data.conversationId===c.id).filter(m=>{if(m.data.visibility!=='public'&&m.data.visibility!=='internal')safe.corrupt();return m.data.visibility===(internal?'internal':'public');}).map(m=>({...m,data:safe.message(m.data)})).sort((a,b)=>a.data.sequence-b.data.sequence);}
 export function questions(s:UnitOfWork,c:StoredRecord<'conversation'>) {return s.list('inquiryQuestion',c.contextId!).filter(q=>q.data.conversationId===c.id).map(q=>({...q,data:safe.question(q.data)}));}
 export function counts(s:UnitOfWork,c:StoredRecord<'conversation'>):QuestionCounts {
     const q=questions(s,c);return {questions:q.length,answered:q.filter(x=>x.data.state==='resolved').length,unresolved:q.filter(x=>x.data.state!=='resolved').length,waitingGsg:q.filter(x=>x.data.state==='gsg_waiting').length,waitingBrand:q.filter(x=>x.data.state==='brand_supplement_waiting').length,externalWaiting:q.filter(x=>x.data.state==='external_waiting').length};
@@ -37,8 +38,8 @@ export function history(s:UnitOfWork,p:Principal,c:StoredRecord<'conversation'>,
 }
 export function summary(s:UnitOfWork,p:Principal,c:StoredRecord<'conversation'>,clock:Clock):ConversationSummaryDTO {
     const d=safe.conversation(c.data);if(d.phase!=='active')safe.corrupt();
-    const messages=s.list('inquiryMessage',c.contextId!).filter(m=>m.data.conversationId===c.id&&m.data.visibility==='public').map(m=>({id:m.id,data:safe.message(m.data)}));
+    const publicMessages=messages(s,c);
     const ownReads=s.list('inquiryRead',c.contextId!).filter(r=>r.data.conversationId===c.id&&r.data.userId===p.user.id);
-    let through=0;for(const r of ownReads){readDTO(s,p,r,c);const m=messages.find(x=>x.id===r.data.throughMessageId);if(!m)safe.corrupt();through=Math.max(through,m.data.sequence);}
-    return {phase:'active',id:c.id,contextId:c.contextId!,title:d.title,revision:d.publicRevision,initiatorLabel:label(s,p,d.initiatorId,c.contextId!),task:visibleTask(s,p,d.taskId,c.contextId!,clock),counts:counts(s,c),unreadCount:messages.filter(m=>m.data.authorId!==p.user.id&&m.data.sequence>through).length,createdAt:d.activatedAt,updatedAt:d.publicUpdatedAt,lastResolvedAt:d.lastResolvedAt,nextChecks:questions(s,c).flatMap(q=>{const e=q.data.externalWait;return e?[{questionId:q.id,date:e.nextCheckDate,timezone:e.timezone,responsibleLabel:label(s,p,e.responsibleUserId,c.contextId!)}]:[];}).sort((a,b)=>a.date.localeCompare(b.date))};
+    let through=0;for(const r of ownReads){readDTO(s,p,r,c);const m=publicMessages.find(x=>x.id===r.data.throughMessageId);if(!m)safe.corrupt();through=Math.max(through,m.data.sequence);}
+    return {phase:'active',id:c.id,contextId:c.contextId!,title:d.title,revision:d.publicRevision,initiatorLabel:label(s,p,d.initiatorId,c.contextId!),task:visibleTask(s,p,d.taskId,c.contextId!,clock),counts:counts(s,c),unreadCount:publicMessages.filter(m=>m.data.authorId!==p.user.id&&m.data.sequence>through).length,createdAt:d.activatedAt,updatedAt:d.publicUpdatedAt,lastResolvedAt:d.lastResolvedAt,nextChecks:questions(s,c).flatMap(q=>{const e=q.data.externalWait;return e?[{questionId:q.id,date:e.nextCheckDate,timezone:e.timezone,responsibleLabel:label(s,p,e.responsibleUserId,c.contextId!)}]:[];}).sort((a,b)=>a.date.localeCompare(b.date))};
 }
