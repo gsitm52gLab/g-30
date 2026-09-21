@@ -25,7 +25,11 @@ export async function namespaceBrowser(origin: string, contextId: string, report
                     const sheets = page.getByRole('combobox', { name: '가져올 공개 시트', exact: true });
                     await sheets.selectOption((await sheets.locator('option').filter({ hasText: 'Products' }).getAttribute('value'))!);
                     await page.getByRole('spinbutton', { name: '머리글 행 번호', exact: true }).fill('3');
-                    await page.getByRole('button', { name: '선택한 머리글의 표준 키로 매핑 채우기', exact: true }).click();
+                    const fields = ['contextKey', 'common.code', 'common.name', 'common.description', 'local.jan', 'retail.amount', 'retail.currency', 'retail.taxIncluded', 'retail.effectiveFrom', 'local.sku'];
+                    for (const [i, field] of fields.entries()) {
+                        await page.getByRole('button', { name: '열 매핑 추가', exact: true }).click();
+                        await page.getByRole('group', { name: `열 매핑 ${i + 1}`, exact: true }).getByRole('combobox', { name: '반영할 상품 필드', exact: true }).selectOption(field);
+                    }
                     const previewButton = page.getByRole('button', { name: '전체 미리보기 만들기 · 다시 검증', exact: true });
                     await expect(previewButton).toBeEnabled();
                     const [previewResponse] = await Promise.all([page.waitForResponse(r => r.url().endsWith('/api/imports/preview') && r.request().method() === 'POST'), previewButton.click()]);
