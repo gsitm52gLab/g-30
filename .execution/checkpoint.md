@@ -1,3 +1,9 @@
+# State142 latest — both G15 repair and G11 completion independently validating
+
+Accepted246 stays11/19 GoalACTIVE. G15d8d0 independentai_verify reports425/build+76UIpassed, owncausalfirstharnesswrongbusyexpectation retained correctioninprogress finalpacketpending. Rootprior8ownreports334HTTPbody semantic0a791, actualnonemptyRSC2component/context/inputIDpositive7a350 (textfetchedclientAPI, zero-byteRSCexcluded). Integrationregressiondraft5d645… ready notassigned.
+
+G11 authorad3 original32UI+19restartPASS then actualinitialreadA(submittedrev3) overwritesnewfocusB(completedrev4) reproduced twice1P1F. Productfixce049f5ef9365afc4dbf9dd8be290d0282be9523 onlycontroller+new2casetest, originalPOSTfollowup3PASS notdefect. Rootdiffread; workflow formal689fdf… detachedg11-verification-final4231/32 whole7groups+40browser, priorad3taskb319 superseded fornewruntime. Goalsfinalproofongoing. G16prdread-only76f576… root942c…11inputs22sources0errors; serverdraftf7e605… GSGinternal/labeledsynthetic/deploymentcorpus/new0013 reservedonly. No G16implementationuntilG15accepted. G17 actualAPI mandatoryNOT_RUN.
+
 # State141 latest — repaired AI candidate under independent closure
 
 Accepted246 remains11/19 GoalACTIVE. G15 originalb1dd FAIL89773 retained:71P1F/72 plus deterministic DEF-G15-V01. Root1373artifacts573sources85CRC19cmd review3105; dedup f2f243 corrects raw aggregatealiases142P2F to72actual71P1F. Narrowrepair d8d0 author449f result/21ea manifest; rootacf79 review369artifacts575Git/cwd10cmd40CRC40rawPASS,425check/build. Formal983250 independentai_verify newdetachedg15-verification-repair1 ports4235/36. Server/parser/history unchangedsourceboundfresh0; no acceptance yet.

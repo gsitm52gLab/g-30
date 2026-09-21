@@ -134,3 +134,8 @@ G10 final1512 independent7groups raw reviewed3307artifacts/409sourcepairs/23comm
 
 ## 2026-09-21T20:06:45.394396+00:00 — G10 current stage accepted
 Exact1512 independentlyverified, serial953 fullsourceidentical andfresh integrated348unit/coremock4DB4/HTTP17/UI14/newPID3 verified. Root461artifact/12commands/409source/12CRC andprior3307unchanged checked. Fullunchangedbrowser/cornercases/history reusedfresh0, originalerrorspreserved.10/19stagesaccepted, actualG11completion/G13delivery/G16AIproducer andG18remain.
+
+
+## G16 implementation choices (state142, preparation only)
+
+PRD16 forbids automatic brand disclosure. Analysis/result/human decisions default to GSG internal, deliberate G10 publication stays separate. A labeled synthetic adapter enables keyless demos; it never impersonates OpenAI or silently replaces live failures. Curated legal sources are deployment-owned versioned releases with reproducible publication and a read-only viewer. Old translations remain historical but stale translations are excluded from current retrieval. New migration0013 is reserved; no implementation lease until G15 is ACCEPTED. These routine choices require no extra user decision.
