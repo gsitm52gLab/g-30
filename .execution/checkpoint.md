@@ -1,3 +1,11 @@
+# State135 latest — G12 integrated, acceptance regression pending
+
+Rootserialmerge **24636458b6fab6b93c6b215d9a627a5d84b26b98**, all478nonledgerpaths identical repaired5229. Workflow formalregressiond35828b305744dced4137b8258d77d0952f9ad0580920398b6b5592096b07364 newdetachedg12-regression4231/32, boundedcheck/build/UI-B+union+stronglayout/ownseams/newPID; oldfunctionalproof sourceboundfresh0. Repairedindependent9cff772… PASS rootreview3fd3d7…503artifacts24CRC9commands40geometrystate0errors, actualmobilePNGrootviewed. Original74eFAIL/mobileB04invalid nevererased. Rootrawaddendum8d1f93… actual3RSC+API/SSR positivepublic/privateabsence andhelperfailureclassification. **Accepted remains95310/19 untilregressionreview.**
+
+G15finalUI1eec rootreview8463708d29034ac5870b3b83ea09360b8340b2a658388e8b28f1f1e3bbb15864; integrity56a0fc…937artifacts300Git/worktree24commands74CRC56rawbrowser0errors. LatestCSS freshbuild+geometry4, functional56/unit348/restart9 sourceboundfresh0, weakR10 excluded. Goalspreparation6fe996… reads union10conflicts withG12base; originalSQL1..10+12=11;7migrationtestcounts and ownFS-copyhistoryhelper needed. Formalcombined afterG12accepted, notassignedyet.
+
+PrdG11 now d55ee98 adds2ownscriptsonly; caf891 serverproductimmutable. Actualmockinitial7PASS1FAIL incorrectwholeDTOhash includesdistinctexternalActionID URLs; correctingtestexactIDs/contenthash/bytes, originalredretained. No server productchange. G11 UI draftbdca873… readyNOTASSIGNED. G13futuretaskdraft96ae325… preparedonly. G17actualOpenAIstillNOT_RUN.
+
 # State134 latest — mobile defects repaired, independent closure pending
 
 Accepted953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6 stays10/19 GoalACTIVE. G12 original74e independent **FAIL** G12-V01 configured390→425 clipping; weakB04 invalidated. Rootreview909f0d34…3582artifacts/4inputs/319CRC24commands noerrors. Narrow CSS+layouttest5229e8ca author391/build+mock8/DB8,20rawgeometry rootreview40b04da…198artifacts0errors. Workflow formal9197afa… newdetachedg12-layout-verification ports4231/32, changedlayout fresh +unchangedserverproof fresh0; no integration untilnewPASS.
