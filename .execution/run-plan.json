@@ -15,10 +15,10 @@
       "prd_id": "PRD-00",
       "title": "환경과 저장구조",
       "dependencies": [],
-      "state": "VERIFYING",
+      "state": "ACCEPTED",
       "required_for_product_completion": true,
       "candidate_commit": "401f346a62fcf99bc45f650e374e471a0ef6c5d5",
-      "integration_commit": null,
+      "integration_commit": "d1437100dfb0013550d321f1f755641dcd075336",
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
@@ -45,37 +45,61 @@
         {
           "id": "AC-00-01",
           "expected": "clean install 후 키 없이 mock 모드의 홈·업무·상품으로 이동한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json"
+          ]
         },
         {
           "id": "AC-00-02",
           "expected": "G00 기반 완료는 DB migration/seed와 저장소 adapter로 합성 최소 레코드를 저장하고 프로세스 재시작 후 다시 읽는 것으로 검증한다. 아직 구현하지 않은 상품·문의·완료 UI나 재로그인을 G00 완료 조건으로 요구하지 않는다. 각 실제 기능의 영속성은 해당 모듈에서 검증하고 전체 사용자 여정·재로그인 영속성은 G18에서 통합 검증한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json"
+          ]
         },
         {
           "id": "AC-00-03",
           "expected": "mock/DB가 같은 도메인 계약을 사용하며 화면 저장 방식 변경으로 필드 의미가 달라지지 않는다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json"
+          ]
         },
         {
           "id": "AC-00-04",
           "expected": "다른 scaffold의 버전·의존성·라이선스·실행 가능 범위를 확인하고 대상 경로에서 재검증한 결과만 기록한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json"
+          ]
         },
         {
           "id": "AC-00-05",
           "expected": "기존 main/origin을 보존하고 최초 커밋에 `.env` 등 비밀파일이 포함되지 않은 것을 확인한 뒤 worktree를 생성한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json"
+          ]
         }
       ],
-      "next_action": "Independent exact candidate checks on port 4102; no integration before verifier evidence review",
+      "next_action": "Consumed by G01; subsequent modules must preserve foundation behavior",
       "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g00-verify",
-      "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/implementation-result.json"
+      "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/implementation-result.json",
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/verification-result.json",
+      "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g00-regression",
+      "accepted_at": "2026-09-21T09:00:14.945901+00:00",
+      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/regression-result.json"
     },
     {
       "id": "G01",
@@ -84,16 +108,54 @@
       "dependencies": [
         "G00"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": null,
-      "verifier_session_id": null,
-      "attempt": 0,
-      "owned_paths": [],
-      "actual_worktree_cwd": null,
-      "evidence_root": ".execution/private/runs/<run-id>/G01/<attempt>/",
+      "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
+      "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
+      "attempt": 1,
+      "owned_paths": [
+        "src/domain/**",
+        "src/server/auth/**",
+        "src/server/contexts/**",
+        "src/server/http/**",
+        "src/server/policy/**",
+        "src/server/db/migrations/0002*",
+        "src/server/db/seed.ts",
+        "src/server/repositories/**",
+        "src/server/config/**",
+        "src/server/workspace.ts",
+        "src/data/fixtures.ts",
+        "src/features/auth/**",
+        "src/features/contexts/**",
+        "src/app/api/auth/**",
+        "src/app/api/contexts/**",
+        "src/app/api/users/**",
+        "src/app/api/invitations/**",
+        "src/app/login/**",
+        "src/app/invitations/**",
+        "src/app/settings/**",
+        "src/app/contexts/**",
+        "src/app/layout.tsx",
+        "src/app/page.tsx",
+        "src/app/tasks/**",
+        "src/app/products/**",
+        "src/components/**",
+        "src/app/globals.css",
+        "tests/**",
+        "scripts/**",
+        "README.md",
+        ".env.example",
+        "playwright.config.ts",
+        "src/app/api/health/**",
+        "package.json",
+        "package-lock.json",
+        "src/lib/**",
+        "src/app/providers.tsx"
+      ],
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g01-impl",
+      "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/1",
       "acceptance": [
         {
           "id": "AC-01-01",
@@ -120,7 +182,8 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+      "next_action": "Implement G01 full context/user/invitation/auth/reassignment vertical flow; return candidate for independent verification",
+      "base_commit": "d1437100dfb0013550d321f1f755641dcd075336"
     },
     {
       "id": "G02",
@@ -1028,10 +1091,10 @@
   "secret_policy": "env runtime only; no values in packets/logs/Git",
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
-  "accepted_commit": null,
-  "current_goal": "G00",
-  "next_action": "Independent exact candidate checks on port 4102; no integration before verifier evidence review",
-  "state_version": 7,
+  "accepted_commit": "d1437100dfb0013550d321f1f755641dcd075336",
+  "current_goal": "G01",
+  "next_action": "Implement G01 full context/user/invitation/auth/reassignment vertical flow; return candidate for independent verification",
+  "state_version": 13,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1057,6 +1120,6 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T08:47:19.753961+00:00",
+  "updated_at": "2026-09-21T09:00:15.118545+00:00",
   "traceability_path": ".execution/traceability.json"
 }

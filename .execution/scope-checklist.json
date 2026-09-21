@@ -11,8 +11,10 @@
       "owner_note": "G00",
       "requirement": "저장 방식에 무관한 필드 의미·seed 정책·비밀값/실연동 구분. 원안13·16절, PRD-00",
       "verification_idea": "같은 합성 명령을 mock/SQLite에 넣고 DTO/오류 의미를 비교. DB 재시드 후 기존 입력 처리와 문서가 일치. 키 없는 mock 성공을 AI 호출 성공으로 표시하지 않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json"
+      ]
     },
     {
       "id": "SA-02",

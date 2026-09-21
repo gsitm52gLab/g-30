@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "note": "Scheduled integration assertions keep cross-module obligations visible. Their originating foundation acceptance is limited to its stated stage; final Goal requires these actual flows. None executed yet.",
+  "checks": [
+    {
+      "id": "D01",
+      "origin_goal": "G01",
+      "required_in": [
+        "G04",
+        "G05",
+        "G18"
+      ],
+      "expected": "Reassignment preserves original real submission/file authors after actual submission UI/API exists",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D02",
+      "origin_goal": "G02",
+      "required_in": [
+        "G04",
+        "G05",
+        "G18"
+      ],
+      "expected": "Initial file policy harness expands to actual upload/original/preview/download and cross-context reuse paths",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D03",
+      "origin_goal": "G02",
+      "required_in": [
+        "G06",
+        "G07",
+        "G14",
+        "G18"
+      ],
+      "expected": "Price/private fields absent in actual product API/HTML/search/count/Excel/export/audit",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D04",
+      "origin_goal": "G02",
+      "required_in": [
+        "G08",
+        "G09",
+        "G13",
+        "G18"
+      ],
+      "expected": "Revoked membership is enforced for actual notice/message/event/notification delivery, including open subscriptions",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D05",
+      "origin_goal": "G02",
+      "required_in": [
+        "G15",
+        "G16",
+        "G17",
+        "G18"
+      ],
+      "expected": "AI input/result/source access uses current server context permissions and no cross-context retrieval",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D06",
+      "origin_goal": "G04",
+      "required_in": [
+        "G05",
+        "G18"
+      ],
+      "expected": "Actual prior submission -> new request version -> old answer/file snapshots unchanged -> added requirements only -> explicit resubmission",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D07",
+      "origin_goal": "G04",
+      "required_in": [
+        "G13",
+        "G18"
+      ],
+      "expected": "Durable request change/outbox is consumed into real app notification with proper recipients and deduplication",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D08",
+      "origin_goal": "G04",
+      "required_in": [
+        "G11",
+        "G18"
+      ],
+      "expected": "Actual GSG completion never auto-completes project or treats external/AI approval as a gate",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D09",
+      "origin_goal": "G05",
+      "required_in": [
+        "G07",
+        "G10",
+        "G11",
+        "G15",
+        "G18"
+      ],
+      "expected": "Evidence/review/completion/AI all consume exact immutable submission and file version references",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "D10",
+      "origin_goal": "G00",
+      "required_in": [
+        "G01",
+        "G04",
+        "G05",
+        "G06",
+        "G09",
+        "G11",
+        "G14",
+        "G18"
+      ],
+      "expected": "Adapter persistence extends to all real module records across logout/login and process restart",
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ]
+}

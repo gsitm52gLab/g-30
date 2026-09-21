@@ -246,8 +246,10 @@
         "G14"
       ],
       "summary": "동시 변경·멱등성·DB 영속성",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G00_FOUNDATION",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json"
+      ]
     },
     {
       "id": "A21",
@@ -310,8 +312,10 @@
         "G18"
       ],
       "summary": "clean install·mock·DB·build·테스트",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G00_FOUNDATION",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json"
+      ]
     },
     {
       "id": "A26",
