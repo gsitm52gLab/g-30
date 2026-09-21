@@ -13,3 +13,5 @@ Root created isolated internal assembly e44d481 (43b+interimUI8f) in g05-assembl
 Workflow independent verifier idle with main-reviewed14group plan bound to d89; wait formal exact final combined candidate. Candidate independent execution then root review, serial root integration, exact impacted regression before acceptance. No later dependent module implementation yet.
 
 Preserve .env, main/origin, untracked docs/execution-v2. No fetch/push/deploy/API calls. Actual session prefix archives20260921T142417Z, final tails/sanitized derivatives pending. Root orchestrates and reviews; no product edits.
+
+State77: root verified two actual e44 trace.network POSTlogin429 from default full mock suite. G05-RUNNER-01 new narrow runner lease to prd activated after original run preserved; selected spec×project isolated server/data, preserve CLI filters/counts and production auth/tests. Workflow read-only binding finalUIed9+server43 in parallel; runtime remains NOT_RUN. Root visually inspected ed9 390px action viewport: readable2×2 buttons.
