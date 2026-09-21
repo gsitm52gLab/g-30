@@ -4,7 +4,7 @@
 
 현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
 
-G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. 실제 답변 제출(G05), 독립 상품 CRUD·스냅샷(G06), 증빙·Excel(G07), 문의·AI 등 후행 기능은 아직 연결되지 않았습니다. 과거 답변 검사는 저장된 합성 prior-submission 계약 fixture이며 실제 제출 생산자 연결은 G05/G18의 책임입니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
+G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본에 이어 이 후보는 G05 실제 답변 서버 계약을 추가합니다. 답변 UI는 별도 작업에서 연결하며 증빙·Excel, 검토·완료·문의·AI의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
 
 ## 설치·실행
 
@@ -173,3 +173,18 @@ npm run products:migration-check
 ```
 
 `PRODUCTS_HTTP_REPORT`는 보고서 경로를 지정하며 실제 요청/상태/응답 hash와 프로세스 종료를 남깁니다. `E2E_PORT`/`E2E_AUX_PORT`는 비어 있는 자신 소유 슬롯으로 함께 바꿀 수 있습니다. 기존 원장에 이행할 수 없는 상품이 있으면 전체 데이터 이행을 원복하고 CLI에 G06 모듈·상품 ID·원본 컨텍스트 ID·허용된 사유만 표시합니다. 원문 값·비공개 가격·stack을 진단에 넣지 않으며 API의 일반 오류 응답도 그대로 유지합니다.
+
+## G05 답변 서버 계약
+
+`src/server/submissions/contracts.ts`가 입력/출력 타입 진입점입니다. 현재 공개 요청에 대해 브랜드 주·공동 담당자 또는 허용 GSG가 공유 초안을 저장합니다. 팀 비담당자는 공개 제출만 읽으며 미제출 초안/임시파일은 받지 않습니다. GSG 대리는 실제 자료 제공자와 로그인 기록자를 구분합니다.
+
+- `GET /api/tasks/:id/submissions`: 신선한 권한으로 초안, 실제 제출/이력, 후보 파일/상품을 조회합니다. `draftEvaluation`은 편집 초안, `submittedEvaluation`은 실제 최신 제출을 현재 요청에 대조한 진행입니다.
+- `POST /api/tasks/:id/submission-evaluation`: `{baseRequestId,content}`를 쓰기 없이 검사합니다. 8종 입력·조건 계층·필수 누락을 계산합니다. 자유문자 규격의 `check:auto`도 실행 가능한 규칙이 아니므로 사람 확인 대기이며 자동 검증 완료가 아닙니다.
+- `POST /api/tasks/:id/submission-draft`: `save`, `rebase_apply`, `copy_submission` 명령. 요청 ID와 공유 초안 revision을 검사합니다. 숫자 `-` 등 입력 중 값은 보존하고 제출 시 유효성을 검사합니다. `GET`은 요청 변경 후 명시적 이어받기 미리보기입니다.
+- `POST /api/tasks/:id/submissions`: 저장한 초안의 부분/전체 제출. 같은 초안 revision은 한 번만 소비합니다. 요청·상품·파일의 정확한 버전, 감사, 이벤트, 멱등 응답, 업무 진행을 한 transaction으로 기록합니다. 전체 제출은 구조적 충족이며 검토 승인/실물 수령/업무 완료가 아닙니다.
+- `GET /api/submissions/:id`: 불변 과거 제출과 당시 상품 사용본. 현재 권한과 원본/참조 권한은 다시 확인합니다.
+- `POST /api/tasks/:id/submission-files?requestId=...`: multipart `files`와 같은 순서의 `clientItemIds` 각 1~10개. `{items:[{clientItemId,state:'ready',file}|{clientItemId,state:'failed',error}]}`로 성공을 유지하고 실패 파일만 재시도합니다. 파일당 25MiB와 기존 MIME·시그니처 검사를 적용하며 전역 `/api/files` 응답은 변경하지 않습니다.
+
+모든 변경 요청은 기존 Origin/CSRF/세션 정책을 사용합니다. `REQUEST_CHANGED`, `DRAFT_CHANGED`, `CONFLICT` 409에서 입력과 준비된 파일 ID를 유지하고 최신 조회/명시적 비교·재선택을 사용합니다. 업로드/초안 저장은 제출 상태를 바꾸지 않습니다. 임시 참조 제외는 물리 삭제가 아니며, 공개 요청 또는 실제 불변 제출에 포함되어야 다른 업무/상품이 재사용할 수 있습니다. 외부 링크는 서버가 수집하지 않고 내용 미고정으로 보존합니다. 보류/취소 중 초안 저장은 가능하고 새 제출은 재개 후 가능합니다.
+
+합성 단위 검사는 `npx vitest run tests/unit/submissions.test.ts`이며 mock/SQLite 양쪽에서 실제 생성·부분/전체·v2·CAS·멱등·권한·업로드·요청변경·상품 캡처·rollback을 검사합니다. `0005-submissions.sql`은 업무당 공유 초안, 순번/초안 소비/파일 재시도 키의 고유성과 제출 불변성을 추가합니다. 실패저장 복구는 승인된 사용자/컨텍스트/업무/요청별 bounded sessionStorage 계약을 후속 UI가 구현하며 원시 File bytes/쿠키는 저장하지 않습니다.

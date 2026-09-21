@@ -3,7 +3,7 @@ import type { Principal } from "@/server/auth/service";
 import { decide, activeMember } from "@/server/policy/policy";
 import { projectContext, projectTask, taskScope } from "@/server/policy/projection";
 import { fileMetadata, fileUrls, sourceReference } from "@/server/files/service";
-import { visibleFile } from "@/server/files/access";
+import { isPublishedTaskFile, visibleFile } from "@/server/files/access";
 import { resolveProduct, productContextScope, visibleProductRelations } from "./access";
 import { commonDTO, commonDiff, contextDTO, bindingDTO, retailDTO, internalDTO, provenanceDTO } from "./projection";
 import { readProductUse } from "./capture";
@@ -74,8 +74,7 @@ export function productDetail(s: UnitOfWork, p: Principal, r: ResolvedProduct, c
     const reusableFiles = s.list("fileVersion", r.context.id).filter(f => visibleFile(s, p, f, scope, clock)).flatMap(f => {
         // Unpublished task files cannot be reused in a public product scope.
         if (f.data.taskId) {
-            const task = s.get("task", f.data.taskId);
-            if (!task || taskScope(task).visibility !== "public" || !s.list("requestVersion", r.context.id).some(v => v.data.taskId === task.id && v.data.content.referenceFileIds.includes(f.id)))
+            if (!isPublishedTaskFile(s, f))
                 return [];
         }
         return [{ ...productFileMetadata(s, p, r.context.id, f), ...fileUrls(f, sourceReference(f)) }];
@@ -94,7 +93,7 @@ export function productDetail(s: UnitOfWork, p: Principal, r: ResolvedProduct, c
         sharedCommonNotice, visibleContexts: visibleContexts(s, p, r, clock), commonHistory, contextHistory, files, reusableFiles,
         uploadUrl: `/api/files?${new URLSearchParams({ productId: reference.productId, contextId: reference.contextId })}`,
         retail: publicPrice(s, p, r), ...(canPrice ? { internal: privatePrice(s, p, r) } : {}), linkedTasks, uses,
-        useConnection: { connected: false as const, message: "실제 제출·검토의 상품 사용 기록 연결은 후속 기능에서 제공됩니다." },
+        useConnection: { connected: true as const, message: "실제 제출 당시의 상품 사용본을 연결합니다. 검토 사용본은 후속 검토 기능에서 연결됩니다." },
         taskChoices: canManageTasks ? tasks.filter(t => !t.data.productIds.includes(r.product.id)).map(t => ({ id: t.id, title: typeof t.data.title === "string" ? t.data.title : "", revision: t.revision, status: t.data.status })) : [],
         projects: s.list("project", r.context.id).filter(project => canManageTasks || project.data.taskIds.some(id => tasks.some(t => t.id === id))).map(project => ({ id: project.id, title: typeof project.data.title === "string" ? project.data.title : "" })),
         linkedContextChoices: s.list("context").filter(c => c.data.brandId === r.product.data.brandId && !s.list("contextProduct", c.id).some(cp => cp.data.productId === r.product.id) && decide(s, p, "product.edit", productContextScope(c.id, r.product.id), clock).allowed).map(projectContext),

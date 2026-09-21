@@ -26,7 +26,8 @@ export interface RequestContent {
 export interface TaskExtension {
     schemaVersion?: 2; visibility?: "draft" | "public";
     /** Progress before hold/cancel; separate from per-request acceptance history. */
-    resumeStatus?: "requested" | "in_progress" | "partial" | null;
+    resumeStatus?: "requested" | "in_progress" | "partial" | "submitted" | null;
+    submissionProgress?: { latestSubmissionId: string; requestId: string; mode: "partial" | "full" };
     subtype?: string; projectId?: string | null; coAssigneeIds?: string[];
     draft?: RequestContent; currentRequestId?: string | null;
     templateVersionId?: string | null;
@@ -60,6 +61,7 @@ export type FileOwner = { kind: "task"; taskId: string } | { kind: "product"; pr
 export interface FileVersionData {
     /** Legacy task files retain taskId and immutable bytes; new files also have an explicit owner. */
     taskId: string | null; owner?: FileOwner; storageKey: string; originalName: string; mime: string; bytes: number; sha256: string;
+    submissionUpload?: { key: string; clientItemId: string; requestId: string; bodyHash: string };
     uploaderId: string; visibility: "public" | "internal"; preview: boolean;
 }
 export const certaintyLabels = { confirmed: "확정", requested: "요청", expected: "예상", needs_confirmation: "확인 필요" };

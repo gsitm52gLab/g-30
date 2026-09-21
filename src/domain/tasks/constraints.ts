@@ -9,6 +9,8 @@ export function taskRelations<K extends RecordKind>(s: UnitOfWork, kind: K, inpu
     }
     if (kind === "fileVersion") {
         const d = input.data as import("./types").FileVersionData;
+        if (d.submissionUpload && (!d.taskId || s.get("requestVersion", d.submissionUpload.requestId)?.data.taskId !== d.taskId)) throw new StoreError("INVALID_RECORD");
+        if (d.submissionUpload && s.list("fileVersion").some(f => f.id !== input.id && f.data.submissionUpload?.key === d.submissionUpload!.key)) throw new StoreError("CONFLICT");
         if (d.owner?.kind === "product") {
             const cp = s.get("contextProduct", d.owner.contextProductId);
             if (d.taskId !== null || !cp || cp.contextId !== input.contextId || cp.data.productId !== d.owner.productId) throw new StoreError("INVALID_RECORD");
@@ -32,7 +34,7 @@ export function taskRelations<K extends RecordKind>(s: UnitOfWork, kind: K, inpu
     }
     if (kind === "task") {
         const d = input.data as import("../records").TaskData;
-        if (d.resumeStatus != null && (!["requested", "in_progress", "partial"].includes(d.resumeStatus) || !["on_hold", "cancelled"].includes(d.status))) throw new StoreError("INVALID_RECORD");
+        if (d.resumeStatus != null && (!["requested", "in_progress", "partial", "submitted"].includes(d.resumeStatus) || !["on_hold", "cancelled"].includes(d.status))) throw new StoreError("INVALID_RECORD");
         if (d.schemaVersion === 2 && (d.projectId && s.get("project", d.projectId)?.contextId !== input.contextId || d.currentRequestId && s.get("requestVersion", d.currentRequestId)?.data.taskId !== input.id)) throw new StoreError("INVALID_RECORD");
     }
     if (kind === "commandReceipt") {

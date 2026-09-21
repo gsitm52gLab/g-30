@@ -4,10 +4,12 @@ import path from "node:path";
 import type { UnitOfWork, StoredRecord } from "@/domain/records";
 import type { FileOwner } from "@/domain/tasks/types";
 import type { Principal, IdentityService } from "@/server/auth/service";
-import { authorize } from "@/server/policy/policy";
+import { authorize, decide } from "@/server/policy/policy";
 import { fail, unavailable } from "@/server/auth/errors";
 import { MAX_BATCH_FILES, validateFile } from "@/domain/files/validate";
-import { originalScope, referenceScope, canReferenceFile, type FileReference } from "./access";
+import { originalScope, referenceScope, canReferenceFile, canReadTemporarySubmissionFile, type FileReference } from "./access";
+import { taskScope } from "@/server/policy/projection";
+import { contentFiles } from "@/domain/submissions/files";
 import { resolveProduct } from "@/server/products/access";
 const text = (v: unknown) => typeof v === "string" ? v : "";
 export const fileMetadata = (f: StoredRecord<"fileVersion">) => ({ id: f.id, name: text(f.data.originalName), bytes: typeof f.data.bytes === "number" ? f.data.bytes : 0, mime: text(f.data.mime), sha256: text(f.data.sha256), preview: f.data.preview === true, visibility: f.data.visibility === "internal" ? "internal" as const : "public" as const });
@@ -35,7 +37,7 @@ export class FileService {
         if (typeof reference === "string") {
             const task = s.get("task", reference)!;
             const versions = s.list("requestVersion", task.contextId!).filter(v => v.data.taskId === task.id);
-            included = versions.some(v => v.data.content.referenceFileIds.includes(file.id)) || p.user.data.role === "gsg" && (task.data.draft?.referenceFileIds.includes(file.id) === true || task.id === file.data.taskId);
+            included = decide(s,p,"submission.write",taskScope(task),this.identity.clock).allowed && s.list("submissionDraft",task.contextId!).some(d=>d.data.taskId===task.id && contentFiles(d.data).includes(file.id)) || versions.some(v => v.data.content.referenceFileIds.includes(file.id)) || s.list("submission", task.contextId!).some(v => v.data.taskId === task.id && v.data.fileVersionIds.includes(file.id)) || canReadTemporarySubmissionFile(s,p,file,target,this.identity.clock) || p.user.data.role === "gsg" && (task.data.draft?.referenceFileIds.includes(file.id) === true || task.id === file.data.taskId);
         }
         else {
             const r = resolveProduct(s, p, reference.contextId, reference.productId, this.identity.clock);
