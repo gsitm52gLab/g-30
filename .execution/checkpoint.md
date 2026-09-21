@@ -1,3 +1,9 @@
+# State150 latest — G16 typed server frozen; G13 exclusive common lease
+
+Existing Goal ACTIVE, accepted product0804a4a1a750ab4dee149036659e212480230242 remains13/19. Root reviewed G16 server774 (512unit/build, actual HTTP still separate), G15 capability bridge ddb (7artifacts/3commands/613-source exactbindings/4P20filtered). Root bridge review c70a547. G16 pureUI fe333 reviewed e82788; workflow now owns fullUI packet30bd, merge774+ddb, no common files. Prd ownHTTP/history proof continues; reported mock22P6SQLite-onlyskip/DB28P pending root review, old H15 fixtureexpectation failure preserved. G16 independent ai_verify not yet assigned combined candidate.
+
+G13 source repair ed56 root960c review34artifacts11snapshots406productidentity32priorartifacts; actual campaign brand-recipient suppression reproduced4red and repaired4new+6regression10P14filtered. Not delivery/dedupe proof. Goals now EXCLUSIVE common records/constraints/policy/0014 and narrow producer binding under full-server lease1e855, additive774 schema alignment. G16 common and two G15 bridge paths RELEASED. 0013frozen-notaccepted;0014assigned. Root+prd+workflow+goals active, ai_verify idle. G17 actualAPI mandatoryNOT_RUN; no costcap. G18 final207row worksheet remains preparation only.
+
 # State149 latest — audit worksheet and server boundary addendum
 
 Accepted0804 still13/19. Root finalaudit worksheet script outputs207 distincttrackingrows (91AC/26A/13AI/64SA/10D/2subgroups/1mandatoryOpenAI), currentrefs hashchecked errors0; all finalstatusNOT_EVALUATED, no tests/acceptance inferred. Regeneratefinalstate. G17provider-call-fact addendum d40b separates engine choice/network attempt/schema success; fresh GSG afterIO mandatory. G16fullUI draft abefd ready, workflow8purecomponents checking; prd server meaningful tests pending; goalsownreadadapters ongoing. GoalACTIVE.
