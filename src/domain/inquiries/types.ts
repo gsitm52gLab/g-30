@@ -1,4 +1,4 @@
-/** Standalone contracts. Repository wiring and authorization belong to the server stage. */
+/** Inquiry storage and wire contracts. Every server projection checks current participation. */
 export type QuestionState = 'gsg_waiting' | 'brand_supplement_waiting' | 'external_waiting' | 'resolved';
 export type PublicMessageKind = 'question' | 'comment' | 'acknowledgement' | 'answer' | 'supplement';
 export interface ExternalWait {
@@ -82,6 +82,7 @@ export type InquiryEventData = { conversationId: string; position: number; recor
 );
 /** Safe projected metadata only; storage paths/uploader grants never cross this boundary. */
 export interface InquiryFileDTO {
+    visibility: 'public'|'internal';
     id: string;
     name: string;
     bytes: number;
@@ -145,7 +146,7 @@ export interface ConversationSummaryDTO {
 }
 export interface InquiryReadDTO { userLabel: string; throughMessageId: string; at: string }
 export type InquiryHistoryDTO = { id: string; actorLabel: string; at: string } & (
-    { action: 'question_state'; questionId: string; from: QuestionState | null; to: QuestionState; reason: string; sourceMessageId: string | null } |
+    { action: 'question_state'; questionId: string; from: QuestionState | null; to: QuestionState; reason: string; sourceMessageId: string | null; externalWait: QuestionDTO['externalWait'] } |
     { action: 'task_link'; previousTask: { id: string; title: string } | null; task: { id: string; title: string } | null }
 );
 export interface DraftConversationDetailDTO {
@@ -164,8 +165,10 @@ export interface ActiveConversationDetailDTO extends ConversationSummaryDTO {
     messages: PublicMessageDTO[];
     reads: InquiryReadDTO[];
     history: InquiryHistoryDTO[];
-    capabilities: { send: boolean; ask: boolean; answer: boolean; supplement: boolean; manageState: boolean; linkTask: boolean; upload: boolean };
+    capabilities: { send: boolean; ask: boolean; answer: boolean; supplement: boolean; manageState: boolean; linkTask: boolean; upload: boolean; uploadInternal: boolean; internalNote: boolean };
     cursor: string;
+    readyFiles: InquiryFileDTO[];
+    staffOptions: { id: string; label: string }[];
 }
 /** Staff-only fields must be constructed separately, never filtered in a client. */
 export interface StaffConversationDetailDTO extends ActiveConversationDetailDTO {
@@ -199,3 +202,6 @@ export interface InquiryCursorBinding {
     publicPosition: number;
     internalPosition: number | null;
 }
+
+/** Random durable opaque token, never authentication or a serialized offset. */
+export interface InquiryCursorData extends InquiryCursorBinding { token: string }

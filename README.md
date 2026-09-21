@@ -1,5 +1,19 @@
 # GS HALE
 
+## G09 문의 서버 계약 후보
+
+G09 서버 구현은 UI·독립 검증 및 전체 모듈 수용과 구분합니다. `src/server/inquiries/contracts.ts`는 client type-only 진입점이고 `readInquirySummary(store, principal, contextId, clock, taskId?)`는 같은 UoW에서 홈/업무가 사용할 현재 권한 집계입니다.
+
+브랜드는 `POST /api/inquiries`의 `{contextId,taskId:null|id,idempotencyKey}`로 비공개 초안을 만듭니다. 초안은 현재 작성자만 읽으며 GSG/admin도 볼 수 없습니다. `POST /api/inquiries/:id/files?visibility=public`에 multipart `files`와 같은 순서의 `clientItemIds`를 1~10개 전송합니다. 파일별 ready/failed 응답과 같은 키 재시도는 기존 파일을 보존합니다. 업로드만으로 질문을 공개하지 않습니다. 실제 파일 선택 후 `POST /api/inquiries/:id`의 `publish_first`를 명시 전송하며 제목, 첫 내용, 양수 초안 revision을 사용합니다.
+
+`GET /api/inquiries?context=...`는 공개된 참여 문의만 집계합니다. 같은 브랜드/컨텍스트의 다른 브랜드 사용자는 참여자가 아닙니다. `GET /api/inquiries/:id`는 팝업과 상세가 함께 쓸 원본입니다. 공개 후 GSG는 명시 answer/state/internal_note/link_task를, 브랜드는 question/supplement를 사용합니다. comment/acknowledgement/read는 질문을 해결하지 않습니다. 답변과 업무·제출·완료는 별개입니다.
+
+`GET /api/inquiries/:id/events?after=...` 및 `/stream?after=...`는 저장된 이벤트와 actor/conversation/view에 묶인 opaque cursor를 사용합니다. 상세의 cursor 이후를 연결하고, cursor가 유효하지 않으면 상세를 다시 읽습니다. SSE `inquiry` 사건의 JSON과 `unavailable` 오류를 구별합니다. 공개/내부 위치는 분리되어 내부 메모가 공개 cursor·revision·정렬 시각을 바꾸지 않습니다. 모든 전달과 파일 읽기는 현재 권한을 다시 검사합니다.
+
+파일은 정확한 `conversationId`와 `messageId` 참조로 읽습니다. 미전송 ready 파일은 현재 업로더만 읽으며 공개 메시지에 포함된 선택 파일만 상대에게 보입니다. 내부 파일의 공개 메시지 재사용이나 다른 업무/상품으로의 문의 파일 재사용은 제공하지 않습니다. 401/403/404는 보호 데이터·복구 입력을 제거하고, 409/503에서는 허용된 입력과 성공 파일·이미 만들어진 업무 ID를 보존합니다. 같은 intent를 재시도하고 새 질문/업무를 자동 생성하지 않습니다.
+
+`0008-inquiries.sql`은 이 분기의 7번째 migration입니다(0006 G07은 아직 포함되지 않음). 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
+
 **Healthcare & Aesthetic Launch Enablement** · **해외 헬스케어 진출의 모든 일**
 
 현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
