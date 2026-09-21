@@ -831,7 +831,8 @@
         "src/domain/files/** (submission provenance/access contract only; preserve shared parser semantics)",
         "src/server/repositories/mock.ts (only new immutable submission kinds if shared constraints cannot enforce)",
         "src/server/repositories/sqlite.ts (only corresponding typed submission support)",
-        "tests/unit/repositories.test.ts (new actual immutable/CAS regression only)"
+        "tests/unit/repositories.test.ts (new actual immutable/CAS regression only)",
+        "src/components/workspace.tsx (taskLabels declaration only)"
       ],
       "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g05-server",
       "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1",
@@ -887,7 +888,11 @@
           "state": "WAITING_FROZEN_CONTRACT",
           "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec"
         }
-      ]
+      ],
+      "ownership_addenda": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/server/ownership-addendum-1.json"
+      ],
+      "verification_preparation": "workflow creating bounded G05 plan; no tests/candidate binding yet"
     },
     {
       "id": "G06",
@@ -1815,7 +1820,7 @@
   "accepted_commit": "7f409a2a14266776001f6b7910e80e402a5b7717",
   "current_goal": "G06",
   "next_action": "prd implements and freezes G05 server typed contract; main reviews then goals builds disjoint UI; workflow independently verifies combined candidate later.",
-  "state_version": 66,
+  "state_version": 67,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1842,7 +1847,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T14:04:25.124230+00:00",
+  "updated_at": "2026-09-21T14:06:19.193224+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
