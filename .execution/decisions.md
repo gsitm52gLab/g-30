@@ -94,3 +94,6 @@ Root reviewed raw7groups, source and evidence hashes, default test IDs and curre
 
 ## 2026-09-21T17:37:18.952427+00:00 — First inquiry file ownership and explicit send
 Root accepts minimal private conversation draft then owned per-item idempotentupload then atomic publish_first; actor-only draft excludes GSG/otherbrand/basiclist/home/events until send. This is delegated implementation choice fixing a static DTO cycle, not a user-confirmed new workflow requirement or runtime PASS. Current4 domain files may be revised; old artifacts frozen. Pure G09/G10 unit checks are not feature acceptance. G10 stored projector must not reuse strict command parsing as proof of safe positive unknown-extension reads.
+
+## 2026-09-21T17:42:42.262885+00:00 — G08 current stage ACCEPTED
+Exactcandidate6460 independent and integrated3c4e freshregression both reviewed. Currentnotice scopes, versions/read and atomic durableevent producer accepted. G13delivery/G09streams/G07coexistence/G18remain explicit; wholeGoalACTIVE. NextG07union consumes actualaccepted3c4e.

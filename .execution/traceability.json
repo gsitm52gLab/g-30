@@ -62,11 +62,13 @@
         "G12"
       ],
       "summary": "설명·항목·양식·기한·공개 미리보기",
-      "status": "PARTIAL_G04_ACCEPTED",
+      "status": "PARTIAL_THROUGH_G08_ACCEPTED",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json"
       ],
-      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
+      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence.",
+      "current_g08_stage": "PASS:notice/guide/form/currentcontext/versionedread+files/eventproducer; futureglobal/delivery consumers notimplied"
     },
     {
       "id": "A05",
@@ -190,8 +192,11 @@
         "G08"
       ],
       "summary": "공지·가이드·읽음·업무 분리",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_THROUGH_G08_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json"
+      ],
+      "current_g08_stage": "PASS:notice/guide/form/currentcontext/versionedread+files/eventproducer; futureglobal/delivery consumers notimplied"
     },
     {
       "id": "A14",
@@ -256,8 +261,11 @@
         "G13"
       ],
       "summary": "수신자·알림 중복/중단",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_THROUGH_G08_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json"
+      ],
+      "current_g08_stage": "PASS:notice/guide/form/currentcontext/versionedread+files/eventproducer; futureglobal/delivery consumers notimplied"
     },
     {
       "id": "A19",
@@ -268,14 +276,16 @@
         "G14"
       ],
       "summary": "서버 전 경로 권한·가격/파일/AI 격리",
-      "status": "PARTIAL_G05_ACCEPTED",
+      "status": "PARTIAL_THROUGH_G08_ACCEPTED",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json"
       ],
-      "remaining": "Current G05 channels verified; evidence/Excel/notices/messages/notification/search/export/AI later channels mandatory."
+      "remaining": "Current G05 channels verified; evidence/Excel/notices/messages/notification/search/export/AI later channels mandatory.",
+      "current_g08_stage": "PASS:notice/guide/form/currentcontext/versionedread+files/eventproducer; futureglobal/delivery consumers notimplied"
     },
     {
       "id": "A20",
