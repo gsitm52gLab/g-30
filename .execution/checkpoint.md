@@ -28,3 +28,7 @@ G06 server assigned to prd in .worktrees/g06-impl at accepted cc59987. Sole sche
 ## State 53 — G06 server implementation continues
 
 Canonical accepted product remains cc59987. G06 server prd in .worktrees/g06-impl is sole shared writer; migration repository and two exact legacy fixture test leases added. Contract is not frozen yet; first typecheck failures preserved and being repaired. Goals UI and workflow verification plans reviewed, all NOT_RUN. G05 task-draft-v2 and G06 UI draft prepared without assignment. Material counts remain unconnected/null until G07. Goal active, no blocker.
+
+## State 54 — G06 UI and server fixes in parallel
+
+Internal contract cab8432 is compiled/self-checked140 and main-reviewed for UI use only, not G06 accepted. UI goals assigned .worktrees/g06-ui ports4169/4170. Server prd owns CR01–03 pagination/retryDTO/taskfile-reference corrections and HTTP tests, types/routes frozen. Static reviewer workflow had a tool limitation; evidence preservation requested, no runtime PASS. Accepted product remains cc59987.

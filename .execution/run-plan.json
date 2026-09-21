@@ -920,7 +920,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd sole shared server/schema/file owner prepares concrete contract; UI assigned afterward in separate worktree.",
+      "next_action": "Parallel G06 UI on fixed cab contract and server CR01-03 repair/HTTP; review exact combined candidate after serial internal assembly.",
       "base_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/task.json",
       "ownership_addenda": [
@@ -929,6 +929,71 @@
       ],
       "contract_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-1.json"
+      ],
+      "contract_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064",
+      "contract_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/contract-result.json",
+      "main_contract_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-review.json",
+      "open_defects": [
+        {
+          "id": "G06-CR01",
+          "severity": "P2",
+          "title": "Nonfinite pagination becomes Infinity/null rather than validation error",
+          "source": "src/server/products/service.ts ProductService.list",
+          "status": "OPEN_STATIC_FINDING_REPAIR_ASSIGNED",
+          "runtime_status": "NOT_RUN_BY_MAIN",
+          "owner": "prd"
+        },
+        {
+          "id": "G06-CR02",
+          "severity": "P1",
+          "title": "Idempotent replay returns stored receipt.result without explicit output DTO",
+          "source": "src/server/products/store.ts receipt",
+          "status": "OPEN_STATIC_FINDING_REPAIR_ASSIGNED",
+          "runtime_status": "NOT_RUN_BY_MAIN",
+          "owner": "prd"
+        },
+        {
+          "id": "G06-CR03",
+          "severity": "P1",
+          "title": "Task-origin file reuse checks task visibility but not published reference inclusion",
+          "source": "src/server/files/access.ts canReferenceFile; product save_files",
+          "status": "OPEN_STATIC_FINDING_REPAIR_ASSIGNED",
+          "runtime_status": "NOT_RUN_BY_VERIFIER",
+          "owner": "prd",
+          "finder_session": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a"
+        }
+      ],
+      "implementer_session_ids": [
+        "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+        "01a0c307-c975-75b1-b96a-5a5c4e448aec"
+      ],
+      "subtasks": [
+        {
+          "id": "G06-SERVER",
+          "state": "IMPLEMENTING_FIXES_AND_HTTP",
+          "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+          "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-impl",
+          "contract_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064"
+        },
+        {
+          "id": "G06-UI",
+          "state": "IMPLEMENTING",
+          "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
+          "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-ui",
+          "base_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064",
+          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/ui/task.json",
+          "owned_paths": [
+            "src/features/products/**",
+            "src/app/products/**",
+            "src/components/product*",
+            "src/components/workspace.tsx",
+            "src/features/tasks/create.tsx",
+            "src/app/tasks/new/page.tsx",
+            "tests/e2e/products*.spec.ts",
+            "tests/unit/products-ui*.test.ts",
+            "scripts/verify-products-ui*"
+          ]
+        }
       ]
     },
     {
@@ -1571,8 +1636,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
-  "next_action": "prd sole shared server/schema/file owner prepares concrete contract; UI assigned afterward in separate worktree.",
-  "state_version": 53,
+  "next_action": "Parallel G06 UI on fixed cab contract and server CR01-03 repair/HTTP; review exact combined candidate after serial internal assembly.",
+  "state_version": 54,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1599,7 +1664,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T12:39:04.996281+00:00",
+  "updated_at": "2026-09-21T12:49:51.365842+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
