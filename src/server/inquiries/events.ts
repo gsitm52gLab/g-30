@@ -22,7 +22,7 @@ export function eventPage(s:UnitOfWork,p:Principal,c:StoredRecord<'conversation'
     if(!old||old.data.token!==after||old.contextId!==c.contextId||old.data.userId!==p.user.id||old.data.conversationId!==c.id||old.data.view!==view)fail('CURSOR_UNAVAILABLE',409,'연결 위치를 다시 확인해야 합니다. 문의를 새로 조회해 주세요.');
     let pub=safe.count(old.data.publicPosition),internal=view==='staff'?safe.count(old.data.internalPosition):0;
     if(pub>c.data.publicSequence||internal>c.data.internalSequence||view==='public'&&old.data.internalPosition!==null)safe.corrupt();
-    const rows=s.list('inquiryEvent',c.contextId!).filter(r=>r.data.conversationId===c.id&&(r.data.lane==='public'||view==='staff'&&r.data.lane==='internal')).map(r=>{
+    const rows=s.list('inquiryEvent',c.contextId!).filter(r=>r.data.conversationId===c.id).filter(r=>{if(r.data.lane!=='public'&&r.data.lane!=='internal')safe.corrupt();return r.data.lane==='public'||view==='staff';}).map(r=>{
         const d=r.data;safe.id(d.recordId);safe.timestamp(d.at);safe.count(d.position,1);
         if(d.lane==='public'&&!['message','question','read','task_link'].includes(d.kind)||d.lane==='internal'&&d.kind!=='internal_message')safe.corrupt();return r;
     }).filter(r=>r.data.position>(r.data.lane==='public'?pub:internal)).sort((a,b)=>a.data.lane.localeCompare(b.data.lane)||a.data.position-b.data.position);

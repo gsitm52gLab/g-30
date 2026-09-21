@@ -25,6 +25,15 @@ for(const mode of ['mock','sqlite'] as const)describe(`${mode} G09 saved project
         await setup();await repo.transaction(s=>{s.create('inquiryMessage',{id:randomUUID(),contextId:A,data:{conversationId:id,questionId:null,clientMessageId:randomUUID(),authorId:'user-gsg',body:'Known body',kind:['comment'],visibility:'public',fileVersionIds:[],createdAt:NOW,sequence:3}} as never);});
         await expect(service.detail(brand,id)).rejects.toMatchObject({status:503});
     });
+    it('known malformed message visibility cannot silently disappear from an authorized conversation',async()=>{
+        await setup();await repo.transaction(s=>{s.create('inquiryMessage',{id:randomUUID(),contextId:A,data:{conversationId:id,questionId:null,clientMessageId:randomUUID(),authorId:'user-gsg',body:'saved body',kind:'comment',visibility:['public'],fileVersionIds:[],createdAt:NOW,sequence:3}} as never);});
+        await expect(service.detail(brand,id)).rejects.toMatchObject({status:503});
+    });
+    it('known malformed durable event lane requires safe failure rather than skipping missed data',async()=>{
+        await setup();const d=await service.detail(brand,id);if(d.phase!=='active')throw Error('active');
+        await repo.transaction(s=>{s.create('inquiryEvent',{id:randomUUID(),contextId:A,data:{conversationId:id,lane:['public'],kind:'message',position:3,recordId:d.messages[0].id,at:NOW}} as never);});
+        await expect(service.events(brand,id,new URLSearchParams({after:d.cursor}))).rejects.toMatchObject({status:503});
+    });
     it('current private task details do not leak via a later brand command or same-intent replay',async()=>{
         await setup();const content={...blankContent(),title:'실제 비공개 업무',description:'합성 요청',deadline:{...blankContent().deadline,responsibleUserId:'user-gsg'}};const taskId=(await new TaskService(service.identity).create(gsg,{targets:[{contextId:A,ownerId:'user-gsg',assigneeId:'user-team',coAssigneeIds:[],productIds:[]}],category:'spot',content,idempotencyKey:randomUUID()})).ids[0];const d=await service.detail(gsg,id);if(d.phase!=='active')throw Error('active');
         await service.command(gsg,id,{command:'link_task',taskId,expectedRevision:d.revision,idempotencyKey:randomUUID()});
