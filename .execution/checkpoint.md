@@ -1,6 +1,6 @@
 # Execution checkpoint
 
-State version: 45
+State version: 46
 Updated: 2026-09-21T12:05:50.681658+00:00
 Active Goal: existing user Goal, ACTIVE
 Accepted product commit: `cec612fbeb3795e233d07121a54db9ac96adbf4b`
@@ -12,3 +12,5 @@ Prior7f FAIL(V01,V02) and3304 FAIL(V03) immutable with separate main-rejection.j
 G06 beforeG05 afterG04 ACCEPTED. Draftrevision3 includes explicit shared common edit decision and file owner/consumer contract. prd idle; implementation not started. Source/data/UI handoff preparation only; D01–D10 futureproducer checks remain NOT_RUN as applicable.
 
 Next: inspect exact candidate packets and actual evidence → serial root merge → exact integrated-SHA regression → G04 ACCEPTED → G06 assignment. Preserve .env/main/origin/untracked docs/execution-v2, all raw private evidence and actual session logs. Original log prefix integrity refreshed12:03:13UTC; final private archive/sanitization pending.
+
+Update 2026-09-21T12:09:24.610876+00:00: final candidate `fb493e69830461fbf3fa11be90d9b50c94b0e334` test-only successor of5b. Only HTTP/unit tests add/correct seeded nonpriceGSG check; all product bytes unchanged (main exactdiff confirmed). workflow preserves5b partial actual evidence and moves to g04-verify4 with G04/4/verification-task.json. goals freezesfb and finalchecks. No product failure asserted for superseded5b.
