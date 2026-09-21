@@ -77,3 +77,8 @@ Valid prefix aliases with identical namespace URI/local names and equal expanded
 ## G09 1:1 participant default — state100
 
 원안8절·PRD09의 1:1 문의에 대해 브랜드 시작 사용자와 현재 해당 컨텍스트 GSG 운영팀이 참여하는 기본값을 정한다. 같은 브랜드/컨텍스트라는 이유만으로 다른 브랜드 사용자에게 대화를 공개하지 않는다. 업무 연결·담당자 변경은 문의 참여자 변경이나 G05 제출 변환이 아니다. 원 작성자/메시지/파일/해결 이력은 보존하고 비활성·권한 철회 직후 구독/재조회/파일도 제한한다. 이는 위임받은 설계 기본값이며 사용자가 별도로 승인한 정책이라고 주장하지 않는다. 구현 계약은 private G09/1/participant-policy-decision.json을 소비한다. 실제 구현·검증은 아직 NOT_RUN.
+
+
+## G08 progresses independently of G07 repair — state101
+
+G08 dependencies are accepted G04/G05 with G06 in37b ancestry; G07 is not a prerequisite. Earlier planned G07-first union is a scheduling preference, not a completion requirement. With G08server/UI frozen while G07V02 is under repair, assemble/verify G08 first at accepted37b plus its own candidates. No unaccepted G07 source is consumed. If G08 is accepted first, author-resolve its common-schema/policy union with G07 in a new candidate before independent G07 verification and integration. Both features coexistence remains mandatory in G07/G18, original failures retained.
