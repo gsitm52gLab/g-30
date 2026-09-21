@@ -16,16 +16,24 @@ import { parseWorkbook } from '@/server/imports/parser-core';
 import { guardedZip } from '@/server/imports/zip';
 const A = 'ctx-jp-a-luna', brand = tokenFor('user-luna'), price = tokenFor('user-price'), gsg = tokenFor('user-gsg');
 const fields = ['contextKey', 'common.code', 'common.name', 'local.jan', 'retail.amount', 'retail.currency'];
-async function xlsx(rows: unknown[][], headers = fields) { const book = new ExcelJS.Workbook(), sheet = book.addWorksheet('상품'); sheet.addRow(headers); for (const row of rows)
-    sheet.addRow(row); return Buffer.from(await book.xlsx.writeBuffer()); }
+async function xlsx(rows: unknown[][], headers = fields) {
+    const book = new ExcelJS.Workbook(), sheet = book.addWorksheet('상품');
+    sheet.addRow(headers);
+    for (const row of rows)
+        sheet.addRow(row);
+    return Buffer.from(await book.xlsx.writeBuffer());
+}
 for (const mode of ['mock', 'sqlite'] as const)
     describe(`${mode} G07 atomic standard import`, () => {
         let repo: RecordRepository, service: ImportService, products: ProductService, dir: string;
         async function setup() { repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); const identity = await policyFixture(repo); dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-g07-import-')); service = new ImportService(identity, new ImportStaging(dir)); products = new ProductService(identity); }
         async function preview(rows: unknown[][], headers = fields, token = brand) { const source = await service.inspect(token, A, 'standard.xlsx', await xlsx(rows, headers)); return service.preview(token, { sourceId: source.sourceId, sheetId: source.sheets[0].id, headerRow: 1, mapping: headers.map((field, i) => ({ column: i + 1, field })), choices: [] }); }
         const business = async () => Promise.all((['product', 'contextProduct', 'productVersion', 'contextProductVersion', 'retailPrice', 'retailPriceVersion', 'internalPrice', 'internalPriceVersion', 'audit', 'domainEvent', 'commandReceipt', 'importBatch', 'submission', 'productUseSnapshot'] as RecordKind[]).map(k => repo.list(k)));
-        afterEach(async () => { repo?.close(); if (dir)
-            await rm(dir, { recursive: true, force: true }); });
+        afterEach(async () => {
+            repo?.close();
+            if (dir)
+                await rm(dir, { recursive: true, force: true });
+        });
         it('AC07-03 preview writes no business rows; exact 0/leading zeros survive atomic apply and response-loss retry', async () => {
             await setup();
             const before = await business(), p = await preview([[A, '000-NEW', '신규 상품', '00001234', '0', 'JPY'], [A, 'SECOND', '두 번째', '', '19.0001', 'USD']]);
@@ -54,14 +62,28 @@ for (const mode of ['mock', 'sqlite'] as const)
         it('AC07-03 injected late exception rolls back all versions/audit/result/receipt; CAS is fresh', async () => {
             await setup();
             const p = await preview([[A, 'ONE', 'one', '', '1', 'JPY'], [A, 'TWO', 'two', '', '2', 'JPY']]), before = await business();
-            const faulty = new ImportService(service.identity, service.staging, row => { if (row === 3)
-                throw new Error('late batch failure'); });
+            const faulty = new ImportService(service.identity, service.staging, row => {
+                if (row === 3)
+                    throw new Error('late batch failure');
+            });
             await expect(faulty.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() })).rejects.toThrow('late batch failure');
             expect(await business()).toEqual(before);
             const current = await products.detail(brand, 'product-serum', A), update = await preview([[A, current.common.code, 'Excel update', '', '', '']]);
             await products.command(brand, current.productId, { contextId: A, command: 'save_common', common: { ...current.common, name: 'concurrent' }, expectedCommonRevision: current.commonRevision, idempotencyKey: randomUUID() });
             await expect(service.apply(brand, { previewId: update.id, idempotencyKey: randomUUID() })).rejects.toMatchObject({ code: 'CONFLICT' });
             expect(await repo.list('importBatch')).toHaveLength(0);
+        });
+        it('stored batch nested extensions cannot cross the public result DTO', async () => {
+            await setup();
+            const p = await preview([[A, 'DTO-ROW', 'dto', '', '1', 'JPY']]), id = (await service.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() })).ids[0], original = (await repo.get('importBatch', id))!;
+            const poisoned = await repo.transaction(s => s.create('importBatch', { id: randomUUID(), contextId: A, data: { ...original.data, sourceName: { nested: 'G07_IMPORT_CANARY' }, rows: original.data.rows.map(r => ({ ...r, action: { nested: 'G07_IMPORT_CANARY' }, extra: { secret: 'G07_IMPORT_CANARY' } })), extra: { secret: 'G07_IMPORT_CANARY' } } as unknown as typeof original.data }));
+            await expect(service.batch(brand, poisoned.id)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+            expect(await repo.get('importBatch', poisoned.id)).toEqual(poisoned);
+            const extended = await repo.transaction(s => s.create('importBatch', { id: randomUUID(), contextId: A, data: { ...original.data, rows: original.data.rows.map(r => ({ ...r, extra: { secret: 'G07_IMPORT_CANARY' } })), extra: { secret: 'G07_IMPORT_CANARY' } } as typeof original.data }));
+            const dto = await service.batch(brand, extended.id);
+            expect(JSON.stringify(dto)).not.toContain('G07_IMPORT_CANARY');
+            expect(dto.rows).toHaveLength(1);
+            expect(await repo.get('importBatch', extended.id)).toEqual(extended);
         });
         it('AC07-04 private mapping denied before preview; price-authorized import supported, public export ZIP omits private field/value', async () => {
             await setup();
@@ -92,6 +114,15 @@ describe('G07 bounded XLSX parser', () => {
         expect(parsed.sheets[0].rows[2].hidden).toBe(true);
         expect(parsed.sheets[0].rows[2].cells[1].text).toBe('=literal');
         expect(parsed.sheets[0].rows[2].cells[4].error).toBe('FORMULA_UNSUPPORTED');
+    });
+    it('bounded uuid override retains ExcelJS CJS v4 conditional-format writer compatibility', async () => {
+        const book = new ExcelJS.Workbook(), sheet = book.addWorksheet('format');
+        sheet.addRows([[1], [2], [3]]);
+        sheet.addConditionalFormatting({ ref: 'A1:A3', rules: [{ type: 'iconSet', iconSet: '3Stars', priority: 1, cfvo: [{ type: 'percent', value: 0 }, { type: 'percent', value: 33 }, { type: 'percent', value: 67 }] }] });
+        const bytes = Buffer.from(await book.xlsx.writeBuffer()), parsed = await parseWorkbook(bytes);
+        expect(parsed.sheets[0].rows).toHaveLength(3);
+        const zip = await guardedZip(bytes);
+        expect(zip.get('xl/worksheets/sheet1.xml')!.toString()).toMatch(/x14:cfRule/);
     });
     it('export of formula-looking data never creates formulas', async () => { const bytes = await xlsx([[A, '=literal', '+SUM(1,2)', '@text', '-1', 'JPY']]); const xml = [...(await guardedZip(bytes)).entries()].filter(([k]) => k.startsWith('xl/worksheets/')).map(([, v]) => v.toString('utf8')).join(''); expect(xml).not.toMatch(/<f\b/); });
 });

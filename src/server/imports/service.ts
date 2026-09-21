@@ -1,3 +1,4 @@
+import {batchDTO} from './projection';
 import { previewInput } from '@/domain/imports/validate';
 import { createHash } from 'node:crypto';
 import type { Clock, UnitOfWork } from '@/domain/records';
@@ -150,7 +151,7 @@ export class ImportService {
         });
     }
     async batch(token: string | undefined, id: string) { return this.identity.repo.transaction(s => { const p = this.identity.principal(s, token), b = s.get('importBatch', id); if (!b?.contextId)
-        unavailable(); access(s, p, b.contextId, this.clock, false, b.data.includesInternalPrice); return { id: b.id, contextId: b.contextId, appliedAt: b.data.appliedAt, sourceHash: b.data.sourceHash, sourceName: b.data.sourceName, schema: IMPORT_SCHEMA, rows: b.data.rows.map(r => ({ row: r.row, action: r.action, productId: r.productId, contextProductId: r.contextProductId, versionIds: r.versionIds.filter(id => typeof id === 'string') })), mapping: b.data.mapping.map(m => ({ column: m.column, field: m.field })) }; }); }
+        unavailable(); access(s, p, b.contextId, this.clock, false, b.data.includesInternalPrice); return batchDTO(b); }); }
     async workbook(token: string | undefined, contextId: string, kind: 'template' | 'export', includeInternal = false) {
         const data = await this.identity.repo.transaction(s => {
             const p = this.identity.principal(s, token);
