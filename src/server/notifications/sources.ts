@@ -77,8 +77,9 @@ export function notificationEventSource(s: UnitOfWork, principal: Principal, eve
         const requestId = activity?.data.requestId ?? versionId, request = requestId ? s.get('requestVersion', requestId) : null;
         if (!request || request.data.taskId !== task.id || request.contextId !== event.contextId || task.data.visibility !== 'public') unavailable();
         if (activity && (activity.data.taskId !== task.id || activity.contextId !== event.contextId || activity.data.kind !== 'schedule')) unavailable();
-        const source = campaignRequestSource(s, request);
-        const disposition = type === 'TASK_REQUEST_REVISED' && source ? 'semantic_duplicate' : request.id !== task.data.currentRequestId ? 'superseded' : undefined;
+        campaignRequestSource(s, request); // Validate immutable provenance; a related event is not proof of recipient-level delivery.
+        // Canonical-alert dedupe belongs to delivery after the same origin AND current recipient are established.
+        const disposition = request.id !== task.data.currentRequestId ? 'superseded' : undefined;
         const dto = eventFact(event, p, 'task', title, url, ['TASK_ACCEPTED', 'TASK_SCHEDULE_CHANGE_REQUESTED'].includes(type) ? owner : brand, disposition);
         return { ...dto, sourcePrecision: type === 'TASK_SCHEDULE_CHANGE_REQUESTED' && !activity ? 'activity_unavailable' : 'exact', certainty: sourceDeadline(activity?.data.proposedDeadline ?? request.data.content.deadline).certainty };
     }

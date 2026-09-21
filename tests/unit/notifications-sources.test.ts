@@ -115,7 +115,7 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G13 actual pro
     it('S13-08 actual G12 selected/decline/cancellation preserve facts and no brand nag; general requirement survives decline', async () => {
         await setup(); const f = await completionCampaign(identity); await f.select();
         const campaignEvent = await event(brand, 'CAMPAIGN_PUBLISHED', f.campaignId); expect(campaignEvent.disposition).toBe('eligible');
-        expect((await event(brand, 'TASK_REQUEST_REVISED', f.taskId)).disposition).toBe('semantic_duplicate');
+        expect(await event(brand, 'TASK_REQUEST_REVISED', f.taskId)).toMatchObject({ disposition: 'eligible', recipientId: 'user-luna' });
         expect((await event(gsg, 'CAMPAIGN_SELECTION_RECORDED', f.campaignId)).disposition).toBe('eligible');
         const selected = await read(brand, (s, p) => campaignSchedules(s, p, f.campaignId, () => NOW)); expect(selected.filter(r => r.active)).not.toHaveLength(0); expect(selected.filter(r => !r.active)).not.toHaveLength(0); expect(JSON.stringify(selected)).not.toContain(campaignMarker);
         await f.applied(); await f.select('decline'); const records = await repo.list('campaignExternalFact');
