@@ -23,6 +23,25 @@ import { MAX_FILE_BYTES } from '@/domain/files/validate';
 const A = 'ctx-jp-a-luna', admin = tokenFor('user-admin'), brand = tokenFor('user-luna'), co = tokenFor('user-co'), team = tokenFor('user-team');
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=', 'base64');
 const payload = () => ({ ...blankContent(), title: 'G05 합성 요청', description: '자료를 보내 주세요', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('answer'), label: '답변' }] });
+// Inspect actual JSON fields and complete numeric values, never substrings of opaque IDs.
+const privatePriceKeys = new Set(['internalPrice', 'internalPriceId', 'internalPriceVersion', 'internalPriceVersionId', 'internalPriceVersions', 'internalSupplyPrice', 'internalSupplyRate', 'supplyAmount', 'supplyRate', 'margin', 'marginRate']);
+function privatePriceLeaks(value: unknown, at = '$'): string[] {
+    if (Array.isArray(value)) return value.flatMap((entry, index) => privatePriceLeaks(entry, `${at}[${index}]`));
+    if (value !== null && typeof value === 'object') return Object.entries(value).flatMap(([key, entry]) => [
+        ...(privatePriceKeys.has(key) ? [`${at}.${key}: forbidden key`] : []),
+        ...privatePriceLeaks(entry, `${at}.${key}`),
+    ]);
+    const numeric = typeof value === 'number' ? value : typeof value === 'string' && /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value.trim()) ? Number(value.trim()) : null;
+    return numeric === 1700 || numeric === 0.4 ? [`${at}: confidential fixture value`] : [];
+}
+it('price privacy oracle accepts the exact observed UUID and harmless embedded digit sequences', () => {
+    const value = { taskId: '8d170022-a8a6-4895-a90d-cefbdf43ba61', versions: [{ id: 'record-0.4-suffix', label: 'v0.4.2', retailPriceVersionId: 'public-retail-1700-id', amount: '4300' }] };
+    expect(privatePriceLeaks(value)).toEqual([]);
+});
+it('price privacy oracle detects nested private keys and complete numeric/string confidential prices', () => {
+    for (const key of ['internalPrice', 'internalPriceVersionId', 'internalSupplyPrice', 'internalSupplyRate', 'margin', 'supplyAmount', 'supplyRate']) expect(privatePriceLeaks({ products: [{ nested: { [key]: null } }] })).toContain(`$.products[0].nested.${key}: forbidden key`);
+    for (const value of [1700, 0.4, '1700', '0.4', '1700.00', '0.400']) expect(privatePriceLeaks({ products: [{ unknown: value }] })).toEqual(['$.products[0].unknown: confidential fixture value']);
+});
 for (const mode of ['mock', 'sqlite'] as const)
     describe(`${mode} G05 actual producer`, () => {
         let repo: RecordRepository, identity: IdentityService, tasks: TaskService, sub: SubmissionService, dir: string, files: SubmissionFiles, products: ProductService;
@@ -68,7 +87,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(observer.draftEvaluation).toBeNull();
             expect(observer.submittedEvaluation!.evaluation.missing).toBe(0);
             expect((await tasks.catalog(team, A)).tasks.find(t => t.id === id)!.data.submissionSummary!.mode).toBe('full');
-            expect((await sub.snapshot(brand, second)).review.connected).toBe(false);
+            expect((await sub.snapshot(brand, second)).review).toMatchObject({ connected: true, reviews: [], status: 'pending' });
             await expect(repo.transaction(s => { const row = s.get('submission', first)!; s.update('submission', first, row.revision, row.data); })).rejects.toMatchObject({ code: 'INVALID_RECORD' });
         });
         it('SA17 CAS races, response loss/new-key retry consume one draft; snapshot/product/audit/outbox/receipt rollback is atomic', async () => {
@@ -184,7 +203,8 @@ for (const mode of ['mock', 'sqlite'] as const)
             await save(id, d);
             const second = (await sub.submit(brand, id, await submissionInput(id))).ids[0];
             expect((await sub.snapshot(brand, second)).products[0].common.name).toBe('수정된 현재 상품');
-            expect(JSON.stringify(v1)).not.toMatch(/internalPrice|1700|0\.4/);
+            expect((await repo.get('product', 'product-serum'))!.data).toMatchObject({ internalSupplyPrice: '1700', internalSupplyRate: '0.4' });
+            expect(privatePriceLeaks(v1)).toEqual([]);
         });
         it('actual product-scoped condition ancestry and typed invalid values keep exact denominator without author-provided flags', async () => {
             await setup();

@@ -12,7 +12,7 @@
 
 파일은 정확한 `conversationId`와 `messageId` 참조로 읽습니다. 미전송 ready 파일은 현재 업로더만 읽으며 공개 메시지에 포함된 선택 파일만 상대에게 보입니다. 내부 파일의 공개 메시지 재사용이나 다른 업무/상품으로의 문의 파일 재사용은 제공하지 않습니다. 401/403/404는 보호 데이터·복구 입력을 제거하고, 409/503에서는 허용된 입력과 성공 파일·이미 만들어진 업무 ID를 보존합니다. 같은 intent를 재시도하고 새 질문/업무를 자동 생성하지 않습니다.
 
-현재 migration은 `0001`~`0008` 총 8개입니다. 기존 G07 체인은 `0008`만, G09 선행 분기(`0001`~`0005`, `0007`, `0008`)는 빠진 `0006`만 추가합니다. 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
+현재 migration은 `0001`~`0009` 총 9개입니다. 수용된 G09 통합 체인(`0001`~`0008`)에는 `0009`만, 이전 G10 분기(`0001`~`0005`, `0007`, `0009`)에는 빠진 `0006`과 `0008`을 추가합니다. 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
 
 ```sh
 npm run build
@@ -272,7 +272,7 @@ G08 공지 UI·브랜드 홈·PC/모바일·서버는 독립 검증과 루트 �
 
 파일 API는 기존 경로에 `?noticeId=...`와 선택 `versionId=...` 참조를 추가합니다. 기존 25MiB/10개와 private 저장소 규칙을 유지합니다. 업로드된 초안 파일은 공개 버전에 포함되기 전 브랜드가 읽거나 다른 자료에 재사용할 수 없습니다. 과거 버전에서 제거된 파일은 허용된 과거 공지 주소에서 정확한 바이트로 조회하며, 비동기 읽기 전후 권한을 다시 검사합니다. 공지 전용 파일 owner 추가는 기존 task/product 파일 원장을 다시 쓰지 않습니다.
 
-`0007-notices.sql`과 G07의 `0006-evidence-imports.sql`을 모두 유지하여 migration 파일은 총 7개입니다. 기존 0001~0006 DB에는 0007을 추가하고, 기존 0001~0005+0007 DB에는 아직 없는 0006을 추가합니다. 적용된 파일의 내용과 checksum은 바꾸지 않습니다. 공개 버전·읽음은 불변이고 공개 pointer/event/audit/receipt는 하나의 transaction입니다. `NOTICE_PUBLISHED`/`NOTICE_REVISED` 사건은 G13 알림 소비 계약이며 실제 전달 완료를 뜻하지 않습니다.
+`0007-notices.sql`과 G07의 `0006-evidence-imports.sql`을 모두 유지합니다. 현재 통합본의 migration은 `0001`~`0009` 총 9개이며, 기존 DB에는 아직 적용하지 않은 파일만 추가합니다. 적용된 파일의 내용과 checksum은 바꾸지 않습니다. 공개 버전·읽음은 불변이고 공개 pointer/event/audit/receipt는 하나의 transaction입니다. `NOTICE_PUBLISHED`/`NOTICE_REVISED` 사건은 G13 알림 소비 계약이며 실제 전달 완료를 뜻하지 않습니다.
 
 ```sh
 npm ci
@@ -299,3 +299,13 @@ NOTICES_MODE=sqlite E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notic
 미전송 입력과 업로드된 파일 참조는 계정·컨텍스트·문의별로 sessionStorage에 최대 24시간/8건/건당 180,000자 보관합니다. 파일 바이트는 저장하지 않아 실패 파일은 새로고침 후 다시 선택해야 합니다. 복구 전에 실제 현재 권한을 확인하며 401/403/404에서는 문의 화면·목록·커서·보관 입력을 지웁니다. 이 로컬 보관 기간은 서버 초안 삭제 정책이 아닙니다.
 
 UI 자체 검사(원본 결과·실패 및 합본 독립 검증은 별도): `npm run check`, `npm run build`, 이후 `E2E_PORT=4213 E2E_AUX_PORT=4214 npm run test:e2e -- inquiries` 및 동일 포트의 `npm run test:e2e:db -- inquiries`. 기본 runner가 모드/프로젝트/스펙마다 별도 DB·서버를 만듭니다. 실제 실행 기록은 할당된 비공개 evidence에 보존하며 이 설명 자체가 G09 수용 판정은 아닙니다.
+
+# G10 corrections server
+
+The corrections server uses current task permissions and actual immutable G05 submissions. GET `/api/corrections?taskId=...` returns public batches and exact source choices; only GSG receives the separate staff opinion/draft/review section. POST `/api/corrections` supports `save_opinion`, `save_draft`, `publish`, `reflect`, `resolve`, and `record_review`. Client types are exported from `src/server/corrections/contracts.ts`.
+
+Internal opinions append versions. Published batches and their source draft are immutable; late opinions require an explicit follow-up batch. Brand assignees record reflection against a later actual submission, then GSG records individual resolution. Uploading or submitting does not resolve corrections. Previous reviews are references only; AI candidates return `AI_NOT_CONNECTED` until the actual later producer exists.
+
+Public preview: GET `/api/corrections/drafts/:id/preview` (GSG only). Exact batch: GET `/api/corrections/:id`. Target-file links use `/api/corrections/files/:id` and recheck the current batch/item plus original file authority before and after file IO. Internal opinion files use existing internal task uploads; no draft or upload releases them to brands.
+
+Run the existing `npm ci`, `npm run db:setup`, `npm run check`, and `npm run build` setup/check commands. Migration `0009-corrections.sql` adds constraints without changing previous SQL. This combined branch contains 0001 through 0009 (nine). A previous accepted G09 database gains only 0009; the previous isolated G10 chain gains 0006 and 0008. Existing applied SQL bytes and records remain unchanged. The actual corrections UI is available at `/tasks/:id/corrections?context=...`; downstream notification delivery and independent acceptance remain separate stages.
