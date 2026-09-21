@@ -91,3 +91,6 @@ G10 depends on acceptedG05, so implementer may add only standalone corrections t
 
 ## 2026-09-21T17:32:28.408403+00:00 — G08 independent PASS integrated, not yet accepted
 Root reviewed raw7groups, source and evidence hashes, default test IDs and current-version screenshot. Serial merge3c4e is product-identical to verified6460 across230 files. workflow assigned exact3c4e freshregression in separate g08-regression/4201/4202; no G08ACCEPTED or G07consumption before this gate. G09/G10 standalone source only stilldisjoint.
+
+## 2026-09-21T17:37:18.952427+00:00 — First inquiry file ownership and explicit send
+Root accepts minimal private conversation draft then owned per-item idempotentupload then atomic publish_first; actor-only draft excludes GSG/otherbrand/basiclist/home/events until send. This is delegated implementation choice fixing a static DTO cycle, not a user-confirmed new workflow requirement or runtime PASS. Current4 domain files may be revised; old artifacts frozen. Pure G09/G10 unit checks are not feature acceptance. G10 stored projector must not reuse strict command parsing as proof of safe positive unknown-extension reads.

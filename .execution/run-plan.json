@@ -1715,7 +1715,7 @@
           "evidence": []
         }
       ],
-      "next_action": "goals standalone domain types/actual bounded commandvalidation ONLY accepted37b; no shared schema/lock/auth/UI/runtime. Fullserver andUI pending latestaccepted combined base/sharedlease. AllAC NOT_RUN.",
+      "next_action": "goals domainv2 privatecreateDraft+explicitpublish_first types/validators only. Root accepted proposal closes static initialfileowner circular contract; actual auth/files/runtime/ACremainNOTRUN.",
       "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/task-draft.json",
       "participant_policy_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/participant-policy-decision.json",
       "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/dor-task.json",
@@ -1726,11 +1726,15 @@
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/domain-contract-task.json",
       "subtasks": {
         "domain_contract": {
-          "state": "IMPLEMENTING",
+          "state": "REPAIRING_INTERFACE_BEFORE_SERVER",
           "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g09-contract",
           "base_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
           "agent": "/root/goals",
-          "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/domain-contract-task.json"
+          "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/domain-contract-task.json",
+          "candidate_commit": "f1d25a4e576a09362b061b13fa920527d30cfbc5",
+          "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/domain-contract/result.json",
+          "main_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-domain-review.json",
+          "revision_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/domain-revision-task.json"
         },
         "server": {
           "state": "NOT_ASSIGNED"
@@ -1738,7 +1742,8 @@
         "ui": {
           "state": "NOT_ASSIGNED"
         }
-      }
+      },
+      "initial_attachment_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/initial-attachment-decision-proposal.json"
     },
     {
       "id": "G10",
@@ -1786,7 +1791,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd standalone new correction domain/types/real input validators only; shared/server/UI/runtime NOT_ASSIGNED. Exact existing submission productUse historical target, no current recapture. G07union priority.",
+      "next_action": "Standalone domain frozen/reviewed pure9unit; staticprecommitidentityreusefresh0. Server/UI/allAC NOT_RUN. prd idle readyG07union afterG08acceptance.",
       "preparation_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/preparation-task.json",
       "preparation_status": "ACTUAL20SOURCE8INPUT_ROOT_REVIEWED",
       "base_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
@@ -1795,10 +1800,13 @@
       "main_preparation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-preparation-review.json",
       "subtasks": {
         "domain_contract": {
-          "state": "IMPLEMENTING",
+          "state": "AUTHOR_COMPLETE_ROOT_REVIEWED_NOT_ACCEPTED",
           "base_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
           "agent": "/root/prd",
-          "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/domain-contract-task.json"
+          "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/domain-contract-task.json",
+          "candidate_commit": "de954ae7340efd62f226a1e054dd84fcfec85a7b",
+          "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/domain-contract/result.json",
+          "main_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-domain-review.json"
         },
         "server": {
           "state": "NOT_ASSIGNED"
@@ -2260,7 +2268,7 @@
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G08",
   "next_action": "workflow actualexact integrated3c4e freshregression running; rootrawreview thenACCEPTED ifPASS. Candidate independentPASS/currentG08findingsclosedbut finalacceptancepending. G09/G10 standalone author stages continue; afterG08accepted assignG07union priority.",
-  "state_version": 106,
+  "state_version": 107,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2287,7 +2295,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T17:32:28.408403+00:00",
+  "updated_at": "2026-09-21T17:37:18.952427+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
