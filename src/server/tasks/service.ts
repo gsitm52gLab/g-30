@@ -242,7 +242,7 @@ export class TaskService {
                 activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
                 requirementStatus: current ? evaluateRequirements(current.data.content, prior?.data as PriorSubmissionData ?? null, previous?.data.content ?? null) : [],
-                submissionConnection: "G05 제출 기능 연결 전", completionConnection: "G11 수동 완료 연결 전", notificationConnection: "G13 앱 알림 연결 전" };
+                submissionConnection: "답변 제출은 준비 중입니다", completionConnection: "업무 완료는 준비 중입니다", notificationConnection: "앱 알림은 준비 중입니다" };
         });
     }
     async catalog(token: string | undefined, contextId: string) {
