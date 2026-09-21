@@ -66,7 +66,7 @@ npm run test:e2e:db
 CLI는 `--project=desktop`, `--project mobile`을 지원하며 반복 옵션으로 둘을 선택할 수 있습니다. 프로젝트를 생략하면 둘 다 실행합니다. 테스트 파일/행, `--grep`/`--grep-invert`, `--list`, `--headed` 등 나머지 인자는 shell 조합 없이 Playwright에 전달합니다. 잘못된 프로젝트·옵션·무일치 필터와 테스트 실패는 nonzero exit입니다. 격리를 우회하는 `--config/-c`, `--reporter`, `--output`과 상주 `--ui`는 명시 거부합니다. 보고서/산출물은 환경변수로 지정하세요. 직접 `npx playwright test` 대신 아래 wrapper 명령을 사용합니다.
 
 ```bash
-# 기본 전체 실행: 현재 모드별 13 desktop + 13 mobile 시나리오
+# 기본 전체 실행: desktop과 mobile의 모든 시나리오
 E2E_PORT=4149 E2E_AUX_PORT=4150 npm run test:e2e
 E2E_PORT=4149 E2E_AUX_PORT=4150 npm run test:e2e:db
 # 요청한 프로젝트/파일/테스트만 실행; 인자는 -- 뒤에 지정
