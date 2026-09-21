@@ -1,1 +1,2 @@
 {"event": "run_started", "run_id": "RUN-20260921-01", "state_version": 1, "goal": "G00", "classification": "progress", "reason": "Read active objective and current source state; created authoritative task ledger"}
+{"at": "2026-09-21T08:40:16.377879+00:00", "actor_session": "01a0c281-e335-7a81-a808-36dd5305557e", "event": "traceability_initialized", "from_state_version": 4, "state_version": 5, "original_criteria": 26, "ac_count": 91, "ai_evaluations": 13, "product_tests_executed_by_this_event": 0}

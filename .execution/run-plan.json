@@ -19,10 +19,26 @@
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": "/root/prd",
-      "verifier_session_id": null,
+      "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+      "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
-      "owned_paths": [],
+      "owned_paths": [
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
+        "next.config.*",
+        "eslint.config.*",
+        "postcss.config.*",
+        "vitest.config.*",
+        "playwright.config.*",
+        "src/**",
+        "scripts/**",
+        "tests/**",
+        "drizzle/**",
+        "README.md",
+        ".env.example",
+        ".gitignore"
+      ],
       "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g00-impl",
       "evidence_root": ".execution/private/runs/<run-id>/G00/<attempt>/",
       "acceptance": [
@@ -57,7 +73,7 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+      "next_action": "Await immutable implementation candidate; verifier executes fresh detached worktree and integration regression before ACCEPTED"
     },
     {
       "id": "G01",
@@ -1013,7 +1029,7 @@
   "accepted_commit": null,
   "current_goal": "G00",
   "next_action": "G00 implementation in isolated worktree then independent candidate verification",
-  "state_version": 3,
+  "state_version": 5,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1038,5 +1054,7 @@
   "implementation_branch": "run/g00-impl",
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
-  "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json"
+  "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
+  "updated_at": "2026-09-21T08:40:16.377879+00:00",
+  "traceability_path": ".execution/traceability.json"
 }

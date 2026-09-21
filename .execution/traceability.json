@@ -1,0 +1,444 @@
+{
+  "schema_version": 1,
+  "run_id": "RUN-20260921-01",
+  "source_revision": "DP-20260921-03",
+  "source_sha256": "017f392ae2f11aa509c0e29131de9cbe80fe6a3762621258820f44c71c10acc9",
+  "prd_sha256": "a911e13ff757aeaaf75910952c5d13fec71c86d02b0a04ebcafe6939ae4ac7a1",
+  "original_criteria": [
+    {
+      "id": "A01",
+      "scenario": "같은 브랜드·다른 리테일러, 같은 리테일러·다른 브랜드, 다른 국가 컨텍스트 생성",
+      "expected": "조합별 사용자/업무/자료 분리. 같은 조합 중복 방지, 허용 멤버십만 선택",
+      "primary_goals": [
+        "G01",
+        "G02"
+      ],
+      "summary": "3요소 컨텍스트·조합 고유·격리·독립 행사 예외",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A02",
+      "scenario": "GSG가 사용자 생성·활성화·복수 컨텍스트 연결·중지·담당 교체",
+      "expected": "로그인 신원 중복 없이 멤버십 관리, 중지 즉시 접근 차단, 과거 작성자와 재배정 이력 보존",
+      "primary_goals": [
+        "G01",
+        "G02"
+      ],
+      "summary": "신원/멤버십·초대·중지·재배정",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A03",
+      "scenario": "신규 입점 프로젝트에서 병렬 업무 생성, 독립 스팟 업무 생성",
+      "expected": "두 최상위 분류·개별 사용자 할당·선택 프로젝트·다음 행동이 화면과 저장 데이터에 일치",
+      "primary_goals": [
+        "G03",
+        "G04"
+      ],
+      "summary": "신규 입점/스팟·사용자 배정·병렬/다음 행동",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A04",
+      "scenario": "텍스트+파일 요청, 참고 양식과 마감 설정 후 공개",
+      "expected": "담당자에게 요청 내용과 필요한 자료·기한이 보임. 원본/내부 메모는 노출되지 않음",
+      "primary_goals": [
+        "G04",
+        "G08",
+        "G12"
+      ],
+      "summary": "설명·항목·양식·기한·공개 미리보기",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A05",
+      "scenario": "읽음, 수락, 일정 조정, 줄글 답변, 부분/전체 제출",
+      "expected": "상태를 혼동하지 않음. 미제출 목록 정확, 줄글·파일 버전 보존, 입력 실패 후 복구",
+      "primary_goals": [
+        "G04",
+        "G05"
+      ],
+      "summary": "읽음/수락/조정·줄글·부분/전체 제출",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A06",
+      "scenario": "v1 보완 묶음 공개, v2 일부 반영, 늦은 추가/상충 의견",
+      "expected": "원본/공개본 불변, 후속 묶음, 반영과 해소 분리, 새 버전 자동 승인 없음",
+      "primary_goals": [
+        "G05",
+        "G10"
+      ],
+      "summary": "버전·수정 묶음·늦은/상충 의견",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A07",
+      "scenario": "GSG가 미해결·외부 대기·AI 실패가 남은 업무를 완료",
+      "expected": "GSG만 수동 완료 가능, 정확한 잔여 상태 스냅샷, 법적 승인/외부 납품으로 오표시하지 않음",
+      "primary_goals": [
+        "G10",
+        "G11",
+        "G17"
+      ],
+      "summary": "무승인게이트 수동 완료·잔여 스냅샷",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A08",
+      "scenario": "다섯 질문 중 네 개 답변, 하나 외부 대기, 해결 후 추가 질문",
+      "expected": "남은 질문과 다음 확인일 유지, 자동 접수/내부 메모로 해결하지 않음, 재개 이력 보존",
+      "primary_goals": [
+        "G03",
+        "G09",
+        "G13"
+      ],
+      "summary": "질문별 부분 답변·외부 대기·재개",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A09",
+      "scenario": "문의 팝업과 상세 동시 사용·연결 끊김 후 복귀",
+      "expected": "동일 대화/파일/읽음, 새 메시지 수신, 재연결 누락 복구, 중복 전송 방지",
+      "primary_goals": [
+        "G09"
+      ],
+      "summary": "동일 대화·실시간·재연결·중복 방지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A10",
+      "scenario": "상품 등록·수정·검색·상세·업무 연결·자료 표·보관 처리",
+      "expected": "독립 상품 메뉴 동작, 컨텍스트 정보 구분, 이전 제출의 상품 스냅샷 보존",
+      "primary_goals": [
+        "G03",
+        "G06",
+        "G07"
+      ],
+      "summary": "독립 상품 CRUD·업무/증빙 연결",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A11",
+      "scenario": "공통 인증 관련 서류를 여러 상품/업무에 연결",
+      "expected": "파일 버전 재사용, 적용 상태 개별 유지, 질문지/청구서를 인증 승인으로 오인하지 않음",
+      "primary_goals": [
+        "G06",
+        "G07"
+      ],
+      "summary": "공통 증빙·제품별 적용·인증 오인 방지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A12",
+      "scenario": "기본 Excel 정상·오류·중복·내부 가격 포함 파일 가져오기/내보내기",
+      "expected": "매핑/미리보기/명시적 반영·실패 안내, 가격 권한 적용. 현업 양식 검증은 별도",
+      "primary_goals": [
+        "G06",
+        "G07"
+      ],
+      "summary": "Excel 매핑/미리보기/명시 반영·가격 권한",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A13",
+      "scenario": "공지·가이드 공개와 읽음 확인, 연결 업무 제출",
+      "expected": "공지 읽음이 제출/완료를 바꾸지 않음, 수정 공지 이력·대상 범위 정확",
+      "primary_goals": [
+        "G08"
+      ],
+      "summary": "공지·가이드·읽음·업무 분리",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A14",
+      "scenario": "다중 컨텍스트 요청과 템플릿 변경",
+      "expected": "업무별 진행 독립, 선택 대상에만 변경 공개, 이전 답변 유지",
+      "primary_goals": [
+        "G04"
+      ],
+      "summary": "다중 컨텍스트 독립·템플릿/요건 변경",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A15",
+      "scenario": "참여/불참/추가 협의, 메뉴 선택·신청·선정·취소 협의",
+      "expected": "불참 독촉 없음, 미선택 준비물 없음, 신청·선정·진행 완료 분리",
+      "primary_goals": [
+        "G12"
+      ],
+      "summary": "참여·메뉴·신청·선정·취소 협의",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A16",
+      "scenario": "촬영용/배포용 실물을 서로 다른 목적지로 처리",
+      "expected": "수량/단위·발송/수령 개별 기록, 파일/송장 존재로 납품 완료 추정 금지",
+      "primary_goals": [
+        "G12"
+      ],
+      "summary": "목적지/용도별 실물·발송/수령",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A17",
+      "scenario": "확정/요청/예상 일정, 원문 충돌, 기한 미정, 외부 지연",
+      "expected": "출처·시간대·변경 이력 유지, 브랜드 지연과 외부 지연 구분, 임의 SLA 생성 없음",
+      "primary_goals": [
+        "G04",
+        "G12",
+        "G13"
+      ],
+      "summary": "일정 확정 수준·원문 충돌·외부 지연",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A18",
+      "scenario": "공개/제출/보완/마감/외부 확인 알림, 완료·취소",
+      "expected": "정확한 수신자, 중복 방지, 내부 취합 비노출, 종료 건 독촉 없음",
+      "primary_goals": [
+        "G03",
+        "G08",
+        "G09",
+        "G13"
+      ],
+      "summary": "수신자·알림 중복/중단",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A19",
+      "scenario": "다른 컨텍스트 ID·파일 URL·검색·알림·내보내기·AI 결과 접근 시도",
+      "expected": "서버가 읽기/쓰기 모두 거부, 제목·개수·가격·본문 누출 없음",
+      "primary_goals": [
+        "G02",
+        "G14"
+      ],
+      "summary": "서버 전 경로 권한·가격/파일/AI 격리",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A20",
+      "scenario": "동시에 수정·중복 클릭·재시도·새로고침·재로그인",
+      "expected": "충돌 안내와 멱등성, DB 모드에서 제출·문의·완료·상품·감사 기록 유지",
+      "primary_goals": [
+        "G00",
+        "G05",
+        "G11",
+        "G14"
+      ],
+      "summary": "동시 변경·멱등성·DB 영속성",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A21",
+      "scenario": "지원 AI 정상/위험/근거 없음/범위 밖/스캔/PDF 일부 선택",
+      "expected": "읽은 범위만 표시, 구조화 후보·정확한 근거 또는 미확인, 자동 승인·공개 없음",
+      "primary_goals": [
+        "G15",
+        "G16"
+      ],
+      "summary": "AI 범위·OCR·위치·근거·미확인",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A22",
+      "scenario": "AI injection·다른 컨텍스트 참조·timeout·429·파싱 실패·키 없음",
+      "expected": "격리·명시적 실패·제한된 재시도, 기존 업무 이용 가능, 오류를 안전으로 처리하지 않음",
+      "primary_goals": [
+        "G15",
+        "G16",
+        "G17"
+      ],
+      "summary": "injection·격리·명시적 오류·기본 업무 유지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A23",
+      "scenario": "AI 모델/입력/corpus/번역 갱신과 비용 기록",
+      "expected": "버전·출처·stale 구분, runtime 번역/범용 AI 없음, 금액 기반 $10 차단 없음",
+      "primary_goals": [
+        "G15",
+        "G16",
+        "G17"
+      ],
+      "summary": "입력/모델/corpus/번역/비용·제외 범위",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A24",
+      "scenario": "모바일 업무 수행·키보드 조작·빈 상태·오류·큰 파일",
+      "expected": "요청→답변→첨부→문의 흐름 수행, 레이블·포커스·읽기 가능한 상태 안내",
+      "primary_goals": [
+        "G03",
+        "G05",
+        "G18"
+      ],
+      "summary": "모바일·키보드·상태/큰 파일",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A25",
+      "scenario": "clean install·mock 실행·DB migrate/seed·build·테스트",
+      "expected": "문서대로 재현, 합성 데이터만 포함, DB 재시드 정책 명시, 키 없이 기본 데모 실행",
+      "primary_goals": [
+        "G00",
+        "G14",
+        "G18"
+      ],
+      "summary": "clean install·mock·DB·build·테스트",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "A26",
+      "scenario": "실제 외부 서비스 검증과 운영 준비",
+      "expected": "AI 실호출/실제 메일/현업 Excel/백업 복구는 수행한 경우에만 각각 증거와 결과 보고",
+      "primary_goals": [
+        "G07",
+        "G13",
+        "G17",
+        "G18"
+      ],
+      "summary": "실연동·현업 양식·운영/복구 증거",
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ],
+  "ai_evaluations": [
+    {
+      "id": "AI-E01",
+      "expected": "분류 불명확",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E02",
+      "expected": "약용 등 범위 밖",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E03",
+      "expected": "문제 후보·원문 위치",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E04",
+      "expected": "legal_basis와 지침 분리",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E05",
+      "expected": "exact locator 미확인",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E06",
+      "expected": "risk와 confidence 분리",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E07",
+      "expected": "원문/한국어 정렬",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E08",
+      "expected": "stale 번역 제외",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E09",
+      "expected": "사람 수락/수정/기각과 FP/FN",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E10",
+      "expected": "prompt injection",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E11",
+      "expected": "컨텍스트 격리",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E12",
+      "expected": "오류 시 미판정",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AI-E13",
+      "expected": "입력/모델/프롬프트/corpus 버전 재현",
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ],
+  "external_levels": [
+    {
+      "id": "OpenAI actual response",
+      "required_for_goal": true,
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "actual external email",
+      "required_for_goal": false,
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "business Excel compatibility",
+      "required_for_goal": false,
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "expert legal judgment",
+      "required_for_goal": false,
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "production backup restore",
+      "required_for_goal": false,
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ],
+  "policy": "Mapping does not establish coverage or PASS. Each original scenario and expected behavior needs execution evidence. All 91 AC are tracked in run-plan.json."
+}
