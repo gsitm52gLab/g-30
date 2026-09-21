@@ -626,8 +626,12 @@
       "owner_note": "G12",
       "requirement": "PR메뉴는외부리테일러마케팅서비스이고플랫폼상품정보와별개. 카탈로그원문/번역/버전/GSG공개조건. FR-022",
       "verification_idea": "브랜드페이지제작메뉴를생성해도상품CRUD메뉴유지. 같은메뉴번호다른카탈로그버전에서메뉴명+버전으로구별, 내부가격/원문선별공개",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G12_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-acceptance.json"
+      ],
+      "current_g12_stage": "PASS actualcampaign/request/materialselection/physicalfacts/privacy/persistence and mobileclosure; consumer delivery/completion/search/home pending.",
+      "remaining": "G13actualreminder/G11residual whereapplicable; finalG18"
     },
     {
       "id": "SA-45",
@@ -637,8 +641,12 @@
       "owner_note": "G12",
       "requirement": "참여/불참/추가협의·외부신청·심사선정·준비·실제진행·결과수령 독립, 신청자/기록자분리. BR-002·020",
       "verification_idea": "참여만으로신청/선정0. 불참은정상회신완료+독촉중지. 이미신청후불참은취소협의이고외부신청상태자동삭제없음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G12_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-acceptance.json"
+      ],
+      "current_g12_stage": "PASS actualcampaign/request/materialselection/physicalfacts/privacy/persistence and mobileclosure; consumer delivery/completion/search/home pending.",
+      "remaining": "G13actualreminder/G11residual whereapplicable; finalG18"
     },
     {
       "id": "SA-46",
@@ -648,8 +656,12 @@
       "owner_note": "G12",
       "requirement": "선택메뉴만제품/수량/비용·통화·세금/취소조건/자료·실물/신청·납품·게시일정 생성. FR-022/BR-008",
       "verification_idea": "3메뉴중1개선택후나머지준비물0·누락0. 선택변경시요건변경이력과기존답변보존. 과거견적의현행자동공개없음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G12_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-acceptance.json"
+      ],
+      "current_g12_stage": "PASS actualcampaign/request/materialselection/physicalfacts/privacy/persistence and mobileclosure; consumer delivery/completion/search/home pending.",
+      "remaining": "G13actualreminder/G11residual whereapplicable; finalG18"
     },
     {
       "id": "SA-47",
@@ -660,11 +672,13 @@
       "owner_note": "G12+G04",
       "requirement": "기본7유형템플릿, 출처별규격·제작주체·자막/원본제공책임·사용장소, 사용자정의항목. FR-003·027",
       "verification_idea": "상품/서류,POP/리플렛,브랜드페이지,영상/교육,행사,샘플/배송,정기업데이트를생성/편집. 영상권장길이는차단아님. 특정PNG규격을모든업무에전파하지않음",
-      "status": "PASS_CURRENT_G04_STAGE",
+      "status": "PASS_CURRENT_G12_STAGE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-acceptance.json"
       ],
-      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
+      "remaining": "G13actualreminder/G11residual whereapplicable; finalG18",
+      "current_g12_stage": "PASS actualcampaign/request/materialselection/physicalfacts/privacy/persistence and mobileclosure; consumer delivery/completion/search/home pending."
     },
     {
       "id": "SA-48",
@@ -674,8 +688,12 @@
       "owner_note": "G12",
       "requirement": "실물목적지·용도·상품/샘플변형·요구/발송수량·단위·예정발송/도착·택배/송장·증빙·수령·기록자. FR-026/BR-009",
       "verification_idea": "촬영1개/배포100개를다른목적지에저장후한쪽만발송/수령. 다른쪽불변. PDF/송장만으로수령완료0, 단위/상품변형빠짐없이재조회",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G12_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-acceptance.json"
+      ],
+      "current_g12_stage": "PASS actualcampaign/request/materialselection/physicalfacts/privacy/persistence and mobileclosure; consumer delivery/completion/search/home pending.",
+      "remaining": "G13actualreminder/G11residual whereapplicable; finalG18"
     },
     {
       "id": "SA-49",
@@ -685,8 +703,12 @@
       "owner_note": "G12",
       "requirement": "요청된게시URL·실행사진·성과리포트 등후속산출물별기한, 원문날짜/번호/가격·할인·포인트충돌. FR-027/BR-019·020",
       "verification_idea": "행사후리포트항목별도기한/미제출표시. 한국어/일본어원문상충값2개와출처유지·확인필요. 할인과포인트를동일값으로합치지않음, 과거성과를예측치로표시안함",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G12_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-acceptance.json"
+      ],
+      "current_g12_stage": "PASS actualcampaign/request/materialselection/physicalfacts/privacy/persistence and mobileclosure; consumer delivery/completion/search/home pending.",
+      "remaining": "G13actualreminder/G11residual whereapplicable; finalG18"
     },
     {
       "id": "SA-50",

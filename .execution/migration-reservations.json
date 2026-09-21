@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "rule": "Root allocates new migration filename; immutable accepted SQL bytes stay unchanged. File count is actual checkout migrations, never inferred from highest reserved number. Reservation does not grant schema lease or mark implementation complete.",
-  "at": "2026-09-21T20:43:20.556067+00:00",
+  "at": "2026-09-21T20:53:56.459461+00:00",
   "reservations": [
     {
       "id": "0001",
@@ -61,7 +61,7 @@
       "id": "0010",
       "file": "0010-campaigns.sql",
       "goal": "G12",
-      "state": "AUTHOR_FROZEN_INDEPENDENT_VERIFYING"
+      "state": "ACCEPTED"
     },
     {
       "id": "0011",

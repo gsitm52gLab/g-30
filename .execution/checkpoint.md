@@ -1,3 +1,11 @@
+# State136 latest — G12 ACCEPTED, G15 assembly assigned
+
+**Accepted24636458b6fab6b93c6b215d9a627a5d84b26b98, 11/19.** G12exactregression8a07296… PASS rootreview746448…581artifacts/9commands/15CRC0errors. Fresh391unit, mock6/SQLite6UI incl20geometry, own18HTTP+9browserchannel+5general/newPID assertions. Oldbroad/race/history fresh0. Original74eFAIL/B04invalid preserved; repaired5229 thenintegration246 all478nonledger bytesidentical. main-acceptance.json holdsstageboundaries G13reminders/G11residual/G03home/G14search/G18 mandatorypending. Regression copiedscope_limits staleNOTRUN integrationtext explicitly superseded by actualproof/rootreview; workflowaddendum requested, originalsunchanged.
+
+Goals formal **G15/combined-task.json**, newworktreeg15-combined branchrun/g15-combined baseaccepted246 ports4233/34; exclusivecommonrecords/constraints/taskdetail/README+7migrationcounttest lease. Mergefinal1eec preservingG09/G10/G12, 10expectedconflicts, actualSQL1..10+12=11; earlyfreeze then ownfinalproof. Wholeindependentprd only. G15 UI/serverreviews complete, nofeatureacceptance yet.
+
+PrdG11finalab3138 (cafserverproduct identical2newHTTPscripts only), author372sourcebound/29mock+5skip/34DB/historical28 and634artifacts424source27cmd471rawHTTP announced. Rootfinalreviewpending; prdreadonlycampaign-consumer-preparation now assigned, noediting sharedlease heldG15. G11UI draft notassigned. Workflow G12done, correctionaddendum only. G17actualAPIstillNOT_RUN GoalACTIVE.
+
 # State135 latest — G12 integrated, acceptance regression pending
 
 Rootserialmerge **24636458b6fab6b93c6b215d9a627a5d84b26b98**, all478nonledgerpaths identical repaired5229. Workflow formalregressiond35828b305744dced4137b8258d77d0952f9ad0580920398b6b5592096b07364 newdetachedg12-regression4231/32, boundedcheck/build/UI-B+union+stronglayout/ownseams/newPID; oldfunctionalproof sourceboundfresh0. Repairedindependent9cff772… PASS rootreview3fd3d7…503artifacts24CRC9commands40geometrystate0errors, actualmobilePNGrootviewed. Original74eFAIL/mobileB04invalid nevererased. Rootrawaddendum8d1f93… actual3RSC+API/SSR positivepublic/privateabsence andhelperfailureclassification. **Accepted remains95310/19 untilregressionreview.**
