@@ -3,8 +3,10 @@ import { useEffect, useState, useRef, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { api } from "./client";
+import {clearSubmissionRecovery} from "@/features/submissions/recovery";
 export function LoginForm() { const router = useRouter(); const [error, setError] = useState(""); const [busy, setBusy] = useState(false); async function submit(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const f = new FormData(e.currentTarget); setBusy(true); setError(""); try {
     await api("/api/auth/login", "POST", { email: f.get("email"), password: f.get("password") });
+    clearSubmissionRecovery();
     router.replace("/");
     router.refresh();
 }
@@ -20,6 +22,7 @@ export function AccountMenu() { const router = useRouter(); const pathname = use
     };
 }>("/api/auth/me").then(r => setUser(r.user)).catch(() => setUser(null)); }, [pathname]); return <div className="account-menu">{user ? <><span>{user.name}</span><button className="button subtle" onClick={async () => { try {
     await api("/api/auth/logout", "POST");
+    clearSubmissionRecovery();
     setUser(null);
     router.replace("/login");
     router.refresh();
