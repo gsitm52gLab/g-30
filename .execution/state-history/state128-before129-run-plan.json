@@ -1922,10 +1922,10 @@
       "dependencies": [
         "G05"
       ],
-      "state": "REGRESSION",
+      "state": "VERIFYING",
       "required_for_product_completion": true,
       "candidate_commit": "1512dff0c948b3c9e82df9e43ff64c13e5f2ac13",
-      "integration_commit": "953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6",
+      "integration_commit": null,
       "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
@@ -1933,7 +1933,7 @@
         "src/domain/corrections/**",
         "tests/unit/corrections-domain.test.ts"
       ],
-      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g10-regression",
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g10-verification-repair1",
       "evidence_root": ".execution/private/runs/<run-id>/G10/<attempt>/",
       "acceptance": [
         {
@@ -1961,7 +1961,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Fresh exactintegrated bounded regression then rootaccept; unchanged fullsuite source-boundfresh0.",
+      "next_action": "Independent final1512 closure G10-TEST-01 and7groups; original3d57 check345P1F retained UUIDfalsepositive. Sourceidentical3d57 fullbrowser reusedfresh0 withprovenance; no acceptanceyet.",
       "preparation_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/preparation-task.json",
       "preparation_status": "ACTUAL20SOURCE8INPUT_ROOT_REVIEWED",
       "base_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
@@ -2063,22 +2063,6 @@
       "verification_repair_addendum": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/verification-repair1-addendum.json",
         "sha256": "70694313e72152a5349342a98ed79b15f4171f76199ca496a90cc0db5155c676"
-      },
-      "verification_result": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/verification-result.json",
-        "sha256": "a4d04d5c17eb745183e0cbf9e347fee0028ca5dc856c021200b3938a566e66d8"
-      },
-      "main_verification_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-verification-review.json",
-        "sha256": "7478730ccbffb0fadd082e616e85a2bdb372a72f7834b0598e06a35fd2895ca8"
-      },
-      "regression_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/regression-task.json",
-        "sha256": "42939e438f1e798c55f194e9f8cc5b0114e8894b3ad73087854e39e3b31a9a2b"
-      },
-      "integration_source_equivalence": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/integration-source-equivalence.json",
-        "sha256": "da034b39df24d1fd6c0ee3cba359ad5376f690b7188d180524bd728c7ed235be"
       }
     },
     {
@@ -2194,7 +2178,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Rootreview exactcb109UI finalpacket thenassigncombinedlatestacceptedunion; finalownB/C8PASS andsourcebound14+14priorPASS (no doublecounts), originalpreviewdirty/providerdisplaybugs preserved.",
+      "next_action": "prd actual campaignUI uses repaired976 typedserver, fullnarrowentrylease released; allACindependentnotrun.",
       "domain_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/domain-contract-task-draft.json",
       "prepared_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-contract",
       "base_commit": "c71d3873e80a297b7a52c1b099e7b2b8c8b145ac",
@@ -2221,19 +2205,18 @@
           "next": "Consume exact976 server via G12UI only; independent aftercombined."
         },
         "ui": {
-          "state": "AUTHOR_FROZEN_FINAL_PACKET_PENDING",
+          "state": "IMPLEMENTING",
           "agent": "/root/prd",
           "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-ui",
           "packet": {
             "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/ui-task.json",
             "sha256": "bd100275ebf162606e24c8f1c66d4bf6506852593e5969faffc03fe023fd4104"
           },
-          "lease": "FROZEN_RELEASE_PENDING_FINAL",
+          "lease": "OWN_UI_PLUS_TASK_ENTRIES_README",
           "ports": [
             4229,
             4230
-          ],
-          "candidate_commit": "cb109d3ecfbbe816d81f616fde94e4358db07111"
+          ]
         }
       },
       "shared_lease": "RELEASED_SERVER",
@@ -2419,7 +2402,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Actual normalNextOCR found snapshot keyorderhash mismatch after16HTTPPASS; goals narrow own snapshot.ts fix+persistedOCRregression then finalserverpacket.340unit/build21f earlyproof not endpointsuccess.",
+      "next_action": "Goals owns persisted API/server then UI, leaving prd independent for wholeG15. Current noenv/noAPI.",
       "extraction_task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/extraction-task-draft.json",
         "sha256": "74a2797771a8160647c0d48485a4d85d182354497ff999fe173cc0a3b51dbe78",
@@ -2449,7 +2432,7 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/main-extraction-review.json",
         "sha256": "81b39ec1f2fec22f1d11276d0b5d5d3fec5cd9ad2a89d5e6fc4bb22adea9f1da"
       },
-      "shared_lease": "RELEASED_CONTRACT_21f_OWN_SNAPSHOT_ONLY_REPAIR",
+      "shared_lease": "EXCLUSIVE_G15_SERVER_NARROW_RECORDS_CONSTRAINTS_FILES_POLICY_NEXTCONFIG",
       "subtasks": {
         "extraction": {
           "candidate": "cd648ff1fc2407606e4449050e0388935ee65eca",
@@ -2458,14 +2441,12 @@
           "lease": "RELEASED"
         },
         "server": {
-          "state": "AUTHOR_ACTUAL_ENDPOINT_REPAIRING",
+          "state": "IMPLEMENTING",
           "agent": "/root/goals",
           "ports": [
             4233,
             4234
-          ],
-          "contract_candidate": "21f6302bfe813dec2aa1e33dc793d60f31aca8f6",
-          "shared_lease": "RELEASED"
+          ]
         },
         "ui": {
           "state": "NOT_ASSIGNED",
@@ -2475,11 +2456,6 @@
           "state": "NOT_ASSIGNED",
           "intended_agent": "/root/prd"
         }
-      },
-      "server_contract_candidate": "21f6302bfe813dec2aa1e33dc793d60f31aca8f6",
-      "server_contract_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/main-server-contract-review.json",
-        "sha256": "8ecd219c9d585a0c05e97673212693ab11f105fb1610083f695b4de20f976854"
       }
     },
     {
@@ -2687,8 +2663,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "92a463e57e58e4f569304d045e9bbe1f7a0ccd7b",
   "current_goal": "G10",
-  "next_action": "G10 exact953 integration regression assigned workflow after root3307artifact review; G12UI cb109 finalpacket pending; G15 server21f contract lease released, actualOCR snapshot key-order defect repair running.",
-  "state_version": 129,
+  "next_action": "Workflow G10 verifier completing3d57 fullsuites then1512 test-onlyrepair freshcheck+ownscenarios; goals G15server resumes; prd G12UIchecks. Root G11/G12 verification drafts andofficial G16 sourcepreparation ready.",
+  "state_version": 128,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2719,7 +2695,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T19:59:42.835416+00:00",
+  "updated_at": "2026-09-21T19:46:48.184800+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -2732,9 +2708,5 @@
     "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/submission-log-derivatives/state122/manifest.json",
     "sha256": "879f2955ed2efb593affd7e4e05f9d6fb966f93488b00ad618a45d91ed760a22",
     "scope": "40974 actual record metadata only; no text/tool args/results, not full transcript, not execution proof, no external transmission; growing tails pending"
-  },
-  "repository_main_ai_source_check": {
-    "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/repository-main-source-check.json",
-    "sha256": "d87e42f144047abb25002dafb52ff3d3b18c2abd23906f50b1ff19578dc7082d"
   }
 }
