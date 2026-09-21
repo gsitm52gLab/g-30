@@ -142,8 +142,11 @@
         "G07"
       ],
       "summary": "독립 상품 CRUD·업무/증빙 연결",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G06_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
     },
     {
       "id": "A11",
@@ -154,8 +157,11 @@
         "G07"
       ],
       "summary": "공통 증빙·제품별 적용·인증 오인 방지",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G06_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
     },
     {
       "id": "A12",
@@ -166,8 +172,11 @@
         "G07"
       ],
       "summary": "Excel 매핑/미리보기/명시 반영·가격 권한",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G06_PRICE_PERMISSION_ONLY_EXCEL_NOT_RUN",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
     },
     {
       "id": "A13",
@@ -255,12 +264,13 @@
         "G14"
       ],
       "summary": "서버 전 경로 권한·가격/파일/AI 격리",
-      "status": "PARTIAL_G04_ACCEPTED",
+      "status": "PARTIAL_G06_ACCEPTED",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
       ],
-      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
+      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
     },
     {
       "id": "A20",
@@ -273,14 +283,15 @@
         "G14"
       ],
       "summary": "동시 변경·멱등성·DB 영속성",
-      "status": "PARTIAL_G04_ACCEPTED",
+      "status": "PARTIAL_G06_ACCEPTED",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
       ],
-      "remaining": "G05/G11/G12/G13 real producer and remaining downstream channels required where applicable; current fixture is not real producer evidence."
+      "remaining": "Real downstream producers/material applicability/Excel and later channels remain mandatory where applicable; current G06 is not whole-platform acceptance."
     },
     {
       "id": "A21",

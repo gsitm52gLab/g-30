@@ -285,8 +285,11 @@
       "owner_note": "G06",
       "requirement": "독립 상품목록의 이미지·브랜드·이름·SKU/코드·용량/변형·카테고리·컨텍스트상태·요청/부족/미확인자료수. 원안7.1/FR-023",
       "verification_idea": "이름만있는CRUD로끝내지않고목록필드/필터(국가·리테일러·브랜드·상품명·SKU)와DB집계비교. 상품에서관련업무생성/연결·Excel진입실행",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G06_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "scope_note": "G07 requested/missing/unconfirmed actual counts and Excel entry remain; null connected=false until implemented"
     },
     {
       "id": "SA-23",
@@ -296,8 +299,11 @@
       "owner_note": "G06",
       "requirement": "기본/현지명·코드·카테고리·용량/단위·색상/향·이미지·설명·사용법·원산지/제조정보. PRD-06본문",
       "verification_idea": "제공된각필드에구별되는합성값을저장/수정/재조회. 원산지/제조정보가없을때임의생성안함. 용량변형과패키지설명을한문자열로뭉개지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "scope_note": "Product field round-trip current; no invented missing values"
     },
     {
       "id": "SA-24",
@@ -307,8 +313,11 @@
       "owner_note": "G06",
       "requirement": "최소등록3값, 임시코드구분·컨텍스트내중복·미확인barcode/성분분류/만료일. 원안7.1",
       "verification_idea": "브랜드/이름/코드만등록성공, 요청별추가필수는해당업무에서검사. 임시코드표시, 중복거부, 모르는값null/미확인유지",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G06_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "scope_note": "Minimum registration current; actual submission-specific requirements await G05"
     },
     {
       "id": "SA-25",
@@ -318,8 +327,11 @@
       "owner_note": "G06",
       "requirement": "브랜드공통원장과 ContextProduct의 현지SKU/JAN·등록/출시/중단·예정/확정출시일·입점프로젝트. FR-023",
       "verification_idea": "한상품2retailer에다른SKU/JAN/상태/출시일/프로젝트를설정후한쪽수정. 공통필드와해당context값만예정대로변경",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "scope_note": "Actual local fields independent, shared common edit policy explicit"
     },
     {
       "id": "SA-26",
@@ -329,8 +341,11 @@
       "owner_note": "G06",
       "requirement": "소비자가·통화·세금포함여부·적용국가/retailer·적용일, 내부공급가/공급률, 공개협찬비용별개. BR-023",
       "verification_idea": "동일상품JPY/KRW가격·적용일구분. brand/가격미권한GSG에는내부필드자체없음. 행사협찬비가공급가필드로합쳐지지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G06_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "scope_note": "Public retail/internal price current; actual event sponsorship G12 remains separate"
     },
     {
       "id": "SA-27",
@@ -340,8 +355,11 @@
       "owner_note": "G06",
       "requirement": "전성분원문/파일·언어·제출일, 포장/용기/라벨/박스·ITF 등 요청된정보. 원안7.1/E03·E06·E07",
       "verification_idea": "성분파일+원문/언어와용기/포장2종데이터저장. 제품/용량/변형연결이맞고미확인정보는빈상태. 패키지이미지를AI검토대상으로자동확장하지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G06_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "scope_note": "Current ingredient/packaging data; AI input scope exclusion G15 required"
     },
     {
       "id": "SA-28",
@@ -351,8 +369,11 @@
       "owner_note": "G06",
       "requirement": "자료/인증/시험·수상증빙, 업무/검토사용처/언어/매체, 변경자/전후/출처·상품/파일버전. FR-023/BR-003·004",
       "verification_idea": "상품에서자료·정확한제출/검토로탐색. 공통정보변경시영향context표시, 현재최신/과거검토스냅샷불변. 보관/판매중단해도기존이력/연결조회가능",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G06_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "scope_note": "Current file metadata/history and capture contract fixture; real submission/review/evidence G05/G07/G10 required"
     },
     {
       "id": "SA-29",

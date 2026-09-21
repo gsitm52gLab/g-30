@@ -45,7 +45,10 @@
       ],
       "expected": "Price/private fields absent in actual product API/HTML/search/count/Excel/export/audit",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
+      "current_g06_stage": "Current product paths only; Excel/global search/export/audit remain"
     },
     {
       "id": "D04",
@@ -131,7 +134,9 @@
       ],
       "expected": "Actual G05 submission captures exact immutable common product/context product/retail price/file versions; subsequent G06 product/context/file changes leave prior submission snapshots unchanged. Evidence/review/completion/AI consume exact immutable submission/product/file references with current permissions.",
       "status": "NOT_RUN",
-      "evidence": [],
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      ],
       "origin_goals": [
         "G05",
         "G06"
@@ -159,7 +164,8 @@
           "evidence": []
         }
       ],
-      "source": "PRD-06 AC-06-03, G06/preparation.md sections6/10 and G05/preparation.md section5"
+      "source": "PRD-06 AC-06-03, G06/preparation.md sections6/10 and G05/preparation.md section5",
+      "current_g06_stage": "Contract only, producer and downstream consumer groups remain NOT_RUN"
     },
     {
       "id": "D10",
@@ -177,10 +183,12 @@
       "expected": "Adapter persistence extends to all real module records across logout/login and process restart",
       "status": "NOT_RUN",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
-      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
+      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition.",
+      "current_g06_stage": "Current product persistence only; later records remain required"
     }
   ]
 }

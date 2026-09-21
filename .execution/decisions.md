@@ -49,3 +49,6 @@
 ## G06 material counts and document/capture boundary
 
 Original7.1 requests material counts, not a substitute task count. Before the actual G07 evidence producer, requested/missing/unconfirmed material counts are null and explicitly unconnected. Related task count can be separately labeled. SA22 aggregate completion remains G07/G18. G06 retains supplied basic document metadata in versioned context bindings; applicability decisions and certification status are G07. Exact product-use capture must describe retail effective intervals and explicit version selection, without private supply metadata. This is an implementation sequencing decision, not a product PASS. See private G06/1/contract-clarification-1.json.
+
+
+G05 delegated defaults (state66): exact requestId/requirementKey/productId identity, shared draft CAS and consumed-draft uniqueness; one canonical typed evaluator; providedBy/recordedBy/uploader separate. Paused draft save permitted, explicit submit waits resume; GSG manual completion remains unblocked. Request OR immutable-submission file release plus original AND reference authorization; upload/draft is not publication. Scoped sessionStorage recovery required for failed-save+refresh, no raw file bytes/auth secrets. Preparation decisions and formal packet hold complete rationale.

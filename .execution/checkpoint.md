@@ -27,3 +27,9 @@ Combined exact51339b author selfcheck reviewed:279artifact hashes,56source blobs
 
 
 State64: G06 independent exact51339b PASS reviewed (518 artifacts,191 source hashes,17 commands). Serial root integration7f409a2 product168 blobs equal. Exact integrated regression assigned workflow in g06-regression4163/4166; accepted remainscc59987 until reviewed PASS. G05 preparation only.
+
+
+State65: G06 accepted current product stage at7f409a2. Main reviewed exact independent518 and integrated334 artifacts,191 source hashes each,168equal product blobs; fresh integrated unit160, mock40+2SQLite-onlyskip/DB42, HTTP67/current24, originalUI20P1locatorF and focused7P retained. Actual G05 snapshots/G07 counts+Excel/later consumer obligations remain. Next G05 server then disjoint UI. Goal ACTIVE.
+
+
+State66: G05 SERVER assigned prd atg05-server, exact accepted7f409a2 base,4151/4154, no realenv/API. Packet G05/1/server/task.json. Typed contract milestone first, then main-review/disjoint goalsUI; workflow independent final combined verifier. Source common schema/files/evaluator owned only by server. Recovery decision binds failed-save+refresh to scoped text/ready-ref recovery, never claims raw failed File bytes recovered.
