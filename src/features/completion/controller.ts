@@ -1,0 +1,27 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {CompletionError,isDenied,request} from './client';
+import {blankForms,type Command,type CompletionWorkspace,type Recovery,type Forms,type TaskCatalog} from './model';
+import {clearRecovery,readRecovery,storeRecovery} from './recovery';
+export function useCompletion(initial:CompletionWorkspace,actorId:string){
+ const scope={actorId,contextId:initial.contextId,taskId:initial.taskId};
+ const [state,setState]=useState({data:initial as CompletionWorkspace|null,ready:false,busy:false,denied:false,error:'',code:'',message:'',recheck:false,catalog:null as TaskCatalog|null,recovery:{...scope,at:0,forms:blankForms(),pending:null} as Recovery});
+ const current=useRef(state),live=useRef({alive:false,halted:false,generation:0,reads:0,locked:false});
+ function update(p:Partial<typeof state>){const next={...current.current,...p};current.current=next;setState(next);if(next.ready&&!next.denied)storeRecovery(next.recovery);}
+ const active=(g=live.current.generation)=>live.current.alive&&!live.current.halted&&g===live.current.generation;
+ function purge(){live.current.halted=true;live.current.generation++;clearRecovery();update({data:null,catalog:null,denied:true,ready:false,busy:false,error:'현재 접근 권한이 없어 보호된 내용과 복구 입력을 지웠습니다.',code:'DENIED',message:'',recovery:{...scope,at:Date.now(),forms:blankForms(),pending:null}});}
+ function failure(e:unknown){if(isDenied(e)){purge();return;}if(active())update({error:e instanceof Error?e.message:'처리하지 못했습니다. 입력은 유지됩니다.',code:e instanceof CompletionError?e.code:'NETWORK'});}
+ async function load(){const me=await request<{user:{id:string}}>('/api/auth/me');if(me.user.id!==actorId)throw new CompletionError('로그인 사용자가 변경되었습니다.',403,'ACTOR_CHANGED');const data=await request<CompletionWorkspace>(`/api/completion?taskId=${encodeURIComponent(initial.taskId)}`);if(data.contextId!==initial.contextId||initial.preview&&!data.preview)throw new CompletionError('권한이 변경되었습니다.',403,'AUTHORITY_CHANGED');return data;}
+ async function refresh(recheck=false){const g=live.current.generation,r=++live.current.reads;try{const data=await load();if(active(g)&&r===live.current.reads)update({data,recheck:recheck?false:current.current.recheck,message:recheck?'최신 잔여 상태를 다시 불러왔습니다. 확인한 뒤 완료 버튼을 눌러 주세요.':'현재 저장본을 확인했습니다. 작성값은 유지됩니다.'});}catch(e){if(active(g))failure(e);}}
+ useEffect(()=>{const lifetime=live.current;lifetime.alive=true;lifetime.halted=false;const g=++lifetime.generation;void load().then(data=>{if(active(g))update({data,ready:true,recovery:readRecovery(scope)??current.current.recovery});}).catch(e=>{if(active(g))failure(e);});
+ const focus=()=>{if(active())void refresh();};const logout=(e:MouseEvent)=>{const b=e.target instanceof Element?e.target.closest('button'):null;if(b?.textContent?.trim()==='로그아웃')purge();};window.addEventListener('focus',focus);document.addEventListener('click',logout,true);const timer=setInterval(focus,20000);return()=>{lifetime.alive=false;lifetime.generation++;window.removeEventListener('focus',focus);document.removeEventListener('click',logout,true);clearInterval(timer);};
+ // The route key scopes all state and pending commands by actor/context/task.
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[]);
+ function edit(p:Partial<Forms>){if(active()&&!current.current.recovery.pending)update({recovery:{...current.current.recovery,forms:{...current.current.recovery.forms,...p}}});}
+ async function execute(body?:Command){if(!active()||live.current.locked)return;live.current.locked=true;const g=live.current.generation;++live.current.reads;update({busy:true,error:'',code:'',message:''});try{let pending=current.current.recovery.pending;if(!pending){if(!body)return;pending={body,ids:null};update({recovery:{...current.current.recovery,pending}});}if(!pending.ids){const result=await request<{ids:string[]}>('/api/completion',pending.body,()=>active(g));if(!active(g))return;pending={...pending,ids:result.ids};update({recovery:{...current.current.recovery,pending}});}++live.current.reads;const data=await load();if(!active(g))return;const forms={...current.current.recovery.forms};if(pending.body.command==='complete')forms.memo='';if(pending.body.command==='reopen')forms.reopenReason='';if(pending.body.command==='record_external')forms.external=null;if(pending.body.command==='link_followup'){forms.createdTaskId=null;forms.followupTaskId='';forms.followupReason='';}update({data,recheck:false,recovery:{...current.current.recovery,forms,pending:null},message:pending.body.command==='complete'?'업무 완료 기록을 저장했습니다. 잔여 사항과 외부 사실은 그대로 보존됩니다.':'기록을 저장했습니다. 외부 발송·승인·납품을 실행하지 않았습니다.'});}catch(e){if(active(g)){if(e instanceof CompletionError&&[409,422].includes(e.status))update({recovery:{...current.current.recovery,pending:null},recheck:e.status===409});failure(e);}}finally{live.current.locked=false;if(active(g))update({busy:false});}}
+ async function catalog(){const g=live.current.generation;try{const value=await request<TaskCatalog>(`/api/tasks?context=${initial.contextId}`);if(value.userId!==actorId||!value.canManage)throw new CompletionError('업무 생성 권한이 없습니다.',403,'DENIED');if(active(g))update({catalog:value});}catch(e){if(active(g))failure(e);}}
+ function created(id:string){if(active())edit({createdTaskId:id,followupTaskId:id});}
+ return{state,edit,execute,refresh,catalog,created,active,purge,failure,locked:state.busy||!state.ready||!!state.recovery.pending};
+}
+export type Controller=ReturnType<typeof useCompletion>;
