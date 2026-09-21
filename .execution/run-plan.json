@@ -1451,7 +1451,9 @@
         "final_audit": "0 observed findings; full combined independent pending"
       },
       "provisional_ui_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-provisional-ui-review.json",
-      "main_server_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-final-review.json"
+      "main_server_final_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-server-final-review.json",
+      "verification_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verification-task-draft.json",
+      "mobile_presentation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-mobile-presentation-review.json"
     },
     {
       "id": "G08",
@@ -1520,7 +1522,9 @@
       "dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-review.json",
       "main_dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-dor-review.json",
       "base_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
-      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/task.json"
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/task.json",
+      "independent_preparation": "workflow assigned read-only literal oracle plan, no product runtime; G07 final verification takes priority",
+      "target_rule_decision": ".execution/decisions.md G08 notice target eligibility"
     },
     {
       "id": "G09",
@@ -2071,7 +2075,7 @@
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G07",
   "next_action": "G07 final UI validation then internal assemble db7 server delta and independent exact combined verification. G08 independent accepted-base implementation in parallel with shared single-owner lease.",
-  "state_version": 94,
+  "state_version": 95,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2098,7 +2102,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T16:26:48.531212+00:00",
+  "updated_at": "2026-09-21T16:29:45.995831+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

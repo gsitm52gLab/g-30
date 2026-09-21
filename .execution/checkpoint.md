@@ -1,6 +1,6 @@
 # GS HALE execution checkpoint
 
-State94; Goal ACTIVE. Root /Users/evan/workspace/gs-hale branch run/integration. Preserve main/origin/.env and user untracked docs/execution-v2. No fetch/push/deploy/OpenAI calls. .execution/run-plan.json authoritative; evidence root .execution/private/runs/RUN-20260921-01. Product accepted37b7fe1912ebe383991d94540aff7e8a23ab7631, G00/G01/G02/G04/G05/G06 current stages ACCEPTED; G07 IMPLEMENTING; wholeGoal incomplete.
+State95; Goal ACTIVE. Root /Users/evan/workspace/gs-hale branch run/integration. Preserve main/origin/.env and user untracked docs/execution-v2. No fetch/push/deploy/OpenAI calls. .execution/run-plan.json authoritative; evidence root .execution/private/runs/RUN-20260921-01. Product accepted37b7fe1912ebe383991d94540aff7e8a23ab7631, G00/G01/G02/G04/G05/G06 current stages ACCEPTED; G07 IMPLEMENTING; wholeGoal incomplete.
 
 ## Current work / next action
 
@@ -35,3 +35,5 @@ State92: FullUI firsttypecheck passed authorreported. Rootprovisional Importscre
 State93: G07-SRV-02 OPEN/P2 ordinary inert hyperlink containing oleObject falsely rejected by wholeXMLwordsearch. Root original rawlog reviewed1FAIL/4filteredSKIP at770d4e2 plusnewworkingtreetest. main-server-finding-02.json; finaldb7c164 structuralchecks authorvalidation ongoing, independent required. UI first/second desktop fixture and assertion failures preserved, thirdcandidate c16fc3b includes UI key change plus fixture corrections; no final browserclaim yet.
 
 State94: G07 server final db7c164 frozen/root reviewed484artifacts/54Gitblobs/46commandpairs, fresh220unit/build/http31mock34SQLite with2PID/relogin. ExactrawexportZIP2 and actual503canary absence reviewed, G05/G06prior770 sourceidentity16paths confirmedfresh0. main-server-final-review.json. SRV01/02 independentpending. Sharedlease released; prd G08 assigned accepted37b in .worktrees/g08-impl branchrun/g08-impl,4183/4184,migration0007, packetG08/1/task.json. NavwithhelduntilG07UIrelease; optionalembeddedCreateTaskcallback allowedpreservingdefaults. Root G07 finalUI+assembly/verification next; acceptedstill37b.
+
+State95: Root actualview mobile importresult/Evidencecards652 screenshots; finalmock19/20 failuremobile .first selectedhiddendesktop node, test-only scopefix pending. Requested narrow UI internalbatch/schema/hash/versionIDs underrecorddetails, preserve primaryfile/time/count/actions; finalUIcandidatepending. G07/1/verification-task-draft.json prepared notassigned. Workflow G08 literal-oracle planprep assigned whilewaiting finalG07; no runtime. G08 target wholecontext currenteligibility includesnewlegitimatemembers, publishsnapshot notforeverauthlist; decision recorded.

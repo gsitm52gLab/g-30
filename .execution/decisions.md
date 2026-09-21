@@ -63,3 +63,7 @@ G05 delegated defaults (state66): exact requestId/requirementKey/productId ident
 - One server schema/migration/policy/lockfile writer. Root reviews actual typed contract commit before separate UI assignment; internal contract freeze is not checkpoint acceptance.
 
 G07 pre-freeze clarification: only complete exact historical submission addresses carry requestId/submissionId/requirementKey/productId. Ordinary current-request navigation must not look like an incomplete historical address. Evidence application confirmation is a file/product relationship; it does not clear canonical human content/specification pending. Preserve that pending status/count without adding G10 review implementation. Source review findings G07/1/main-provisional-contract-review.json; runtime NOT_RUN.
+
+## G08 notice target eligibility — 2026-09-21
+
+One notice has one explicit country×retailer×brand context. “All active brand members” is a current eligibility rule; a publish-time recipient snapshot does not permanently exclude legitimate members who join later. Every read/file path still requires current context membership and eligibility under both current publication and the requested historical version. Target changes publish a new immutable version. A selected-user mode is not mandatory; if supplied, an empty selection means no recipients, never all. Version-specific read receipts do not mark the next revision read. This is a delegated design decision applying PRD-08, not completed verification.
