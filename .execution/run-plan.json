@@ -798,10 +798,10 @@
       "dependencies": [
         "G04"
       ],
-      "state": "INDEPENDENT_VERIFICATION_ASSIGNED",
+      "state": "REGRESSION",
       "required_for_product_completion": true,
       "candidate_commit": "9988cf48d9774af22aef1dc2f29b8efd30c6ca3d",
-      "integration_commit": null,
+      "integration_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
@@ -870,7 +870,7 @@
           "evidence": []
         }
       ],
-      "next_action": "workflow independently verifies exact9988detached g05-verify4163/4164 using14boundgroups. Main reviews rawresult, assigns repairifneeded; serialrootintegration and exactimpactregression required beforeG05ACCEPTED.",
+      "next_action": "workflow exact37b7 integrated impact regression4167/4168. Main reviews result then G05 acceptance and G07 server assignment.",
       "base_commit": "7f409a2a14266776001f6b7910e80e402a5b7717",
       "execution_dependencies": [
         "G04",
@@ -962,7 +962,11 @@
       "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g05-verify",
       "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/verification-task.json",
       "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/assembly/selfcheck/result.json",
-      "combined_selfcheck_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-combined-selfcheck-review.json"
+      "combined_selfcheck_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-combined-selfcheck-review.json",
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/verification-result.json",
+      "main_candidate_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-candidate-review.json",
+      "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g05-regression",
+      "regression_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/regression-task.json"
     },
     {
       "id": "G06",
@@ -1891,9 +1895,9 @@
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "7f409a2a14266776001f6b7910e80e402a5b7717",
-  "current_goal": "G06",
-  "next_action": "workflow independently verifies exact9988detached g05-verify4163/4164 using14boundgroups. Main reviews rawresult, assigns repairifneeded; serialrootintegration and exactimpactregression required beforeG05ACCEPTED.",
-  "state_version": 81,
+  "current_goal": "G05",
+  "next_action": "workflow exact37b7 integrated impact regression4167/4168. Main reviews result then G05 acceptance and G07 server assignment.",
+  "state_version": 82,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1920,7 +1924,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T15:08:02.189554+00:00",
+  "updated_at": "2026-09-21T15:28:00.160422+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
