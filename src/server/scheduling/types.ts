@@ -8,6 +8,7 @@ export interface SourceSchedule {
     taskId: string | null;
     title: string;
     nextAction?: string;
+    recipientPolicy?: 'task_assignees' | 'explicit_action_owner' | 'external_gsg';
     kind: string;
     source: ScheduleSource;
     sourceRevision: number;

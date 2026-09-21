@@ -5,7 +5,7 @@ import { taskScope } from '@/server/policy/projection';
 import { scheduleContent } from '@/domain/scheduling/validate';
 import { object, str, ids, enumValue, dateValue } from '@/domain/tasks/validate';
 import { receipt, newId, audit, fresh } from '@/server/products/store';
-import { sourceTask, currentActor, activeRecipientIds } from './access';
+import { sourceTask, currentActor, activeRecipientIds, actionRecipientIds } from './access';
 import { calendarDTO, scheduleSources, visibleSource } from './read';
 import { manualSchedule, manualVersionDTO } from './manual';
 export class SchedulingService {
@@ -19,7 +19,7 @@ export class SchedulingService {
             if (options.taskId) sourceTask(s, p, options.taskId, this.clock);
             const items = scheduleSources(s, p, contextId, this.clock).map(row => calendarDTO(row, this.clock)).filter(r => (!options.taskId || r.taskId === options.taskId) && (!options.kind || r.kind === options.kind) && (!options.from || r.calendar.dueDay !== null && r.calendar.dueDay >= options.from) && (!options.to || r.calendar.dueDay !== null && r.calendar.dueDay <= options.to)).sort((a, b) => (a.calendar.dueDay ?? '9999').localeCompare(b.calendar.dueDay ?? '9999') || a.logicalKey.localeCompare(b.logicalKey));
             const tasks = s.list('task', contextId).flatMap(t => decide(s, p, 'task.manage', taskScope(t), this.clock).allowed ? [{ id: t.id, title: t.data.title }] : []);
-            const actors = p.user.data.role === 'gsg' ? s.list('user').filter(u => activeRecipientIds(s, contextId, [u.id], 'gsg').length).map(u => ({ id: u.id, label: u.data.name })) : [];
+            const actors = p.user.data.role === 'gsg' ? s.list('user').flatMap(u => { const taskIds = tasks.filter(t => actionRecipientIds(s, s.get('task', t.id)!, u.id).length).map(t => t.id); return taskIds.length ? [{ id: u.id, label: u.data.name, role: u.data.role, taskIds }] : []; }) : [];
             return { contextId, items, total: items.length, capabilities: { create: tasks.length > 0 }, tasks, actors, delivery: { inApp: 'app_open_sync' as const, email: 'not_connected' as const, background: 'not_connected' as const } };
         });
     }
@@ -39,6 +39,7 @@ export class SchedulingService {
             authorize(s, p, 'task.manage', taskScope(task), this.clock);
             if (task.contextId !== contextId || old && old.row.data.taskId !== task.id) unavailable();
             if (!activeRecipientIds(s, contextId, [c.deadline.responsibleUserId], 'gsg').length && !activeRecipientIds(s, contextId, [c.deadline.responsibleUserId], 'brand').length) fail('VALIDATION', 422, '현재 일정 확인 담당자를 선택해 주세요.');
+            if (!['brand_reply', 'submission', 'correction'].includes(c.kind) && !actionRecipientIds(s, task, c.deadline.responsibleUserId).length) fail('VALIDATION', 422, '이 업무의 현재 주·공동 담당자 또는 GSG 담당자를 선택해 주세요.');
             return receipt(s, p, contextId, `schedule.${command}:${scheduleId ?? 'new'}`, x, () => {
                 fresh(old?.row ?? null, x.expectedRevision);
                 const root = old?.row ?? s.create('schedule', { id: newId(), contextId, data: { taskId: task.id, currentVersionId: null, createdBy: p.user.id } });

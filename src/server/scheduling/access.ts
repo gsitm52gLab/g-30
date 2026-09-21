@@ -28,3 +28,6 @@ export function recipientFacts(p: Principal, ids: readonly string[]) {
     const own = ids.includes(p.user.id);
     return { recipient: own ? { id: p.user.id, role: p.user.data.role, active: true, sourceReadable: true } satisfies CurrentRecipient : null, recipientState: !ids.length ? 'needs_assignment' as const : own ? 'current_recipient' as const : 'other_recipient' as const };
 }
+
+/** Operational brand actors must be current task assignees; context membership alone is insufficient. */
+export function actionRecipientIds(s: UnitOfWork, task: StoredRecord<'task'>, id: string) { return activeRecipientIds(s, task.contextId!, [id], 'gsg').length ? [id] : brandRecipientIds(s, task).includes(id) ? [id] : []; }
