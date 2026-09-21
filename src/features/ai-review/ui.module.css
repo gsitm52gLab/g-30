@@ -42,3 +42,8 @@
   .quote { padding: 12px; }
   .actions button { flex: 1 1 150px; }
 }
+
+.links { display: flex; flex-wrap: wrap; gap: 12px 18px; min-width: 0; }
+.links a, .actions a { color: #185d48; text-decoration: underline; overflow-wrap: anywhere; min-height: 44px; display: inline-flex; align-items: center; }
+.stack h1 { overflow-wrap: anywhere; }
+.stack > header { min-width: 0; }

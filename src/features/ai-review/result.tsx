@@ -3,10 +3,10 @@ import { FindingCard } from './finding';
 import { limitationLabels, quarantineLabels, resultLabels } from './labels';
 import s from './ui.module.css';
 
-export function AnalysisIdentityView({ identity }: { identity: AnalysisIdentity }) {
+export function AnalysisIdentityView({ identity, providerCalled = false }: { identity: AnalysisIdentity; providerCalled?: boolean }) {
   return <section className={s.panel} aria-label="분석 실행 기준">
     <h2>분석 실행 기준</h2>
-    <p className={s.notice}>{identity.engine === 'synthetic_demo' ? '합성 데모 결과입니다. 실제 외부 모델 호출이나 법률 정확도 평가가 아닙니다.' : '외부 모델 분석 결과입니다. 호출 기록과 사람 검토를 별도로 확인해 주세요.'}</p>
+    <p className={s.notice}>{identity.engine === 'synthetic_demo' ? '합성 데모 결과입니다. 실제 외부 모델 호출이나 법률 정확도 평가가 아닙니다.' : providerCalled ? '외부 모델 호출 기록이 있는 결과입니다. 사람 검토와 별도로 확인해 주세요.' : '외부 모델이 선택된 실행입니다. 실제 호출 기록은 확인되지 않았습니다.'}</p>
     <dl className={s.facts}><div><dt>모델 식별자</dt><dd>{identity.modelId}</dd></div><div><dt>프롬프트 버전</dt><dd>{identity.promptVersion}</dd></div><div><dt>근거 자료 공개 버전</dt><dd>{identity.corpusReleaseId}</dd></div></dl>
     <details className={s.records}><summary>입력·추출·근거 버전 식별 정보</summary>
       <dl className={s.facts}>
