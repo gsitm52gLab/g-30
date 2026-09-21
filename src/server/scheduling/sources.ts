@@ -48,7 +48,7 @@ export function campaignSchedules(s: UnitOfWork, principal: Principal, campaignI
     const content = versionDTO(s, p, v, clock), result: SourceSchedule[] = [];
     for (const menu of content.menus) {
         const state = menuProgress(s, p, v, menu, clock), key = menuIdentityKey(menu.identity);
-        const base = { contextId: task.contextId!, taskId: task.id, title: sourceText(menu.identity.menuName), sourceRevision: v.revision, visibility: 'public' as const, actionUrl: `/tasks/${encodeURIComponent(task.id)}/campaigns?context=${encodeURIComponent(task.contextId!)}`, active: state.active, unresolvedConflict: menu.confirmationIssues.some(i => i.state === 'unresolved') };
+        const base = { contextId: task.contextId!, taskId: task.id, title: sourceText(menu.identity.menuName), sourceRevision: v.revision, visibility: 'public' as const, actionUrl: `/tasks/${encodeURIComponent(task.id)}/campaigns?context=${encodeURIComponent(task.contextId!)}`, active: state.active, unresolvedConflict: menu.confirmationIssues.some(i => i.state === 'needs_confirmation') };
         const rows = [
             { key: 'request', kind: 'submission', deadline: menu.request.deadline },
             ...menu.request.milestones.filter(m => m.visibility === 'public' || p.user.data.role === 'gsg').map(m => ({ key: `milestone:${m.id}`, kind: m.kind, deadline: m.deadline })),
