@@ -2,10 +2,14 @@
 import type { ScheduleContent } from '@/domain/scheduling/types';
 import s from './ui.module.css';
 type SourceFields = Pick<ScheduleContent, 'statements' | 'conflicts'>;
-export function SourcesEditor({ value, onChange, disabled = false }: { value: SourceFields; onChange: (value: SourceFields) => void; disabled?: boolean }) {
-  const update = (id: string, patch: Partial<SourceFields['statements'][number]>) => onChange({ ...value, statements: value.statements.map(x => x.id === id ? { ...x, ...patch } : x) });
-  const changeConflict = (id: string, patch: Partial<SourceFields['conflicts'][number]>) => onChange({ ...value, conflicts: value.conflicts.map(x => x.id === id ? { ...x, ...patch } : x) });
-  return <fieldset className={s.fieldset} disabled={disabled}><legend>출처 원문과 충돌</legend>
+export function SourcesEditor({ value, onChange, disabled = false }: {
+    value: SourceFields;
+    onChange: (value: SourceFields) => void;
+    disabled?: boolean;
+}) {
+    const update = (id: string, patch: Partial<SourceFields['statements'][number]>) => onChange({ ...value, statements: value.statements.map(x => x.id === id ? { ...x, ...patch } : x) });
+    const changeConflict = (id: string, patch: Partial<SourceFields['conflicts'][number]>) => onChange({ ...value, conflicts: value.conflicts.map(x => x.id === id ? { ...x, ...patch } : x) });
+    return <fieldset className={s.fieldset} disabled={disabled}><legend>출처 원문과 충돌</legend>
     <p className={s.hint}>서로 다른 원문은 각각 남겨 주세요. 충돌을 기록한 것만으로 날짜가 확정되지는 않습니다.</p>
     <div className={s.stack}>{value.statements.map((item, index) => <fieldset className={s.sub} key={item.id}><legend>출처 원문 {index + 1}</legend>
       <div className={s.grid}>
