@@ -1,0 +1,118 @@
+import type { StoredRecord, RecordKind, Clock, UnitOfWork } from "@/domain/records";
+import type { Principal } from "@/server/auth/service";
+import type { Decision, ResourceScope } from "./types";
+import { authorize } from "./policy";
+
+const strings = (value: readonly string[] | undefined) => (value ?? []).filter(v => typeof v === "string");
+const scalar = (value: unknown) => typeof value === "string" || typeof value === "number" || typeof value === "boolean" || value === null;
+function metadata<K extends RecordKind>(row: StoredRecord<K>) {
+    return { kind: row.kind, id: row.id, contextId: row.contextId, revision: row.revision, createdAt: row.createdAt, updatedAt: row.updatedAt };
+}
+
+/** G00/G01 records are explicitly public synthetic previews; future drafts need their own adapter. */
+export function taskScope(row: StoredRecord<"task">): ResourceScope {
+    return { id: row.id, contextId: row.contextId, kind: "task", visibility: "public", assigneeUserId: row.data.assigneeId };
+}
+export function productScope(row: StoredRecord<"product">): ResourceScope {
+    return { id: row.id, contextId: row.contextId, kind: "product", visibility: "public" };
+}
+
+/** These names are the extension contract, not a new product/price persistence schema. */
+export function privateFields(data: object, decision: Extract<Decision, { allowed: true }>) {
+    const source = data as Record<string, unknown>;
+    const result: Record<string, string | number> = {};
+    for (const key of decision.internalFields ? ["internalOriginal", "internalMemo"] : []) {
+        if (typeof source[key] === "string") result[key] = source[key];
+    }
+    for (const key of decision.internalPrice ? ["internalSupplyPrice", "internalSupplyRate"] : []) {
+        if (typeof source[key] === "string" || typeof source[key] === "number" && Number.isFinite(source[key])) result[key] = source[key];
+    }
+    return result;
+}
+
+export function projectTask(store: UnitOfWork, principal: Principal, row: StoredRecord<"task">, clock?: Clock) {
+    const decision = authorize(store, principal, "task.read", taskScope(row), clock);
+    const d = row.data;
+    return { ...metadata(row), data: {
+        title: d.title, category: d.category, description: d.description, status: d.status,
+        assigneeId: d.assigneeId, ownerId: d.ownerId, deadline: d.deadline, nextAction: d.nextAction,
+        productIds: strings(d.productIds), notes: strings(d.notes), authorId: d.authorId,
+        contributorIds: strings(d.contributorIds), assignmentNeedsAttention: d.assignmentNeedsAttention,
+        ...privateFields(d, decision),
+    } };
+}
+
+export function projectProduct(store: UnitOfWork, principal: Principal, row: StoredRecord<"product">, clock?: Clock) {
+    const decision = authorize(store, principal, "product.read", productScope(row), clock);
+    const d = row.data;
+    return { ...metadata(row), data: {
+        name: d.name, code: d.code, brand: d.brand, size: d.size, category: d.category,
+        status: d.status, missingMaterials: d.missingMaterials, ...privateFields(d, decision),
+    } };
+}
+
+export function projectContext(row: StoredRecord<"context">) {
+    const d = row.data;
+    return { ...metadata(row), data: {
+        country: d.country, retailer: d.retailer, brand: d.brand, type: d.type,
+        countryId: d.countryId, retailerId: d.retailerId, brandId: d.brandId, eventName: d.eventName,
+        combinationKey: d.combinationKey,
+    } };
+}
+
+/** Peer identity deliberately excludes grants; only authenticated self gets sessionUser. */
+export function memberIdentity(row: StoredRecord<"user">) {
+    return { id: row.id, revision: row.revision, name: row.data.name, email: row.data.email, role: row.data.role, status: row.data.status };
+}
+export function sessionUser(row: StoredRecord<"user">) {
+    const grant = row.data.adminGrant;
+    return { ...memberIdentity(row), adminGrant: grant ? {
+        scope: grant.scope, contextIds: strings(grant.contextIds), internalPriceAccess: grant.internalPriceAccess === true,
+    } : null };
+}
+export function projectUserLabel(row: StoredRecord<"user">) {
+    return { ...metadata(row), data: { name: row.data.name, email: "", role: row.data.role } };
+}
+export function projectMembership(row: StoredRecord<"membership">) {
+    const d = row.data;
+    return { ...metadata(row), data: {
+        userId: d.userId, role: d.role, status: d.status, scope: d.scope,
+        internalPriceAccess: d.internalPriceAccess === true, activatedAt: d.activatedAt, suspendedAt: d.suspendedAt,
+    } };
+}
+
+const auditKeys: Record<string, readonly string[]> = {
+    "context.created": ["country", "retailer", "brand", "type", "countryId", "brandId", "retailerId", "eventName", "combinationKey"],
+    "invitation.created": ["userId", "membershipId"],
+    "invitation.reissued": ["invitationId"],
+    "invitation.accepted": ["status", "membershipId"],
+    "membership.changed": ["status", "scope", "internalPriceAccess"],
+    "user.status": ["status"],
+    "task.reassigned": ["assigneeId", "ownerId", "authorId"],
+};
+
+export function projectAudit(row: StoredRecord<"audit">) {
+    const d = row.data;
+    function changes(value: Record<string, unknown>) {
+        const safe: Record<string, unknown> = {};
+        for (const key of auditKeys[d.action] ?? []) if (Object.hasOwn(value, key) && scalar(value[key])) safe[key] = value[key];
+        return safe;
+    }
+    return { ...metadata(row), data: {
+        actorId: d.actorId, action: Object.hasOwn(auditKeys, d.action) ? d.action : "record.changed", targetId: d.targetId,
+        before: changes(d.before), after: changes(d.after), at: d.at,
+    } };
+}
+
+/** Harness contract for future channels: never spread the future producer's raw payload. */
+export function projectChannel(store: UnitOfWork, principal: Principal, action: import("./types").Action,
+    scope: ResourceScope, source: Record<string, unknown>, clock?: Clock) {
+    const decision = authorize(store, principal, action, scope, clock);
+    return {
+        id: scope.id, contextId: scope.contextId,
+        ...(typeof source.title === "string" ? { title: source.title } : {}),
+        ...(typeof source.description === "string" ? { description: source.description } : {}),
+        ...(typeof source.fileVersionId === "string" ? { fileVersionId: source.fileVersionId } : {}),
+        ...privateFields(source, decision),
+    };
+}
