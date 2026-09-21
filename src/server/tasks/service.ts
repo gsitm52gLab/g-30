@@ -7,6 +7,7 @@ import { IdentityService, type Principal, revision, hasScope } from "@/server/au
 import { fail, unavailable } from "@/server/auth/errors";
 import { authorize, activeMember, decide } from "@/server/policy/policy";
 import { taskScope, projectTask, projectContext, projectAudit } from "@/server/policy/projection";
+import { projectedRequest, projectedVersion, projectedActivity, projectedTemplate, projectedProject, projectedRequirementStatus, stringList } from "./projection";
 const id = () => randomUUID();
 type Target = { contextId: string; ownerId: string; assigneeId: string; coAssigneeIds: string[]; productIds: string[] };
 export class TaskService {
@@ -107,10 +108,10 @@ export class TaskService {
     async project(token: string | undefined, projectId: string) {
         return this.identity.repo.transaction(s => { const p = this.identity.principal(s, token), row = s.get("project", projectId); if (!row || !row.contextId) unavailable();
             authorize(s, p, "task.read", { id: row.id, contextId: row.contextId, kind: "task", visibility: "public" }, this.clock);
-            const tasks = row.data.taskIds.map(t => s.get("task", t)).filter((t): t is StoredRecord<"task"> => !!t).filter(t => decide(s, p, "task.read", taskScope(t), this.clock).allowed).map(t => projectTask(s, p, t, this.clock));
+            const tasks = stringList(row.data.taskIds).map(t => s.get("task", t)).filter((t): t is StoredRecord<"task"> => !!t).filter(t => decide(s, p, "task.read", taskScope(t), this.clock).allowed).map(t => projectTask(s, p, t, this.clock));
             if (!tasks.length && p.user.data.role !== "gsg") unavailable();
             const visible = new Set(tasks.map(t => t.id));
-            return { ...row, data: { ...row.data, taskIds: tasks.map(t => t.id), dependencies: row.data.dependencies.filter(e => visible.has(e.before) && visible.has(e.after)) }, tasks, canManage: p.user.data.role === "gsg" };
+            return { ...projectedProject(row, visible), tasks, canManage: p.user.data.role === "gsg" };
         });
     }
     async dependencies(token: string | undefined, projectId: string, input: Record<string, unknown>) {
@@ -236,7 +237,7 @@ export class TaskService {
     async previewTemplate(token: string | undefined, input: Record<string,unknown>) {
         return this.identity.repo.transaction(s=>{const p=this.identity.principal(s,token),contextId=str(input.contextId,160,true);this.manage(s,p,contextId);const template=this.template(s,p,contextId,input.versionId);if(!template)unavailable();
             return {targets:list(input.targets,50).map(v=>{const t=object(v,["id","expectedRevision"]),row=this.task(s,p,str(t.id,160,true),true);if(row.contextId!==contextId)unavailable();this.fresh(row,t.expectedRevision);const previous=row.data.currentRequestId?s.get("requestVersion",row.data.currentRequestId):null;
-                return {id:row.id,title:row.data.title,currentVersionId:previous?.id??null,addedKeys:template.data.content.requirements.filter(q=>!previous?.data.content.requirements.some(o=>o.key===q.key)).map(q=>q.key),changedKeys:template.data.content.requirements.filter(q=>previous?.data.content.requirements.some(o=>o.key===q.key&&JSON.stringify(o)!==JSON.stringify(q))).map(q=>q.key)};
+                return {id:row.id,title:row.data.title,currentVersionId:previous?.id??null,addedKeys:stringList(template.data.content.requirements.filter(q=>!previous?.data.content.requirements.some(o=>o.key===q.key)).map(q=>q.key)),changedKeys:stringList(template.data.content.requirements.filter(q=>previous?.data.content.requirements.some(o=>o.key===q.key&&JSON.stringify(o)!==JSON.stringify(q))).map(q=>q.key))};
             })};
         });
     }
@@ -244,9 +245,8 @@ export class TaskService {
         return this.identity.repo.transaction(s=>{const p=this.identity.principal(s,token),row=this.task(s,p,taskId,true);if(!row.data.draft)fail("VALIDATION",422,"새 요청 업무에서 미리보기를 사용해 주세요.");return {content:this.projectedContent(s,p,row.data.draft,false,row.id)};});
     }
     private projectedContent(s: UnitOfWork, p: Principal, c: RequestContent, internal: boolean, prospectiveTaskId?:string) {
-        const { internalOriginal, internalMemo, ...rest } = c;
-        const referenceFileIds = c.referenceFileIds.filter(fid => { const f = s.get("fileVersion", fid), origin = f ? s.get("task", f.data.taskId) : null; return f && origin && decide(s, p, "task.read", taskScope(origin), this.clock).allowed && (internal || f.data.visibility === "public" && (taskScope(origin).visibility === "public" || origin.id===prospectiveTaskId)); });
-        return { ...rest, referenceFileIds, milestones: c.milestones.filter(m => internal || m.visibility === "public"), ...(internal ? { internalOriginal, internalMemo } : {}) };
+        const referenceFileIds = stringList(c.referenceFileIds).filter(fid => { const f = s.get("fileVersion", fid), origin = f ? s.get("task", f.data.taskId) : null; return f && origin && decide(s, p, "task.read", taskScope(origin), this.clock).allowed && (internal || f.data.visibility === "public" && (taskScope(origin).visibility === "public" || origin.id===prospectiveTaskId)); });
+        return projectedRequest(c, internal, referenceFileIds);
     }
     async detail(token: string | undefined, taskId: string, contextId?: string) {
         return this.identity.repo.transaction(s => { const p = this.identity.principal(s, token), row = this.task(s, p, taskId); if (contextId && contextId !== row.contextId) unavailable(); const internal = p.user.data.role === "gsg";
@@ -255,14 +255,14 @@ export class TaskService {
             const prior = s.list("priorSubmission", row.contextId!).filter(v => v.data.taskId === taskId).sort((a,b) => b.createdAt.localeCompare(a.createdAt))[0] ?? null;
             const previous = prior ? s.get("requestVersion", prior.data.requestId) : null;
             const request = current ? this.projectedContent(s, p, current.data.content, internal) : null;
-            const projectedVersions = versions.map(v => ({ id: v.id, sequence: v.data.sequence, publishedBy: v.data.publishedBy, publishedAt: v.data.publishedAt, changedKeys: v.data.changedKeys, content: this.projectedContent(s,p,v.data.content,internal) }));
+            const projectedVersions = versions.map(v => projectedVersion(v, this.projectedContent(s,p,v.data.content,internal)));
             const fileIds = new Set([...projectedVersions.flatMap(v=>v.content.referenceFileIds), ...(internal ? row.data.draft?.referenceFileIds ?? [] : [])]);
             const files = s.list("fileVersion", row.contextId!).filter(f => fileIds.has(f.id) || internal && f.data.taskId === taskId).filter(f => internal || f.data.visibility === "public").map(f => ({ id: f.id, name: f.data.originalName, bytes: f.data.bytes, mime: f.data.mime, sha256: f.data.sha256, preview: f.data.preview, visibility: f.data.visibility }));
-            return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal ? row.data.draft ?? null : null, request,
+            return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal && row.data.draft ? projectedRequest(row.data.draft, true, this.projectedContent(s,p,row.data.draft,true).referenceFileIds) : null, request,
                 versions: projectedVersions,
-                activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)),
+                activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)).map(projectedActivity),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
-                requirementStatus: current ? evaluateRequirements(current.data.content, prior?.data as PriorSubmissionData ?? null, previous?.data.content ?? null) : [],
+                requirementStatus: current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
                 submissionConnection: "답변 제출은 준비 중입니다", completionConnection: "업무 완료는 준비 중입니다", notificationConnection: "앱 알림은 준비 중입니다" };
         });
     }
@@ -275,7 +275,7 @@ export class TaskService {
             return { userId:p.user.id, canManage:internal, mode:this.identity.repo.mode, contexts:s.list("context").filter(c=>hasScope(s,p,c.id,this.clock)).map(projectContext), members, tasks,
                 products:s.list("product",contextId).map(v=>({id:v.id,name:v.data.name})),
                 projects:s.list("project",contextId).filter(v=>internal || v.data.taskIds.some(t=>visible.has(t))).map(v=>({id:v.id,revision:v.revision,title:v.data.title,status:v.data.status})),
-                templates:internal?s.list("templateVersion").filter(v=>v.contextId===contextId || v.contextId===null && v.data.builtin && v.id.startsWith("builtin-")).map(v=>({id:v.id,...v.data})):[] };
+                templates:internal?s.list("templateVersion").filter(v=>v.contextId===contextId || v.contextId===null && v.data.builtin && v.id.startsWith("builtin-")).map(v=>projectedTemplate(v,projectedRequest(v.data.content,true,this.projectedContent(s,p,v.data.content,true).referenceFileIds))):[] };
         });
     }
 }

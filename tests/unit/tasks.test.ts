@@ -133,6 +133,29 @@ for (const mode of ["mock", "sqlite"] as const) describe(`${mode} G04 actual tas
         // SA-15: hold/cancel must preserve already accepted progress, not reset it to requested.
         expect((await repo.get("task", result.ids[0]))!.data.status).toBe("in_progress");
     });
+    it("G04-V03 AC-04-02 A19 stored nested extensions never enter current/history/preview/draft/template/activity/project output", async () => {
+        await setup(); const marker="V03_PRIVATE_STORED_EXTENSION";
+        function poison<T>(value:T):T { if(Array.isArray(value))return value.map(poison) as T; if(value && typeof value==="object")return Object.assign(Object.fromEntries(Object.entries(value).map(([k,v])=>[k,poison(v)])),{privateExtension:{deep:marker}}) as T; return value; }
+        const clean=payload(); clean.links=[{url:"https://example.test/guide",description:"공개 링크",contentFixed:false}];
+        clean.requirements[0].specifications=[{text:"공개 규격",source:"공개 출처",version:"v1",severity:"recommended",check:"human"}];
+        clean.milestones=[{id:"print",kind:"printing_delivery",counterpart:"공개 확인 상대",visibility:"public",deadline:{...clean.deadline,sourceVersion:"m1"}}];
+        const c=Object.assign(poison(clean),{internalSupplyPrice:marker,unknownObject:{deep:marker}}); const id=await create(clean);
+        await repo.transaction(s=>{s.create("requestVersion",{id:"v03-old",contextId:ctx,data:{taskId:id,sequence:1,previousId:null,templateVersionId:null,content:c,publishedBy:"user-admin",publishedAt:identity.clock(),changedKeys:["description",{private:marker}] as unknown as string[]}});const t=s.get("task",id)!;s.update("task",id,t.revision,{...t.data,draft:c,currentRequestId:"v03-old",visibility:"public",status:"requested"});
+            s.create("templateVersion",{id:"v03-template",contextId:ctx,data:Object.assign({templateId:"v03-template",name:"공개 템플릿",sequence:1,previousId:null,content:c,createdBy:"user-admin",builtin:false},{privateExtension:marker})});
+            s.create("taskActivity",{id:"v03-activity",contextId:ctx,data:Object.assign({taskId:id,requestId:"v03-old",userId:"user-luna",kind:"schedule" as const,at:identity.clock(),sequence:1,reason:"공개 조정 사유",proposedDeadline:poison(clean.deadline),respondsTo:null,decision:null,resultingRequestId:null},{privateExtension:marker})});
+            s.create("project",{id:"v03-project",contextId:ctx,data:Object.assign({title:"공개 프로젝트",taskIds:[id,"task-onboarding"],dependencies:[Object.assign({before:id,after:"task-onboarding"},{privateExtension:marker})],status:"active" as const,createdBy:"user-admin"},{privateExtension:marker})});});
+        await command(id,"publish");
+        const before=await Promise.all([repo.get("task",id),repo.list("requestVersion"),repo.list("taskActivity"),repo.list("templateVersion"),repo.list("project")]);
+        const b=await tasks.detail(brand,id), g=await tasks.detail(admin,id), preview=await tasks.preview(admin,id), catalog=await tasks.catalog(admin,ctx), project=await tasks.project(brand,"v03-project");
+        expect(JSON.stringify({b,g,preview,catalog,project})).not.toContain(marker);
+        const {internalOriginal,internalMemo,...publicContent}=clean;
+        expect(b.request).toEqual(publicContent);expect(b.versions[1].content).toEqual(publicContent);expect(b.versions[1].changedKeys).toEqual(["description"]);expect(preview.content).toEqual(publicContent);
+        expect(g.draft).toEqual(clean);expect(g.request).toEqual(clean);expect(catalog.templates.find(t=>t.id==="v03-template")!.content).toEqual(clean);
+        expect(b.activities[0].data.proposedDeadline).toEqual(clean.deadline);expect(b.activities[0].data.reason).toBe("공개 조정 사유");expect(project.data.dependencies).toEqual([{before:id,after:"task-onboarding"}]);
+        expect(internalOriginal).toBe("내부 원문 보존");expect(internalMemo).toBe("내부 메모");
+        expect(await Promise.all([repo.get("task",id),repo.list("requestVersion"),repo.list("taskActivity"),repo.list("templateVersion"),repo.list("project")])).toEqual(before);
+        await expect(command(id,"save",{content:c})).rejects.toMatchObject({status:422});
+    });
     it("G04-V02 AC-04-05 SA-15 requested/accepted nested pause restores progress without duplicate acceptance or state events", async () => {
         await setup(); const id = await publish();
         await expect(command(id, "resume", { reason: "not paused" })).rejects.toMatchObject({ status: 409 });
