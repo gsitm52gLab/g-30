@@ -1,10 +1,9 @@
 import yauzl from 'yauzl';
 import { crc32 } from 'node:zlib';
 import { importLimits as limits } from '@/domain/imports/types';
-export class WorkbookInputError extends Error {
-    constructor(public code: string) { super(code); }
-}
-export function inputError(code: string): never { throw new WorkbookInputError(code); }
+import { WorkbookInputError, inputError } from './xml-errors';
+export { WorkbookInputError, inputError } from './xml-errors';
+import { inspectXml } from './xml';
 /** Read bounded ZIP members in memory; never extract uploaded paths or follow relationships. */
 export function guardedZip(bytes: Buffer): Promise<Map<string, Buffer>> {
     if (bytes.length > limits.inputBytes || bytes.length < 4 || bytes.readUInt32LE(0) !== 0x04034b50)
@@ -63,20 +62,8 @@ export function guardedZip(bytes: Buffer): Promise<Map<string, Buffer>> {
                             return;
                         }
                         const data = Buffer.concat(chunks);
-                        if (/\.(?:xml|rels)$/i.test(name)) {
-                            const xml = data.toString('utf8');
-                            // Inspect OOXML structure, never arbitrary cell text or hyperlink target words.
-                            const relationships = [...xml.matchAll(/<(?:[\w.-]+:)?Relationship\b[^>]*\/?\s*>/g)].map(([tag]) => tag);
-                            const activeType = canonical === '[content_types].xml' && [...xml.matchAll(/\bContentType\s*=\s*["']([^"']*)["']/g)].some(([, type]) => /(?:macroEnabled|vbaProject|oleObject)/i.test(type));
-                            if (/<!\s*(?:DOCTYPE|ENTITY)/i.test(xml) || activeType || /<(?:[\w.-]+:)?oleObjects?\b/i.test(xml) || relationships.some(tag => /\/(?:vbaProject|oleObject|externalLink|externalLinkPath)$/.test(attribute(tag, 'Type') ?? ''))) {
-                                stop(new WorkbookInputError('ACTIVE_CONTENT_UNSUPPORTED'));
-                                return;
-                            }
-                            if (/\.rels$/i.test(name) && relationships.some(tag => attribute(tag, 'TargetMode')?.toLowerCase() === 'external' && !/\/hyperlink$/.test(attribute(tag, 'Type') ?? ''))) {
-                                stop(new WorkbookInputError('EXTERNAL_CONNECTION_UNSUPPORTED'));
-                                return;
-                            }
-                        }
+                        try { if (/\.(?:xml|rels)$/i.test(name)) inspectXml(name, data); }
+                        catch (error) { stop(error); return; }
                         result.set(name, data);
                         zip.readEntry();
                     });
@@ -89,4 +76,3 @@ export function guardedZip(bytes: Buffer): Promise<Map<string, Buffer>> {
         zip.readEntry();
     }));
 }
-export function attribute(tag: string, name: string): string | null { return new RegExp(`(?:^|\\s)${name}\\s*=\\s*["']([^"']*)["']`).exec(tag)?.[1] ?? null; }

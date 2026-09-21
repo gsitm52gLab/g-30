@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { spawn, execFileSync, type ChildProcess } from 'node:child_process';
-import { createWriteStream, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { createWriteStream, mkdirSync, mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import path from 'node:path';
 import ExcelJS from 'exceljs';
@@ -149,6 +149,34 @@ try {
     await start();
     for (const [c, name] of [[admin, 'admin'], [brand, 'luna'], [team, 'team'], [gsg, 'operator'], [price, 'price'], [foreign, 'wave']] as const)
         await c.login(name);
+    if (process.env.IMPORTS_NAMESPACE_ONLY === '1') {
+        const fields = ['contextKey', 'common.code', 'common.name', 'common.description', 'local.jan', 'retail.amount', 'retail.currency', 'retail.taxIncluded', 'retail.effectiveFrom', 'local.sku'];
+        for (const name of ['standard', 'formula-cached', 'numeric-identifier']) {
+            const bytes = readFileSync(`tests/fixtures/imports-${name}-prefixed.xlsx`), before = await fixture({ action: 'snapshot' }), form = new FormData();
+            form.append('file', new Blob([new Uint8Array(bytes)]), `${name}.xlsx`);
+            const response = await brand.mutate(`/api/imports/source?context=${A}`, form);
+            check(`${name}: original prefixed fixture actual upload accepted`, response.status === 201, ['G07-V02', 'AC-07-03']);
+            const source = await response.json() as WorkbookInspection;
+            const preview = await posted<ImportPreview>(brand, '/api/imports/preview', { sourceId: source.sourceId, sheetId: source.sheets.find(s => s.name === 'Products')!.id, headerRow: 3, mapping: fields.map((field, i) => ({ column: i + 1, field })), choices: [] }, 201);
+            check(`${name}: source hash remains exact original bytes`, preview.sourceHash === hash(bytes), ['G07-V02']);
+            check(`${name}: preview has no business writes`, hash(await fixture({ action: 'snapshot' })) === hash(before), ['G07-V02']);
+            const applied = await brand.mutate('/api/imports/apply', { previewId: preview.id, idempotencyKey: randomUUID() });
+            if (name === 'standard') {
+                check('standard: whole valid prefixed batch applied', preview.canApply && preview.totalRows === 3 && applied.status === 201, ['G07-V02', 'AC-07-03']);
+                const result = await applied.json() as { ids: string[] }, batch = await brand.get<ImportBatch>(`/api/imports/batches/${result.ids[0]}`);
+                const products = await Promise.all(batch.rows.filter(r => r.productId).map(r => detail(r.productId!)));
+                check('standard: leading zero and zero and exact large decimal remain strings', products.some(p => p.common.code === 'G07-C' && p.local.jan === '0000000000003' && p.local.sku === '0003' && p.retail.current?.fields.amount === '0') && products.some(p => p.common.code === 'G07-A' && p.retail.current?.fields.amount === '12345678901234567890.123456'), ['G07-V02', 'AC-07-03']);
+                check('standard: literal equals text remains inert and context explicit', products.every(p => p.context.id === A) && products.some(p => p.common.description === '=literal-not-formula'), ['G07-V02']);
+            } else {
+                check(`${name}: invalid cells block apply despite cached value or formatting`, !preview.canApply && preview.errorRows > 0 && applied.status === 422, ['G07-V02', 'AC-07-03']);
+                check(`${name}: rejected apply has zero business changes`, hash(await fixture({ action: 'snapshot' })) === hash(before), ['G07-V02']);
+            }
+        }
+        if (process.env.IMPORTS_NAMESPACE_BROWSER === '1') {
+            const { namespaceBrowser } = await import('./verify-imports-namespace-browser');
+            await namespaceBrowser(origin, A, report, artifacts, check);
+        }
+    } else {
     check('anonymous imports denied', (await new Client().send(`/api/imports?context=${A}`)).status === 401, ['A19']);
     check('foreign context neutral404', (await foreign.send(`/api/imports?context=${A}`)).status === 404, ['A19']);
     check('CSRF preview denied', (await brand.send('/api/imports/preview', 'POST', {})).status === 403, ['A19']);
@@ -245,6 +273,7 @@ try {
         check('relogin evidence and batch survive', (await brand.get<EvidenceDetail>(`/api/evidence/${evidence.id}`)).current.id === evidence.current.id && (await brand.get<ImportBatch>(`/api/imports/batches/${batch.id}`)).sourceHash === batch.sourceHash, ['A20']);
         const persisted = await fixture({ action: 'snapshot' });
         check('restart original immutable business rows identical', hash(persisted) === hash(original), ['A20']);
+    }
     }
     complete = true;
 }
