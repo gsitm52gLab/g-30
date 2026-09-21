@@ -1,4 +1,4 @@
-import type { Clock, UnitOfWork } from "@/domain/records";
+import type { Clock, StoredRecord, UnitOfWork } from "@/domain/records";
 import type { Principal } from "@/server/auth/service";
 import { decide, activeMember } from "@/server/policy/policy";
 import { projectContext, projectTask, taskScope } from "@/server/policy/projection";
@@ -21,13 +21,24 @@ export function versionMeta(s: UnitOfWork, p: Principal, contextId: string, row:
     id: string;
     data: Parameters<typeof provenanceDTO>[0];
 }) { return { id: row.id, ...provenanceDTO(row.data, label(s, p, contextId, row.data.changedBy)) }; }
+/** File provenance is independent of the editor/time of a later product binding. */
+function productFileMetadata(s: UnitOfWork, p: Principal, contextId: string, file: StoredRecord<"fileVersion">) {
+    const uploader = s.get("user", file.data.uploaderId);
+    const visible = uploader && uploader.data.status === "active" &&
+        (uploader.id === p.user.id || activeMember(s, uploader.id, contextId));
+    const uploaderLabel = visible && typeof uploader.data.name === "string" && uploader.data.name.trim()
+        ? uploader.data.name : "이전 업로더";
+    const uploadedAt = typeof file.createdAt === "string" && Number.isFinite(Date.parse(file.createdAt))
+        ? file.createdAt : null;
+    return { ...fileMetadata(file), uploaderLabel, uploadedAt };
+}
 export function projectedBindings(s: UnitOfWork, p: Principal, r: ResolvedProduct, clock: Clock, bindings: ProductFileBinding[]) {
     const scope = productContextScope(r.context.id, r.product.id), ref = { kind: "product" as const, contextId: r.context.id, productId: r.product.id };
     return (Array.isArray(bindings) ? bindings : []).flatMap(binding => {
         const file = s.get("fileVersion", binding.fileVersionId);
         if (!file || !visibleFile(s, p, file, scope, clock))
             return [];
-        return [{ ...bindingDTO(binding), file: { ...fileMetadata(file), ...fileUrls(file, ref) } }];
+        return [{ ...bindingDTO(binding), file: { ...productFileMetadata(s, p, r.context.id, file), ...fileUrls(file, ref) } }];
     });
 }
 export function visibleContexts(s: UnitOfWork, p: Principal, r: ResolvedProduct, clock: Clock) {
@@ -67,7 +78,7 @@ export function productDetail(s: UnitOfWork, p: Principal, r: ResolvedProduct, c
             if (!task || taskScope(task).visibility !== "public" || !s.list("requestVersion", r.context.id).some(v => v.data.taskId === task.id && v.data.content.referenceFileIds.includes(f.id)))
                 return [];
         }
-        return [{ ...fileMetadata(f), ...fileUrls(f, sourceReference(f)) }];
+        return [{ ...productFileMetadata(s, p, r.context.id, f), ...fileUrls(f, sourceReference(f)) }];
     });
     const tasks = s.list("task", r.context.id).filter(t => decide(s, p, "task.read", taskScope(t), clock).allowed);
     const canManageTasks = decide(s, p, "task.manage", { id: r.context.id, contextId: r.context.id, kind: "task", visibility: "public" }, clock).allowed;

@@ -102,6 +102,7 @@ async function stop(p: number) { const child = children.get(p); if (!child)
     return; const done = new Promise<void>(resolve => child.once("exit", () => resolve())); child.kill("SIGTERM"); if (child.exitCode === null && child.signalCode === null)
     await done; const record = processes.findLast(r => r.pid === child.pid)!; record.exitCode = child.exitCode; record.signal = child.signalCode; record.stopped = true; children.delete(p); }
 interface FixtureSnapshot {
+    fileProvenance: { id: string; uploaderId: string; createdAt: string; sha256: string }[];
     sha256: string;
     canaryStored: boolean;
     uses: {
@@ -210,7 +211,7 @@ try {
     }
     check("price grant and decimal zero preserved", (await detail(price, pid)).internal!.current!.fields.supplyAmount === privatePriceValue && (await detail(brand, pid)).retail.current!.fields.amount === "0", ["SA-26"]);
     check("internal upload capability distinct from price", (await detail(gsg, pid)).capabilities.uploadInternalFile === true && (await detail(gsg, pid)).capabilities.editInternalPrice === false && (await detail(brand, pid)).capabilities.uploadInternalFile === false, ["AC-06-04"]);
-    const uploaded = await brand.upload(`productId=${pid}&contextId=${A}`, png);
+    const uploaded = await team.upload(`productId=${pid}&contextId=${A}`, png);
     check("independent product multipart upload", uploaded.status === 201, ["SA-27"]);
     const file = (await uploaded.json()).files[0] as {
         id: string;
@@ -221,6 +222,9 @@ try {
     await command(brand, pid, "save_files", { files: [binding], expectedContextRevision: d.contextRevision });
     d = await detail(brand, pid);
     check("file metadata fields and exact version projected", d.files[0].documentType === "SDS" && d.files[0].statedValidTo === null && d.files[0].file.sha256 === file.sha256 && d.files[0].fileVersionId === file.id, ["SA-28"]);
+    const uploadedRow = (await fixture<FixtureSnapshot>({ action: "snapshot", productId: pid, contextId: A })).fileProvenance.find(f => f.id === file.id)!;
+    check("product upload provenance current/history/image/reuse uses original uploader/time", uploadedRow.uploaderId === "user-team" && d.files[0].file.uploaderLabel === "브랜드 팀원" && d.files[0].file.uploadedAt === uploadedRow.createdAt && d.image?.uploaderLabel === "브랜드 팀원" && d.contextHistory.flatMap(h => h.files).filter(f => f.fileVersionId === file.id).every(f => f.file.uploadedAt === uploadedRow.createdAt && f.file.uploaderLabel === "브랜드 팀원") && d.reusableFiles.find(f => f.id === file.id)?.uploadedAt === uploadedRow.createdAt, ["AC-06-05", "U06-08"]);
+    check("product file metadata omits raw uploader identity", ["uploaderId", "email", "user", "membership", "storageKey"].every(k => !Object.hasOwn(d.files[0].file, k)), ["AC-06-04", "U06-08"]);
     const download = await brand.send(d.files[0].file.originalUrl);
     check("authenticated private original bytes/no-store", download.status === 200 && download.headers.get("cache-control")!.includes("no-store") && createHash("sha256").update(Buffer.from(await download.arrayBuffer())).digest("hex") === file.sha256, ["SA-27", "A19"]);
     check("same-brand other context has no implicit image/file", (await detail(brand, pid, B)).image === null && (await brand.send(`/api/files/${file.id}?productId=${pid}&contextId=${B}`)).status === 404, ["AC-06-04"]);
@@ -273,7 +277,7 @@ try {
     const taskDetail = () => admin.get<TaskDetail>(`/api/tasks/${tid}`);
     const taskCommand = async (name: string, extra: Record<string, unknown> = {}) => { const r = await admin.mutate(`/api/tasks/${tid}`, { command: name, expectedRevision: (await taskDetail()).task.revision, idempotencyKey: randomUUID(), ...extra }); assert.equal(r.status, 200, await r.clone().text()); };
     await taskCommand("publish");
-    const pending = await admin.upload(`taskId=${tid}`, png), pendingFile = (await pending.json()).files[0] as {
+    const pending = await gsg.upload(`taskId=${tid}`, png), pendingFile = (await pending.json()).files[0] as {
         id: string;
     };
     d = await detail(brand, pid);
@@ -285,6 +289,11 @@ try {
     check("G04 own draft publication plus product file reference work", pd.request!.referenceFileIds.includes(pendingFile.id) && pd.task.data.productIds.includes(pid), ["G06-CR03", "AC-06-01"]);
     const sharedDownload = await brand.send(`/api/files/${d.files[0].fileVersionId}?taskId=${tid}`);
     check("actual task reference reads exact product file", sharedDownload.status === 200 && createHash("sha256").update(Buffer.from(await sharedDownload.arrayBuffer())).digest("hex") === file.sha256, ["SA-27"]);
+    const taskSource = (await fixture<FixtureSnapshot>({ action: "snapshot", productId: pid, contextId: A })).fileProvenance.find(f => f.id === pendingFile.id)!;
+    await command(brand, pid, "save_files", { files: [binding, blankFileBinding("published-task-file", pendingFile.id)], expectedContextRevision: (await detail(brand, pid)).contextRevision });
+    d = await detail(brand, pid);
+    const taskBinding = d.files.find(f => f.fileVersionId === pendingFile.id)!;
+    check("existing published task file keeps original upload provenance in product/history", taskSource.uploaderId === "user-gsg" && taskBinding.file.uploaderLabel === "가상 운영자" && taskBinding.file.uploadedAt === taskSource.createdAt && d.contextHistory.flatMap(h => h.files).filter(f => f.fileVersionId === pendingFile.id).every(f => f.file.uploadedAt === taskSource.createdAt), ["AC-06-05", "U06-08"]);
     const second = await create(brand, "SECOND-HTTP");
     check("brand task link denied", (await brand.mutate(`/api/products/${second.pid}`, { contextId: A, command: "link_task", taskId: tid, expectedTaskRevision: pd.task.revision, idempotencyKey: randomUUID() })).status === 403, ["AC-06-04"]);
     await command(admin, second.pid, "link_task", { taskId: tid, expectedTaskRevision: pd.task.revision });
@@ -339,6 +348,11 @@ try {
     const tm = members.members.find(m => m.data.userId === "user-team")!;
     const suspension = await admin.mutate(`/api/contexts/${A}/members/${tm.id}`, { expectedRevision: tm.revision, status: "suspended", scope: tm.data.scope, internalPriceAccess: false }, "PATCH");
     check("current membership suspension blocks product and original file", suspension.status === 200 && (await team.send(`/api/products/${pid}?context=${A}`)).status === 404 && (await team.send(d.files[0].file.downloadUrl)).status === 404, ["AC-06-04", "A19"]);
+    const afterSuspension = await detail(brand, pid);
+    check("suspended original uploader uses safe fallback throughout current and historical product files", afterSuspension.files.find(f => f.fileVersionId === file.id)?.file.uploaderLabel === "이전 업로더" && afterSuspension.image?.uploaderLabel === "이전 업로더" && afterSuspension.reusableFiles.find(f => f.id === file.id)?.uploaderLabel === "이전 업로더" && afterSuspension.contextHistory.flatMap(h => h.files).filter(f => f.fileVersionId === file.id).every(f => f.file.uploaderLabel === "이전 업로더" && f.file.uploadedAt === uploadedRow.createdAt), ["AC-06-05", "U06-08"]);
+    const filesAfterSuspension = (await fixture<FixtureSnapshot>({ action: "snapshot", productId: pid, contextId: A })).fileProvenance;
+    check("metadata edits/archive/revoke do not rewrite original product or task file rows", filesAfterSuspension.find(f => f.id === file.id)?.sha256 === uploadedRow.sha256 && filesAfterSuspension.find(f => f.id === pendingFile.id)?.sha256 === taskSource.sha256, ["AC-06-05", "U06-08"], "DB_FIXTURE");
+
 }
 catch (error) {
     failure = error instanceof Error ? error.message : "unknown failure";

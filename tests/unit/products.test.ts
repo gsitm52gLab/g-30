@@ -167,6 +167,46 @@ for (const mode of ["mock", "sqlite"] as const)
             await repo.transaction(s => { const m = s.list("membership", A).find(m => m.data.userId === "user-luna")!; s.update("membership", m.id, m.revision, { ...m.data, status: "suspended" }); });
             await expect(u.fs.download(brand, u.file.id, { kind: "product", contextId: A, productId: pid }, "download")).rejects.toMatchObject({ status: 404 });
         });
+        it("AC06-05 file uploader/time use immutable source for product and legacy task files, safe current labels and unchanged history", async () => {
+            await setup();
+            const pid = await create(), uploaded = await upload(pid, team), tasks = new TaskService(identity);
+            const taskContent = { ...blankContent(), title: "이전 업무 자료", description: "합성 참고자료", requirements: [{ ...blankRequirement("text"), label: "자료" }], deadline: { ...blankContent().deadline, responsibleUserId: "user-gsg" } };
+            const tid = (await tasks.create(admin, { targets: [{ contextId: A, ownerId: "user-gsg", assigneeId: "user-luna", coAssigneeIds: [], productIds: [pid] }], content: taskContent, category: "spot", idempotencyKey: randomUUID() })).ids[0];
+            const taskFile = (await uploaded.fs.upload(gsg, tid, [uploadFile], "public")).files[0];
+            const original = (await repo.get("fileVersion", taskFile.id))!;
+            const legacyId = "legacy-task-file-provenance";
+            await repo.transaction(s => { const { owner, ...legacyData } = original.data; void owner; s.create("fileVersion", { id: legacyId, contextId: A, data: legacyData }); });
+            let task = await tasks.detail(admin, tid);
+            await tasks.command(admin, tid, { command: "save", expectedRevision: task.task.revision, content: { ...taskContent, referenceFileIds: [legacyId] }, idempotencyKey: randomUUID() });
+            task = await tasks.detail(admin, tid);
+            await tasks.command(admin, tid, { command: "publish", expectedRevision: task.task.revision, idempotencyKey: randomUUID() });
+            const binding = { ...blankFileBinding("uploader-product", uploaded.file.id), purpose: "image" as const };
+            await command(pid, "save_files", { files: [binding, blankFileBinding("uploader-legacy", legacyId)], expectedContextRevision: (await detail(pid)).contextRevision });
+            const raw = await repo.list("fileVersion"), productRow = raw.find(f => f.id === uploaded.file.id)!, legacyRow = raw.find(f => f.id === legacyId)!;
+            let d = await detail(pid);
+            expect(d.files[0].file).toMatchObject({ uploaderLabel: "브랜드 팀원", uploadedAt: productRow.createdAt });
+            expect(d.files[1].file).toMatchObject({ uploaderLabel: (await repo.get("user", "user-gsg"))!.data.name, uploadedAt: legacyRow.createdAt });
+            expect(d.image).toMatchObject({ uploaderLabel: "브랜드 팀원", uploadedAt: productRow.createdAt });
+            expect(d.reusableFiles.find(f => f.id === legacyId)).toMatchObject({ uploaderLabel: (await repo.get("user", "user-gsg"))!.data.name, uploadedAt: legacyRow.createdAt });
+            expect((await uploaded.fs.download(brand, legacyId, { kind: "product", contextId: A, productId: pid }, "original")).bytes).toEqual(png);
+            await command(pid, "save_files", { files: d.files.map(f => ({ ...blankFileBinding(f.id, f.fileVersionId), title: "다른 편집자의 후속 메타 수정" })), expectedContextRevision: d.contextRevision });
+            d = await detail(pid);
+            expect(d.contextHistory.flatMap(h => h.files).filter(f => f.fileVersionId === uploaded.file.id).every(f => f.file.uploaderLabel === "브랜드 팀원" && f.file.uploadedAt === productRow.createdAt)).toBe(true);
+            await repo.transaction(s => {
+                const membership = s.list("membership", A).find(m => m.data.userId === "user-team")!;
+                s.update("membership", membership.id, membership.revision, { ...membership.data, status: "suspended" });
+                const user = s.get("user", "user-gsg")!;
+                s.update("user", user.id, user.revision, { ...user.data, status: "suspended" });
+            });
+            d = await detail(pid);
+            expect(d.files.every(f => f.file.uploaderLabel === "이전 업로더")).toBe(true);
+            expect(d.contextHistory.flatMap(h => h.files).every(f => f.file.uploaderLabel === "이전 업로더")).toBe(true);
+            expect(d.reusableFiles.filter(f => [uploaded.file.id, legacyId].includes(f.id)).every(f => f.uploaderLabel === "이전 업로더")).toBe(true);
+            expect(d.files[0].file.uploadedAt).toBe(productRow.createdAt);
+            for (const key of ["uploaderId", "email", "user", "membership", "storageKey"]) expect(Object.hasOwn(d.files[0].file, key)).toBe(false);
+            expect(await repo.list("fileVersion")).toEqual(raw);
+            await expect(detail(pid, A, team)).rejects.toMatchObject({ status: 404 });
+        });
         it("D09 initial prior-use fixture keeps exact old common/context/price/file hashes after current update; future price requires explicit date", async () => {
             await setup();
             const pid = await create(), u = await upload(pid);
