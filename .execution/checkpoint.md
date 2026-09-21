@@ -1,3 +1,11 @@
+# State140 latest — independent G15 readiness race repair assigned
+
+Accepted246 remains11/19 GoalACTIVE. Ai_verify exactb1dd fresh425/check/build; actual72browser71PASS1FAIL (mockdesktopU14). Single narrowrerunPASS doesnoterase: DEF-G15-V01 high deterministic SQLite390 unknownV1 GET200held, stillenabledreadiness sendsoldknownV2runID→200allowedtrue, afterGETrelease unknownV1text+allowednotice. Provider0. Root6hash+ZIPCRC/actualPNGviewreviewe80e… currentb1ddcannotaccept. Formalrepairfa4a7… prdnewg15-readiness-fix b1dd ports4229/30 owns screen+newdeterministicrace only; server/API/schemafrozen. Ai_verifycontinues8groups onunchangedb1dd; newcandidateclosurelater.
+
+GoalsG15authorfinal4a20… manifesteda6… rootfinal6e41…1812artifacts525Git/worktree/snapshots490pairs20cmd73CRC72rawbrowser346HTTP+18historybody hashes. Firstrootintegrityc7fbc…six falseflags were intentionallymigratedupgradeDB/WAL/SHM copies, original15andpristinecopiesallmatch; correctedappendonlyfinalreview, no evidence edited. Author28mock+3skip/31DB, history28+26, sourcebound634unit425fresh0; cannotcloseindependentDEF.
+
+G11campaignauthorfinal2de379634ccc9001b233715e1d87e96d5e126231 onlynewHTTPscript vsfe2e frozenproduct; rootfinal939af…335artifacts483source19cmd246HTTPbody82basis, history686448…11originalsunchanged. Actual16mock+1skip/17DB/history35, originalrunnerwrong.error.code3P1Fpreserved. GoalsnowG11UIformalb66cd… newg11-ui exactfe2e ownsUI+entry/README4233/34; additive2dehelpermergeauthorized. Prdserverallleasesreleased thenG15UIrepair. Root+goals+prd+ai_verify4active; workflowidle historical intendedG11verifier. G16notstarted/G17realAPI mandatoryNOT_RUN.
+
 # State139 latest — G11 actual campaign contract reviewed, UI queued
 
 G11fe2e17e04d25d618e4b9c861b16fed3fc85cfd8e rootreview6efc11…29artifacts482Git/worktreesources9commands0errors, raw427unit/build andactual12newproducerunit subset. ExistingSQL1..11 unchanged; currentmaterial0/cancelhold/receiptunknown separated,6kindbasisCAS/currentauth/immutablehistory. PrdserverruntimeHTTP/FS-copyproof continues, newscript4614 first3P1F checker.error.code field error retained; productfe2eunchanged. GoalsUInewworktreeg11-ui exactfe2e formalqueuedb66cd… startsafterG15finalpacket, ownsUI+entry/README narrowlease. WorkflowwholeG11verifier; prd afterwardG16author whenG15ACCEPTED.
