@@ -1,4 +1,5 @@
 import { fixtures } from "@/data/fixtures";
+import { builtins } from "@/domain/tasks/templates";
 import type { RecordRepository } from "@/domain/records";
 /** Insert missing IDs only. Never replace user edits or delete records. */
 export async function seed(repository: RecordRepository) {
@@ -30,6 +31,10 @@ export async function seed(repository: RecordRepository) {
             }
             store.create(fixture.kind, fixture.input);
             inserted++;
+        }
+        for (const input of builtins) {
+            if (!store.get("templateVersion", input.id)) { store.create("templateVersion", input); inserted++; }
+            else preserved++;
         }
         return { inserted, preserved };
     });

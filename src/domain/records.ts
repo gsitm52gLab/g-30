@@ -1,4 +1,5 @@
-/** G00 demo records. Later modules add validated domain services and constraints. */
+import type { TaskExtension, RequestVersionData, TemplateVersionData, ProjectData, TaskActivityData, PriorSubmissionData, DomainEventData, CommandReceiptData, FileVersionData } from "./tasks/types";
+/** Foundation records plus module-owned typed extensions. */
 export interface ContextData {
     country: string;
     retailer: string;
@@ -66,13 +67,13 @@ export interface AuditData {
     after: Record<string, unknown>;
     at: string;
 }
-export interface TaskData {
+export interface TaskData extends TaskExtension {
     title: string;
     category: "onboarding" | "spot";
     assigneeId: string;
     ownerId: string;
     description: string;
-    status: "requested" | "in_progress" | "partial" | "completed";
+    status: "draft" | "requested" | "in_progress" | "partial" | "completed" | "on_hold" | "cancelled";
     deadline: string | null;
     nextAction: string;
     productIds: string[];
@@ -91,6 +92,14 @@ export interface ProductData {
     missingMaterials: number;
 }
 export interface RecordDataMap {
+    requestVersion: RequestVersionData;
+    templateVersion: TemplateVersionData;
+    project: ProjectData;
+    taskActivity: TaskActivityData;
+    priorSubmission: PriorSubmissionData;
+    domainEvent: DomainEventData;
+    commandReceipt: CommandReceiptData;
+    fileVersion: FileVersionData;
     context: ContextData;
     user: UserData;
     membership: MembershipData;

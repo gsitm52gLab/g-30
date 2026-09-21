@@ -9,9 +9,9 @@ function metadata<K extends RecordKind>(row: StoredRecord<K>) {
     return { kind: row.kind, id: row.id, contextId: row.contextId, revision: row.revision, createdAt: row.createdAt, updatedAt: row.updatedAt };
 }
 
-/** G00/G01 records are explicitly public synthetic previews; future drafts need their own adapter. */
+/** Legacy synthetic records are public; G04 records use persisted visibility/assignment. */
 export function taskScope(row: StoredRecord<"task">): ResourceScope {
-    return { id: row.id, contextId: row.contextId, kind: "task", visibility: "public", assigneeUserId: row.data.assigneeId };
+    return { id: row.id, contextId: row.contextId, kind: "task", visibility: row.data.schemaVersion === 2 ? row.data.visibility ?? "draft" : "public", assigneeUserId: row.data.assigneeId, coAssigneeUserIds: row.data.coAssigneeIds ?? [] };
 }
 export function productScope(row: StoredRecord<"product">): ResourceScope {
     return { id: row.id, contextId: row.contextId, kind: "product", visibility: "public" };
@@ -38,6 +38,8 @@ export function projectTask(store: UnitOfWork, principal: Principal, row: Stored
         assigneeId: d.assigneeId, ownerId: d.ownerId, deadline: d.deadline, nextAction: d.nextAction,
         productIds: strings(d.productIds), notes: strings(d.notes), authorId: d.authorId,
         contributorIds: strings(d.contributorIds), assignmentNeedsAttention: d.assignmentNeedsAttention,
+        schemaVersion: d.schemaVersion, visibility: d.visibility, subtype: d.subtype, projectId: d.projectId,
+        coAssigneeIds: strings(d.coAssigneeIds), currentRequestId: d.currentRequestId, templateVersionId: d.templateVersionId, cycle: d.cycle,
         ...privateFields(d, decision),
     } };
 }
@@ -89,6 +91,14 @@ const auditKeys: Record<string, readonly string[]> = {
     "membership.changed": ["status", "scope", "internalPriceAccess"],
     "user.status": ["status"],
     "task.reassigned": ["assigneeId", "ownerId", "authorId"],
+    "task.created": ["title", "category", "projectId"],
+    "task.draft": ["revision"],
+    "task.published": ["requestVersionId", "sequence"],
+    "task.state": ["status", "reason"],
+    "task.read": ["requestVersionId"], "task.accept": ["requestVersionId"],
+    "task.schedule": ["requestVersionId"], "task.schedule_decide": ["requestVersionId"],
+    "project.created": ["title", "taskCount"], "project.dependencies": ["count"],
+    "template.saved": ["previousId", "templateVersionId"],
 };
 
 export function projectAudit(row: StoredRecord<"audit">) {

@@ -12,7 +12,7 @@ export function EmptyState({ title, detail }: {
 }) { return <div className="empty-state"><span aria-hidden="true" className="empty-mark">—</span><h2>{title}</h2><p>{detail}</p></div>; }
 export function StorageFailure() { return <section role="alert" className="notice error"><h1>자료를 불러오지 못했습니다</h1><p>저장소 연결 또는 환경 설정을 확인한 후 다시 시도해 주세요. DB 자료를 불러오지 못했을 때 예시 자료로 바꾸지 않습니다.</p><Link className="button" href="/">다시 시도</Link></section>; }
 export const categoryLabels = { onboarding: "신규 입점", spot: "스팟 업무" };
-export const taskLabels = { requested: "요청됨", in_progress: "진행 중", partial: "부분 제출", completed: "GSG 업무 완료" };
+export const taskLabels = { draft: "내부 초안", requested: "요청됨", in_progress: "진행 중", partial: "부분 제출", completed: "GSG 업무 완료", on_hold: "보류", cancelled: "취소" };
 export const productLabels = { draft: "등록 준비", active: "판매 중", archived: "보관" };
 export function TaskList({ tasks, users }: Pick<Workspace, "tasks" | "users">) {
     if (!tasks.length)
