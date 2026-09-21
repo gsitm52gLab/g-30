@@ -727,8 +727,12 @@
       "owner_note": "G13",
       "requirement": "브랜드회신/자료제출/외부신청/검토회신/보완/인쇄·발송·도착/게시·사용 구분. FR-021/BR-012",
       "verification_idea": "같은업무에내부회신과외부신청기한을다르게설정하고각화면/다음행동/알림일치. 불필요한종류를기계적으로필수생성하지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G13_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
+      ]
     },
     {
       "id": "SA-51",
@@ -738,8 +742,12 @@
       "owner_note": "G13",
       "requirement": "확정/요청/예상/확인필요+출처/자료버전/시간대/변경자, 기한미정/의향/옛날메일제목미승격. BR-019",
       "verification_idea": "날짜같아도확정수준별상태보존, 충돌원문선택전임의확정0. 시차경계/자정에기한계산확인, 입력없는일정에가짜SLA0",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G13_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
+      ]
     },
     {
       "id": "SA-52",
@@ -749,8 +757,12 @@
       "owner_note": "G13",
       "requirement": "병렬일정과선후관계위험, 달력일D-2/당일/초과1회/일; 실제다음행동담당자. FR-021/BR-018",
       "verification_idea": "병렬2업무를직렬로막지않음. 고정clock으로D-2·당일·다음날각수신자/횟수확인, 영업일SLA로임의변환안함",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G13_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
+      ]
     },
     {
       "id": "SA-53",
@@ -760,8 +772,12 @@
       "owner_note": "G13",
       "requirement": "공개/배정→브랜드, 제출/조정/질문→GSG, 보완공개/답변→브랜드; 취합중0·event+recipient중복방지. FR-012/BR-016",
       "verification_idea": "이벤트종류별수신자와알림목표링크, 초안/내부메모비노출. 실패후재시도중복0. 읽음/미읽음·처리/실패기록재로그인유지",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G13_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
+      ]
     },
     {
       "id": "SA-54",
@@ -771,8 +787,12 @@
       "owner_note": "G13",
       "requirement": "완료/취소/불참/불필요항목독촉제외, 재개재평가, 외부확인일은GSG. BR-013·017",
       "verification_idea": "종료각상태별후속독촉0. 외부지연때브랜드독촉0/GSG확인알림1. 재개후해당규칙복원. 앱알림을실제메일로보고안함",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G13_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
+      ]
     },
     {
       "id": "SA-55",

@@ -2651,7 +2651,7 @@
         "G11",
         "G12"
       ],
-      "state": "ACCEPTED",
+      "state": "INTEGRATION_REGRESSION",
       "required_for_product_completion": true,
       "candidate_commit": "0c9703fce103619d90769568c806fdedb5e1ebc4",
       "integration_commit": "f48e3487544f46d46118f856d823111fd953f073",
@@ -2665,55 +2665,35 @@
         {
           "id": "AC-13-01",
           "expected": "서로 다른 확정 수준·시간대·출처를 저장하고 변경 이력을 표시한다.",
-          "status": "PASS_CURRENT_G13_STAGE",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         },
         {
           "id": "AC-13-02",
           "expected": "내부 취합 중에는 알림이 없고 공개 묶음 하나에 수신자별 알림 하나가 생성된다.",
-          "status": "PASS_CURRENT_G13_STAGE",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         },
         {
           "id": "AC-13-03",
           "expected": "이벤트ID+수신자 중복 방지로 재시도에도 알림이 중복되지 않는다.",
-          "status": "PASS_CURRENT_G13_STAGE",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         },
         {
           "id": "AC-13-04",
           "expected": "종료·불참·외부 대기 사례에 잘못된 브랜드 독촉이 발생하지 않는다.",
-          "status": "PASS_CURRENT_G13_STAGE",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         },
         {
           "id": "AC-13-05",
           "expected": "실제 메일 미연동 상태를 발송 성공으로 표시하지 않는다.",
-          "status": "PASS_CURRENT_G13_STAGE",
-          "evidence": [
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification-result.json",
-            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json"
-          ]
+          "status": "NOT_RUN",
+          "evidence": []
         }
       ],
-      "next_action": "Acceptedcurrentstage; G18finalcrossmodule regression/auditpending.",
+      "next_action": "Workflow exactf48e regression in own detachedg13-regression; accept onlyafterrootrawreview.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/task-draft.json",
         "sha256": "96ae325b75e6aecb15b0face92814167bad7aa1658aa8165c35df4708f9750f4"
@@ -2870,24 +2850,7 @@
       "integration_regression_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/integration-regression-task.json",
         "sha256": "e42fa52d62d751255720e19d72720140c0028c0d12b31b0b103d336849119f22"
-      },
-      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json",
-      "regression_result_ref": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/regression-result.json",
-        "sha256": "ef88b1adb7174b909f08c0862751130059fb8bb16a6be3af9f18c31f520df614"
-      },
-      "main_acceptance": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-acceptance.json",
-        "sha256": "94254368a65637a8410dfea7eba5f5c29041b97e082370dceb707bfa8b723088"
-      },
-      "regression_root_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/main-regression-review.json",
-        "sha256": "d26fd45996f1eaf0211e3970de62bcc292a66a61712d960d5d617f74c639d7ba"
-      },
-      "implementer_session_ids": [
-        "01a0c307-c975-75b1-b96a-5a5c4e448aec",
-        "01a0c307-9b54-7b83-b5eb-1b12b9a8553c"
-      ]
+      }
     },
     {
       "id": "G14",
@@ -2902,15 +2865,15 @@
         "G12",
         "G13"
       ],
-      "state": "IMPLEMENTING",
+      "state": "PLANNED",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+      "implementer_session_id": null,
       "verifier_session_id": null,
       "attempt": 0,
       "owned_paths": [],
-      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g14-server",
+      "actual_worktree_cwd": null,
       "evidence_root": ".execution/private/runs/<run-id>/G14/<attempt>/",
       "acceptance": [
         {
@@ -2938,7 +2901,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd serverfirst typed freeze/check/build→releasecommon thenownHTTP/history; separateUI later. G17ownservice untouched.",
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
       "readonly_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/preparation-task.json",
         "sha256": "8d2e5fb5bc7c7c59a0c1db0c615a3f8625ecd293b9d120d2402970426dd6bdab"
@@ -2975,17 +2938,7 @@
       "full_task_v2_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/full-task-draft-v2.json",
         "sha256": "20acf466fb5113309f0c191e77ff7990da086a2bac1c9eb292c2657d19fbefed"
-      },
-      "base_commit": "f48e3487544f46d46118f856d823111fd953f073",
-      "implementer_session_ids": [
-        "01a0c307-9b54-7b83-b5eb-1b12b9a8553c"
-      ],
-      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/server-task.json",
-      "server_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/server-task.json",
-        "sha256": "c924742066dae6083cd6bc499d8b168229d1027904e32e2a72cb52754d3ffa83"
-      },
-      "common_lease_status": "EXCLUSIVE_PRD_RECORDS_CONSTRAINTS_SHARED_AUDIT_AND_ENUMERATED_PRODUCERS"
+      }
     },
     {
       "id": "G15",
@@ -3790,10 +3743,10 @@
   "secret_policy": "env runtime only; no values in packets/logs/Git",
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
-  "accepted_commit": "f48e3487544f46d46118f856d823111fd953f073",
-  "current_goal": "G14",
-  "next_action": "G13ACCEPTED15/19f48e. G14prd serverfirst/common0016 andnarrowproducerleases. G17goalsfullruntime afterrepairs; authoractualcallverified, independentpending. Workflow/ai_verify idleavailable.",
-  "state_version": 162,
+  "accepted_commit": "60b99ce05639278a221a96d7a3c575344cb7e08e",
+  "current_goal": "G17",
+  "next_action": "G13 exactf48e integrationregression(workflow); G17 ownerrorrecovery/fullUI/runtime(goals), actualauthor07cprovider1verifiedbutnotaccepted. G14 startsafterG13ACCEPTED. Accepted14/19.",
+  "state_version": 161,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3825,7 +3778,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T23:46:01.968310+00:00",
+  "updated_at": "2026-09-21T23:41:00.637902+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
