@@ -1,0 +1,716 @@
+{
+  "source_file": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/preparation-scope-audit.md",
+  "source_sha256": "900abcb874658a20a27b5f5ab012174f786b0a8c14176b58795b2ea83f3642f8",
+  "note": "Existing source requirements decomposed for omission review; not new AC or executed tests. Module status does not automatically mark these passed.",
+  "items": [
+    {
+      "id": "SA-01",
+      "owners": [
+        "G00"
+      ],
+      "owner_note": "G00",
+      "requirement": "저장 방식에 무관한 필드 의미·seed 정책·비밀값/실연동 구분. 원안13·16절, PRD-00",
+      "verification_idea": "같은 합성 명령을 mock/SQLite에 넣고 DTO/오류 의미를 비교. DB 재시드 후 기존 입력 처리와 문서가 일치. 키 없는 mock 성공을 AI 호출 성공으로 표시하지 않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-02",
+      "owners": [
+        "G01"
+      ],
+      "owner_note": "G01",
+      "requirement": "신원/멤버십·초대 대기/활성/중지·소속 변경·담당 교체와 과거 작성자. 원안3절, FR-020·025, BR-015·021",
+      "verification_idea": "신원1개+멤버십2개, 한 곳 중지/전역 중지 구분, 만료 초대 복구, 기존 세션 차단. 독립 행사에는 국가/브랜드/행사명, 표준에는3요소. 검토기관을 retailer나 계정으로 자동 생성하지 않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-03",
+      "owners": [
+        "G02"
+      ],
+      "owner_note": "G02",
+      "requirement": "같은 컨텍스트 팀원은 공개 조회, 주/공동담당만 답변 수정. GSG 대리 기록은 제공자/기록자 분리. 원안3절, FR-020·024, BR-014·023",
+      "verification_idea": "비담당 공개 조회 성공/타인 제출403, 공동담당 제출 성공. GSG 기록자가 브랜드 제공자와 다른 값으로 남음. 운영자 범위와 내부 가격권한을 각각 검사",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-04",
+      "owners": [
+        "G02",
+        "G18"
+      ],
+      "owner_note": "G02+후행/G18",
+      "requirement": "조회/쓰기 외 파일 원본·preview·download, count/order/page, export, 알림, 감사, AI 입력/결과 격리. 원안3·13절",
+      "verification_idea": "각 실제 endpoint를 소유 모듈 권한행렬에 추가. 다른 context/정지사용자 직주소 요청에서 제목·개수·가격·본문 누출0. G02 초기 harness만으로 후행 HTTP까지 완료라고 쓰지 않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-05",
+      "owners": [
+        "G03"
+      ],
+      "owner_note": "G03",
+      "requirement": "GSG 모든 미답변/오늘·임박·초과/외부확인/새제출/전달필요와 담당별 다음 행동; 브랜드 요청자료/기한/보완/GSG담당/공지. 원안4절, FR-004·012",
+      "verification_idea": "각 배지를 독립 fixture로 생성하고 홈 수치→목록→원본의 ID/상태 일치 확인. 5질문 중1개 미해결이 사라지지 않고 외부대기가 브랜드 미제출로 합산되지 않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-06",
+      "owners": [
+        "G03",
+        "G18"
+      ],
+      "owner_note": "G03+G18",
+      "requirement": "내업무/컨텍스트전체, 목록/칸반/프로젝트타임라인, 독립 상품 메뉴, 빈/권한없음/검색없음/로딩/실패. 원안4·11절",
+      "verification_idea": "같은 레코드를3뷰에서 바꾸고 일치 확인. 상품 메뉴에서 저장·연결까지 수행. 여러 빈/오류 상태를0건성공으로 통합하지 않음. 브랜드 문구가 업무 버튼/범위설명을 대신하지 않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-07",
+      "owners": [
+        "G04"
+      ],
+      "owner_note": "G04",
+      "requirement": "최상위는 신규입점/스팟, PR·행사·샘플·등록은 세부유형. 프로젝트 선택 작업·병렬·선행 관계·개별완료 분리. 원안5.1, FR-002·020",
+      "verification_idea": "신규입점 선택3작업 중2개 병렬/1개 의존, 독립 스팟은 project=null. 업무1개 완료가 프로젝트전체를 완료시키지 않음. 추가SKU가 기존상품/진행을 초기화하지 않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-08",
+      "owners": [
+        "G04"
+      ],
+      "owner_note": "G04",
+      "requirement": "수동 회차 복제의 회차/대상 기간, 기본 템플릿과 직접 작성. 원안5.1·10절",
+      "verification_idea": "월별 업데이트를2회 복제하여 기간/담당/마감/답변ID 독립 확인. 자동 스케줄러가 없어도 수동 회차 생성 동작. 템플릿 외 사용자 정의 요청 항목 저장 가능",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-09",
+      "owners": [
+        "G04"
+      ],
+      "owner_note": "G04",
+      "requirement": "GSG책임자1·브랜드주담당1·선택공동담당, 목적/줄글/산출물·제작주체·다음행동. 원안5.2, FR-020/BR-018",
+      "verification_idea": "여러 담당과 실제 제작책임이 서로 다르게 저장/표시. 정지/다른context 배정 거부. '담당자' 문자열 한 칸으로 역할을 합치지 않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-10",
+      "owners": [
+        "G04"
+      ],
+      "owner_note": "G04",
+      "requirement": "요청 항목8종(짧은/긴글·파일·선택·숫자·날짜·링크·실물), 필수/선택·조건·제품별 적용범위. 참고자료와 결과물 분리. FR-001·003, BR-009·024",
+      "verification_idea": "종류별 최소1개와 조건부 제품별 항목 입력/재조회. 참고양식 업로드만으로 요구결과물이 충족되지 않음. 미선택/해당없음은 미제출 분모에서 제외",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-11",
+      "owners": [
+        "G04"
+      ],
+      "owner_note": "G04",
+      "requirement": "규격 출처·버전·필수/권장, 자동검사 가능/사람확인 분리. 원안5.2·10절, FR-027/BR-024",
+      "verification_idea": "PNG크기 필수 규격과 영상권장길이를 다른 항목에 적용. 권장초과는 강제반려로 바뀌지 않고 사람확인 항목을 파일존재만으로 통과시키지 않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-12",
+      "owners": [
+        "G04"
+      ],
+      "owner_note": "G04",
+      "requirement": "내부초안→브랜드미리보기→공개, 공개자/시각/버전; 기한미정+확인주체. FR-024, BR-023",
+      "verification_idea": "내부원문을 가진 초안을 미리보기해 공개 설명만 노출. 공개실패 시브랜드알림0. 기한미정 저장 후 담당자/다음 확인주체 표시",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-13",
+      "owners": [
+        "G04"
+      ],
+      "owner_note": "G04",
+      "requirement": "다중 컨텍스트는 원본/템플릿만 공통, 개별 업무·담당·마감·진행·답변. FR-002/BR-007",
+      "verification_idea": "같은브랜드 다른리테일러 포함3업무 생성 후1개마감/답변 변경. 다른2개 DB/화면 변동0, contextId로유일성을대체하지않고 업무ID도독립",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-14",
+      "owners": [
+        "G04"
+      ],
+      "owner_note": "G04",
+      "requirement": "템플릿 수정이 생성 업무에 자동전파되지 않음. 영향업무 선택적 변경분적용, 기존요청/답변보존·새로필요한부분 표시. FR-003, BR-020, T08·T22",
+      "verification_idea": "템플릿v2에 SDS필수·기한·설명 변경. 기존3업무중2개만선택적용. 미선택v1유지, 선택업무v2+변경알림, 기존답변불변, 추가항목만남음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-15",
+      "owners": [
+        "G04",
+        "G05"
+      ],
+      "owner_note": "G04+G05",
+      "requirement": "읽음≠수락≠일정조정≠제출≠완료; 취소/보류 및 부분제출/외부대기 배지. BR-001",
+      "verification_idea": "순서별 버튼을누르고 저장상태비교. 일정조정요청만으로기존마감변화0, GSG반영후이력생성. 상태열하나로부분제출/외부대기정보를소실하지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-16",
+      "owners": [
+        "G05"
+      ],
+      "owner_note": "G05",
+      "requirement": "임시저장/부분/전체제출, 줄글·값·편집원본·확인본·증빙링크가 같은 제출 버전에 고정. FR-005·006, BR-003·004·026",
+      "verification_idea": "v1텍스트/원본.ai/확인PDF/링크 제출 후v2수정. v1본문·값·파일·댓글·검토·전달 참조 해시/ID불변. 업로드만으로 제출상태 변화0",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-17",
+      "owners": [
+        "G05"
+      ],
+      "owner_note": "G05",
+      "requirement": "전체제출은 형식적 충족; 미제출정확·저장실패/새로고침복구·중복클릭1버전. FR-005·030, BR-027",
+      "verification_idea": "3필수중2개 부분제출→잔여1, 전체요청은구조적미충족안내. 제출API응답유실/재시도로버전1개. 저장실패뒤작성값복구",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-18",
+      "owners": [
+        "G05"
+      ],
+      "owner_note": "G05",
+      "requirement": "PDF·PNG/JPG·XLS/XLSX·CSV·DOC/DOCX·PPT/PPTX·Illustrator.ai·ZIP·MP4/MOV 보관; preview와download전용 구분. 원안6절",
+      "verification_idea": "형식별 합성파일1개 저장/다운로드 원본 hash대조. preview불가파일은명시. .ai를AI입력으로해석하지않음. ZIP해제/매크로실행없음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-19",
+      "owners": [
+        "G05"
+      ],
+      "owner_note": "G05",
+      "requirement": "25MiB/개·회당10개, MIME/확장자·권한 서버검사, 파일별실패/재시도/삭제·임시업로드관리. 원안6·13절",
+      "verification_idea": "한도정확/1byte초과/11개·MIME위조·타context파일검사. 실패파일별상태, 임시첨부삭제가이미제출한버전파일을지우지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-20",
+      "owners": [
+        "G05"
+      ],
+      "owner_note": "G05",
+      "requirement": "대용량영상 링크+설명, 가변링크 ‘내용미고정’, 사용본확정 시 보관사본/고정식별자; 서버임의수집없음. BR-026",
+      "verification_idea": "같은URL외부내용변경을가정해과거검토가자동갱신안됨. 사용본에는고정참조, 링크등록만으로외부네트워크fetch0",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-21",
+      "owners": [
+        "G05",
+        "G07"
+      ],
+      "owner_note": "G05+G07",
+      "requirement": "정확한 파일버전 참조 재사용, GSG 공개범위와 원본범위 확인. 새원본≠과거업무자동갱신. BR-003·022·023",
+      "verification_idea": "공통증빙v1을2업무에참조후원본v2등록. 과거2업무v1유지. 같은브랜드다른context비공개원본은재사용거부",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-22",
+      "owners": [
+        "G06"
+      ],
+      "owner_note": "G06",
+      "requirement": "독립 상품목록의 이미지·브랜드·이름·SKU/코드·용량/변형·카테고리·컨텍스트상태·요청/부족/미확인자료수. 원안7.1/FR-023",
+      "verification_idea": "이름만있는CRUD로끝내지않고목록필드/필터(국가·리테일러·브랜드·상품명·SKU)와DB집계비교. 상품에서관련업무생성/연결·Excel진입실행",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-23",
+      "owners": [
+        "G06"
+      ],
+      "owner_note": "G06",
+      "requirement": "기본/현지명·코드·카테고리·용량/단위·색상/향·이미지·설명·사용법·원산지/제조정보. PRD-06본문",
+      "verification_idea": "제공된각필드에구별되는합성값을저장/수정/재조회. 원산지/제조정보가없을때임의생성안함. 용량변형과패키지설명을한문자열로뭉개지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-24",
+      "owners": [
+        "G06"
+      ],
+      "owner_note": "G06",
+      "requirement": "최소등록3값, 임시코드구분·컨텍스트내중복·미확인barcode/성분분류/만료일. 원안7.1",
+      "verification_idea": "브랜드/이름/코드만등록성공, 요청별추가필수는해당업무에서검사. 임시코드표시, 중복거부, 모르는값null/미확인유지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-25",
+      "owners": [
+        "G06"
+      ],
+      "owner_note": "G06",
+      "requirement": "브랜드공통원장과 ContextProduct의 현지SKU/JAN·등록/출시/중단·예정/확정출시일·입점프로젝트. FR-023",
+      "verification_idea": "한상품2retailer에다른SKU/JAN/상태/출시일/프로젝트를설정후한쪽수정. 공통필드와해당context값만예정대로변경",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-26",
+      "owners": [
+        "G06"
+      ],
+      "owner_note": "G06",
+      "requirement": "소비자가·통화·세금포함여부·적용국가/retailer·적용일, 내부공급가/공급률, 공개협찬비용별개. BR-023",
+      "verification_idea": "동일상품JPY/KRW가격·적용일구분. brand/가격미권한GSG에는내부필드자체없음. 행사협찬비가공급가필드로합쳐지지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-27",
+      "owners": [
+        "G06"
+      ],
+      "owner_note": "G06",
+      "requirement": "전성분원문/파일·언어·제출일, 포장/용기/라벨/박스·ITF 등 요청된정보. 원안7.1/E03·E06·E07",
+      "verification_idea": "성분파일+원문/언어와용기/포장2종데이터저장. 제품/용량/변형연결이맞고미확인정보는빈상태. 패키지이미지를AI검토대상으로자동확장하지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-28",
+      "owners": [
+        "G06"
+      ],
+      "owner_note": "G06",
+      "requirement": "자료/인증/시험·수상증빙, 업무/검토사용처/언어/매체, 변경자/전후/출처·상품/파일버전. FR-023/BR-003·004",
+      "verification_idea": "상품에서자료·정확한제출/검토로탐색. 공통정보변경시영향context표시, 현재최신/과거검토스냅샷불변. 보관/판매중단해도기존이력/연결조회가능",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-29",
+      "owners": [
+        "G07"
+      ],
+      "owner_note": "G07",
+      "requirement": "행=상품, 열=요청자료유형; 미제출/제출됨/내용확인필요/적용확인/보완필요/해당없음. FR-023/BR-009·022",
+      "verification_idea": "2상품×3자료6상태fixture. 셀에서정확한파일버전/요청이동. 파일존재가적용확인으로승격되지않고해당없음은부족집계제외",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-30",
+      "owners": [
+        "G07"
+      ],
+      "owner_note": "G07",
+      "requirement": "SDS/MSDS·서명질문지·보증/확인서·갱신청구서·제품목록·실제인증서 구분. 발행/서명일·명시기간·제품별적용. BR-009·022",
+      "verification_idea": "공통제품목록하나를2제품에연결하되적용상태별개. 질문지서명·청구기간이certified=true를만들지않음. 원문없는만료일생성0, 확인기간있는자료만갱신알림대상",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-31",
+      "owners": [
+        "G07"
+      ],
+      "owner_note": "G07",
+      "requirement": "표준양식 제공부터 파일/시트/헤더/열매핑/오류·중복·가격미리보기/명시반영/결과·실패행. FR-016",
+      "verification_idea": "다중sheet·header가첫행아닌합성xlsx로모든단계수행. 미리보기만으로DB변경0. 반영후batchId/출처/행결과조회·재시작유지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-32",
+      "owners": [
+        "G07"
+      ],
+      "owner_note": "G07",
+      "requirement": "제품코드+context키로중복, 신규/업데이트/건너뛰기선택, 오류1행이면전체차단. FR-016/BR-027",
+      "verification_idea": "기존1/신규1/오류1파일에서전체반영0. 오류수정후선택한신규/갱신만저장, skip불변. 동일batch재시도중복없음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-33",
+      "owners": [
+        "G07"
+      ],
+      "owner_note": "G07",
+      "requirement": "가격권한이import preview/반영/export모두동일, brand내보내기는내부가격열자체제외. FR-016/BR-023",
+      "verification_idea": "직접payload에내부가격을추가한import거부, CSV/XLSX의header/hidden sheet/metadata에누출없음. 정상표준양식완료와현업Excel미제공상태별도",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-34",
+      "owners": [
+        "G08"
+      ],
+      "owner_note": "G08",
+      "requirement": "공지 대상/설명/양식·가이드/FAQ·업무유형안내, 게시/수정/확인자·시각, 연결업무. FR-001/BR-001",
+      "verification_idea": "공지읽음으로수락/제출/완료불변. 수정전후본문·양식버전조회, 대상밖읽음명단/첨부도거부. 답변필요공지에서별도업무생성",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-35",
+      "owners": [
+        "G09"
+      ],
+      "owner_note": "G09",
+      "requirement": "브랜드가독립문의또는업무연결문의 생성, 줄글/첨부, 업무전환시원대화보존. FR-011",
+      "verification_idea": "GSG요청이없는브랜드가문의시작가능. 나중에업무연결해도원messageID/첨부/시각불변. 담당제출권한제한으로독립문의작성을막지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-36",
+      "owners": [
+        "G09"
+      ],
+      "owner_note": "G09",
+      "requirement": "질문별4상태·외부상대/보낸시각/GSG담당/다음확인일/최근결과, 자동접수/내부메모≠답변. FR-013·019/BR-010·011·017",
+      "verification_idea": "5질문중4답변1외부대기fixture에서홈잔여1. 접수메모추가해도대기유지. 해결후추가질문으로재개하고과거해결시각유지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-37",
+      "owners": [
+        "G09"
+      ],
+      "owner_note": "G09",
+      "requirement": "팝업/상세 공통대화·파일·읽음, 전송중/실패/재전송·새메시지·실시간/누락복구. FR-011",
+      "verification_idea": "두실제계정/탭에서읽음일치. 연결끊김동안2메시지→재연결해2개만추가, 같은clientMessageId재전송1개. 내부메모실시간payload비노출",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-38",
+      "owners": [
+        "G10"
+      ],
+      "owner_note": "G10",
+      "requirement": "출처·대상버전·페이지/위치·수정내용/이유·공개설명·우선순위·반영본·해소확인자. FR-007·018/BR-016",
+      "verification_idea": "내부원문과공개설명을다르게작성후brand미리보기. 항목3개중2개반영/1개미반영이구별되고GSG확인한항목만해소",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-39",
+      "owners": [
+        "G10"
+      ],
+      "owner_note": "G10",
+      "requirement": "공개묶음불변·늦은의견후속묶음·충돌추가확인·긴급공개남은기관/범위. FR-006·018/BR-005·016",
+      "verification_idea": "v1공개후늦은/상충의견을v2묶음으로추가. 첫공개본문불변, 미해소/대기범위계속표시. 취합중알림0/공개시묶음1",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-40",
+      "owners": [
+        "G10"
+      ],
+      "owner_note": "G10",
+      "requirement": "검토기관/검토자·자료버전·매체/언어/사용처/제품범위·수신일/결과/근거/기록자, 내부/기관/AI구분. FR-008/BR-003·005",
+      "verification_idea": "동일파일의다른사용처·언어검토를별도저장. 재제출시과거의견참고연결가능하나자동승인0. 파일교체만으로모든수정해소0",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-41",
+      "owners": [
+        "G11"
+      ],
+      "owner_note": "G11",
+      "requirement": "전달목적(검토요청/신청/최종사용)·대상·실제수행자·플랫폼기록자·자료버전·시각·증빙·최근진행. FR-010/BR-002·015",
+      "verification_idea": "실제수행자와GSG기록자가다른사례, 같은파일다른전달목적2건저장. 기록버튼만으로메일/신청/게시성공표시없음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-42",
+      "owners": [
+        "G11"
+      ],
+      "owner_note": "G11",
+      "requirement": "요청/제출/상품버전·미해결·외부대기·마지막진행·완료자/시각 스냅샷; 메모권장. 변경FR-009·029/BR-006·025",
+      "verification_idea": "외부대기/보완/AI실패남긴채메모없이GSG완료성공. 정확한잔여snapshot, brand/AI완료거부. 법률적합/외부승인/게시·납품상태불변",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-43",
+      "owners": [
+        "G11"
+      ],
+      "owner_note": "G11",
+      "requirement": "완료후후속업무연결 또는사유있는재개, 과거완료시각/잔여항목보존; CAS/멱등성유지. FR-029·030/BR-004·027",
+      "verification_idea": "완료→재개→다시완료후각snapshot불변. 중복클릭/동시변경에서단일이벤트와정확한최신버전, 강제승인조건재도입없음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-44",
+      "owners": [
+        "G12"
+      ],
+      "owner_note": "G12",
+      "requirement": "PR메뉴는외부리테일러마케팅서비스이고플랫폼상품정보와별개. 카탈로그원문/번역/버전/GSG공개조건. FR-022",
+      "verification_idea": "브랜드페이지제작메뉴를생성해도상품CRUD메뉴유지. 같은메뉴번호다른카탈로그버전에서메뉴명+버전으로구별, 내부가격/원문선별공개",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-45",
+      "owners": [
+        "G12"
+      ],
+      "owner_note": "G12",
+      "requirement": "참여/불참/추가협의·외부신청·심사선정·준비·실제진행·결과수령 독립, 신청자/기록자분리. BR-002·020",
+      "verification_idea": "참여만으로신청/선정0. 불참은정상회신완료+독촉중지. 이미신청후불참은취소협의이고외부신청상태자동삭제없음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-46",
+      "owners": [
+        "G12"
+      ],
+      "owner_note": "G12",
+      "requirement": "선택메뉴만제품/수량/비용·통화·세금/취소조건/자료·실물/신청·납품·게시일정 생성. FR-022/BR-008",
+      "verification_idea": "3메뉴중1개선택후나머지준비물0·누락0. 선택변경시요건변경이력과기존답변보존. 과거견적의현행자동공개없음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-47",
+      "owners": [
+        "G12",
+        "G04"
+      ],
+      "owner_note": "G12+G04",
+      "requirement": "기본7유형템플릿, 출처별규격·제작주체·자막/원본제공책임·사용장소, 사용자정의항목. FR-003·027",
+      "verification_idea": "상품/서류,POP/리플렛,브랜드페이지,영상/교육,행사,샘플/배송,정기업데이트를생성/편집. 영상권장길이는차단아님. 특정PNG규격을모든업무에전파하지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-48",
+      "owners": [
+        "G12"
+      ],
+      "owner_note": "G12",
+      "requirement": "실물목적지·용도·상품/샘플변형·요구/발송수량·단위·예정발송/도착·택배/송장·증빙·수령·기록자. FR-026/BR-009",
+      "verification_idea": "촬영1개/배포100개를다른목적지에저장후한쪽만발송/수령. 다른쪽불변. PDF/송장만으로수령완료0, 단위/상품변형빠짐없이재조회",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-49",
+      "owners": [
+        "G12"
+      ],
+      "owner_note": "G12",
+      "requirement": "요청된게시URL·실행사진·성과리포트 등후속산출물별기한, 원문날짜/번호/가격·할인·포인트충돌. FR-027/BR-019·020",
+      "verification_idea": "행사후리포트항목별도기한/미제출표시. 한국어/일본어원문상충값2개와출처유지·확인필요. 할인과포인트를동일값으로합치지않음, 과거성과를예측치로표시안함",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-50",
+      "owners": [
+        "G13"
+      ],
+      "owner_note": "G13",
+      "requirement": "브랜드회신/자료제출/외부신청/검토회신/보완/인쇄·발송·도착/게시·사용 구분. FR-021/BR-012",
+      "verification_idea": "같은업무에내부회신과외부신청기한을다르게설정하고각화면/다음행동/알림일치. 불필요한종류를기계적으로필수생성하지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-51",
+      "owners": [
+        "G13"
+      ],
+      "owner_note": "G13",
+      "requirement": "확정/요청/예상/확인필요+출처/자료버전/시간대/변경자, 기한미정/의향/옛날메일제목미승격. BR-019",
+      "verification_idea": "날짜같아도확정수준별상태보존, 충돌원문선택전임의확정0. 시차경계/자정에기한계산확인, 입력없는일정에가짜SLA0",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-52",
+      "owners": [
+        "G13"
+      ],
+      "owner_note": "G13",
+      "requirement": "병렬일정과선후관계위험, 달력일D-2/당일/초과1회/일; 실제다음행동담당자. FR-021/BR-018",
+      "verification_idea": "병렬2업무를직렬로막지않음. 고정clock으로D-2·당일·다음날각수신자/횟수확인, 영업일SLA로임의변환안함",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-53",
+      "owners": [
+        "G13"
+      ],
+      "owner_note": "G13",
+      "requirement": "공개/배정→브랜드, 제출/조정/질문→GSG, 보완공개/답변→브랜드; 취합중0·event+recipient중복방지. FR-012/BR-016",
+      "verification_idea": "이벤트종류별수신자와알림목표링크, 초안/내부메모비노출. 실패후재시도중복0. 읽음/미읽음·처리/실패기록재로그인유지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-54",
+      "owners": [
+        "G13"
+      ],
+      "owner_note": "G13",
+      "requirement": "완료/취소/불참/불필요항목독촉제외, 재개재평가, 외부확인일은GSG. BR-013·017",
+      "verification_idea": "종료각상태별후속독촉0. 외부지연때브랜드독촉0/GSG확인알림1. 재개후해당규칙복원. 앱알림을실제메일로보고안함",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-55",
+      "owners": [
+        "G14"
+      ],
+      "owner_note": "G14",
+      "requirement": "context·상품/SKU·업무/문의제목본문·파일명·상태·담당·기간, count/order/page권한. FR-015/BR-014",
+      "verification_idea": "각검색대상에고유표식을넣어권한내검색됨을확인, 권한밖은내용/개수0. LLM없어도필터·페이지정상, 6개월이전fixture조회가능",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-56",
+      "owners": [
+        "G14"
+      ],
+      "owner_note": "G14+각쓰기G",
+      "requirement": "요청/템플릿/담당/기한/공개/답변/제출/보완/검토/전달/상품/완료/재개/권한의작성자·시각·전후·버전·출처. FR-014·030/BR-004·027",
+      "verification_idea": "이벤트종류별1건생성후audit완전성대조. 동시충돌최신내용/재적용안내. 공개/제출/Excel/완료/외부기록재시도1건. 보존정책미정상태자동삭제0",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-57",
+      "owners": [
+        "G15"
+      ],
+      "owner_note": "G15",
+      "requirement": "context·상품·업무·제출버전/독립검토, 분류/사용처/매체/언어, 실제읽을범위미리보기. FR-031·032/BR-028",
+      "verification_idea": "입력대상버전과선택페이지동일. 일본일반화장품/일본어POP·리플렛만지원, 약용/불명/패키지·SDS는사람업무로남고AI정상실행안함",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-58",
+      "owners": [
+        "G15"
+      ],
+      "owner_note": "G15",
+      "requirement": "텍스트10,000자,PDF10MiB/선택10쪽,이미지4개/합계10MiB,토큰사전검사; OCR미확인/제외쪽. FR-035",
+      "verification_idea": "각한도정확/초과·잠금/손상/빈입력·저품질OCR검사. 일반25MiB첨부와AI한도를분리. 미선택/못읽은쪽완료표시0",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-59",
+      "owners": [
+        "G16"
+      ],
+      "owner_note": "G16",
+      "requirement": "finding위치/유형·risk≠confidence·이유/추가정보·수정제안, legal_basis권위/locator/URL/시행일/범위와보조지침구분. FR-033·036",
+      "verification_idea": "정상/후보/근거부족각결과schema필드대조. locator없으면human_review_required, 0후보적법확정0, 수정안자동덮어쓰기/외부공개0",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-60",
+      "owners": [
+        "G16"
+      ],
+      "owner_note": "G16",
+      "requirement": "일본어/사전한국어정렬·검수수준·원문개정stale·모델/프롬프트/corpus/입력hash·사람수락/수정/기각사유. FR-034",
+      "verification_idea": "source버전개정뒤old번역검색제외, machine-unreviewed표시. 세사람판정행동이력보존. source_id·원본응답까지재현, 런타임번역호출0",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-61",
+      "owners": [
+        "G16"
+      ],
+      "owner_note": "G16",
+      "requirement": "YK-01·02·03·05·06·07·09·10·11·12, TR-01, EV-01 범위 유지. 원안12.3/FR-031",
+      "verification_idea": "단어하나로위법확정하지않고맥락/이미지/각주/수치와근거를후보에연결. YK-04/08을약용정상경로로복원하지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-62",
+      "owners": [
+        "G17"
+      ],
+      "owner_note": "G17",
+      "requirement": "오류분류·일시실패만제한재시도·중복run·사용량/가격기준일/추정비용·기본업무지속. FR-035, 원안12.5/PRD-17",
+      "verification_idea": "key/권한/429/5xx/timeout/OCR/parsing/근거없음각분리. 영구오류무한재시도0. 금액차단0, 기술limit유지. 실제OpenAI schema/근거·usage성공은필수이며mock대체금지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-63",
+      "owners": [
+        "G18"
+      ],
+      "owner_note": "G18",
+      "requirement": "PC/모바일/키보드·labels/focus·빈/권한/로딩/실패/큰파일, 두업무분류종단/재로그인. 원안4·15절",
+      "verification_idea": "정상클릭만아니라오류복구후재개를양측계정으로수행. 브랜드지정문구의앱/메타데이터/발표원고대조, 상품/문의/파일흐름DB유지",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SA-64",
+      "owners": [
+        "G18"
+      ],
+      "owner_note": "G18",
+      "requirement": "기능·서버/DB·실호출·메일·현업Excel·전문가·운영복구 분리, clean install/seed정책·증거. 원안14~17/최신PRD-17·18",
+      "verification_idea": "G17실호출없으면전체미완료. 메일/현업Excel/전문가/운영백업은미확보상태별도. 합성fixture를실적/정확도/6개월운영/복구성공으로바꾸지않음",
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ]
+}

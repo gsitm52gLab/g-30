@@ -15,9 +15,9 @@
       "prd_id": "PRD-00",
       "title": "환경과 저장구조",
       "dependencies": [],
-      "state": "IMPLEMENTING",
+      "state": "VERIFYING",
       "required_for_product_completion": true,
-      "candidate_commit": null,
+      "candidate_commit": "401f346a62fcf99bc45f650e374e471a0ef6c5d5",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
@@ -73,7 +73,9 @@
           "evidence": []
         }
       ],
-      "next_action": "Await immutable implementation candidate; verifier executes fresh detached worktree and integration regression before ACCEPTED"
+      "next_action": "Independent exact candidate checks on port 4102; no integration before verifier evidence review",
+      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g00-verify",
+      "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/implementation-result.json"
     },
     {
       "id": "G01",
@@ -1028,8 +1030,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": null,
   "current_goal": "G00",
-  "next_action": "G00 implementation in isolated worktree then independent candidate verification",
-  "state_version": 5,
+  "next_action": "Independent exact candidate checks on port 4102; no integration before verifier evidence review",
+  "state_version": 7,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1055,6 +1057,6 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T08:40:16.377879+00:00",
+  "updated_at": "2026-09-21T08:47:19.753961+00:00",
   "traceability_path": ".execution/traceability.json"
 }
