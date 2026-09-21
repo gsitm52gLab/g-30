@@ -197,3 +197,5 @@ SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
 ```
 
 `SUBMISSIONS_HTTP_ROOT`는 새 고유 DB/파일 런타임 디렉터리의 부모(기본 `.local/g05-http`), `SUBMISSIONS_HTTP_REPORT`는 요청 상태·응답 hash·assertion 결과·프로세스 종료 보고서 경로입니다. 과거 보고서를 덮어쓰지 않게 새 경로를 사용하세요. SQLite 검사의 private fixture는 실제 생성된 레코드의 읽기·해시 대조만 하며, mock은 같은 읽기 전용 관찰을 IPC로 수행합니다. 실제 UI·브라우저·복구 및 독립 검증은 별도 실행 증거로 구분합니다.
+
+저장된 공개 요청의 항목 구조가 손상된 경우 `REQUEST_INVALID`409로 답변 쓰기를 거부합니다. 읽기 평가는 `needs_reconfirmation`, `canSubmitFull:false`, 요청 구조 확인 필요를 표시합니다. 비정상 상품 범위를 공통 항목으로 바꿔 제출을 허용하지 않습니다. GSG가 실제 요청 편집에서 규칙을 확인·정정한 뒤 다시 공개하고, 작성자는 유지한 답변을 명시적으로 비교·재적용합니다. 정상 값의 알 수 없는 추가 키는 공개 출력에서 제외하지만 합법적인 제출은 유지합니다. 이 답변 구조 검사는 후행 GSG 수동 완료의 강제 승인 게이트가 아닙니다.

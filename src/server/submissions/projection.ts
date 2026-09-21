@@ -1,3 +1,7 @@
+import { requestRequirementsValid } from '@/domain/submissions/request';
+import type { RequestContent } from '@/domain/tasks/types';
+import { projectedRequest } from '@/server/tasks/projection';
+import { evaluateAnswers } from '@/domain/submissions/evaluate';
 import type { AnswerInput, DateInput, LinkInput, Provider, StoredAnswer, DraftContent } from '@/domain/submissions/types';
 import type { Clock, StoredRecord, UnitOfWork } from '@/domain/records';
 import type { Principal } from '@/server/auth/service';
@@ -44,4 +48,12 @@ export function publicFile(s: UnitOfWork, p: Principal, task: StoredRecord<'task
 export function fileDTO(s: UnitOfWork, p: Principal, task: StoredRecord<'task'>, id: string, clock: Clock) {
     const f = publicFile(s, p, task, id, clock);
     return { ...fileMetadata(f), ...fileUrls(f, task.id), uploaderLabel: userLabel(s, p, task.contextId!, f.data.uploaderId), uploadedAt: f.createdAt };
+}
+/** Sanitize stored legacy/extensions before deriving a public evaluation, too. */
+export function safeEvaluation(current: RequestContent, answers: AnswerInput[], previous: RequestContent | null = current, prior = false) {
+    const content = (value: RequestContent): RequestContent => ({ ...projectedRequest(value, false, []), internalOriginal: '', internalMemo: '' });
+    const result = evaluateAnswers(content(current), answers.map(answerDTO), previous ? content(previous) : null, prior);
+    if (!requestRequirementsValid(current))
+        return { ...result, satisfied: 0, missing: result.required, invalid: Math.max(1, result.invalid), canSubmitFull: false, humanReviewPending: true, items: result.items.map(item => ({ ...item, status: 'needs_reconfirmation' as const, humanReviewPending: true, warnings: [...item.warnings, '공개 요청 구조 확인 필요'] })) };
+    return result;
 }

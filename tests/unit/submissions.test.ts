@@ -237,6 +237,27 @@ for (const mode of ['mock', 'sqlite'] as const)
             await sub.submit(brand, id, await submissionInput(id));
             expect((await fs.download(team, file.id, id, 'original')).bytes).toEqual(png);
         });
+        it('stored malformed nested request values cannot cross evaluation DTO while original record is preserved', async () => {
+            await setup();
+            const id = await task(), initial = await sub.workspace(brand, id);
+            await repo.transaction(s => { const old = s.get('requestVersion', initial.request.id)!, task = s.get('task', id)!; const data = { ...old.data, sequence: 2, previousId: old.id, content: { ...old.data.content, requirements: old.data.content.requirements.map(q => ({ ...q, label: { private: 'EVALUATION_CANARY' }, productIds: [{ private: 'EVALUATION_CANARY' }] })) } } as unknown as typeof old.data; const next = s.create('requestVersion', { id: randomUUID(), contextId: A, data }); s.update('task', task.id, task.revision, { ...task.data, currentRequestId: next.id }); });
+            const w = await sub.workspace(brand, id);
+            expect(JSON.stringify(w)).not.toContain('EVALUATION_CANARY');
+            expect(w.draftEvaluation!.canSubmitFull).toBe(false);
+            expect(w.draftEvaluation!.invalid).toBeGreaterThan(0);
+            await expect(sub.draft(brand, id, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: 0, content: blankDraft(), idempotencyKey: randomUUID() })).rejects.toMatchObject({ code: 'REQUEST_INVALID', status: 409 });
+            expect(JSON.stringify((await repo.list('requestVersion')).find(r => r.data.sequence === 2))).toContain('EVALUATION_CANARY');
+        });
+        it('unknown extra request keys retain legitimate authoritative rules and full submit', async () => {
+            await setup();
+            const id = await task(), w = await sub.workspace(brand, id);
+            await repo.transaction(s => { const old = s.get('requestVersion', w.request.id)!, task = s.get('task', id)!; const next = s.create('requestVersion', { id: randomUUID(), contextId: A, data: { ...old.data, sequence: 2, previousId: old.id, content: { ...old.data.content, requirements: old.data.content.requirements.map(q => ({ ...q, privateExtension: { marker: 'EXTRA_CANARY' } })) } } }); s.update('task', task.id, task.revision, { ...task.data, currentRequestId: next.id }); });
+            const d = await textDraft(id);
+            await save(id, d);
+            const result = await sub.submit(brand, id, await submissionInput(id));
+            expect((await sub.snapshot(brand, result.ids[0])).evaluation.canSubmitFull).toBe(true);
+            expect(JSON.stringify(await sub.workspace(brand, id))).not.toContain('EXTRA_CANARY');
+        });
         it('persisted unknown nested extensions never cross live draft/snapshot output and same-key replay is allowlisted', async () => {
             await setup();
             const id = await task(), d = await textDraft(id);

@@ -3,7 +3,6 @@ import type { StoredRecord, UnitOfWork } from '@/domain/records';
 import type { DraftContent, StoredAnswer, SubmissionDraftData } from '@/domain/submissions/types';
 import { answerKey } from '@/domain/submissions/types';
 import { parseDraft, normalizeAnswer, validLink } from '@/domain/submissions/validate';
-import { evaluateAnswers } from '@/domain/submissions/evaluate';
 import { ids, object, enumValue, list } from '@/domain/tasks/validate';
 import type { IdentityService, Principal } from '@/server/auth/service';
 import { revision } from '@/server/auth/service';
@@ -12,7 +11,7 @@ import { receipt, newId, audit } from '@/server/products/store';
 import { captureProductUse } from '@/server/products/capture';
 import { resolveProduct } from '@/server/products/access';
 import { submissionTask, assertRequest, assertDraft, provider, capabilities } from './access';
-import { contentDTO, answerDTO, contentFiles, publicFile } from './projection';
+import { safeEvaluation, contentDTO, answerDTO, contentFiles, publicFile } from './projection';
 import { workspace, snapshotDTO, rebasePreview, sharedDraft, latestSubmission } from './read';
 const hash = (v: unknown) => createHash('sha256').update(JSON.stringify(v)).digest('hex');
 export class SubmissionService {
@@ -46,7 +45,7 @@ export class SubmissionService {
                     return [{ productId: selection.productId, code: 'UNAVAILABLE' as const }];
                 }
             });
-            return { requestId: request.id, evaluation: evaluateAnswers(request.data.content, content.answers), fileIssues, productIssues, missingProductIds: task.data.productIds.filter(id => !content.productSelections.some(v => v.productId === id)), invalidLinkIndexes: content.links.flatMap((link, index) => validLink(link) ? [] : [index]) };
+            return { requestId: request.id, evaluation: safeEvaluation(request.data.content, content.answers), fileIssues, productIssues, missingProductIds: task.data.productIds.filter(id => !content.productSelections.some(v => v.productId === id)), invalidLinkIndexes: content.links.flatMap((link, index) => validLink(link) ? [] : [index]) };
         });
     }
     async rebasePreview(token: string | undefined, taskId: string) { return this.identity.repo.transaction(s => rebasePreview(s, this.identity.principal(s, token), taskId, this.clock)); }
@@ -131,7 +130,7 @@ export class SubmissionService {
                 if (draft.data.baseRequestId !== request.id)
                     fail('REQUEST_CHANGED', 409, '초안을 현재 요청으로 전환해 주세요.');
                 const content = parseDraft(contentDTO(draft.data), request.id, request.data.content, task.data.productIds);
-                const evaluation = evaluateAnswers(request.data.content, content.answers);
+                const evaluation = safeEvaluation(request.data.content, content.answers);
                 if (evaluation.invalid || content.links.some(l => !validLink(l)))
                     fail('INVALID_ANSWERS', 422, '입력한 값의 형식과 링크 설명을 확인해 주세요. 빈 필수 항목은 부분 제출할 수 있습니다.');
                 if (mode === 'full' && !evaluation.canSubmitFull)

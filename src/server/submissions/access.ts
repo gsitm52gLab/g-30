@@ -1,3 +1,4 @@
+import { requestRequirementsValid } from '@/domain/submissions/request';
 import type { Clock, UnitOfWork, StoredRecord } from '@/domain/records';
 import type { Provider } from '@/domain/submissions/types';
 import { parseProvider } from '@/domain/submissions/validate';
@@ -17,6 +18,8 @@ export function submissionTask(s: UnitOfWork, p: Principal, taskId: string, cloc
     const request = s.get('requestVersion', task.data.currentRequestId);
     if (!request || request.data.taskId !== task.id)
         unavailable();
+    if (edit && (!requestRequirementsValid(request.data.content) || request.data.content.requirements.some(q => q.productIds.some(id => !task.data.productIds.includes(id)))))
+        fail('REQUEST_INVALID', 409, '공개 요청의 항목 구조를 확인할 수 없습니다. 입력을 유지하고 GSG에 요청 확인을 요청해 주세요.');
     return { task, request };
 }
 export function capabilities(s: UnitOfWork, p: Principal, task: StoredRecord<'task'>, clock: Clock) {

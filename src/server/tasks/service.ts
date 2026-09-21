@@ -1,6 +1,6 @@
 import { resolveProduct, visibleProductRelations } from "@/server/products/access";
 import { latestSubmission } from "@/server/submissions/read";
-import { evaluateAnswers } from "@/domain/submissions/evaluate";
+import { safeEvaluation } from "@/server/submissions/projection";
 import { canReferenceFile, visibleFile } from "@/server/files/access";
 import { createHash, randomUUID } from "node:crypto";
 import type { UnitOfWork, StoredRecord } from "@/domain/records";
@@ -271,7 +271,7 @@ export class TaskService {
                 versions: projectedVersions,
                 activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)).map(projectedActivity),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
-                requirementStatus: current && live ? evaluateAnswers(current.data.content,live.data.answers,liveRequest?.data.content??null,true).items.map(projectedRequirementStatus) : current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
+                requirementStatus: current && live ? safeEvaluation(current.data.content,live.data.answers,liveRequest?.data.content??null,true).items.map(projectedRequirementStatus) : current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
                 submissionConnection: current ? "공개 요청에 답변을 저장하고 제출할 수 있습니다" : "요청 공개 후 답변할 수 있습니다", submissionSummary: live ? { id:live.id,sequence:live.data.sequence,requestId:live.data.requestId,mode:live.data.mode,submittedAt:live.data.submittedAt,isCurrentRequest:live.data.requestId===current?.id } : null, completionConnection: "업무 완료는 준비 중입니다", notificationConnection: "앱 알림은 준비 중입니다" };
         });
     }
