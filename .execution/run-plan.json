@@ -1406,9 +1406,13 @@
       "verification_preparation": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verifier-preparation/plan.json",
         "sha256": "08b11bb0092a6bc51871044bd9134838172e7e5835e554b1e19739efd86e1c52",
-        "status": "BINDING_TYPED_CONTRACT_HELPERS_NO_PRODUCT_RUNTIME",
+        "status": "TYPED_BOUND_ROOT_REVIEWED_NO_PRODUCT_RUNTIME",
         "main_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-verification-preparation-review.json",
-        "binding_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verification-binding-task.json"
+        "binding_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verification-binding-task.json",
+        "binding": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/verifier-preparation/binding.json",
+        "binding_sha256": "24b1a9dd9ea3c4a0b58c82e094a3ffaf771094c6544545e7f529d45ebb81c2fb",
+        "main_binding_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-verification-binding-review.json",
+        "main_binding_review_sha256": "61494d06a510c11d83e0ea78fa80d2aef9c95e86a50bdb6f2b5d12c9cea0a7ba"
       },
       "ui_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/ui-task-draft.json",
       "provisional_contract_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/1/main-provisional-contract-review.json",
@@ -2030,7 +2034,7 @@
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G07",
   "next_action": "G07 full UI goals on internalf5e21b2, server prd completing HTTP/adversarial/newPID, verifier workflow binding helpers only on frozena8. Review final author candidates, assemble then assign exact combined independent verification.",
-  "state_version": 90,
+  "state_version": 91,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2057,7 +2061,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T16:12:03.130958+00:00",
+  "updated_at": "2026-09-21T16:16:51.032621+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
