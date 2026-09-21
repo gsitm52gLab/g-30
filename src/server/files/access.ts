@@ -1,3 +1,4 @@
+import { resolveNotice, releasedNoticeFile, noticeVersionScope as importedNoticeVersionScope } from '@/server/notices/access';
 import type { Clock, StoredRecord, UnitOfWork } from "@/domain/records";
 import type { Principal } from "@/server/auth/service";
 import { fail, unavailable } from "@/server/auth/errors";
@@ -5,20 +6,24 @@ import { authorize, decide } from "@/server/policy/policy";
 import { taskScope } from "@/server/policy/projection";
 import { resolveProduct, productContextScope } from "@/server/products/access";
 import type { ResourceScope } from "@/server/policy/types";
-export type FileReference = string | {
+export type FileReference = string | {kind:'notice';noticeId:string;versionId?:string} | {
     kind: "product";
     contextId: string;
     productId: string;
 };
 export function fileReference(params: URLSearchParams): FileReference {
-    const taskId = params.get("taskId"), productId = params.get("productId"), contextId = params.get("contextId");
-    if (taskId && !productId && !contextId)
-        return taskId;
-    if (!taskId && productId && contextId)
-        return { kind: "product", productId, contextId };
-    fail("VALIDATION", 422, "업무 또는 상품의 적용 컨텍스트를 지정해 주세요.");
+    if (['taskId','productId','contextId','noticeId','versionId'].some(k=>params.getAll(k).length>1)) fail('VALIDATION',422,'자료 참조를 하나만 지정해 주세요.');
+    const taskId=params.get('taskId'),productId=params.get('productId'),contextId=params.get('contextId'),noticeId=params.get('noticeId'),versionId=params.get('versionId');
+    if(noticeId&&!taskId&&!productId&&!contextId)return {kind:'notice',noticeId,...versionId?{versionId}:{}};
+    if(taskId&&!productId&&!contextId&&!noticeId&&!versionId)return taskId;
+    if(!taskId&&productId&&contextId&&!noticeId&&!versionId)return {kind:'product',productId,contextId};
+    fail('VALIDATION',422,'업무·상품·공지의 자료 참조를 지정해 주세요.');
 }
 export function referenceScope(s: UnitOfWork, p: Principal, reference: FileReference, clock: Clock, edit = false): ResourceScope {
+    if (typeof reference !== "string" && reference.kind === "notice") {
+        const r=resolveNotice(s,p,reference.noticeId,clock,edit,reference.versionId);
+        return reference.versionId&&r.version?{...r.scope,sourceScopes:[r.scope,importedNoticeVersionScope(s,r.notice,r.version)]}:r.scope;
+    }
     if (typeof reference !== "string") {
         const r = resolveProduct(s, p, reference.contextId, reference.productId, clock, edit);
         return productContextScope(r.context.id, r.product.id);
@@ -32,6 +37,11 @@ export function referenceScope(s: UnitOfWork, p: Principal, reference: FileRefer
 }
 export function originalScope(s: UnitOfWork, p: Principal, file: StoredRecord<"fileVersion">, clock: Clock): ResourceScope {
     const owner = file.data.owner;
+    if (owner?.kind === "notice") {
+        const r=resolveNotice(s,p,owner.noticeId,clock);
+        if(r.notice.contextId!==file.contextId)unavailable();
+        return r.scope;
+    }
     if (owner?.kind === "product") {
         if (!file.contextId)
             unavailable();
@@ -62,6 +72,8 @@ export function canReferenceFile(s: UnitOfWork, p: Principal, file: StoredRecord
         unavailable();
     const origin = originalScope(s, p, file, clock);
     authorize(s, p, "file.original", { id: file.id, contextId: file.contextId, kind: "file", visibility: file.data.visibility, originalScope: origin, referenceScope: target }, clock);
+    if (origin.kind === 'notice' && !releasedNoticeFile(s,p,file,clock) && !(target.kind==='notice'&&origin.id===target.id&&p.user.data.role==='gsg'))
+        fail('VALIDATION',422,'공개된 공지 버전에 포함된 자료만 연결할 수 있습니다.');
     const ownTask = origin.kind === "task" && target.kind === "task" && origin.id === target.id;
     if (file.data.visibility === "public" && origin.kind === "task" && !isPublishedTaskFile(s, file)) {
         if (!ownTask || !(file.data.submissionUpload ? canReadTemporarySubmissionFile(s, p, file, target, clock) : p.user.data.role === "gsg"))

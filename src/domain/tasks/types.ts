@@ -57,7 +57,7 @@ export interface PriorSubmissionData {
 }
 export interface DomainEventData { eventType: string; targetId: string; sourceVersionId: string | null; actorId: string; at: string }
 export interface CommandReceiptData { key: string; actorId: string; command: string; bodyHash: string; result: { ids: string[] } }
-export type FileOwner = { kind: "task"; taskId: string } | { kind: "product"; productId: string; contextProductId: string };
+export type FileOwner = { kind: "notice"; noticeId: string } | { kind: "task"; taskId: string } | { kind: "product"; productId: string; contextProductId: string };
 export interface FileVersionData {
     /** Legacy task files retain taskId and immutable bytes; new files also have an explicit owner. */
     taskId: string | null; owner?: FileOwner; storageKey: string; originalName: string; mime: string; bytes: number; sha256: string;

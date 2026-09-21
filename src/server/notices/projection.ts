@@ -1,0 +1,34 @@
+import type { Clock, StoredRecord, UnitOfWork } from '@/domain/records';
+import type { Principal } from '@/server/auth/service';
+import type { NoticeContent } from '@/domain/notices/types';
+import { noticeTypes } from '@/domain/notices/types';
+import { decide, activeMember } from '@/server/policy/policy';
+import { taskScope } from '@/server/policy/projection';
+import { fileMetadata, fileUrls } from '@/server/files/service';
+import { visibleFile } from '@/server/files/access';
+import { noticeScope, noticeVersionScope } from './access';
+const text = (v: unknown) => typeof v === 'string' ? v : '';
+export const nullableText=(v:unknown)=>typeof v==='string'?v:null;
+export function actorLabel(s: UnitOfWork, id: string, contextId: string, p: Principal) {
+    const u = s.get('user', id);
+    return u && (id === p.user.id || activeMember(s, id, contextId)) ? text(u.data.name) : '작성자 정보 비공개';
+}
+export function fileDTO(s: UnitOfWork, p: Principal, f: StoredRecord<'fileVersion'>, noticeId: string, versionId?: string) {
+    return { ...fileMetadata(f), ...fileUrls(f, { kind: 'notice', noticeId, ...versionId ? { versionId } : {} }), uploaderLabel: actorLabel(s, f.data.uploaderId, f.contextId!, p), uploadedAt: f.createdAt };
+}
+export function publicContent(s: UnitOfWork, p: Principal, notice: StoredRecord<'notice'>, content: NoticeContent, clock: Clock, version?: StoredRecord<'noticeVersion'>) {
+    const scope = version ? noticeVersionScope(s, notice, version) : noticeScope(s, notice);
+    const files = (Array.isArray(content.fileIds) ? content.fileIds : []).flatMap(id => { const f = typeof id === 'string' ? s.get('fileVersion', id) : null; return f && f.data.visibility === 'public' && visibleFile(s, p, f, scope, clock) ? [fileDTO(s, p, f, notice.id, version?.id)] : []; });
+    const tasks = (Array.isArray(content.taskIds) ? content.taskIds : []).flatMap(id => {
+        const t = typeof id === 'string' ? s.get('task', id) : null;
+        if (!t || t.contextId !== notice.contextId || taskScope(t).visibility !== 'public' || !decide(s, p, 'task.read', taskScope(t), clock).allowed)
+            return [];
+        const activities = s.list('taskActivity', t.contextId!).filter(a => a.data.taskId === t.id && a.data.requestId === t.data.currentRequestId && a.data.userId === p.user.id);
+        const submissions = s.list('submission', t.contextId!).filter(v => v.data.taskId === t.id).sort((a, b) => b.data.sequence - a.data.sequence);
+        return [{ id: t.id, title: text(t.data.title), status: text(t.data.status), requestId: nullableText(t.data.currentRequestId), ownReadAt: nullableText(activities.find(a => a.data.kind === 'read')?.data.at), ownAcceptedAt: nullableText(activities.find(a => a.data.kind === 'accept')?.data.at), latestSubmittedAt: nullableText(submissions[0]?.data.submittedAt), completed: t.data.status === 'completed', url: `/tasks/${encodeURIComponent(t.id)}?context=${encodeURIComponent(t.contextId!)}` }];
+    });
+    return { title: text(content.title), body: text(content.body), type: noticeTypes.includes(content.type) ? content.type : 'notice' as const, category: text(content.category), documentVersion: text(content.documentVersion), changeSummary: text(content.changeSummary), files, tasks };
+}
+export function versionDTO(s: UnitOfWork, p: Principal, n: StoredRecord<'notice'>, v: StoredRecord<'noticeVersion'>, clock: Clock) {
+    return { id: v.id, sequence: v.data.sequence, previousId: nullableText(v.data.previousId), publishedAt: text(v.data.publishedAt), authorLabel: actorLabel(s, v.data.publishedBy, n.contextId!, p), content: publicContent(s, p, n, v.data.content, clock, v), ownReadAt: nullableText(s.list('noticeRead', n.contextId!).find(r => r.data.versionId === v.id && r.data.userId === p.user.id)?.data.readAt) };
+}
