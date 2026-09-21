@@ -1299,7 +1299,10 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
+      "contract_integration_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/contract-integration-preparation.md",
+      "main_preparation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/main-contract-preparation-review.json",
+      "preparation_status": "PREPARATION_ONLY_IMPLEMENTATION_REQUIRES_G05_ACCEPTED"
     },
     {
       "id": "G08",
@@ -1890,7 +1893,7 @@
   "accepted_commit": "7f409a2a14266776001f6b7910e80e402a5b7717",
   "current_goal": "G06",
   "next_action": "workflow independently verifies exact9988detached g05-verify4163/4164 using14boundgroups. Main reviews rawresult, assigns repairifneeded; serialrootintegration and exactimpactregression required beforeG05ACCEPTED.",
-  "state_version": 80,
+  "state_version": 81,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1917,7 +1920,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T15:06:19.216679+00:00",
+  "updated_at": "2026-09-21T15:08:02.189554+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
