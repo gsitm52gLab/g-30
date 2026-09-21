@@ -1,6 +1,6 @@
 # GS HALE execution checkpoint
 
-State89; Goal ACTIVE. Root /Users/evan/workspace/gs-hale branch run/integration. Preserve main/origin/.env and user untracked docs/execution-v2. No fetch/push/deploy/OpenAI calls. .execution/run-plan.json authoritative; evidence root .execution/private/runs/RUN-20260921-01. Product accepted37b7fe1912ebe383991d94540aff7e8a23ab7631, G00/G01/G02/G04/G05/G06 current stages ACCEPTED; G07 IMPLEMENTING; wholeGoal incomplete.
+State90; Goal ACTIVE. Root /Users/evan/workspace/gs-hale branch run/integration. Preserve main/origin/.env and user untracked docs/execution-v2. No fetch/push/deploy/OpenAI calls. .execution/run-plan.json authoritative; evidence root .execution/private/runs/RUN-20260921-01. Product accepted37b7fe1912ebe383991d94540aff7e8a23ab7631, G00/G01/G02/G04/G05/G06 current stages ACCEPTED; G07 IMPLEMENTING; wholeGoal incomplete.
 
 ## Current work / next action
 
@@ -25,3 +25,5 @@ G05 mainacceptance SHA74651da9aff31791daa7551cca24502ffda31fba961faf49695d6ca92d
 G08 draft only, notimplemented: G08/1/task-draft.json SHAc26655cec0615694f5207f92d3b6b4d340b2f5f3d8a7ffd5111ca3212b179581. IndependentDoR +root10inputhash/11Gitblobs found narrownoticefile-owner guard lease gap, fixed in draft. G08/1/main-dor-review.json SHA92aa1ae7617cca3681e2fa1af4bb9b6070ac2c484736e8a3de32d2aca383a641. Exactbase/worktree/migration/sharedlease pending; G08 statePLANNED. Initial drafthelper missing G04/1 acceptance failed beforewrites; correctedauthoritativeG04/4 path, failurepreserved. No newresearchneeded.
 
 Actual4session logprefix archive20260921T155906Z, previousprefix hashesunchanged, exactprivatebytecopies. ManifestSHA8cd00f5e787deea9b119b913c36d480d11bf4104600adc304d6bd403a265216d. Finaltails and sanitizedcopies pending. Rootoriginalsession01a0c281-e335-7a81-a808-36dd5305557e; no fabricatedJSONL. Actual OpenAI callNOT_RUN mandatoryG17. No permissionblocker now.
+
+State90: G07-SRV-01 OPEN/P1 authorfound+rootrawreviewed frozena8 ImportService.batch stored sourceName/row.action objects leak syntheticextensioncanary; actual2FAIL/11filteredSKIP (newworkingtree regression, not testcommittedina8). G07/1/main-server-finding-01.json rootrecord; prdrepair strictscalar/malformedsafeerror+normalextra+API preservingrows. workflowinformed for ownindependentcounterexample. Finalcandidate mustclose. Actualrepro testsource/hashpreservationrequested. Dependency auditreported2moderate fromExcelJS->uuid8.3.2sameadvisory; prd boundedExcelJS-onlyuuid11.1.1override/CJS+parse/export/conditionalformat compatibility/audit investigationrunning; lockdelta notyetmergedUI. No wholeGoalblocker.
