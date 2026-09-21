@@ -20,11 +20,14 @@ export async function namespaceBrowser(origin: string, contextId: string, report
                     await page.getByLabel('상품 Excel 원본', { exact: true }).setInputFiles({ name: `${fixture}.xlsx`, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: bytes });
                     await page.getByRole('button', { name: '원본 읽기 · 다시 시도', exact: true }).click();
                     await expect(page.getByRole('status')).toContainText('원본을 읽었습니다.');
+                    const sheets = page.getByRole('combobox', { name: '가져올 공개 시트', exact: true });
+                    await sheets.selectOption((await sheets.locator('option').filter({ hasText: 'Products' }).getAttribute('value'))!);
                     await page.getByRole('spinbutton', { name: '머리글 행 번호', exact: true }).fill('3');
                     await page.getByRole('button', { name: '선택한 머리글의 표준 키로 매핑 채우기', exact: true }).click();
-                    const response = page.waitForResponse(r => r.url().endsWith('/api/imports/preview') && r.request().method() === 'POST');
-                    await page.getByRole('button', { name: '전체 미리보기 만들기 · 다시 검증', exact: true }).click();
-                    const previewResponse = await response, preview = await previewResponse.json() as ImportPreview;
+                    const previewButton = page.getByRole('button', { name: '전체 미리보기 만들기 · 다시 검증', exact: true });
+                    await expect(previewButton).toBeEnabled();
+                    const [previewResponse] = await Promise.all([page.waitForResponse(r => r.url().endsWith('/api/imports/preview') && r.request().method() === 'POST'), previewButton.click()]);
+                    const preview = await previewResponse.json() as ImportPreview;
                     check(`${name} ${fixture}: actual UI source and header mapping keep original hash`, previewResponse.status() === 201 && preview.sourceHash === createHash('sha256').update(bytes).digest('hex'), ['G07-V02', 'AC-07-03']);
                     const apply = page.getByRole('button', { name: '확인한 모든 행 반영', exact: true });
                     if (fixture === 'standard') {
@@ -45,7 +48,9 @@ export async function namespaceBrowser(origin: string, contextId: string, report
                     const screenshot = `${report}.${name}-${fixture}.png`; await page.screenshot({ path: screenshot, fullPage: true }); artifacts.push(screenshot);
                 }
             } finally {
-                await Promise.allSettled(pending);
+                const collected = await Promise.allSettled(pending);
+                const collectionFailures = collected.filter(r => r.status === 'rejected');
+                if (collectionFailures.length) transcript.push({ url: 'response-collection-failure', status: 0, body: collectionFailures.map(r => String(r.reason)) });
                 const trace = `${report}.${name}.trace.zip`, dom = `${report}.${name}.html`, responses = `${report}.${name}.responses.json`;
                 await context.tracing.stop({ path: trace }); writeFileSync(dom, await page.content()); writeFileSync(responses, JSON.stringify(transcript, null, 2)); artifacts.push(trace, dom, responses);
                 await context.close();
