@@ -1,14 +1,14 @@
 # Execution checkpoint
 
-State version: 42
-Updated: 2026-09-21T11:50:28.324441+00:00
+State version: 43
+Updated: 2026-09-21T11:58:09.069396+00:00
 Active Goal: existing user Goal, ACTIVE
 Accepted product commit: `cec612fbeb3795e233d07121a54db9ac96adbf4b`
 
-G00/G01/G02 initial stage ACCEPTED. G04 attempt2 frozen candidate `3304c5b97096699f00ea6863f30df8b715745301` in `/Users/evan/workspace/gs-hale/.worktrees/g04-fix2` assembled by main from runner ea5cc46 and state1f3dd853. goals executes fresh combined checks on4141/4144. workflow finishes original7f independent FAIL report with V01(defaultrunner) andV02(resume), preserving all raw evidence. New independent candidate assignment follows; no root product merge or G04acceptance yet.
+G00/G01/G02 initial stage ACCEPTED. G04 attempt2 frozen candidate `3304c5b97096699f00ea6863f30df8b715745301`, exact combined implementer evidence main-reviewed: 201 artifact hashes and 11 actual command metadata/log/report pairs, all exit0. Unit118, README default mock28 + SQLite28, HTTP73/109, G02 HTTP132/RSC11, G01 restart24. Units and overlapping counts remain separate. No root product merge or G04 acceptance yet.
 
-prd runner-fix1 and goals state-fix1 source/evidence remain immutable. Main reviewed120+105 subcandidateartifact hashes and9+14 command/log pairs. Both defects remain pending independent closure. Current state/next action authoritative in `.execution/run-plan.json`.
+Original7f independent FAIL remains immutable: 363 hashes/26 commands/155 tracked blobs verified by main, V01(default runner) and V02(accepted progress resume) reproduced. G04/1/main-rejection.json preserves scope/findings. CR01–06/I01–02 prior current paths independently verified; final new candidate and integration closure still pending.
 
-Next: independent exact3304 verification, serial root merge and integrated regression. G06 beforeG05 after G04accepted; G06 current work preparation only. All19checkpoints/91AC/A01–26/AI13/SA64/D10 remain tracked. Preserve .env/main/origin/untracked docs/execution-v2 and original sessions. Latest actual session log prefix hashes collected11:47:56UTC, final archive/sanitization pending.
+workflow independently verifies3304 in g04-verify2 on4142/4145: final multiple-context creation/edit, seven distinct templates, assignment UI/uploader, state restoration and actual RSC. goals returned implementation result and is idle. prd performs preparation-only common-product edit permission analysis; G06 implementation has not begun.
 
-Update 2026-09-21T11:51:48.214002+00:00: original7f verification-result is final FAIL with V01/V02,363 artifacts. Independent workflow now verifies3304 in g04-verify2 on4142/4145 under G04/2/verification-task.json.
+Next: exact3304 independent PASS and main evidence review → serial root merge → exact integrated-SHA regression → G04 ACCEPTED → G06 beforeG05. Future producer obligations D01–D10 remain explicit; no fixture substitutes for actual later producer. Preserve .env/main/origin/untracked docs/execution-v2, raw private evidence and real session logs.
