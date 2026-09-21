@@ -17,7 +17,7 @@ import { runData } from '@/server/ai-review/stored';
 import { analysisDetail,runSummary } from '@/server/ai-review/read';
 import { providerConfig,type ProviderConfig } from './config';
 import { providerSetting,settingsView } from './projection';
-import { ProviderFailure,providerFail,transient } from './errors';
+import { ProviderFailure,providerFail,transient,configurationIssue } from './errors';
 import { emptyTransport,openaiTransport,providerRequest,type Transport,type TransportResult } from './transport';
 type Hooks={config?:()=>ProviderConfig;transport?:Transport;afterPrepare?:()=>Promise<void>;afterResponse?:()=>Promise<void>;fault?:(stage:string)=>void};
 type Claim={runId:string;attemptId:string|null;claimId:string|null};
@@ -50,7 +50,8 @@ export class AiProviderService {
   });return this.execute(token,claim);
  }
  async retry(token:string|undefined,runId:string,raw:Record<string,unknown>){
-  const input=obj(raw,['expectedRevision','idempotencyKey','acknowledgeUnknown']);str(input.idempotencyKey);if(input.acknowledgeUnknown!==undefined&&typeof input.acknowledgeUnknown!=='boolean')fail('VALIDATION',422,'불확실한 외부 처리에 대한 재시도 선택을 확인해 주세요.');
+  const input=obj(raw,['expectedRevision','idempotencyKey','acknowledgeUnknown','restartConfiguration']);str(input.idempotencyKey);if(input.acknowledgeUnknown!==undefined&&typeof input.acknowledgeUnknown!=='boolean')fail('VALIDATION',422,'불확실한 외부 처리에 대한 재시도 선택을 확인해 주세요.');
+  if(input.restartConfiguration!==undefined&&typeof input.restartConfiguration!=='boolean')fail('VALIDATION',422,'서버 설정 확인 후 재시도 선택을 확인해 주세요.');
   const claim=await this.identity.repo.transaction(s=>{
    const p=this.identity.principal(s,token),r=resolveAnalysis(s,p,id(runId),this.clock,true);if(r.data.engine!=='provider')unavailable();let claimed:Claim={runId,attemptId:null,claimId:null};
    receipt(s,p,r.row.contextId!,`ai.provider.retry:${runId}`,input,()=>{
@@ -61,7 +62,8 @@ export class AiProviderService {
      if(input.acknowledgeUnknown!==true)providerFail('RESPONSE_UNKNOWN');
      this.outcome(s,{runId,attemptId:last.id,claimId:last.data.claimId},emptyTransport('RESPONSE_UNKNOWN',true),false,'not_judged');
     }else{
-     const o=outcomeData(outcome.data,plan.data.model);if(r.data.state!=='failed'||!transient(o.issue))fail('RETRY_UNAVAILABLE',409,'현재 오류는 이 실행에서 재시도할 수 없습니다.');
+     const o=outcomeData(outcome.data,plan.data.model);const configurationRestart=input.restartConfiguration===true&&configurationIssue(o.issue);if(configurationRestart){const cfg=this.config();if(cfg.issue)providerFail(cfg.issue);const setting=providerSetting(s,r.row.contextId!);if(!setting.enabled)providerFail('DISABLED');if(setting.revision!==plan.data.settingRevision||cfg.config!.model!==plan.data.model||cfg.config!.baseURL!==plan.data.baseURL)providerFail('SETTINGS_CHANGED');}
+     if(r.data.state!=='failed'||!transient(o.issue)&&!configurationRestart)fail('RETRY_UNAVAILABLE',409,'현재 오류는 이 실행에서 재시도할 수 없습니다.');
      if(o.remoteOutcomeUnknown&&input.acknowledgeUnknown!==true)providerFail('RESPONSE_UNKNOWN');
     }
     s.update('aiAnalysisRun',runId,r.row.revision,{...r.data,state:'queued',issue:null,claimId:null,leaseUntil:null});claimed=this.claim(s,token,runId);return {ids:[runId]};

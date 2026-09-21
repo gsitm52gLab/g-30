@@ -24,11 +24,18 @@ export const openaiTransport:Transport=async(config,request,beforeDispatch,onDis
  try {
   const client=new OpenAI({apiKey:config.apiKey,baseURL:config.baseURL,maxRetries:0,timeout:PROVIDER_LIMITS.timeoutMs,logLevel:'off',fetch:async(input,init)=>{await beforeDispatch();const pending=fetch(input,init);void pending.catch(()=>{});await onDispatch();return pending;}});
   const {data,response}=await client.responses.create(request).withResponse();
-  if(!Array.isArray(data.output))return emptyTransport('PARSE_ERROR');
-  const rawCandidate=data.output.flatMap(o=>o.type==='message'?o.content.filter(c=>c.type==='output_text').map(c=>c.text):[]).join('');
-  const refusal=data.output.some(o=>o.type==='message'&&o.content.some(c=>c.type==='refusal'));
-  const result:TransportResult={issue:refusal?'REFUSAL':data.status==='incomplete'?'INCOMPLETE':data.status!=='completed'?'SERVER_ERROR':!rawCandidate?'PARSE_ERROR':null,responseId:identifier(data.id),requestId:identifier(response.headers.get('x-request-id')),responseModel:label(data.model),serviceTier:label(data.service_tier),providerStatus:label(data.status),rawCandidate:rawCandidate&&Buffer.byteLength(rawCandidate)<=262144?rawCandidate:null,responseHash:null,usage:providerUsage(data.usage),remoteOutcomeUnknown:false};
-  result.responseHash=sha256(JSON.stringify(result));return result;
+  const result:TransportResult={issue:null,responseId:identifier(data?.id),requestId:identifier(response.headers.get('x-request-id')),responseModel:label(data?.model),serviceTier:label(data?.service_tier),providerStatus:label(data?.status),rawCandidate:null,responseHash:null,usage:providerUsage(data?.usage),remoteOutcomeUnknown:false};
+  const finish=()=>{result.responseHash=sha256(JSON.stringify(result));return result;};
+  if(!Array.isArray(data?.output)){result.issue='PARSE_ERROR';return finish();}
+  let refusal=false;const texts:string[]=[];
+  for(const item of data.output){
+   if(!item||typeof item!=='object'){result.issue='PARSE_ERROR';return finish();}
+   if(item.type!=='message')continue;
+   if(!Array.isArray(item.content)){result.issue='PARSE_ERROR';return finish();}
+   for(const part of item.content){if(!part||typeof part!=='object'){result.issue='PARSE_ERROR';return finish();}if(part.type==='refusal')refusal=true;if(part.type==='output_text'){if(typeof part.text!=='string'){result.issue='PARSE_ERROR';return finish();}texts.push(part.text);}}
+  }
+  const rawCandidate=texts.join('');result.issue=refusal?'REFUSAL':data.status==='incomplete'?'INCOMPLETE':data.status!=='completed'?'SERVER_ERROR':!rawCandidate||Buffer.byteLength(rawCandidate)>262144?'PARSE_ERROR':null;
+  result.rawCandidate=rawCandidate&&Buffer.byteLength(rawCandidate)<=262144?rawCandidate:null;return finish();
  }catch(e){
   if(e instanceof SyntaxError)return emptyTransport('PARSE_ERROR');
   if(e instanceof ProviderFailure)return emptyTransport(e.issue);

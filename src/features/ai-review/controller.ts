@@ -24,7 +24,7 @@ export function useReview(initial:View,actorId:string,selection:Selection){
  function start(w:AiReviewWorkspace,extractionRunId:string,engine:'synthetic_demo'|'provider'='synthetic_demo'){void execute({kind:'start',url:`/api/ai-review/inputs/${w.inputId}/start`,body:{inputVersionId:w.inputVersionId,extractionRunId,expectedRunId:w.runs[0]?.id??null,corpusReleaseId:w.corpus.id,corpusManifestHash:w.corpus.manifestHash,engine,idempotencyKey:crypto.randomUUID()},receipt:null});}
  function review(d:AiReviewDetail,command:HumanReviewCommand){void execute({kind:'review',url:`/api/ai-review/runs/${d.id}/review`,body:{...command,idempotencyKey:crypto.randomUUID()},receipt:null});}
  function settings(w:AiReviewWorkspace,enabled:boolean){void execute({kind:'settings',url:'/api/ai-review/settings',body:{contextId:w.contextId,enabled,expectedRevision:w.providerSettings.revision,idempotencyKey:crypto.randomUUID()},receipt:null});}
- function retry(d:AiReviewDetail,acknowledgeUnknown=false){void execute({kind:'retry',url:`/api/ai-review/runs/${d.id}/retry`,body:{expectedRevision:d.revision,acknowledgeUnknown,idempotencyKey:crypto.randomUUID()},receipt:null});}
+ function retry(d:AiReviewDetail,acknowledgeUnknown=false,restartConfiguration=false){void execute({kind:'retry',url:`/api/ai-review/runs/${d.id}/retry`,body:{expectedRevision:d.revision,acknowledgeUnknown,restartConfiguration,idempotencyKey:crypto.randomUUID()},receipt:null});}
  return {settings,retry,state,refresh,editReview,editOpinion,execute,start,review,active,purge,locked:state.busy||!state.ready||state.denied||!!state.recovery.pending};
 }
 export type ReviewController=ReturnType<typeof useReview>;

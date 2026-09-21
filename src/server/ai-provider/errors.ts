@@ -5,3 +5,5 @@ export const issueMessages: Record<ProviderIssue, string> = {
 export class ProviderFailure extends Error { constructor(readonly issue: ProviderIssue) { super(issue); } }
 export const transient = (issue: ProviderIssue | null) => issue !== null && ['RATE_LIMIT','SERVER_ERROR','TIMEOUT'].includes(issue);
 export function providerFail(issue: ProviderIssue): never { return fail(issue, issue === 'DISABLED' || issue.endsWith('CHANGED') || issue === 'RESPONSE_UNKNOWN' ? 409 : issue === 'EXTERNAL_USE_DENIED' || issue === 'INPUT_LIMIT' ? 422 : 503, issueMessages[issue]); }
+
+export const configurationIssue=(issue:ProviderIssue|null)=>issue!==null&&['KEY_MISSING','CONFIGURATION','PROVIDER_AUTH','PROVIDER_PERMISSION'].includes(issue);
