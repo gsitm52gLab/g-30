@@ -1,3 +1,4 @@
+import type { AiInputData, AiVersionData, AiAssetData, AiRunData, AiSnapshotData } from './ai-input/records';
 import type { CorrectionRecords } from './corrections/records';
 import type { ConversationData, QuestionData, MessageData, InquiryReadData, QuestionTransitionData, InquiryTaskLinkData, InquiryEventData, InquiryCursorData } from './inquiries/types';
 import type { CampaignRecords } from './campaigns/records';
@@ -100,6 +101,11 @@ export interface ProductData extends CommonProductExtension {
     missingMaterials: number;
 }
 export interface RecordDataMap extends CorrectionRecords, CampaignRecords {
+    aiInput: AiInputData;
+    aiVersion: AiVersionData;
+    aiAsset: AiAssetData;
+    aiRun: AiRunData;
+    aiSnapshot: AiSnapshotData;
     conversation: ConversationData;
     inquiryQuestion: QuestionData;
     inquiryMessage: MessageData;
