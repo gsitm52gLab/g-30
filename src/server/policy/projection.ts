@@ -1,3 +1,5 @@
+import { legacyProductScope } from "@/server/products/access";
+import { systemClock } from "@/domain/records";
 import type { StoredRecord, RecordKind, Clock, UnitOfWork } from "@/domain/records";
 import type { Principal } from "@/server/auth/service";
 import type { Decision, ResourceScope } from "./types";
@@ -44,12 +46,13 @@ export function projectTask(store: UnitOfWork, principal: Principal, row: Stored
     } };
 }
 
-export function projectProduct(store: UnitOfWork, principal: Principal, row: StoredRecord<"product">, clock?: Clock) {
-    const decision = authorize(store, principal, "product.read", productScope(row), clock);
+export function projectProduct(store: UnitOfWork, principal: Principal, row: StoredRecord<"product">, clock: Clock = systemClock, contextId?: string) {
+    const scope = legacyProductScope(store,principal,row,clock,contextId);
+    const decision = authorize(store, principal, "product.read", scope, clock);
     const d = row.data;
     return { ...metadata(row), data: {
-        name: d.name, code: d.code, brand: d.brand, size: d.size, category: d.category,
-        status: d.status, missingMaterials: d.missingMaterials, ...privateFields(d, decision),
+        name: typeof d.name === "string" ? d.name : "", code: typeof d.code === "string" ? d.code : "", brand: typeof d.brand === "string" ? d.brand : "", size: typeof d.size === "string" ? d.size : "", category: typeof d.category === "string" ? d.category : "",
+        status: ["draft","active","archived"].includes(d.status) ? d.status : "draft", missingMaterials: typeof d.missingMaterials === "number" ? d.missingMaterials : 0, ...privateFields(d, decision),
     } };
 }
 

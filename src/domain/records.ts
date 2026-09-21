@@ -1,3 +1,4 @@
+import type { CommonProductExtension, ProductVersionData, ContextProductData, ContextProductVersionData, PriceData, RetailPriceVersionData, InternalPriceVersionData, ProductUseSnapshotData } from "./products/types";
 import type { TaskExtension, RequestVersionData, TemplateVersionData, ProjectData, TaskActivityData, PriorSubmissionData, DomainEventData, CommandReceiptData, FileVersionData } from "./tasks/types";
 /** Foundation records plus module-owned typed extensions. */
 export interface ContextData {
@@ -82,7 +83,7 @@ export interface TaskData extends TaskExtension {
     contributorIds?: string[];
     assignmentNeedsAttention?: boolean;
 }
-export interface ProductData {
+export interface ProductData extends CommonProductExtension {
     name: string;
     code: string;
     brand: string;
@@ -92,6 +93,15 @@ export interface ProductData {
     missingMaterials: number;
 }
 export interface RecordDataMap {
+    productVersion: ProductVersionData;
+    contextProduct: ContextProductData;
+    contextProductVersion: ContextProductVersionData;
+    retailPrice: PriceData;
+    internalPrice: PriceData;
+    retailPriceVersion: RetailPriceVersionData;
+    internalPriceVersion: InternalPriceVersionData;
+    productUseSnapshot: ProductUseSnapshotData;
+    productMigration: { productId: string; legacyContextId: string; legacyRevision: number; legacyData: Record<string, unknown> };
     requestVersion: RequestVersionData;
     templateVersion: TemplateVersionData;
     project: ProjectData;
@@ -142,7 +152,7 @@ export interface UnitOfWork {
     get<K extends RecordKind>(kind: K, id: string): StoredRecord<K> | null;
     list<K extends RecordKind>(kind: K, contextId?: string): StoredRecord<K>[];
     create<K extends RecordKind>(kind: K, input: RecordInput<K>): StoredRecord<K>;
-    update<K extends RecordKind>(kind: K, id: string, expectedRevision: number, data: RecordDataMap[K]): StoredRecord<K>;
+    update<K extends RecordKind>(kind: K, id: string, expectedRevision: number, data: RecordDataMap[K], migration?: { legacyProductContextId: string }): StoredRecord<K>;
 }
 export interface RecordRepository {
     readonly mode: "mock" | "sqlite";
@@ -172,4 +182,12 @@ export function assertSynchronous<T>(result: T): T {
         throw new StoreError("ASYNC_TRANSACTION");
     }
     return result;
+}
+
+/** Only the lossless legacy product migration may move a stored context. */
+export function updatedContext<K extends RecordKind>(current: StoredRecord<K>, data: RecordDataMap[K], migration?: { legacyProductContextId: string }): string | null {
+    if (!migration) return current.contextId;
+    const old = current.data as ProductData, next = data as ProductData;
+    if (current.kind !== "product" || !current.contextId || migration.legacyProductContextId !== current.contextId || old.schemaVersion === 2 || next.schemaVersion !== 2 || !next.brandId || next.legacyContextId !== current.contextId) throw new StoreError("INVALID_RECORD");
+    return null;
 }

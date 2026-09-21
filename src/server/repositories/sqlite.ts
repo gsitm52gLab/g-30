@@ -1,6 +1,6 @@
 import { checkRelations } from "@/domain/constraints";
 import type Database from "better-sqlite3";
-import { assertSynchronous, checkInput, jsonCopy, StoreError, systemClock, type Clock, type RecordDataMap, type RecordInput, type RecordKind, type RecordRepository, type StoredRecord, type UnitOfWork } from "@/domain/records";
+import { assertSynchronous, updatedContext, checkInput, jsonCopy, StoreError, systemClock, type Clock, type RecordDataMap, type RecordInput, type RecordKind, type RecordRepository, type StoredRecord, type UnitOfWork } from "@/domain/records";
 interface Row {
     kind: RecordKind;
     id: string;
@@ -35,18 +35,19 @@ export function createSqliteRepository(db: Database.Database, clock: Clock = sys
                 throw new StoreError("CONFLICT");
             return { kind, ...input, data, revision: 1, createdAt: now, updatedAt: now };
         },
-        update<K extends RecordKind>(kind: K, id: string, expectedRevision: number, data: RecordDataMap[K]) {
+        update<K extends RecordKind>(kind: K, id: string, expectedRevision: number, data: RecordDataMap[K], migration?: { legacyProductContextId: string }) {
             const old = uow.get(kind, id);
             if (!old)
                 throw new StoreError("NOT_FOUND");
-            checkInput({ id, contextId: old.contextId, data });
-            checkRelations(uow, kind, { id, contextId: old.contextId, data });
+            const contextId = updatedContext(old, data, migration);
+            checkInput({ id, contextId, data });
+            checkRelations(uow, kind, { id, contextId, data });
             const copy = jsonCopy(data);
             const now = clock();
-            const result = db.prepare("UPDATE records SET data = ?, revision = revision + 1, updated_at = ? WHERE kind = ? AND id = ? AND revision = ?").run(JSON.stringify(copy), now, kind, id, expectedRevision);
+            const result = db.prepare("UPDATE records SET data = ?, context_id = ?, revision = revision + 1, updated_at = ? WHERE kind = ? AND id = ? AND revision = ?").run(JSON.stringify(copy), contextId, now, kind, id, expectedRevision);
             if (!result.changes)
                 throw new StoreError("CONFLICT");
-            return { ...old, data: copy, revision: old.revision + 1, updatedAt: now };
+            return { ...old, contextId, data: copy, revision: old.revision + 1, updatedAt: now };
         },
     };
     return { mode: "sqlite", get: async (kind, id) => uow.get(kind, id), list: async (kind, contextId) => uow.list(kind, contextId),

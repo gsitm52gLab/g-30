@@ -1,3 +1,4 @@
+import { migrateLegacyProducts } from "@/data/products/migrate";
 import { fixtures } from "@/data/fixtures";
 import { builtins } from "@/domain/tasks/templates";
 import type { RecordRepository } from "@/domain/records";
@@ -36,6 +37,7 @@ export async function seed(repository: RecordRepository) {
             if (!store.get("templateVersion", input.id)) { store.create("templateVersion", input); inserted++; }
             else preserved++;
         }
-        return { inserted, preserved };
+        const products = migrateLegacyProducts(store);
+        return { inserted, preserved, products };
     });
 }

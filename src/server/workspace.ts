@@ -1,3 +1,4 @@
+import { visibleProductRelations } from "@/server/products/access";
 import "server-only";
 import { redirect, notFound } from "next/navigation";
 import { identity, currentToken } from "@/server/auth/runtime";
@@ -20,7 +21,7 @@ export async function readWorkspace(contextId?: string) {
             needScope(s, p, contextId, service.clock);
         const selected = contextId ? contexts.find(c => c.id === contextId) : contexts.find(c => c.id === "ctx-jp-a-luna") ?? contexts[0];
         const tasks = selected ? s.list("task", selected.id).filter(t => decide(s,p,"task.read",taskScope(t),service.clock).allowed).map(t => projectTask(s, p, t, service.clock)) : [];
-        const products = selected ? s.list("product", selected.id).map(t => projectProduct(s, p, t, service.clock)) : [];
+        const products = selected ? visibleProductRelations(s,p,service.clock,selected.id).flatMap(cp=>{const product=s.get("product",cp.data.productId);return product?[projectProduct(s,p,product,service.clock,selected.id)]:[];}) : [];
         const visibleIds = new Set(tasks.flatMap(t => [t.data.assigneeId, t.data.ownerId]));
         const users = s.list("user").filter(u => visibleIds.has(u.id)).map(projectUserLabel);
         return { mode: service.repo.mode, contexts, selected, tasks, products, users };

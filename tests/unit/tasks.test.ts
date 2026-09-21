@@ -1,3 +1,4 @@
+import { migrateLegacyProducts } from "@/data/products/migrate";
 import { afterEach, describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
 import { mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
@@ -118,7 +119,9 @@ for (const mode of ["mock", "sqlite"] as const) describe(`${mode} G04 actual tas
     it("AC-04-03 SA-08/13 multi-context clones and manual cycles/additional product tasks keep old state independent", async () => {
         await setup(); await repo.transaction(s => { s.create("membership", { id: "gsg-in-b", contextId: ctx2, data: { userId: "user-price", role: "operator", status: "active", scope: "B", internalPriceAccess: false, activatedAt: identity.clock(), suspendedAt: null } });
             for (const [userId, role] of [["user-gsg","operator"],["user-luna","brand"]] as const) s.create("membership",{id:`third-${userId}`,contextId:"ctx-sg-a-luna",data:{userId,role,status:"active",scope:"third synthetic fixture",internalPriceAccess:false,activatedAt:identity.clock(),suspendedAt:null}});
-            s.create("product",{id:"product-third",contextId:"ctx-sg-a-luna",data:s.get("product","product-serum")!.data});
+            const source=s.get("product","product-serum")!.data;
+            s.create("product",{id:"product-third",contextId:"ctx-sg-a-luna",data:{name:source.name,code:source.code,brand:source.brand,size:source.size,category:source.category,status:source.status,missingMaterials:source.missingMaterials}});
+            migrateLegacyProducts(s);
         });
         const c = payload(); c.requirements[0].productIds = ["product-serum"];
         const result = await tasks.create(admin, { targets: [target, { ...target, contextId: ctx2, ownerId: "user-price", coAssigneeIds: [], productIds: ["product-cream"] }, { ...target, contextId:"ctx-sg-a-luna", coAssigneeIds:[], productIds:["product-third"] }], content: c, category: "spot", idempotencyKey: randomUUID() });
