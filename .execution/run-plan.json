@@ -1801,7 +1801,11 @@
           "ports": [
             4213,
             4214
-          ]
+          ],
+          "source_checkpoint": "e9ff9b11c17a84434315e944c22e362abf7f4f6e",
+          "root_static_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-ui-static-review.json",
+          "root_static_concern": "G09-UI-PRE01 reproduced actualheldPOST aftermembershiprevocation; authorrepairrunning, upload fixturefailure separated",
+          "red_root_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-ui-late-red-review.json"
         }
       },
       "initial_attachment_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/initial-attachment-decision-proposal.json",
@@ -2379,7 +2383,7 @@
   "accepted_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
   "current_goal": "G07",
   "next_action": "workflow G07exact31cbb regression; prd G09UI; goals G10actualserver. Root G09final50eb rawreview then prepare fullG09union onceUI andG07 acceptance.",
-  "state_version": 117,
+  "state_version": 119,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2406,7 +2410,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T18:23:37.730959+00:00",
+  "updated_at": "2026-09-21T18:27:02.632489+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
