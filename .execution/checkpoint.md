@@ -13,3 +13,5 @@ G05 independent verifier: workflow completed 14-group plan, main reviewed; candi
 Recovery: bounded sessionStorage of actual user/context/task/baseRequest text and ready file refs after fresh authorized read. Failed/unuploaded File bytes require reselection. Shared409 preserves local inputs; explicit rebase for new requests; partial/full/approval/receipt/completion distinct.
 
 Preserve .env, main/origin and user untracked docs/execution-v2. No fetch/push/deploy/API calls so far. Existing failure evidence and actual session log prefixes preserved; final tails and sanitized derivatives still pending. Root orchestrates, no product source edits in this checkpoint.
+
+State72: G05 server contractd89c3b8 main-reviewed:30artifact hashes/32Gitblobs/13command logs, exact18unit/typecheck/build; precommit178 only. goals formal UI assigned g05-ui4159/4160, server continues HTTP. No G05 acceptance. Task G05/1/ui/task.json. Session original log prefixes archived20260921T142417Z; final tails/sanitized stillpending.
