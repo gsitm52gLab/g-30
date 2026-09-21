@@ -128,7 +128,7 @@ export function useCorrections(initial: Workspace) {
         return;
     } const g = live.current.generation; setError(''); try {
         const value = await request<CorrectionPreview>(`/api/corrections/drafts/${stored.id}/preview`);
-        if (active(g))
+        if (active(g) && state.current.editors === e && latest.current.staff?.drafts.find(d => d.id === stored.id)?.revision === stored.revision)
             setPreview({ draftId: stored.id, revision: stored.revision, value });
     }
     catch (e) {
