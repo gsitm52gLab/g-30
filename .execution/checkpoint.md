@@ -1,3 +1,7 @@
+# Current checkpoint — state159
+
+2026-09-21T23:32:14.396085+00:00; G13 committedtestrepair plus exact390b remaining independent; G17 fullUI/runtime and recovery investigation. G14 prepared/rootreviewed, gatedG13acceptance. Accepted14/19; actualOpenAI NOT_RUN. G17root539b32sources34artifacts13SQL2commands; commonlease RELEASED. G14root3d9f63sources8inputs32archivalpairs; noimplementation. G13TEST01 raw19P1F confirmedteardown pendingbody; product103 delivered, no productPASSsubstitute. H09lease9f13 requires exactcode, no409mislabel. Allfailures/userenv/v2 preserved.
+
 # Current checkpoint — state158
 
 2026-09-21T23:24:39.469534+00:00; G13workflow exact390b independent; G17goals fullstackcommon0015/package; G14prd readonly390b source/audit ownership update. G17independentplan66ed root984f ready; realAPI still NOT_RUN. Accepted14/19. Root G17narrowtest49lease2505 approved (explicitmissingconfig, no network), oldG16 authority/history assertions intact. G17doc32132ca root3610; currentmodelgpt-6 astra alias, officialbasevalid/keyPresent only notkeyvalid. G14currentpreptaske68 sourcephaseonly noimplementationbeforeG13accepted. Independent G17 actualminimalconfiguredcall once requiredafterfinalfreeze; no callnow. Alluserenv/untrackedv2 preserved.

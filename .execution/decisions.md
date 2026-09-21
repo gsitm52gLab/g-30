@@ -143,3 +143,7 @@ PRD16 forbids automatic brand disclosure. Analysis/result/human decisions defaul
 
 ## 2026-09-21T22:12:49.700703+00:00 — G13 delivery and current certainty
 Requested/expected date guidance preserves its certainty; only confirmed dates use confirmed deadline wording. App-open authenticated CSRF sync is the ordinary in-app delivery path, with explicit absence of closed-app cron/email delivery. Source-bound dates are edited through their producer, never silently overridden. G16 synthetic engine does not count as G17 actual OpenAI success. Narrow existing test expectation deltas preserve original denial and reseed semantics.
+
+
+## 2026-09-21T23:32:14.396085+00:00 — independent test failure and provider recovery
+G13 committed UI-I leaves response.json unawaited beyond page teardown. Original19P1F preserved; author owns onlytestrepair, independent exactnewcandidate closure required. G14 current sourcecontract reviewed, implementation gatedG13accepted. G17 typedserver551check/build is authorstage only; rootraised possiblebaseURLidentity/expiredclaim permanentrecovery issues foractualreproduction. H09 obsolete provider-unavailable assertion may change narrowly but actual domaincause mustbechecked. Noactualproviderclaim, noacceptance advancement.

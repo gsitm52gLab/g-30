@@ -2693,7 +2693,7 @@
           "evidence": []
         }
       ],
-      "next_action": "workflow completes unchanged390b own groups; prd narrow UI-I teardown test repair; exact newcandidate independently required.",
+      "next_action": "Independent workflow exact390b→rootreview→serialintegration→exactregression",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/task-draft.json",
         "sha256": "96ae325b75e6aecb15b0face92814167bad7aa1658aa8165c35df4708f9750f4"
@@ -2812,14 +2812,6 @@
       "combined_root_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/combined/main-review.json",
         "sha256": "71bca648105025c5136277a995cb48d59a756b0928137b126f2490e15ddecd45"
-      },
-      "test_repair_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/test-repair-task.json",
-        "sha256": "87f6fd74e46cab4de209579ff2e484c9f9a451b5bd4f7aeb7121793f3ae654e0"
-      },
-      "independent_early_findings": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/verification/early-findings.json",
-        "sha256": "6703ddbec7e80e688c3e8f94a66ed54ce5cf17591f7af38dfdca7045fea0189d"
       }
     },
     {
@@ -2896,15 +2888,7 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/current-preparation-task.json",
         "sha256": "e68a8f12ce9ef1f0a185092023063ee5fd257d12a0955166df7782db71573940"
       },
-      "current_preparation_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g14-preparation",
-      "current_preparation_contract": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/current-preparation/contract.json",
-        "sha256": "8d0c75c8f8b82f9daf624532107202d4a8275cd4fcadfd6537b0f98e3c957916"
-      },
-      "current_preparation_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/current-preparation/main-review.json",
-        "sha256": "3d9fd26a99b206054e4e46c010ef7f917cda8e6c1930a2c30557d6ba1e027d8e"
-      }
+      "current_preparation_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g14-preparation"
     },
     {
       "id": "G15",
@@ -3528,7 +3512,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Own UI/runtime/provider; author reproduce baseURLcoalescing and interruptedexplicitrecovery sourceconcerns; typeddelta ifneeded. ActualAPI NOT_RUN.",
+      "next_action": "Implement exactlive-provider contract; freeze typedserver thenreleasecommon, proceedUI/actualcall/evidence.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/task-draft.json",
         "sha256": "acf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3"
@@ -3558,7 +3542,7 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/full-task.json",
         "sha256": "68d237f9e534b8e5664556bb76ec91a80091311b2d5b045603aa91c62351ccf4"
       },
-      "common_lease_status": "RELEASED_AC53_TYPED_FREEZE",
+      "common_lease_status": "EXCLUSIVE_GOALS_RECORDS_CONSTRAINTS_0015_PACKAGE",
       "base_commit": "60b99ce05639278a221a96d7a3c575344cb7e08e",
       "documentation_preflight": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/documentation-preflight/result.json",
@@ -3584,19 +3568,6 @@
       "test_contract_lease": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/test-contract-lease-addendum.json",
         "sha256": "25059ec5762ac738755963981c1d5a56ebfc05a1d6901a4e46ccfd9e23071503"
-      },
-      "typed_server_candidate": "ac53caf0fbf4add058483ea1e624d6e100ac3a1a",
-      "typed_server_result": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/server-contract/result.json",
-        "sha256": "d230af1d48ddb3409cda4c1ef160bb74386238ffff28e4e194357e8f5765d33a"
-      },
-      "typed_server_root_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/server-contract/main-typed-review.json",
-        "sha256": "539bbbc8a55074d2db8b9371502b163e32196a51d67f74f19a1d96dcafc33b19"
-      },
-      "http_test_contract_lease": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/http-test-contract-lease-addendum.json",
-        "sha256": "9f131bfdf465886e6c3a010345054be88b0c269e849c6d53259f69dc4df3798f"
       }
     },
     {
@@ -3691,8 +3662,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "60b99ce05639278a221a96d7a3c575344cb7e08e",
   "current_goal": "G17",
-  "next_action": "G13 committedtestrepair plus exact390b remaining independent; G17 fullUI/runtime and recovery investigation. G14 prepared/rootreviewed, gatedG13acceptance. Accepted14/19; actualOpenAI NOT_RUN.",
-  "state_version": 159,
+  "next_action": "G13workflow exact390b independent; G17goals fullstackcommon0015/package; G14prd readonly390b source/audit ownership update. G17independentplan66ed root984f ready; realAPI still NOT_RUN. Accepted14/19.",
+  "state_version": 158,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3724,7 +3695,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T23:32:14.396085+00:00",
+  "updated_at": "2026-09-21T23:24:39.469534+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
