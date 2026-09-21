@@ -2,9 +2,9 @@
 
 **Healthcare & Aesthetic Launch Enablement** · **해외 헬스케어 진출의 모든 일**
 
-현재 후보는 G00 실행·저장 기반, **G01 컨텍스트·사용자 관리와 G02 서버 권한 기반**입니다. 합성 자료로 실제 서버 로그인, 컨텍스트 생성·전환, 초대 수락·재발급, 계정/멤버십 중지, 브랜드 담당자/GSG 책임자 재배정과 변경 이력을 제공합니다. 홈 → 업무 → 상품의 기존 조회와 관리 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
+현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
 
-G02는 현재 API/HTML/RSC와 전 채널 정책 harness를 구분합니다. G03~G18의 전체 업무 작성·제출·상품 CRUD·파일·Excel·문의·AI는 아직 구현하지 않았습니다. 현재 과거 작성자 참조는 합성 Task 레코드이며, 실제 제출/버전 경로와 연결한 회귀 검사는 G04/G05/G18에서 수행해야 합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
+G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. 실제 답변 제출(G05), 독립 상품 CRUD·스냅샷(G06), 증빙·Excel(G07), 문의·AI 등 후행 기능은 아직 연결되지 않았습니다. 과거 답변 검사는 저장된 합성 prior-submission 계약 fixture이며 실제 제출 생산자 연결은 G05/G18의 책임입니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
 
 ## 설치·실행
 
@@ -59,9 +59,27 @@ npm run test:e2e:db
 
 `npm run verify`는 브라우저 설치를 제외한 위 검사를 순서대로 수행합니다. `check`는 lint·typecheck·단위 테스트이며 mock/SQLite의 정상·반례·시간 경계·권한·원자 rollback을 포함합니다. `identity:races`는 서로 다른 네 자식 프로세스로 SQLite 중복 이메일 초대와 동일 초대 수락을 경합시킵니다. `identity:restart`는 production 서버 A를 실제 종료한 뒤 같은 DB의 서버 B에서 새 로그인·멤버십·대기/소비 초대·철회 쿠키·재배정/작성자/감사 보존을 HTTP로 확인합니다. `db:restart`는 별도의 G00 최소 adapter 검사입니다.
 
-Playwright는 기본 4111 포트에서 자체 production 서버를 실행하며 기존 서버를 재사용하지 않습니다. 충돌 시 다른 서버를 종료하지 말고 예약한 `E2E_PORT`를 지정하세요. 매 실행 전용 DB를 `.local`에 생성하고 desktop/mobile에서 실제 로그인·컨텍스트 생성·초대/재발급/수락·중지·재배정·빈 상태·오류 입력 유지·격리·기존 G00 탐색과 키보드를 검사합니다. 쿠키/토큰/비밀번호가 포함되는 일반 network trace와 자동 실패 스크린샷은 끄고, 민감 입력이 없는 화면만 명시적으로 촬영합니다.
+`test:e2e`와 `test:e2e:db`는 `scripts/run-e2e.ts`를 통해 desktop → mobile을 별도 Playwright 프로세스로 순차 실행합니다. 각 프로젝트는 새 production 서버·DB/메모리 fixture·파일 저장 경로·쿠키 이름을 사용합니다. 두 프로젝트의 정상 로그인 횟수가 한 서버의 인증 제한에 누적되지 않으며 제품의 인증 제한과 테스트 assertion은 그대로입니다. `verify`도 이 격리 명령을 사용합니다. `npm run build`와 Chromium 설치를 먼저 완료하세요.
 
-선택 출력: `E2E_REPORT`, `E2E_ARTIFACTS`, `RESTART_REPORT`, `IDENTITY_RESTART_REPORT`, `IDENTITY_RACES_REPORT`. 보고서에 토큰/쿠키/비밀번호·DB 원문을 출력하지 않습니다. 실패 로그는 삭제하거나 성공으로 재명명하지 않습니다. 구현자 자기검증과 독립 검증/통합 회귀는 별개입니다.
+기본 `E2E_PORT=4111`을 각 프로젝트가 순서대로 사용하고, `E2E_AUX_PORT`를 지정하면 mobile은 그 포트를 사용합니다. 지정하지 않으면 `E2E_PORT`와 같습니다. 사용 중인 서버를 재사용하거나 종료하지 않습니다. 테스트마다 다른 사용자의 작업 서버와 충돌하지 않는 예약 포트를 지정하세요. 각 서버의 `APP_ORIGIN`과 고유 쿠키 이름은 실행기가 포트/프로젝트로 설정하며 제품 기본 포트 3000은 유지됩니다. DB는 `.local/e2e-<mode>-<run-id>/<project>/fixture.db`, 파일은 같은 디렉터리의 `files/`에 보존됩니다(mock의 DB 경로는 예약만 하고 DB 파일을 만들지 않음).
+
+CLI는 `--project=desktop`, `--project mobile`을 지원하며 반복 옵션으로 둘을 선택할 수 있습니다. 프로젝트를 생략하면 둘 다 실행합니다. 테스트 파일/행, `--grep`/`--grep-invert`, `--list`, `--headed` 등 나머지 인자는 shell 조합 없이 Playwright에 전달합니다. 잘못된 프로젝트·옵션·무일치 필터와 테스트 실패는 nonzero exit입니다. 격리를 우회하는 `--config/-c`, `--reporter`, `--output`과 상주 `--ui`는 명시 거부합니다. 보고서/산출물은 환경변수로 지정하세요. 직접 `npx playwright test` 대신 아래 wrapper 명령을 사용합니다.
+
+```bash
+# 기본 전체 실행: 현재 모드별 13 desktop + 13 mobile 시나리오
+E2E_PORT=4149 E2E_AUX_PORT=4150 npm run test:e2e
+E2E_PORT=4149 E2E_AUX_PORT=4150 npm run test:e2e:db
+# 요청한 프로젝트/파일/테스트만 실행; 인자는 -- 뒤에 지정
+E2E_PORT=4149 E2E_AUX_PORT=4150 npm run test:e2e -- --project=mobile tests/e2e/foundation.spec.ts --grep 'brand and home'
+# 테스트 목록만 조회하며 서버/DB는 만들지 않음
+npm run test:e2e -- --project desktop --list
+# 실행별 보고서/trace 위치 지정
+E2E_PORT=4149 E2E_AUX_PORT=4150 E2E_REPORT=.local/review/e2e.json E2E_ARTIFACTS=.local/review/artifacts npm run test:e2e
+```
+
+`run-id`는 UTC 시각+무작위 접미사입니다. `E2E_REPORT=/path/e2e.json`이면 `/path/e2e.<run-id>.summary.json`에 명령·cwd·exit·건수·서버 PID/종료·DB/파일/쿠키 경로를 기록하고, 원본 Playwright JSON은 `e2e.<run-id>.desktop.json`과 `e2e.<run-id>.mobile.json`입니다. 기본 prefix는 `.local/e2e-results.json`입니다. 콘솔이 정확한 summary 절대경로를 출력합니다. `E2E_ARTIFACTS=/path/artifacts`이면 `/path/artifacts/<run-id>/<project>/test-results/`에 trace/화면을, 그 상위에 `runner.log`·`server.log`를 남깁니다(기본 root `test-results`). 프로젝트와 재실행 사이에 원본을 덮어쓰지 않습니다. summary의 test 건수는 command 건수와 별개이며 `--list`는 실행 통과로 세지 않습니다.
+
+기본 trace/자동 screenshot 설정은 꺼져 있습니다. G04 여정은 로그인 후 명시 trace·화면과 실패 DOM을 private 산출물로 남깁니다. 보고서는 환경 덤프/인증 헤더/DB 원문을 출력하지 않습니다. 증거는 합성 자료여도 비공개 보관하며 실패 로그를 삭제하거나 성공으로 재명명하지 않습니다. `RESTART_REPORT`, `IDENTITY_RESTART_REPORT`, `IDENTITY_RACES_REPORT`는 해당 검사기의 선택 출력입니다. 구현자 자기검증과 독립 검증/통합 회귀는 별개입니다.
 
 ```bash
 EVIDENCE_ROOT=.local/g01-evidence python3 scripts/record-command.py check -- npm run check
@@ -75,17 +93,17 @@ Next/CLI는 현재 프로젝트의 환경 로딩 규칙을 사용합니다. `.en
 
 G01에서는 설치된 Next **16.3.5**의 authentication·cookies·route-handlers 가이드를 읽고 DB 세션과 서버 DAL을 구성했습니다. 버전은 accepted package/lockfile 그대로이며 신규 의존성은 없습니다. G00 때 참조한 `/Users/evan/workspace/hackathon`의 앱/fixture/DB를 복사하거나 원본을 변경하지 않았습니다. 공개 패키지 license·scaffold 검토는 G00 증거에 남아 있습니다.
 
-다음 모듈은 `src/server/auth/service.ts`의 principal과 `src/server/policy/`의 action/resource 정책을 소비하고 새 mutation마다 동일 UoW 내부 최신 상태 검사를 추가해야 합니다. G04/G05는 실제 업무·제출 작성자 연결, G18은 존재하는 전 채널 및 전체 영속성 회귀를 소유합니다. 현재 G02 구현이 그 후행 경로를 검증했다는 뜻은 아닙니다.
+다음 모듈은 `src/server/auth/service.ts`의 principal과 `src/server/policy/`의 action/resource 정책을 소비하고 새 mutation마다 동일 UoW 내부 최신 상태 검사를 추가해야 합니다. G04는 실제 업무·파일·요청 버전 연결을 제공하며 G05는 실제 제출 작성자 연결, G18은 존재하는 전 채널 및 전체 영속성 회귀를 소유합니다. G02 당시의 harness 결과만으로 후행 경로를 검증했다고 계산하지 않습니다.
 
 ## G02 정책과 검증 경계
 
 `policy.ts`는 세션/계정·현재 멤버십·관리/가격 grant를 같은 동기 transaction에서 다시 읽습니다. 클라이언트 역할이나 이전 요청의 capability를 권한으로 사용하지 않습니다. 알 수 없는 action/kind/공개 범위는 거부하며, 타 범위/없는 자료는 동일한 404 응답입니다. 내부 원문 접근과 가격 접근은 별개입니다. 회원 관리의 peer identity에는 다른 사용자의 adminGrant를 포함하지 않고, 본인의 세션 DTO에만 명시 grant를 제공합니다.
 
-`projection.ts`는 현재 업무·상품·컨텍스트·회원·감사 DTO를 허용 필드로 구성합니다. 내부 공급가/공급률은 브랜드와 가격 권한 없는 GSG에게 필드 자체가 없습니다. 현재 합성 업무의 `notes`는 공개 안내입니다. 기존 `contributorIds`는 이력이며 공동담당 권한으로 해석하지 않습니다. G04는 실제 공개/초안 및 현재 주/공동담당 메타데이터를 생산해야 합니다. 기존 G00/G01 task/product adapter의 공개 합성 미리보기 의미를 미래 초안에 그대로 적용하지 마세요.
+`projection.ts`는 현재 업무·상품·컨텍스트·회원·감사 DTO를 허용 필드로 구성합니다. 내부 공급가/공급률은 브랜드와 가격 권한 없는 GSG에게 필드 자체가 없습니다. 현재 합성 업무의 `notes`는 공개 안내입니다. 기존 `contributorIds`는 이력이며 공동담당 권한으로 해석하지 않습니다. G04는 실제 공개/초안 및 현재 주/공동담당 메타데이터를 생산합니다. 기존 G00/G01 adapter의 공개 합성 미리보기와 실제 내부 초안의 권한은 구분합니다.
 
-현재 연결: 모든 인증/컨텍스트 관리 API와 홈·업무·상품 HTML/RSC. 부트스트랩 로그인/초대 수락/CSRF와 데이터 없는 health는 인증 전 예외입니다. 일반 응답은 no-store이며 body는 읽는 중 16KiB에서 제한하고 입력 키를 검사합니다. 429는 Retry-After를 제공합니다.
+현재 연결: 인증/컨텍스트 관리와 G04 업무·프로젝트·템플릿·참고파일 API, 홈·업무·상품 조회 HTML/RSC. 부트스트랩 로그인/초대 수락/CSRF와 데이터 없는 health는 인증 전 예외입니다. 일반 응답은 no-store이며 body는 읽는 중 16KiB에서 제한하고 입력 키를 검사합니다. 429는 Retry-After를 제공합니다.
 
-후행 계약만 검사한 경로: 파일 original/preview/download와 원본·참조 범위, 제출 lead/co/team, 가격·검색/정렬/페이지/count·Excel/export, 알림 수신자, 감사, AI 입력/결과와 원본 범위. 정책은 원본과 모든 참조의 현재 권한을 확인하고 projection 이후 검색/집계를 수행합니다. `projectChannel`은 최소 harness 계약이며 각 모듈은 실제 DTO allowlist와 HTTP/파일 검사를 추가해야 합니다. 해당 endpoint를 만들거나 검증했다고 주장하지 않습니다. D02~D05 및 G18 회귀 의무는 남습니다. GSG 완료 정책은 잔여 질문/외부 대기/AI 실패를 승인 게이트로 삼지 않습니다.
+G04 참고파일 original/preview/download와 원본·참조 범위는 실제 endpoint로 연결했습니다. 후행 계약만 있는 경로는 실제 제출 lead/co/team, 상품 가격·통합 검색/정렬/페이지/count·Excel/export, 알림 수신자, AI 입력/결과입니다. 정책은 원본과 모든 참조의 현재 권한을 확인하고 projection 이후 검색/집계를 수행합니다. `projectChannel`은 최소 harness 계약이며 후행 모듈은 실제 DTO allowlist와 HTTP/파일 검사를 추가해야 합니다. D02~D05의 후행 소비와 G18 회귀 의무는 남습니다. GSG 완료 정책은 잔여 질문/외부 대기/AI 실패를 승인 게이트로 삼지 않습니다.
 
 ```bash
 npm run check
@@ -97,7 +115,7 @@ E2E_PORT=4121 node --import tsx scripts/verify-policy-browser.ts
 E2E_PORT=4121 E2E_AUX_PORT=4124 node --import tsx scripts/verify-policy-isolation.ts
 ```
 
-권한 HTTP 검사기는 합성 전용 DB와 `E2E_PORT` 서버(기본 4121)를 직접 생성해 중첩 비공개 marker·실제 cookie/CSRF·HTML/RSC·권한 철회·재시작·DB 오류를 검사합니다. isolation 검사는 `E2E_PORT`(기본 4121)와 `E2E_AUX_PORT`(기본 4124)에 독립 DB/쿠키를 생성합니다. 다른 슬롯을 배정받았다면 위 명령의 두 환경변수 값만 바꾸세요. 검사기 소스를 수정할 필요가 없습니다. APP_ORIGIN, Client 요청, 쿠키 이름(`gs_hale_g02_<주 포트>` / `gs_hale_g02_aux_<보조 포트>`), 검사와 결과 보고가 지정한 두 포트를 따릅니다. 서로 다른 1~65535 정수만 허용하며 사용 중인 포트에서는 실행하지 마세요. 기본 제품 APP_ORIGIN은 3000으로 유지하며 검증 포트를 제품 기본값으로 바꾸지 않습니다. 미래 API는 harness 검사로만 기록합니다.
+권한 HTTP 검사기는 합성 전용 DB와 `E2E_PORT` 서버(기본 4121)를 직접 생성해 중첩 비공개 marker·실제 cookie/CSRF·HTML/RSC·권한 철회·재시작·DB 오류를 검사합니다. isolation 검사는 `E2E_PORT`(기본 4121)와 `E2E_AUX_PORT`(기본 4124)에 독립 DB/쿠키를 생성합니다. 다른 슬롯을 배정받았다면 위 명령의 두 환경변수 값만 바꾸세요. 검사기 소스를 수정할 필요가 없습니다. APP_ORIGIN, Client 요청, 쿠키 이름(`gs_hale_g02_<주 포트>` / `gs_hale_g02_aux_<보조 포트>`), 검사와 결과 보고가 지정한 두 포트를 따릅니다. 서로 다른 1~65535 정수만 허용하며 사용 중인 포트에서는 실행하지 마세요. 기본 제품 APP_ORIGIN은 3000으로 유지하며 검증 포트를 제품 기본값으로 바꾸지 않습니다. 아직 없는 후행 API는 harness 검사로만 기록하고, 구현된 G04 파일/API와 구분합니다.
 
 HTTP 검사의 직접 `_rsc` 요청은 프로토콜 probe입니다. 별도 browser 검사는 비공개 합성 marker를 저장한 SQLite에서 PC/모바일의 실제 Link 이동·prefetch가 만든 RSC 응답과 화면을 확인합니다. 로그인 요청/인증 헤더는 수집하지 않고 응답의 안전한 본문·경로·hash·비공개 필드 부재를 기록합니다. 각 서버 검사는 같은 포트를 사용하므로 순서대로 실행하세요.
 
