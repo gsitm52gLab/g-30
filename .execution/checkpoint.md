@@ -1,3 +1,11 @@
+# State132 latest — G12 independent running
+
+Accepted remains953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6 10/19. G12combined frozen74e8c0aae4d13901491086c29ce6d2e357236162; author391unit/build, root458paths/1211Gitbytes/3cmdpairs reviewf151bbd66e1f6643fdeb3eff5c055a2eff6b9a015e24dbf1e33d16202d1f6c98. Workflowformal c2320ea5938e5338a0227e4c884ec672f0f95e54e3e3a2117226c84dd77dbae1, detachedg12-verification ports4231/32, fresh391/build thenunfilteredmock+own7groups running. Prdsamecandidateauthor UI40PASSreported, historicalG12 malformedfixture explicitoriginal503, addednormalUIhistoricalpositivecopy; finalpacketpending. Sharedsourcelease released.
+
+Goals G15UI current. Found queuedoriginalintentloss recoverygap rootservicecodeconfirmed; narrowservice/unit/HTTPrepairpacketb9f98eca0199f159a47abe27f72e26ecc4db813059c32dd09f08f69131ad8c0e: newcurrentauthorized matchingqueuedID receipt→sameexistingrun/attempt; preserveCAS/currentauth/concurrency, originalfailure required. G15README/taskentry narrowleaseaddendum9a4dc8cc33a8f3f4515869f111e7799e7b66b151f74b06e6f396292a82b41692 nowgranted while upcomingG11serveronly. WholeG15 independentdraft0af46736e45dcc4e325d92a1ffae13734c06166989da0e88a07a799ee747b45e prepared forprd (workflow/goalsauthors cannotverify).
+
+G11serverfirst draftf83d8c3a825093eaabc003f3a1b35497ce0cdac052c92841d38acff6c843e6e2 preparednotassigned; latestaccepted953 currently. Prd afterG12finalchecks, phaseownmodule+commonserver/submissionread only, no UI/README lease; earlytypedcontract freeze for eventualseparateUI. NoG12/AIunacceptedproducerclaim.
+
 # State131 latest — G15 UI dispatched
 
 Accepted product stays953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6; 10/19, Goal ACTIVE. Goals new .worktrees/g15-ui at44060, formalui-task f7c69a89561a664488c245d0dc65163a28e9e1afc4352f3fafcb426a529577e1 ownfeatures/routes/nav/tests ports4233/34, sharedREADME/taskentry deferred. Rootserverfinalreview89282c015d7825913bff441ceaff2abb4bc37aa8cc8715cccc1a62b5a5ebd88f:897artifacts/281source/27commands plusoriginal8+18historical sources unchanged; raw160+186HTTP read.346unit,28+3skip/31HTTP,45+4skip/106+3skip history distinctlevels. No UI/independent/OpenAI PASS yet.
