@@ -929,7 +929,8 @@
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-3.json"
       ],
       "contract_addenda": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-1.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-1.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-2.json"
       ],
       "contract_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064",
       "contract_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/contract-result.json",
@@ -940,29 +941,45 @@
           "severity": "P2",
           "title": "Nonfinite pagination becomes Infinity/null rather than validation error",
           "source": "src/server/products/service.ts ProductService.list",
-          "status": "OPEN_STATIC_FINDING_REPAIR_ASSIGNED",
+          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
           "runtime_status": "NOT_RUN_BY_MAIN",
-          "owner": "prd"
+          "owner": "prd",
+          "repair_candidate": "139c72424f30b3266037c3817a28691223743441",
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json"
         },
         {
           "id": "G06-CR02",
           "severity": "P1",
           "title": "Idempotent replay returns stored receipt.result without explicit output DTO",
           "source": "src/server/products/store.ts receipt",
-          "status": "OPEN_STATIC_FINDING_REPAIR_ASSIGNED",
+          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
           "runtime_status": "NOT_RUN_BY_MAIN",
-          "owner": "prd"
+          "owner": "prd",
+          "repair_candidate": "139c72424f30b3266037c3817a28691223743441",
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json"
         },
         {
           "id": "G06-CR03",
           "severity": "P1",
           "title": "Task-origin file reuse checks task visibility but not published reference inclusion",
           "source": "src/server/files/access.ts canReferenceFile; product save_files",
-          "status": "OPEN_STATIC_FINDING_REPAIR_ASSIGNED",
+          "status": "IMPLEMENTER_REPAIR_MAIN_REVIEWED_INDEPENDENT_PENDING",
           "runtime_status": "NOT_RUN_BY_VERIFIER",
           "owner": "prd",
           "finder_session": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
-          "independent_static_alias": "G06-SR01"
+          "independent_static_alias": "G06-SR01",
+          "repair_candidate": "139c72424f30b3266037c3817a28691223743441",
+          "repair_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json"
+        },
+        {
+          "id": "G06-CR04",
+          "severity": "P2",
+          "title": "Legacy product view DTO returns stored null context and home links lose selected context",
+          "source_commit": "cab8432d8d7d6f038249d1a42461f1d8ba7e2064",
+          "source": "src/server/policy/projection.ts projectProduct + readWorkspace + home ProductCards",
+          "status": "OPEN_STATIC_FINDING_REPAIR_ASSIGNED",
+          "runtime_status": "NOT_RUN_BY_MAIN",
+          "owner": "prd"
         }
       ],
       "implementer_session_ids": [
@@ -1007,7 +1024,9 @@
         "sha256": "52fb23a716e7faca9b0341c7cd214dbb50d985e4089deecc99ff4da3d48a2041",
         "runtime": "NOT_RUN",
         "tool_limit": "Prior reviewer turn stopped by tool content classification; only evidence preservation completed afterward."
-      }
+      },
+      "latest_server_candidate": "139c72424f30b3266037c3817a28691223743441",
+      "main_contract_fix1_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json"
     },
     {
       "id": "G07",
@@ -1650,7 +1669,7 @@
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
   "next_action": "Parallel G06 UI on fixed cab contract and server CR01-03 repair/HTTP; review exact combined candidate after serial internal assembly.",
-  "state_version": 55,
+  "state_version": 56,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1677,7 +1696,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T12:50:52.183520+00:00",
+  "updated_at": "2026-09-21T12:53:43.941750+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
