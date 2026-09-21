@@ -28,7 +28,7 @@ export const actionKinds = {
     "inquiry.create": "inquiry", "inquiry.read": "inquiry", "inquiry.write": "inquiry", "inquiry.manage": "inquiry",
     "file.original": "file", "file.preview": "file", "file.download": "file",
     "search.read": "search", "export.read": "export", "notification.read": "notification",
-    "audit.read": "audit", "ai.input.read": "ai_input", "ai.result.read": "ai_result",
+    "audit.read": "audit", "ai.input.read": "ai_input", "ai.result.read": "ai_result", "ai.result.manage": "ai_result",
 } as const;
 export type Action = keyof typeof actionKinds;
 export type Decision = { allowed: true; internalFields: boolean; internalPrice: boolean } |

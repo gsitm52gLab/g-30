@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import type { UnitOfWork,StoredRecord } from '@/domain/records';
 import type { IdentityService,Principal } from '@/server/auth/service';
-import type { OpinionSource,BatchDraftInput } from '@/domain/corrections/types';
+import type { BatchDraftInput } from '@/domain/corrections/types';
+import { assertFindingSource } from '@/server/ai-review/connector';
 import * as parse from '@/domain/corrections/validate';
 import { object,str } from '@/domain/tasks/validate';
 import { fail,unavailable } from '@/server/auth/errors';
@@ -21,7 +22,6 @@ export type CorrectionCommand =
 export class CorrectionService {
     constructor(public identity:IdentityService,private fault?:(stage:string)=>void){}
     get clock(){return this.identity.clock;}
-    private source(source:OpinionSource){if(source.kind==='ai_candidate')fail('AI_NOT_CONNECTED',409,'AI 문제 후보 연결은 아직 준비되지 않았습니다. 실제 실행 근거를 연결한 뒤 기록해 주세요.');}
     private batch(s:UnitOfWork,p:Principal,id:string,taskId:string){const b=s.get('correctionBatch',id);if(!b||b.data.taskId!==taskId)unavailable();correctionTask(s,p,taskId,this.clock);return b;}
     private opinions(s:UnitOfWork,p:Principal,taskId:string,ids:string[]){return ids.map(id=>{const row=s.get('correctionOpinionVersion',id);if(!row||row.data.target.taskId!==taskId)unavailable();return opinionDTO(s,p,row,this.clock);});}
     private checkDraft(s:UnitOfWork,p:Principal,taskId:string,d:BatchDraftInput){
@@ -40,7 +40,7 @@ export class CorrectionService {
         return this.identity.repo.transaction(s=>{
             const p=this.identity.principal(s,token),task=correctionTask(s,p,parsed.taskId,this.clock,command==='reflect'?'reflect':'manage');
             if(command==='save_opinion'){
-                const x=parse.parseSaveOpinion(body);this.source(x.opinion.source);exactTarget(s,p,x.opinion.target,this.clock);internalFiles(s,p,task.id,x.opinion.internalFileVersionIds,this.clock);this.opinions(s,p,task.id,x.opinion.conflictingOpinionVersionIds);
+                const x=parse.parseSaveOpinion(body);assertFindingSource(s,p,x.opinion.source,x.opinion.target,this.clock);exactTarget(s,p,x.opinion.target,this.clock);internalFiles(s,p,task.id,x.opinion.internalFileVersionIds,this.clock);this.opinions(s,p,task.id,x.opinion.conflictingOpinionVersionIds);
                 const old=x.opinionId?s.get('correctionOpinion',x.opinionId):null;if(x.opinionId&&(!old||old.data.taskId!==task.id))unavailable();
                 return receipt(s,p,task.contextId!,`correction.opinion:${task.id}`,x as unknown as Record<string,unknown>,()=>{fresh(old,x.expectedRevision);const root=old??s.create('correctionOpinion',{id:newId(),contextId:task.contextId,data:{taskId:task.id,currentVersionId:null}}),prev=root.data.currentVersionId?s.get('correctionOpinionVersion',root.data.currentVersionId):null;
                     const row=s.create('correctionOpinionVersion',{id:newId(),contextId:task.contextId,data:{...x.opinion,opinionId:root.id,sequence:prev?safe.integer(prev.data.sequence,1)+1:1,previousVersionId:prev?.id??null,recordedBy:p.user.id,recordedAt:this.clock()}});s.update('correctionOpinion',root.id,root.revision,{taskId:task.id,currentVersionId:row.id});audit(s,p,this.clock,task.contextId!,'correction.opinion_saved',root.id,{versionId:prev?.id??null},{versionId:row.id});return {ids:[root.id,row.id]};},()=>this.fault?.('opinion'));
@@ -61,7 +61,7 @@ export class CorrectionService {
                         else if('decision' in value){if(!state||value.reflectionId!==state.data.reflectionId)fail('CONFLICT',409,'현재 반영 제출을 다시 확인해 주세요.');const r=s.create('correctionResolution',{id:newId(),contextId:task.contextId,data:{taskId:task.id,batchVersionId:b.id,itemKey:item.key,reflectionId:value.reflectionId,decision:value.decision,reason:value.reason,resolvedBy:p.user.id,resolvedAt:this.clock(),itemRevision:previous.revision+1}});s.update('correctionItemState',state.id,state.revision,{...state.data,resolutionId:r.id});ids.push(r.id);this.event(s,p,task,'CORRECTION_ITEM_RESOLVED',r.id);}
                     }audit(s,p,this.clock,task.contextId!,`correction.${command}`,b.id,{}, {factIds:ids});return {ids};},()=>this.fault?.(command));
             }
-            const x=parse.parseRecordReview(body);this.source(x.source);const target=exactTarget(s,p,x.target,this.clock);if(x.scope.productIds.some(id=>!target.products.some(u=>u.productId===id)))fail('TARGET_MISMATCH',422,'선택한 제출의 실제 상품 사용본 범위로 검토해 주세요.');internalFiles(s,p,task.id,x.evidenceFileVersionIds.filter(id=>!target.files.some(f=>f.id===id)),this.clock);if(x.previousReviewId){const old=s.get('correctionReview',x.previousReviewId);if(!old||old.data.taskId!==task.id)unavailable();reviewDTO(s,p,old,this.clock);}
+            const x=parse.parseRecordReview(body);assertFindingSource(s,p,x.source,x.target,this.clock);const target=exactTarget(s,p,x.target,this.clock);if(x.scope.productIds.some(id=>!target.products.some(u=>u.productId===id)))fail('TARGET_MISMATCH',422,'선택한 제출의 실제 상품 사용본 범위로 검토해 주세요.');internalFiles(s,p,task.id,x.evidenceFileVersionIds.filter(id=>!target.files.some(f=>f.id===id)),this.clock);if(x.previousReviewId){const old=s.get('correctionReview',x.previousReviewId);if(!old||old.data.taskId!==task.id)unavailable();reviewDTO(s,p,old,this.clock);}
             return receipt(s,p,task.contextId!,`correction.review:${task.id}`,x as unknown as Record<string,unknown>,()=>{const {idempotencyKey:_key,...data}=x;void _key;const r=s.create('correctionReview',{id:newId(),contextId:task.contextId,data:{...data,recordedBy:p.user.id,recordedAt:this.clock(),previousReviewIsReferenceOnly:true}});audit(s,p,this.clock,task.contextId!,'correction.review_recorded',r.id,{},{});return {ids:[r.id]};},()=>this.fault?.('review'));
         });
     }
