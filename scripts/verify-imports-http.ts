@@ -197,11 +197,10 @@ try {
     const before = await fixture({ action: 'snapshot' }), bytes = await workbook([[A, 'G07-HTTP-ONE', 'Excel 최신', '00001', '0', 'JPY'], [A, 'G07-HTTP-THREE', '새 상품', '00003', '12.345', 'USD']], undefined, 2), p = await preview(brand, bytes, undefined, 2);
     check('all-row preview valid', p.canApply && p.totalRows === 2 && p.rows[0].action === 'update' && p.rows[1].action === 'new');
     check('preview changes zero business rows', hash(await fixture({ action: 'snapshot' })) === hash(before));
-    const apply = { previewId: p.id, idempotencyKey: randomUUID() }, applied = await posted<{
-        ids: string[];
-    }>(brand, '/api/imports/apply', apply, 201), replay = await posted<{
-        ids: string[];
-    }>(brand, '/api/imports/apply', apply, 201);
+    const apply = { previewId: p.id, idempotencyKey: randomUUID() };
+    const [applied, concurrent] = await Promise.all([posted<{ids:string[]}>(brand,'/api/imports/apply',apply,201),posted<{ids:string[]}>(brand,'/api/imports/apply',apply,201)]);
+    check('concurrent HTTP same-key apply returns one identical batch',hash(applied)===hash(concurrent));
+    const replay=await posted<{ids:string[]}>(brand,'/api/imports/apply',apply,201);
     check('response loss retry one identical batch', hash(applied) === hash(replay));
     const batch = await brand.get<ImportBatch>(`/api/imports/batches/${applied.ids[0]}`);
     check('batch provenance and both row results durable', batch.rows.length === 2 && batch.sourceHash === p.sourceHash);

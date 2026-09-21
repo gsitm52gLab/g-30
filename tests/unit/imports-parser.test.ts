@@ -19,10 +19,12 @@ describe('G07 adversarial workbook boundary', () => {
         await expect(guardedZip(await alter(z => { z.file('xl/externalLinks/externalLink1.xml', '<x/>'); }))).rejects.toMatchObject({ code: 'ACTIVE_CONTENT_UNSUPPORTED' });
         await expect(guardedZip(await alter(z => { z.file('xl/vbaProject.bin', 'macro'); }))).rejects.toMatchObject({ code: 'ACTIVE_CONTENT_UNSUPPORTED' });
         await expect(guardedZip(await alter(z => { z.file('xl/_rels/bad.rels', '<Relationships><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject" TargetMode="External" Target="https://example.test/private"/></Relationships>'); }))).rejects.toBeDefined();
+        await expect(guardedZip(await alter(z => { z.file('[Content_Types].xml', '<Types><Override PartName="/xl/workbook.xml" ContentType="application/vnd.ms-excel.sheet.macroEnabled.main+xml"/></Types>'); }))).rejects.toMatchObject({code:'ACTIVE_CONTENT_UNSUPPORTED'});
+        await expect(guardedZip(await alter(z => { z.file('xl/worksheets/sheet1.xml','<worksheet><oleObjects><oleObject/></oleObjects></worksheet>'); }))).rejects.toMatchObject({code:'ACTIVE_CONTENT_UNSUPPORTED'});
         const b = new ExcelJS.Workbook(), s = b.addWorksheet('links');
-        s.getCell('A1').value = { text: '명시된 표시', hyperlink: 'https://example.test/never-fetch' };
+        s.getCell('A1').value = { text: 'macroEnabled vbaProject oleObject 명시된 표시', hyperlink: 'https://example.test/oleObject/never-fetch' };
         const result = await parseWorkbook(Buffer.from(await b.xlsx.writeBuffer()));
-        expect(result.sheets[0].rows[0].cells[0]).toMatchObject({ type: 'text', text: '명시된 표시', error: null });
+        expect(result.sheets[0].rows[0].cells[0]).toMatchObject({ type: 'text', text: 'macroEnabled vbaProject oleObject 명시된 표시', error: null });
     });
     it('rejects truncated/CRC corrupted bytes and actual workbook cell limit before ExcelJS allocation', async () => {
         const bytes = await standard();

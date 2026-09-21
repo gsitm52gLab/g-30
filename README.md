@@ -139,7 +139,7 @@ GS HALE은 해외 헬스케어 진출에 필요한 모든 일을 하나의 흐�
 
 참고자료는 인증된 `POST /api/files?taskId=...`에서 업로드하며 `GET /api/files/:id?taskId=...&mode=download|original|preview`에서 원본과 참조 업무의 최신 권한을 모두 검사합니다. private 파일 저장소는 기본 `.data/files`, 선택 환경변수 `FILE_STORAGE_DIR`입니다. 웹 public 폴더가 아닙니다. 1개 25MiB·1회 10개 제한과 이름/확장자/MIME/기본 signature 검사를 적용하고, PDF/PNG/JPEG만 브라우저 미리보기를 제공합니다. 다른 허용 형식은 원본 다운로드로 확인합니다. 악성코드 백신/파일 내용의 전문가 검토를 수행했다고 주장하지 않습니다. 과거 공개 요청의 정확한 FileVersion은 새 버전 이후에도 현재 권한이 있는 사용자가 조회할 수 있습니다.
 
-G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 상품 스냅샷(G06)은 연결됐으며 이 후보의 실제 답변 서버(G05)는 UI 작업과 검증을 진행 중입니다. GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. 기존 G04 과거 답변 검사의 합성 prior-submission과 실제 G05 제출을 구별합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
+G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 상품 스냅샷(G06)과 실제 답변 UI·서버(G05)는 선행 단계에서 통합·검증되었습니다. GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. 기존 G04 과거 답변 검사의 합성 prior-submission과 실제 G05 제출을 구별합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
 
 ```bash
 npm run check
@@ -161,7 +161,7 @@ HTTP 검사기는 새 `.data/g04-http-*` DB/파일과 별도 쿠키 이름을 �
 
 공통 정보 변경은 공유된 현재 정보를 갱신합니다. 미리보기에는 읽을 수 있는 적용 컨텍스트만 표시하고 숨겨진 대상의 이름·수·가격·파일은 반환하지 않습니다. 저장 명령은 각 common/context/price의 revision과 idempotencyKey를 사용합니다. `captureProductUse`는 후속 제출 트랜잭션에서 쓸 정확한 common/context/file 버전과 명시적으로 선택한 소비자가 버전을 저장합니다. 최신 가격을 당일 적용 가격으로 자동 간주하지 않습니다.
 
-G06의 상품 UI/API는 통합·브라우저 검사·독립 검증과 메인 수용을 마친 단계입니다. 초기 prior-use 레코드는 계약 검증용이며 실제 제출이 아닙니다. 이 G05 서버 후보는 실제 제출 트랜잭션에서 상품 사용본을 만들지만 G05 전체 수용을 뜻하지 않습니다. G07 증빙 집계/Excel, G10 검토, G11 완료 연결은 후속 의무입니다. 자료 집계는 연결 전 `connected:false`와 `null`로 표시합니다.
+G06의 상품 UI/API는 통합·브라우저 검사·독립 검증과 메인 수용을 마친 단계입니다. 초기 prior-use 레코드는 계약 검증용이며 실제 제출이 아닙니다. G05는 실제 제출 트랜잭션에서 상품 사용본을 만들며 선행 단계에서 수용되었습니다. 현재 G07 서버 후보는 증빙 집계/Excel을 연결하며, G10 검토·G11 완료는 후속 의무입니다. G07 자료 집계는 연결된 상태의 실제 요청·미제출·미확인 수를 반환하며 신규 상품의 0과 조회 실패를 구별합니다.
 
 상품 서버 검사기는 새 전용 DB/파일·쿠키와 자신의 프로세스를 사용합니다. SQLite 모드는 두 포트에서 실제 동시 수정/중복 등록을 확인하고 종료·재시작·재로그인 후 정확한 상품/가격/파일/스냅샷을 비교합니다. mock 모드의 fixture 준비는 검사 전용 IPC이며 제품 API에 준비용 경로를 추가하지 않습니다. 과거 사용 스냅샷은 명시적 fixture이며 실제 G05 제출 완료로 계산하지 않습니다.
 
@@ -202,7 +202,7 @@ SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
 
 ## G07 증빙·표준 Excel 서버 계약 후보
 
-G07 서버 계약 구현 단계입니다. 자료·Excel UI의 통합 및 독립 수용은 아직 진행 전입니다. 현업 원본 Excel 검증은 원본 미확보로 `NOT_RUN`이며, 합성 표준 `.xlsx`의 실제 검증과 구분합니다.
+G07 서버 계약 구현 단계입니다. 자료·Excel UI는 별도 작업 중이며 이 서버 후보의 합본 통합·독립 수용은 아직 완료되지 않았습니다. 현업 원본 Excel 검증은 원본 미확보로 `NOT_RUN`이며, 합성 표준 `.xlsx`의 실제 검증과 구분합니다.
 
 증빙은 공개 요청/실제 제출/상품 자료의 정확한 파일 버전을 참조합니다. 파일을 복제하지 않고 상품별 적용 상태와 이력을 분리합니다. 적용 확인은 인증 승인·유효성 판단이 아닙니다. 업로드/증빙 등록만으로 제출하지 않으며, 증빙의 해당 없음은 공개 요청의 필수 항목을 면제하지 않습니다. 상품 자료 수는 현재 공개 요청과 실제 제출을 같은 표 projector로 집계합니다.
 
@@ -218,5 +218,12 @@ Excel은 `GET /api/imports?context=ID`의 허용 열/한도를 받아 표준 양
 npm ci
 npm run check
 npm run build
-npx vitest run tests/unit/evidence.test.ts tests/unit/imports.test.ts tests/unit/products.test.ts tests/unit/repositories.test.ts
+npx vitest run tests/unit/evidence.test.ts tests/unit/imports.test.ts tests/unit/imports-parser.test.ts tests/unit/products.test.ts tests/unit/repositories.test.ts
+# production build 이후, 비어 있는 자신 소유의 포트 사용
+IMPORTS_MODE=mock E2E_PORT=4171 npx tsx scripts/verify-imports-http.ts
+IMPORTS_MODE=sqlite E2E_PORT=4172 npx tsx scripts/verify-imports-http.ts
 ```
+
+`IMPORTS_HTTP_REPORT`로 과거 결과를 덮어쓰지 않는 보고서 경로를 지정합니다. 검사기는 `.local/g07-http` 아래 새 전용 DB·파일·분석본과 포트별 쿠키를 사용하며 모든 실제 HTTP 응답·해시·자신의 서버 종료를 남깁니다. SQLite에서는 종료 후 새 PID·재로그인과 불변 원장 해시를 확인합니다. 동시 재시도는 실제 HTTP 요청을 겹쳐 보내 한 배치 응답을 확인하며, 별도 프로세스 간 동시 Excel 반영은 이 검사기에 포함하지 않습니다.
+
+저장된 배치 결과의 알려진 필드 구조가 손상되면 `STORAGE_UNAVAILABLE`503으로 안전하게 실패합니다. 원본 배치 기록을 다시 쓰지 않고 관리자 확인을 요청합니다. 정상 데이터의 알 수 없는 추가 키는 공개 DTO에서 제외합니다. 일반 링크 표시값에 매크로 관련 단어가 있다는 이유만으로 거부하지 않으며 실제 OOXML content type·요소·관계와 파일 구조를 검사합니다.

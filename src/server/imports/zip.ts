@@ -65,11 +65,14 @@ export function guardedZip(bytes: Buffer): Promise<Map<string, Buffer>> {
                         const data = Buffer.concat(chunks);
                         if (/\.(?:xml|rels)$/i.test(name)) {
                             const xml = data.toString('utf8');
-                            if (/<!\s*(?:DOCTYPE|ENTITY)/i.test(xml) || /(?:macroEnabled|vbaProject|oleObject)/i.test(xml)) {
+                            // Inspect OOXML structure, never arbitrary cell text or hyperlink target words.
+                            const relationships = [...xml.matchAll(/<(?:[\w.-]+:)?Relationship\b[^>]*\/?\s*>/g)].map(([tag]) => tag);
+                            const activeType = canonical === '[content_types].xml' && [...xml.matchAll(/\bContentType\s*=\s*["']([^"']*)["']/g)].some(([, type]) => /(?:macroEnabled|vbaProject|oleObject)/i.test(type));
+                            if (/<!\s*(?:DOCTYPE|ENTITY)/i.test(xml) || activeType || /<(?:[\w.-]+:)?oleObjects?\b/i.test(xml) || relationships.some(tag => /\/(?:vbaProject|oleObject|externalLink|externalLinkPath)$/.test(attribute(tag, 'Type') ?? ''))) {
                                 stop(new WorkbookInputError('ACTIVE_CONTENT_UNSUPPORTED'));
                                 return;
                             }
-                            if (/\.rels$/i.test(name) && [...xml.matchAll(/<Relationship\b[^>]*\/?\s*>/g)].some(([tag]) => /TargetMode\s*=\s*["']External["']/i.test(tag) && !/(?:\/hyperlink)["']/i.test(tag))) {
+                            if (/\.rels$/i.test(name) && relationships.some(tag => attribute(tag, 'TargetMode')?.toLowerCase() === 'external' && !/\/hyperlink$/.test(attribute(tag, 'Type') ?? ''))) {
                                 stop(new WorkbookInputError('EXTERNAL_CONNECTION_UNSUPPORTED'));
                                 return;
                             }
@@ -86,4 +89,4 @@ export function guardedZip(bytes: Buffer): Promise<Map<string, Buffer>> {
         zip.readEntry();
     }));
 }
-export function attribute(tag: string, name: string): string | null { return new RegExp(`(?:^|\\s)${name}=["']([^"']*)["']`).exec(tag)?.[1] ?? null; }
+export function attribute(tag: string, name: string): string | null { return new RegExp(`(?:^|\\s)${name}\\s*=\\s*["']([^"']*)["']`).exec(tag)?.[1] ?? null; }

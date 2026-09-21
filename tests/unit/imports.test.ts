@@ -73,6 +73,35 @@ for (const mode of ['mock', 'sqlite'] as const)
             await expect(service.apply(brand, { previewId: update.id, idempotencyKey: randomUUID() })).rejects.toMatchObject({ code: 'CONFLICT' });
             expect(await repo.list('importBatch')).toHaveLength(0);
         });
+        it('update blanks preserve fields, explicit clears and case-normalized code update share one UoW; skip writes no product', async () => {
+            await setup();
+            const d = await products.detail(brand, 'product-serum', A);
+            await products.command(brand, d.productId, {contextId:A, command:'save_context', fields:{...d.local, jan:'000KEEP', localName:'preserved local'}, expectedContextRevision:d.contextRevision, idempotencyKey:randomUUID()});
+            const headers = ['contextKey','common.code','common.name','common.description','local.jan','local.localName'];
+            const current = await products.detail(brand, d.productId, A), oldDescription=current.common.description;
+            const source=await service.inspect(brand,A,'choices.xlsx',await xlsx([[A,current.common.code.toLowerCase(),'','','',''],[A,'SKIPPED-NEW','skip','','','']],headers));
+            const p=await service.preview(brand,{sourceId:source.sourceId,sheetId:source.sheets[0].id,headerRow:1,mapping:headers.map((field,i)=>({column:i+1,field})),choices:[{row:2,action:'update',clearFields:['local.jan']},{row:3,action:'skip',clearFields:[]}]});
+            expect(p.errorRows).toBe(0);
+            const id=(await service.apply(brand,{previewId:p.id,idempotencyKey:randomUUID()})).ids[0], after=await products.detail(brand,d.productId,A);
+            expect(after.common.name).toBe(current.common.name); expect(after.common.description).toBe(oldDescription);
+            expect(after.common.code).toBe(current.common.code.toLowerCase()); expect(after.local.jan).toBe(''); expect(after.local.localName).toBe('preserved local');
+            expect(after.contextRevision).toBeGreaterThan(current.contextRevision);
+            const result=await service.batch(brand,id); expect(result.rows[1]).toMatchObject({action:'skip',productId:null,versionIds:[]});
+            expect((await repo.list('contextProduct',A)).some(x=>x.data.normalizedCode==='skipped-new')).toBe(false);
+        });
+        it('competing apply calls commit once, same-key different preview conflicts; committed replay survives expiry and staging removal', async () => {
+            await setup();
+            const p=await preview([[A,'CONCURRENT','one','','1','JPY']]), key=randomUUID(), command={previewId:p.id,idempotencyKey:key};
+            const results=await Promise.all([service.apply(brand,command),service.apply(brand,command)]);
+            expect(results[0]).toEqual(results[1]); expect(await repo.list('importBatch')).toHaveLength(1);
+            const another=await preview([[A,'ANOTHER','another','','1','JPY']]);
+            await expect(service.apply(brand,{previewId:another.id,idempotencyKey:key})).rejects.toMatchObject({code:'CONFLICT',status:409});
+            service.identity.clock=()=>new Date(Date.parse(NOW)+31*60000).toISOString();
+            await expect(service.apply(brand,{previewId:another.id,idempotencyKey:randomUUID()})).rejects.toMatchObject({code:'PREVIEW_EXPIRED'});
+            await rm(dir,{recursive:true,force:true});
+            expect(await service.apply(brand,command)).toEqual(results[0]);
+            expect(await repo.list('importBatch')).toHaveLength(1);
+        });
         it('stored batch nested extensions cannot cross the public result DTO', async () => {
             await setup();
             const p = await preview([[A, 'DTO-ROW', 'dto', '', '1', 'JPY']]), id = (await service.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() })).ids[0], original = (await repo.get('importBatch', id))!;
