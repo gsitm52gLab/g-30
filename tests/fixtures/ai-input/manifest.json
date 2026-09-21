@@ -1,0 +1,99 @@
+{
+  "synthetic": true,
+  "no_real_product_or_legal_data": true,
+  "japanese_lines": [
+    "うるおいを与える",
+    "肌をすこやかに保つ"
+  ],
+  "image_size": [
+    1200,
+    300
+  ],
+  "font": {
+    "path": "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",
+    "sha256": "833776a6fd68e2c71c0c52fd8041195bd3d0a336cdb278170b7ad71c7e1b3475",
+    "copied_to_repository": false
+  },
+  "pdf_font": {
+    "path": "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+    "sha256": "876af2cd4854644e7f3e7feb2f688997fdb3343c6df6693611209c9dfb47ccec",
+    "subset_embedded": true
+  },
+  "pdfs": {
+    "native-12.pdf": {
+      "pages": 12,
+      "expected_native": [
+        "うるおいを与える",
+        "肌をすこやかに保つ"
+      ],
+      "literal_markers": "PAGE_01_SYNTHETIC through PAGE_12_SYNTHETIC"
+    },
+    "mixed-3.pdf": {
+      "pages": 3,
+      "selected": [
+        1,
+        2
+      ],
+      "unselected": [
+        3
+      ],
+      "excluded_marker": "UNSELECTED_PRIVATE_SENTINEL",
+      "page2": "actual embedded raster Japanese PNG"
+    },
+    "blank.pdf": {
+      "pages": 1,
+      "expected": "NO_TEXT"
+    },
+    "locked.pdf": {
+      "pages": 3,
+      "expected": "PDF_LOCKED"
+    }
+  },
+  "files": [
+    {
+      "path": "blank.pdf",
+      "sha256": "d7818d2f2d8db70f041065475bd7001f29661a0f2c61cbc4be7218659fbb2ab1",
+      "bytes": 1298
+    },
+    {
+      "path": "blank.png",
+      "sha256": "37f444478031e8738ec2e6c4d3275efbe1196385a60fc6490317fb9e3899d0ec",
+      "bytes": 1773
+    },
+    {
+      "path": "corrupt.pdf",
+      "sha256": "4027d52b3e676d0843b63305f8b7b7b04cf1fcd97e419e5a321e90c60f1c0a10",
+      "bytes": 25
+    },
+    {
+      "path": "corrupt.png",
+      "sha256": "c96b4adc5e8588e4243d099dc3cc2871c6fd3c9cb54c073660865bc4f99ea70d",
+      "bytes": 15
+    },
+    {
+      "path": "japanese.png",
+      "sha256": "c97215f31dfa97b0358a6b557b7cd70a44cdd1fc432b5e6f1a3e7e37af1d11a8",
+      "bytes": 27984
+    },
+    {
+      "path": "locked.pdf",
+      "sha256": "4ae3ff3451b7011709ca02f9f3b78f845651e3784236eb45a4a056f66f4749a7",
+      "bytes": 62491
+    },
+    {
+      "path": "low-contrast.png",
+      "sha256": "b36ce2a55a6cc095ac3ac6e0df3ca04b167ec6dd66b5ebe667858bcc23f0ac38",
+      "bytes": 12586
+    },
+    {
+      "path": "mixed-3.pdf",
+      "sha256": "098ab1117eaabf545150123784593efb6a92a3452dfe0fa684afb5171d984b2b",
+      "bytes": 62509
+    },
+    {
+      "path": "native-12.pdf",
+      "sha256": "c98e83c9bf401a03bdf6a2c1df5ba2f7ebc516cc17c4a99e622b6c40d01e705a",
+      "bytes": 41644
+    }
+  ]
+}
