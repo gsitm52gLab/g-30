@@ -1,38 +1,15 @@
-# Execution checkpoint
+# GS HALE execution checkpoint
 
-State version: 58
-Updated: 2026-09-21T13:04:01.257311+00:00
-Active Goal: existing user Goal, ACTIVE
-Accepted product commit: `cc59987fc70f2799cf1703950e5932b7b4b64ada`
+State 70; Goal ACTIVE. Authoritative task state: `.execution/run-plan.json`; prior decisions and attempts remain in events/traceability/private evidence.
 
-G00/G01/G02/G04 accepted current stages. G04 exact integration independently regressed, main actual evidence reviewed. Future submission/review/notification/Excel/AI producer obligations remain explicit. No final whole-product completion.
+Accepted product commit: `7f409a2a14266776001f6b7910e80e402a5b7717`. G00/G01/G02/G04/G06 accepted current stages; mandatory later consumers and whole-product completion remain pending.
 
-G06 IMPLEMENTING. Server prd in `.worktrees/g06-impl` sole shared writer, current internal server93b plus HTTP helperb5d. Author reports mock53/SQLite58 assertions and2process CAS+newPID restart; raw main review/final exactSHA pending. CR01-04 author repairs main-reviewed, all independent pending. Addendum4 permits only bounded migration CLI diagnostic in scripts/db.ts. Ports4161/4164.
+G05 server: prd in `.worktrees/g05-server`, branch run/g05-server, base accepted7f409a2, ports4151/4154. Sole shared schema/files/policy/evaluator writer. Formal packet G05/1/server/task.json and ownership addenda1(taskLabels only),2(product reusable task-file predicate only). Typed contract after meaningful unit/build first, exhaustive HTTP can continue after disjoint UI starts. No frozen candidate yet.
 
-UI goals in `.worktrees/g06-ui`, basecab8432, fixed contract plus additive uploadInternalFile. UI source implementation/typecheck underway, candidate not yet frozen. Ports4169/4170. Server/UI disjoint paths; root serially assembles only after frozen lease release.
+G05 UI: goals completed 55-line actual TaskDetail/recovery/accessibility prep, main reviewed. Waiting frozen contract and formal isolated worktree assignment; no implementation/runtime. Preparation paths G05/1/ui-task-preparation.json and ui-flow-preparation.md. Server taskLabels lease releases at contract freeze; then UI may own narrow TaskList display.
 
-Workflow prepares independent verifier harness under G06/1/verifier-preparation only, no runtime assignment. Bound-v1 plan18groups reviewed; final combined SHA/cwd/ports remain unassigned. CR04 actual former ProductCards route /products?context; use real renderer in finalUI.
+G05 independent verifier: workflow completed 14-group plan, main reviewed; candidate null, all NOT_RUN. Bind exact contract then combined candidate, independent execution, main evidence review, serial root integration and exact integrated impact regression before acceptance.
 
-Next: finish/freeze server+UI, serial internal assembly, author combined selfcheck, independent exactcandidate, main review, root integration, exactintegrated regression, then G06accepted. G05 draft and file/capture bridge prepared, do not start until G06accepted.
+Recovery: bounded sessionStorage of actual user/context/task/baseRequest text and ready file refs after fresh authorized read. Failed/unuploaded File bytes require reselection. Shared409 preserves local inputs; explicit rebase for new requests; partial/full/approval/receipt/completion distinct.
 
-Preserve .env/main/origin/user untracked docs/execution-v2. No push/fetch/API calls. Private original evidence/failures and actual session logs preserved; final log archive/sanitized derivatives pending.
-
-## State 60 — internal G06 assembly
-
-Root serially assembled frozen server cd5e43a + UI8019017 into isolated `.worktrees/g06-assembly` exact51339b4e435818a8bdb63dd7d0310ff9b5ca0719. No overlapping changed paths/conflicts, source blobs checked. Author result packets pending review, combined selfcheck draft prepared but not assigned. Root accepted remainscc59987; no G06 acceptance. CR05 safe original uploader/time added and CR06 mobile nav wrap refined; exact combined independent verification remains required.
-
-## State62 - G06 independent verification
-
-Combined exact51339b author selfcheck reviewed:279artifact hashes,56source blobs,11command/log pairs,unit160,defaultmock40pass2SQL-onlyskip/SQLite42pass,productHTTP58/63,additionalUIAPIoriginal-file28assertions. Three private helper failures preserved; actual clicked RSC stillNOT_RUN. Workflow assigned `.worktrees/g06-verify` exactdetached51339b ports4162/4165 via G06/1/verification-task.json.18groups and7UIedge obligations remain. Root accepted cc59987 unchanged, no G06 acceptance. G05 submission-contract-preparation103lines and main preparation decisions reviewed, no G05 implementation.
-
-
-State64: G06 independent exact51339b PASS reviewed (518 artifacts,191 source hashes,17 commands). Serial root integration7f409a2 product168 blobs equal. Exact integrated regression assigned workflow in g06-regression4163/4166; accepted remainscc59987 until reviewed PASS. G05 preparation only.
-
-
-State65: G06 accepted current product stage at7f409a2. Main reviewed exact independent518 and integrated334 artifacts,191 source hashes each,168equal product blobs; fresh integrated unit160, mock40+2SQLite-onlyskip/DB42, HTTP67/current24, originalUI20P1locatorF and focused7P retained. Actual G05 snapshots/G07 counts+Excel/later consumer obligations remain. Next G05 server then disjoint UI. Goal ACTIVE.
-
-
-State66: G05 SERVER assigned prd atg05-server, exact accepted7f409a2 base,4151/4154, no realenv/API. Packet G05/1/server/task.json. Typed contract milestone first, then main-review/disjoint goalsUI; workflow independent final combined verifier. Source common schema/files/evaluator owned only by server. Recovery decision binds failed-save+refresh to scoped text/ready-ref recovery, never claims raw failed File bytes recovered.
-
-
-State68: G05 server implementation continues; narrow ownership addenda1(taskLabels declaration),2(products/read.ts reusable task-file publication predicate) are active. Main inspected actual duplicate request-only filter; central request OR immutable submission eligibility required without relaxing original/reference/current auth. Workflow preparing verification plan only, no runtime candidate. UI prep path G05/1/ui-task-preparation.json (NOT_ASSIGNED). Recovery decision remains required.
+Preserve .env, main/origin and user untracked docs/execution-v2. No fetch/push/deploy/API calls so far. Existing failure evidence and actual session log prefixes preserved; final tails and sanitized derivatives still pending. Root orchestrates, no product source edits in this checkpoint.

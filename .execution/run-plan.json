@@ -899,7 +899,12 @@
         "sha256": "1152a83d6ee7fb06a3a87c9a5dbd38d545fad13f74a0e9f351f65c2567244f26",
         "state": "MAIN_REVIEWED_NOT_RUN_PENDING_CONTRACT"
       },
-      "ui_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/ui-task-preparation.json"
+      "ui_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/ui-task-preparation.json",
+      "ui_flow_preparation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/ui-flow-preparation.md",
+        "sha256": "af9d47c2dfd32d9066285ddadac388f85016078865234eba13004b0438029347",
+        "status": "MAIN_REVIEWED_NOT_RUN_PENDING_CONTRACT"
+      }
     },
     {
       "id": "G06",
@@ -1827,7 +1832,7 @@
   "accepted_commit": "7f409a2a14266776001f6b7910e80e402a5b7717",
   "current_goal": "G06",
   "next_action": "prd implements and freezes G05 server typed contract; main reviews then goals builds disjoint UI; workflow independently verifies combined candidate later.",
-  "state_version": 69,
+  "state_version": 70,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1854,7 +1859,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T14:11:46.326170+00:00",
+  "updated_at": "2026-09-21T14:19:22.131970+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
