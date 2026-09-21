@@ -308,7 +308,7 @@ try {
         const full = await submit(tid, await submitInput(tid));
         check('actual full structural submit accepted', full.status === 201, ['AC-05-01']);
         const v2id = (await full.json()).ids[0] as string, v2 = await brand.get<SubmissionSnapshot>(`/api/submissions/${v2id}`);
-        check('live full progress is separate from no teammate draft', ((w = await workspace(team, tid)), w.draft === null && w.draftEvaluation === null && w.submittedEvaluation!.evaluation.missing === 0 && w.taskStatus === 'submitted' && !v2.review.connected && !v2.completion.connected), ['SA-17']);
+        check('live full progress is separate from no teammate draft', ((w = await workspace(team, tid)), w.draft === null && w.draftEvaluation === null && w.submittedEvaluation!.evaluation.missing === 0 && w.taskStatus === 'submitted' && v2.review.connected && v2.review.reviews.length === 0 && v2.review.status === 'pending' && !v2.completion.connected), ['SA-17']);
         check('v1 text file product snapshot remains exact after v2', hash(await brand.get(`/api/submissions/${v1id}`)) === hash(v1) && (await fixture<SubmissionFixtureSnapshot>({ taskId: tid })).submissions.find(s => s.id === v1id)!.sha256 === storedV1.submissions[0].sha256, ['AC-05-04', 'D06'], 'DB_FIXTURE');
         check('real submission capture owner and public exact file binding', v2.products[0].files[0].fileVersionId === firstFile.id && (await fixture<SubmissionFixtureSnapshot>({ taskId: tid })).uses.every(u => u.ownerType === 'submission'), ['D09']);
         const currentProduct = await brand.get<ProductDetail>(`/api/products/product-serum?context=${A}`);
