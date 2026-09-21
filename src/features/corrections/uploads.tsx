@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from 'react';
 import type { Controller } from './controller';
 import { request, denied } from './client';
 import { Checks } from './fields';
-import { SubmissionFile } from '@/features/submissions/views';
+import { CorrectionFile as SubmissionFile } from './file-view';
 import s from './ui.module.css';
 type Row = {
     key: string;

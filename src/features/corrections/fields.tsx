@@ -6,7 +6,8 @@ import type { Workspace } from './model';
 import type { Controller } from './controller';
 import { request } from './client';
 import { targetFor } from './model';
-import { SnapshotView, SubmissionFile } from '@/features/submissions/views';
+import { SnapshotView } from '@/features/submissions/views';
+import { CorrectionFile as SubmissionFile } from './file-view';
 import s from './ui.module.css';
 export function Field({ label, value, onChange, multiline = false, max = 5000, type = 'text', required = false }: {
     label: string;

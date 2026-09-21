@@ -4,7 +4,7 @@ import type { CorrectionBatch } from '@/server/corrections/contracts';
 import type { Controller } from './controller';
 import { targetFor, statusLabels, issueLabels, priorityLabels } from './model';
 import { TargetPicker, TargetView, Field, Select } from './fields';
-import { SubmissionFile } from '@/features/submissions/views';
+import { CorrectionFile as SubmissionFile } from './file-view';
 import s from './ui.module.css';
 export function Batches({ c }: {
     c: Controller;

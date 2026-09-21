@@ -3,7 +3,7 @@ import type { Controller } from './controller';
 import { blankOpinion, targetFor } from './model';
 import { Field, SourceFields, TargetPicker, TargetView, Checks } from './fields';
 import { InternalFiles } from './uploads';
-import { SubmissionFile } from '@/features/submissions/views';
+import { CorrectionFile as SubmissionFile } from './file-view';
 import s from './ui.module.css';
 export function Opinions({ c }: {
     c: Controller;

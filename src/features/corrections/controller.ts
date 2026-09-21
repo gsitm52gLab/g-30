@@ -56,11 +56,11 @@ export function useCorrections(initial: Workspace) {
         return; let e = state.current.editors; if (p.body.command === 'save_opinion') {
         const r = next.staff?.opinions.find(o => o.id === ids[0]);
         if (r)
-            e = { ...e, opinionId: r.id, opinionRevision: r.revision };
+            e = { ...e, opinionId: r.id, opinionRevision: p.body.expectedRevision === 0 ? 2 : p.body.expectedRevision + 1 };
     } if (p.body.command === 'save_draft') {
         const r = next.staff?.drafts.find(o => o.id === ids[0]);
         if (r)
-            e = { ...e, draftId: r.id, draftRevision: r.revision };
+            e = { ...e, draftId: r.id, draftRevision: p.body.expectedRevision + 1 };
     } if (p.body.command === 'publish')
         e = { ...e, tab: 'public' }; state.current.editors = e; setEditors(e); mark(null); setPreview(null); setMessage('저장 결과를 확인했습니다. 제출·검토·업무 완료는 각각 별도입니다.'); }
     async function reread() { const p = state.current.pending; const next = await refresh(); if (next && p?.ids)
