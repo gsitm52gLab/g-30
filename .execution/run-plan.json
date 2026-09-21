@@ -1775,10 +1775,17 @@
           "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g09-server",
           "base_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
           "internal_assembly_commit": "252775d249a7f4125454f687fea3b7a69c83ea28",
-          "agent": "/root/goals"
+          "agent": "/root/goals",
+          "contract_commit": "a511823583b019c48d00d96292e04273b46c6164",
+          "contract_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/server/contract-result.json",
+          "contract_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-server-contract-review.json",
+          "shared_lease": "RELEASED_ACTUAL_SERVER_RUNNERS_CONTINUE"
         },
         "ui": {
-          "state": "NOT_ASSIGNED"
+          "state": "PREPARED_NOT_ASSIGNED",
+          "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g09-ui",
+          "internal_base": "a511823583b019c48d00d96292e04273b46c6164",
+          "next": "Assignprd whenboundedG12domain finishes andlease releases"
         }
       },
       "initial_attachment_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/initial-attachment-decision-proposal.json",
@@ -2338,7 +2345,7 @@
   "accepted_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
   "current_goal": "G07",
   "next_action": "workflow G07 exactunion verify. goals G09server implementation. prd G12standalone domain independent3files. Root evidence review/typedcontract and serial integration.",
-  "state_version": 111,
+  "state_version": 112,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2365,7 +2372,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T18:01:21.175396+00:00",
+  "updated_at": "2026-09-21T18:05:18.836841+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

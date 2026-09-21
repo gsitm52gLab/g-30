@@ -97,3 +97,7 @@ Root accepts minimal private conversation draft then owned per-item idempotentup
 
 ## 2026-09-21T17:42:42.262885+00:00 — G08 current stage ACCEPTED
 Exactcandidate6460 independent and integrated3c4e freshregression both reviewed. Currentnotice scopes, versions/read and atomic durableevent producer accepted. G13delivery/G09streams/G07coexistence/G18remain explicit; wholeGoalACTIVE. NextG07union consumes actualaccepted3c4e.
+
+
+## 2026-09-21T18:06:20.632668+00:00 — G09 actual contract and bounded parallel authoring
+Brand users initiate private inquiry drafts; GSG-created requests remain canonical task/notice workflows. Draft visibility is initiator-only even to GSG/admin, then explicit first publication enables current context GSG participation. This is delegated minimal design consistent with source section8, not a separate user-confirmed permission policy. Internal contract a511823 passed exact252 unit/static/build and root30blob review; actual HTTP/SSE/UI/AC remains pending. UI work may use frozen typed contract in its own worktree while the server author validates its actual runtime. Typed changes require explicit handoff deltas. G12 domain3files is independent accepted-base work; G12 actual server/UI is not implemented by those pure tests.
