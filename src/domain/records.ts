@@ -1,3 +1,4 @@
+import type { CompletionRecords } from './completion/types';
 import type { CorrectionRecords } from './corrections/records';
 import type { ConversationData, QuestionData, MessageData, InquiryReadData, QuestionTransitionData, InquiryTaskLinkData, InquiryEventData, InquiryCursorData } from './inquiries/types';
 import type { CampaignRecords } from './campaigns/records';
@@ -99,7 +100,7 @@ export interface ProductData extends CommonProductExtension {
     status: "draft" | "active" | "archived";
     missingMaterials: number;
 }
-export interface RecordDataMap extends CorrectionRecords, CampaignRecords {
+export interface RecordDataMap extends CorrectionRecords, CampaignRecords, CompletionRecords {
     conversation: ConversationData;
     inquiryQuestion: QuestionData;
     inquiryMessage: MessageData;
