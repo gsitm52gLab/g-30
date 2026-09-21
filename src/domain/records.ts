@@ -1,3 +1,4 @@
+import type { CorrectionRecords } from './corrections/records';
 import type { NoticeData, NoticeVersionData, NoticeReadData } from './notices/types';
 import type { SubmissionData, SubmissionDraftData } from './submissions/types';
 import type { CommonProductExtension, ProductVersionData, ContextProductData, ContextProductVersionData, PriceData, RetailPriceVersionData, InternalPriceVersionData, ProductUseSnapshotData } from "./products/types";
@@ -94,7 +95,7 @@ export interface ProductData extends CommonProductExtension {
     status: "draft" | "active" | "archived";
     missingMaterials: number;
 }
-export interface RecordDataMap {
+export interface RecordDataMap extends CorrectionRecords {
     notice: NoticeData;
     noticeVersion: NoticeVersionData;
     noticeRead: NoticeReadData;

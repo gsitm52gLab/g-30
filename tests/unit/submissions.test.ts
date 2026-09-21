@@ -68,7 +68,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(observer.draftEvaluation).toBeNull();
             expect(observer.submittedEvaluation!.evaluation.missing).toBe(0);
             expect((await tasks.catalog(team, A)).tasks.find(t => t.id === id)!.data.submissionSummary!.mode).toBe('full');
-            expect((await sub.snapshot(brand, second)).review.connected).toBe(false);
+            expect((await sub.snapshot(brand, second)).review).toMatchObject({ connected: true, reviews: [], status: 'pending' });
             await expect(repo.transaction(s => { const row = s.get('submission', first)!; s.update('submission', first, row.revision, row.data); })).rejects.toMatchObject({ code: 'INVALID_RECORD' });
         });
         it('SA17 CAS races, response loss/new-key retry consume one draft; snapshot/product/audit/outbox/receipt rollback is atomic', async () => {

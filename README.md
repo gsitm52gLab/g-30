@@ -227,3 +227,12 @@ NOTICES_MODE=sqlite E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notic
 ```
 
 `NOTICES_HTTP_ROOT`는 런타임 부모(기본 `.local/g08-http`), `NOTICES_HTTP_REPORT`는 새 결과 경로입니다. 보고서는 실제 요청·응답 본문 파일/hash, assertion 단위 결과, PID/종료와 저장소 경로를 기록합니다. 원 보고서를 보존하려면 새 경로를 쓰세요. HTTP로 실제 업무와 제출을 만든 뒤 공지 읽음 전후 업무·요청·활동·제출·상품 캡처·파일 원장을 비교합니다. 공지 파일의 상품/다른 공지 재사용과 원본·참조 양측 권한도 검사합니다. 신규 멤버/알 수 없는 저장 확장 키 준비는 제품 endpoint가 없는 private IPC/저장소 fixture이며 읽기 권한은 실제 HTTP로 검사합니다. late fault와 비동기 파일 읽기 중 철회는 양 adapter 단위 검사, 기존 데이터 migration은 별도 `notices-migration.test.ts`가 확인합니다. UI·HTML/RSC·독립 검증은 별도 증거가 필요합니다.
+# G10 corrections server
+
+The corrections server uses current task permissions and actual immutable G05 submissions. GET `/api/corrections?taskId=...` returns public batches and exact source choices; only GSG receives the separate staff opinion/draft/review section. POST `/api/corrections` supports `save_opinion`, `save_draft`, `publish`, `reflect`, `resolve`, and `record_review`. Client types are exported from `src/server/corrections/contracts.ts`.
+
+Internal opinions append versions. Published batches and their source draft are immutable; late opinions require an explicit follow-up batch. Brand assignees record reflection against a later actual submission, then GSG records individual resolution. Uploading or submitting does not resolve corrections. Previous reviews are references only; AI candidates return `AI_NOT_CONNECTED` until the actual later producer exists.
+
+Public preview: GET `/api/corrections/drafts/:id/preview` (GSG only). Exact batch: GET `/api/corrections/:id`. Target-file links use `/api/corrections/files/:id` and recheck the current batch/item plus original file authority before and after file IO. Internal opinion files use existing internal task uploads; no draft or upload releases them to brands.
+
+Run the existing `npm ci`, `npm run db:setup`, `npm run check`, and `npm run build` setup/check commands. Migration `0009-corrections.sql` adds constraints without changing previous SQL. This isolated branch has accepted 0001–0005 and0007 plus0009 (seven); later module assembly must derive its actual union rather than hardcode this local total. G10 UI, downstream notification delivery and independent acceptance are separate stages.
