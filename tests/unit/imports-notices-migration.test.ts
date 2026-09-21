@@ -20,12 +20,12 @@ const contextId = 'ctx-jp-a-luna', admin = tokenFor('user-admin'), brand = token
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=', 'base64');
 const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
 
-it.each([6, 7])('populated chain through module 000%i gains only its missing sibling; rows/checksums/files/replays remain exact', async firstModule => {
+it.each([6, 7])('populated chain through module 000%i gains missing sibling and inquiries; rows/checksums/files/replays remain exact', async firstModule => {
     const directory = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-g07-union-'));
     const sqlSource = path.resolve('src/server/db/migrations'), sqlDirectory = path.join(directory, 'prior');
     await mkdir(sqlDirectory);
     const names = (await readdir(sqlSource)).filter(n => /^\d+.*\.sql$/.test(n)).sort();
-    expect(names).toEqual(['0001-foundation.sql', '0002-identity.sql', '0003-tasks.sql', '0004-products.sql', '0005-submissions.sql', '0006-evidence-imports.sql', '0007-notices.sql']);
+    expect(names).toEqual(['0001-foundation.sql', '0002-identity.sql', '0003-tasks.sql', '0004-products.sql', '0005-submissions.sql', '0006-evidence-imports.sql', '0007-notices.sql', '0008-inquiries.sql']);
     for (const name of names.filter(n => Number(n.slice(0, 4)) <= 5 || Number(n.slice(0, 4)) === firstModule)) await copyFile(path.join(sqlSource, name), path.join(sqlDirectory, name));
     const db = openDatabase(path.join(directory, 'populated.sqlite'), true);
     let repo: ReturnType<typeof createSqliteRepository> | undefined;
@@ -75,12 +75,12 @@ it.each([6, 7])('populated chain through module 000%i gains only its missing sib
         const fileHash = hash((await files.download(brand, file.id, reference, 'original')).bytes);
         expect(fileHash).toBe(hash(png));
         expect((await repo.list('commandReceipt')).length).toBeGreaterThan(4);
-        expect(migrate(db)).toEqual({ applied: 1, total: 7 });
+        expect(migrate(db)).toEqual({ applied: 2, total: 8 });
         expect(rows()).toEqual(before);
         const allMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as { name: string; sha256: string; applied_at: string }[];
         expect(allMigrations.filter(m => Number(m.name.slice(0, 4)) <= 5 || Number(m.name.slice(0, 4)) === firstModule)).toEqual(oldMigrations);
         for (const m of allMigrations) expect(m.sha256).toBe(hash(await readFile(path.join(sqlSource, m.name))));
-        expect(migrate(db)).toEqual({ applied: 0, total: 7 });
+        expect(migrate(db)).toEqual({ applied: 0, total: 8 });
         expect(rows()).toEqual(before);
         expect(await original.replay()).toEqual(original.result);
         expect(rows()).toEqual(before);
@@ -91,6 +91,6 @@ it.each([6, 7])('populated chain through module 000%i gains only its missing sib
             expect(row).toBeDefined();
             expect(() => db.prepare('UPDATE records SET revision=revision+1 WHERE kind=? AND id=?').run(kind, row.id)).toThrow();
         }
-        console.info('G07_UNION_MIGRATION_EVIDENCE ' + JSON.stringify({ firstModule, missingAdded: firstModule === 6 ? '0007-notices.sql' : '0006-evidence-imports.sql', priorRecords: before.length, priorRowsSha256: hash(JSON.stringify(before)), fileSha256: fileHash, migrations: allMigrations, rowsUnchanged: true, receiptReplayUnchanged: true, bothModuleProducersAndImmutableGuards: true }));
+        console.info('G07_UNION_MIGRATION_EVIDENCE ' + JSON.stringify({ firstModule, missingAdded: [firstModule === 6 ? '0007-notices.sql' : '0006-evidence-imports.sql', '0008-inquiries.sql'], priorRecords: before.length, priorRowsSha256: hash(JSON.stringify(before)), fileSha256: fileHash, migrations: allMigrations, rowsUnchanged: true, receiptReplayUnchanged: true, bothModuleProducersAndImmutableGuards: true }));
     } finally { if (repo) repo.close(); else db.close(); await rm(directory, { recursive: true, force: true }); }
 });

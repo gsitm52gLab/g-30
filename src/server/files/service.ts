@@ -1,3 +1,4 @@
+import { inquiryFileIncluded } from '@/server/inquiries/access';
 import { resolveNotice } from '@/server/notices/access';
 import { randomUUID, createHash } from "node:crypto";
 import { mkdir, writeFile, readFile, unlink } from "node:fs/promises";
@@ -15,11 +16,12 @@ import { resolveProduct } from "@/server/products/access";
 const text = (v: unknown) => typeof v === "string" ? v : "";
 export const fileMetadata = (f: StoredRecord<"fileVersion">) => ({ id: f.id, name: text(f.data.originalName), bytes: typeof f.data.bytes === "number" ? f.data.bytes : 0, mime: text(f.data.mime), sha256: text(f.data.sha256), preview: f.data.preview === true, visibility: f.data.visibility === "internal" ? "internal" as const : "public" as const });
 export function fileUrls(file: StoredRecord<"fileVersion">, reference: FileReference) {
-    const query = typeof reference === "string" ? new URLSearchParams({ taskId: reference }) : reference.kind==='notice'?new URLSearchParams({noticeId:reference.noticeId,...reference.versionId?{versionId:reference.versionId}:{}}):new URLSearchParams({ productId: reference.productId, contextId: reference.contextId });
+    const query = typeof reference === "string" ? new URLSearchParams({ taskId: reference }) : reference.kind==='inquiry'?new URLSearchParams({conversationId:reference.conversationId,...reference.messageId?{messageId:reference.messageId}:{}}):reference.kind==='notice'?new URLSearchParams({noticeId:reference.noticeId,...reference.versionId?{versionId:reference.versionId}:{}}):new URLSearchParams({ productId: reference.productId, contextId: reference.contextId });
     const base = `/api/files/${encodeURIComponent(file.id)}?${query}`;
     return { originalUrl: `${base}&mode=original`, downloadUrl: `${base}&mode=download`, previewUrl: file.data.preview === true ? `${base}&mode=preview` : null };
 }
 export function sourceReference(file: StoredRecord<"fileVersion">): FileReference {
+    if(file.data.owner?.kind==='inquiry')return {kind:'inquiry',conversationId:file.data.owner.conversationId};
     if(file.data.owner?.kind==='notice')return {kind:'notice',noticeId:file.data.owner.noticeId};
     if (file.data.owner?.kind === "product" && file.contextId)
         return { kind: "product", productId: file.data.owner.productId, contextId: file.contextId };
@@ -40,6 +42,9 @@ export class FileService {
             const task = s.get("task", reference)!;
             const versions = s.list("requestVersion", task.contextId!).filter(v => v.data.taskId === task.id);
             included = decide(s,p,"submission.write",taskScope(task),this.identity.clock).allowed && s.list("submissionDraft",task.contextId!).some(d=>d.data.taskId===task.id && contentFiles(d.data).includes(file.id)) || versions.some(v => v.data.content.referenceFileIds.includes(file.id)) || s.list("submission", task.contextId!).some(v => v.data.taskId === task.id && v.data.fileVersionIds.includes(file.id)) || canReadTemporarySubmissionFile(s,p,file,target,this.identity.clock) || p.user.data.role === "gsg" && (task.data.draft?.referenceFileIds.includes(file.id) === true || task.id === file.data.taskId);
+        }
+        else if(reference.kind==='inquiry') {
+            included=inquiryFileIncluded(s,p,file,reference.conversationId,this.identity.clock,reference.messageId);
         }
         else if(reference.kind==='notice') {
             const r=resolveNotice(s,p,reference.noticeId,this.identity.clock,false,reference.versionId);
@@ -66,6 +71,7 @@ export class FileService {
     }[], visibility: "public" | "internal") {
         if (!files.length || files.length > MAX_BATCH_FILES || !["public", "internal"].includes(visibility))
             fail("VALIDATION", 422, "한 번에 1~10개 파일과 공개 범위를 선택해 주세요.");
+        if(typeof reference!=='string'&&reference.kind==='inquiry')fail('VALIDATION',422,'문의의 파일별 업로드 경로를 사용해 주세요.');
         await this.checkUpload(token, reference);
         const prepared = files.map(f => ({ ...validateFile(f.name, f.type, f.bytes), buffer: f.bytes, id: randomUUID(), sha256: createHash("sha256").update(f.bytes).digest("hex") }));
         const written: string[] = [];

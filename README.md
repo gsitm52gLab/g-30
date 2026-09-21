@@ -1,10 +1,32 @@
 # GS HALE
 
+## G09 문의 합본 후보
+
+이 내부 후보는 수용된 G07 자료·Excel과 G08 공지에 G09 서버·UI를 합칩니다. 합본 자체 검사와 독립 검증·전체 모듈 수용은 구분합니다. `src/server/inquiries/contracts.ts`는 client type-only 진입점이고 `readInquirySummary(store, principal, contextId, clock, taskId?)`는 같은 UoW에서 홈/업무가 사용할 현재 권한 집계입니다.
+
+브랜드는 `POST /api/inquiries`의 `{contextId,taskId:null|id,idempotencyKey}`로 비공개 초안을 만듭니다. 초안은 현재 작성자만 읽으며 GSG/admin도 볼 수 없습니다. `POST /api/inquiries/:id/files?visibility=public`에 multipart `files`와 같은 순서의 `clientItemIds`를 1~10개 전송합니다. 파일별 ready/failed 응답과 같은 키 재시도는 기존 파일을 보존합니다. 업로드만으로 질문을 공개하지 않습니다. 실제 파일 선택 후 `POST /api/inquiries/:id`의 `publish_first`를 명시 전송하며 제목, 첫 내용, 양수 초안 revision을 사용합니다.
+
+`GET /api/inquiries?context=...`는 공개된 참여 문의만 집계합니다. 같은 브랜드/컨텍스트의 다른 브랜드 사용자는 참여자가 아닙니다. `GET /api/inquiries/:id`는 팝업과 상세가 함께 쓸 원본입니다. 공개 후 GSG는 명시 answer/state/internal_note/link_task를, 브랜드는 question/supplement를 사용합니다. comment/acknowledgement/read는 질문을 해결하지 않습니다. 답변과 업무·제출·완료는 별개입니다.
+
+`GET /api/inquiries/:id/events?after=...` 및 `/stream?after=...`는 저장된 이벤트와 actor/conversation/view에 묶인 opaque cursor를 사용합니다. 상세의 cursor 이후를 연결하고, cursor가 유효하지 않으면 상세를 다시 읽습니다. SSE `inquiry` 사건의 JSON과 `unavailable` 오류를 구별합니다. 공개/내부 위치는 분리되어 내부 메모가 공개 cursor·revision·정렬 시각을 바꾸지 않습니다. 모든 전달과 파일 읽기는 현재 권한을 다시 검사합니다.
+
+파일은 정확한 `conversationId`와 `messageId` 참조로 읽습니다. 미전송 ready 파일은 현재 업로더만 읽으며 공개 메시지에 포함된 선택 파일만 상대에게 보입니다. 내부 파일의 공개 메시지 재사용이나 다른 업무/상품으로의 문의 파일 재사용은 제공하지 않습니다. 401/403/404는 보호 데이터·복구 입력을 제거하고, 409/503에서는 허용된 입력과 성공 파일·이미 만들어진 업무 ID를 보존합니다. 같은 intent를 재시도하고 새 질문/업무를 자동 생성하지 않습니다.
+
+현재 migration은 `0001`~`0008` 총 8개입니다. 기존 G07 체인은 `0008`만, G09 선행 분기(`0001`~`0005`, `0007`, `0008`)는 빠진 `0006`만 추가합니다. 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
+
+```sh
+npm run build
+INQUIRIES_MODE=mock E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inquiries-http.ts
+INQUIRIES_MODE=sqlite E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inquiries-http.ts
+```
+
+검사 포트는 자신이 소유한 빈 두 포트로 바꿉니다. `INQUIRIES_HTTP_ROOT`는 매 실행 새 DB/파일 폴더를 만들 부모 경로(기본 `.local/g09-http`), `INQUIRIES_HTTP_REPORT`는 새 보고서 경로입니다. 응답 원문·해시·실제 SSE 프레임·PID 종료를 private 증거로 보존하므로 과거 보고서와 같은 경로를 덮어쓰지 마세요. mock 검사는 private IPC 저장소 관찰을 위해 별도 자식 부팅을 사용하고, SQLite는 일반 `next start` 두 프로세스와 새 PID/실제 재로그인을 검사합니다. 제품의 테스트 전용 endpoint는 없습니다. 브라우저 문의 화면·홈·팝업의 검증과 독립 수용은 이 서버 검사와 별개입니다.
+
 **Healthcare & Aesthetic Launch Enablement** · **해외 헬스케어 진출의 모든 일**
 
 현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
 
-G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본에 이어 이 후보는 G05 실제 답변 서버 계약을 추가합니다. 답변 UI는 별도 작업에서 연결하며 증빙·Excel, 검토·완료·문의·AI의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
+G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본, G05 실제 답변 UI/API, G07 증빙·Excel, G08 공지를 보존하며 G09 문의 UI/API를 합칩니다. 이 후보는 후행 검토·완료·AI나 G09 독립 수용의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
 
 ## 설치·실행
 
@@ -267,3 +289,13 @@ NOTICES_MODE=sqlite E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notic
 ```
 
 `NOTICES_HTTP_ROOT`는 런타임 부모(기본 `.local/g08-http`), `NOTICES_HTTP_REPORT`는 새 결과 경로입니다. 보고서는 실제 요청·응답 본문 파일/hash, assertion 단위 결과, PID/종료와 저장소 경로를 기록합니다. 원 보고서를 보존하려면 새 경로를 쓰세요. HTTP로 실제 업무와 제출을 만든 뒤 공지 읽음 전후 업무·요청·활동·제출·상품 캡처·파일 원장을 비교합니다. 공지 파일의 상품/다른 공지 재사용과 원본·참조 양측 권한도 검사합니다. 신규 멤버/알 수 없는 저장 확장 키 준비는 제품 endpoint가 없는 private IPC/저장소 fixture이며 읽기 권한은 실제 HTTP로 검사합니다. late fault와 비동기 파일 읽기 중 철회는 양 adapter 단위 검사, 기존 데이터 migration은 별도 `notices-migration.test.ts`가 확인합니다. UI·HTML/RSC·독립 검증은 별도 증거가 필요합니다.
+
+### 문의 UI — G09 내부 구현 후보
+
+현재 컨텍스트의 **문의**에서 브랜드가 비공개 초안을 만든 뒤 제목·메시지·파일을 준비하고 **첫 질문 보내기**로 전송합니다. 업무 담당이 아니어도 새 문의를 시작할 수 있습니다. 질문의 답변·보완·확인 회신·외부 확인 대기를 명시적으로 구분하며, GSG 홈에서 질문별 남은 수와 다음 확인일을 확인합니다. 팝업과 전체 상세는 같은 서버 대화·파일·읽음 기록을 사용합니다. 대화는 업무 수락·자료 제출·완료와 별개이고, 알림 배달은 G13 후행입니다.
+
+파일은 최대 10개/개당 25 MiB입니다. 성공한 업로드를 유지하며 실패 항목만 같은 파일로 재시도하거나 명시적으로 제외합니다. 메시지 응답 유실은 같은 의도로 재시도하고, 전송 성공 후 조회만 실패하면 **저장 결과 다시 읽기**를 사용합니다. 업무 생성 후 문의 연결이 실패하면 실제 생성된 업무 ID를 보존하고 **이미 만든 업무 연결만 다시 시도**합니다. 재생성하지 않습니다.
+
+미전송 입력과 업로드된 파일 참조는 계정·컨텍스트·문의별로 sessionStorage에 최대 24시간/8건/건당 180,000자 보관합니다. 파일 바이트는 저장하지 않아 실패 파일은 새로고침 후 다시 선택해야 합니다. 복구 전에 실제 현재 권한을 확인하며 401/403/404에서는 문의 화면·목록·커서·보관 입력을 지웁니다. 이 로컬 보관 기간은 서버 초안 삭제 정책이 아닙니다.
+
+UI 자체 검사(원본 결과·실패 및 합본 독립 검증은 별도): `npm run check`, `npm run build`, 이후 `E2E_PORT=4213 E2E_AUX_PORT=4214 npm run test:e2e -- inquiries` 및 동일 포트의 `npm run test:e2e:db -- inquiries`. 기본 runner가 모드/프로젝트/스펙마다 별도 DB·서버를 만듭니다. 실제 실행 기록은 할당된 비공개 evidence에 보존하며 이 설명 자체가 G09 수용 판정은 아닙니다.

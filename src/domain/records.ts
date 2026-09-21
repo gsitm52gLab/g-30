@@ -1,3 +1,4 @@
+import type { ConversationData, QuestionData, MessageData, InquiryReadData, QuestionTransitionData, InquiryTaskLinkData, InquiryEventData, InquiryCursorData } from './inquiries/types';
 import type { EvidenceData, EvidenceVersionData, EvidenceLinkData, EvidenceAssessmentData } from './evidence/types';
 import type { ImportBatchData } from './imports/types';
 import type { NoticeData, NoticeVersionData, NoticeReadData } from './notices/types';
@@ -97,6 +98,14 @@ export interface ProductData extends CommonProductExtension {
     missingMaterials: number;
 }
 export interface RecordDataMap {
+    conversation: ConversationData;
+    inquiryQuestion: QuestionData;
+    inquiryMessage: MessageData;
+    inquiryRead: InquiryReadData;
+    inquiryTransition: QuestionTransitionData;
+    inquiryTaskLink: InquiryTaskLinkData;
+    inquiryEvent: InquiryEventData;
+    inquiryCursor: InquiryCursorData;
     evidence: EvidenceData;
     evidenceVersion: EvidenceVersionData;
     evidenceLink: EvidenceLinkData;
