@@ -593,8 +593,11 @@
       "owner_note": "G11",
       "requirement": "전달목적(검토요청/신청/최종사용)·대상·실제수행자·플랫폼기록자·자료버전·시각·증빙·최근진행. FR-010/BR-002·015",
       "verification_idea": "실제수행자와GSG기록자가다른사례, 같은파일다른전달목적2건저장. 기록버튼만으로메일/신청/게시성공표시없음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G11_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/main-acceptance.json"
+      ],
+      "current_g11_stage": "PASS_MANUAL_COMPLETION_EXTERNAL_AND_REOPEN_ACTUAL_PRODUCERS_AI_PENDING"
     },
     {
       "id": "SA-42",
@@ -604,8 +607,11 @@
       "owner_note": "G11",
       "requirement": "요청/제출/상품버전·미해결·외부대기·마지막진행·완료자/시각 스냅샷; 메모권장. 변경FR-009·029/BR-006·025",
       "verification_idea": "외부대기/보완/AI실패남긴채메모없이GSG완료성공. 정확한잔여snapshot, brand/AI완료거부. 법률적합/외부승인/게시·납품상태불변",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G11_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/main-acceptance.json"
+      ],
+      "current_g11_stage": "PASS_MANUAL_COMPLETION_EXTERNAL_AND_REOPEN_ACTUAL_PRODUCERS_AI_PENDING"
     },
     {
       "id": "SA-43",
@@ -615,8 +621,11 @@
       "owner_note": "G11",
       "requirement": "완료후후속업무연결 또는사유있는재개, 과거완료시각/잔여항목보존; CAS/멱등성유지. FR-029·030/BR-004·027",
       "verification_idea": "완료→재개→다시완료후각snapshot불변. 중복클릭/동시변경에서단일이벤트와정확한최신버전, 강제승인조건재도입없음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G11_STAGE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/main-acceptance.json"
+      ],
+      "current_g11_stage": "PASS_MANUAL_COMPLETION_EXTERNAL_AND_REOPEN_ACTUAL_PRODUCERS_AI_PENDING"
     },
     {
       "id": "SA-44",

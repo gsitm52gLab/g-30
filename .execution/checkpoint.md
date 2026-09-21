@@ -1,3 +1,7 @@
+# State146 latest — G11 ACCEPTED; G16 full server and G13 pure module authorized
+
+Accepted0804a4a 13/19. G11regression52f5 rootf286review546artifacts593Git/cwd9exit0/31CRC3clickedRSC/461unit28browser12HTTP14UI. Historical233rows unchanged migration1/repeat0total12,5originalfilesunchanged. G16prd ownpuree1087ce check450 thenbuild; full-server-lease nowexclusive afteradditivemergeaccepted0804,0013/G10exactfinding/G11actualAIresidual. G13goals formalserver-task ownpuretypes/date/eligibility only on0804,0014reserved NO commonlease untilG16typedfreeze. G16independentai_verifyprepared94fa root915a review19refs all13evalcasesNOT_RUN. G17actualAPI stillmandatoryNOT_RUN.
+
 # State145 latest — G11 serial union under targeted regression
 
 Acceptedcd7 12/19 remains. G11ce049 independentffb24 root77ae3review1722artifacts528Git/cwd31cmd21exit0/10exit1,48CRC153literalHTTP/427unit40rawbrowser,17ownbusiness9UI5history4IO. Allhelpererrors retained; ownnonprice/mobileclickedbody notcaptured vsstandard40actualchannels separate. Rootclarifies originalinitialrace two runs1P1F notverifier2FAIL phrase. Rootmerge0804a4a 9conflicts resolvedbothrecords/constraints/taskentry/readme;7migrationtestcounts12, allSQL1..12original. Bindingba8f593nonledger458both69G1554G11same12uniondelta. Formalregression7866 workflow newg11-regression4231/32 bounded28+freshcheck/build+ownseams.
