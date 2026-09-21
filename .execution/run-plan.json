@@ -1511,7 +1511,9 @@
       "repair_main_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/2/main-v02-final-author-review.json",
       "union_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/task-draft.json",
       "union_preflight": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/union-preflight.json",
-      "accepted_sibling_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28"
+      "accepted_sibling_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
+      "shared_lease": "RELEASED_BY_AUTHOR_AT_F2E615",
+      "author_union_frozen_commit": "f2e615c84db547c42b2e756685c9c79e11c7c420"
     },
     {
       "id": "G08",
@@ -1691,9 +1693,25 @@
       "attempt": 1,
       "owned_paths": [
         "src/domain/inquiries/**",
-        "tests/unit/inquiries-domain.test.ts"
+        "src/server/inquiries/**",
+        "src/app/api/inquiries/**",
+        "src/domain/records.ts (new inquiry record map only)",
+        "src/domain/constraints.ts (inquiry relations only)",
+        "src/domain/tasks/types.ts (inquiry owner/necessary upload identity metadata only)",
+        "src/domain/tasks/constraints.ts (inquiry owner relations only)",
+        "src/server/files/access.ts (current original/reference inquiry guard branches)",
+        "src/server/files/service.ts (exact reference/owner extension, preserve existing semantics)",
+        "src/app/api/files/route.ts (inquiry reference parse only ifused; actual inquiry per-item upload route owns new uploads)",
+        "src/app/api/files/[id]/route.ts (exact conversation/message reference parse)",
+        "src/server/policy/types.ts",
+        "src/server/policy/policy.ts (narrow inquiry actions/resource kinds)",
+        "src/server/db/migrations/0008-inquiries.sql (reserved, confirm history)",
+        "tests/unit/inquiries*.test.ts",
+        "tests/unit/repositories.test.ts (actual migration total only)",
+        "scripts/verify-inquiries*.ts",
+        "README.md (server setup/domain instructions only)"
       ],
-      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g09-contract",
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g09-server",
       "evidence_root": ".execution/private/runs/<run-id>/G09/<attempt>/",
       "acceptance": [
         {
@@ -1727,15 +1745,15 @@
           "evidence": []
         }
       ],
-      "next_action": "Standalone domainv2 rootreviewed, actualserver pendingexclusive sharedlease afterG07unionconflict authorsourcefreeze; latestacceptedbase only. Initialattachment runtimechecks remainNOT_RUN.",
+      "next_action": "goals actual inquiry server on accepted3c4e + own standalone domainv2; exclusive common wiring. Freeze typed contract for UI author; independent full feature later.",
       "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/task-draft.json",
       "participant_policy_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/participant-policy-decision.json",
       "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/dor-task.json",
       "preparation_status": "DOR_ROOT_REVIEWED_NARROW_LEGACY_TASK_ENTRY_ADDED",
       "dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/dor-review.json",
       "main_dor_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-dor-review.json",
-      "base_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
-      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/domain-contract-task.json",
+      "base_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/server-task.json",
       "subtasks": {
         "domain_contract": {
           "state": "AUTHOR_V2_ROOT_REVIEWED_NOT_ACCEPTED",
@@ -1749,7 +1767,12 @@
           "revision_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/domain-revision-task.json"
         },
         "server": {
-          "state": "NOT_ASSIGNED"
+          "state": "IMPLEMENTING",
+          "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/server-task.json",
+          "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g09-server",
+          "base_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
+          "internal_assembly_commit": "252775d249a7f4125454f687fea3b7a69c83ea28",
+          "agent": "/root/goals"
         },
         "ui": {
           "state": "NOT_ASSIGNED"
@@ -1761,7 +1784,8 @@
       "prepared_server_head": "252775d249a7f4125454f687fea3b7a69c83ea28",
       "internal_domain_assembly": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/server/internal-assembly.json",
       "verification_preparation_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/verification-preparation-task.json",
-      "verification_preparation_status": "WORKFLOW_READONLY_PLAN_RUNNING_NOT_RUNTIME"
+      "verification_preparation_status": "ROOT_REVIEWED_NOT_RUN",
+      "main_verification_preparation_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-verifier-preparation-review.json"
     },
     {
       "id": "G10",
@@ -1832,7 +1856,8 @@
         "ui": {
           "state": "NOT_ASSIGNED"
         }
-      }
+      },
+      "server_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/server-task-draft.json"
     },
     {
       "id": "G11",
@@ -1939,7 +1964,9 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
+      "domain_task_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/domain-contract-task-draft.json",
+      "prepared_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g12-contract"
     },
     {
       "id": "G13",
@@ -2285,8 +2312,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "3c4e241597a26c69ccdf64cd8ff9ce8c8354bf28",
   "current_goal": "G07",
-  "next_action": "prd G07union conflictresolution+checks. When sharedlease released assigngoals G09serveronpreparedaccepted3c4e+own1eb branch. workflow G09readonlyindepplan thenG07newcandidatepriority. Rootrawreviews/integrationserial.",
-  "state_version": 109,
+  "next_action": "G07 f2e615 author checks then independent workflow. G09 server goals common-wiring owner. Root review G09 plan and G07 author artifacts.",
+  "state_version": 110,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2313,7 +2340,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T17:46:30.754987+00:00",
+  "updated_at": "2026-09-21T17:54:30.574206+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
