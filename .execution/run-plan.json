@@ -461,7 +461,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Implementer tests combined G04 UI+server, resolves defects, returns exact final candidate; then independent verification",
+      "next_action": "Fresh full G04 implementer tests at986511c; then exact candidate independent verification. All open source/integration findings await independent closure.",
       "base_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/task.json",
       "ownership_addenda": [
@@ -500,6 +500,20 @@
           },
           "candidate_commit": "c4f7c5336236d10e0cdf1717234d9a39aa65220f",
           "independent_validation": "PENDING_PARENT_G04_CANDIDATE"
+        },
+        {
+          "id": "G04-UI-FIX1",
+          "state": "MERGED_IN_PARENT_DEVELOPMENT",
+          "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+          "cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-ui-fix1",
+          "base_commit": "3e8fa9236b202fa893cb569695a3c0f1f42dfffd",
+          "owned_paths": [
+            "src/features/tasks/list.tsx",
+            "src/features/tasks/detail.tsx"
+          ],
+          "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ui-fix1/task.json",
+          "candidate_commit": "6fbb52f2e902cad91b0274fe7ad2acc4fc23439b",
+          "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/ui-fix1/implementation-result.json"
         }
       ],
       "implementer_session_ids": [
@@ -572,10 +586,19 @@
           "report": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/contract-review.md",
           "report_sha256": "9290b922a7b5d978cf45c7dc66aed9c17d8b5e44ab8b2f691aee5c82a62e7087",
           "owner_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec"
+        },
+        {
+          "id": "G04-I01",
+          "severity": "P2",
+          "title": "Empty task list lost accessible original h2 heading",
+          "status": "IMPLEMENTER_REPORTED_E2E_FAIL_REPAIR_ASSIGNED",
+          "source_commit": "3e8fa9236b202fa893cb569695a3c0f1f42dfffd",
+          "execution_status": "Implementer reports actual mock desktop failure; final command/report evidence pending main review",
+          "owner_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c"
         }
       ],
-      "internal_integration_commit": "3e8fa9236b202fa893cb569695a3c0f1f42dfffd",
-      "internal_integration_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/subintegration/ui-merge.json"
+      "internal_integration_commit": "986511c929d4aa837cc7e76d18ee94df4e0ce1f2",
+      "internal_integration_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/subintegration/ui-fix1-merge.json"
     },
     {
       "id": "G05",
@@ -1320,8 +1343,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
   "current_goal": "G04",
-  "next_action": "Implementer tests combined G04 UI+server, resolves defects, returns exact final candidate; then independent verification",
-  "state_version": 34,
+  "next_action": "Fresh full G04 implementer tests at986511c; then exact candidate independent verification. All open source/integration findings await independent closure.",
+  "state_version": 36,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1348,7 +1371,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T11:14:41.384949+00:00",
+  "updated_at": "2026-09-21T11:21:54.095352+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

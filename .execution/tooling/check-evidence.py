@@ -27,15 +27,14 @@ for manifest in args.manifests:
     local_errors = []
     if not entries:
         local_errors.append('manifest has no artifacts')
-    for key, expected in [('candidate_commit', args.candidate), ('integration_commit', args.integration)]:
-        observed = document.get(key)
-        if key == 'candidate_commit' and observed is None:
-            observed = document.get('verified_candidate_commit')
-        if expected and observed != expected:
-            local_errors.append(f'{key} mismatch')
-        if key == 'candidate_commit' and expected and 'verified_candidate_commit' in document:
-            if document['verified_candidate_commit'] != expected:
-                local_errors.append('verified_candidate_commit mismatch')
+    if args.candidate:
+        candidate_values = [document[key] for key in
+                            ('candidate_commit', 'verified_candidate_commit', 'candidate')
+                            if key in document]
+        if not candidate_values or any(value != args.candidate for value in candidate_values):
+            local_errors.append('candidate_commit mismatch')
+    if args.integration and document.get('integration_commit') != args.integration:
+        local_errors.append('integration_commit mismatch')
     seen = set()
     for entry in entries:
         path = Path(entry['path'])
