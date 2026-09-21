@@ -96,6 +96,7 @@ for (const mode of ["mock", "sqlite"] as const) describe(`${mode} G04 actual tas
     it("AC-04-05 CR03 receipt retry creates acceptance/event once; CAS and injected failure roll back all writes", async () => {
         await setup(); const id = await publish(), revision = (await repo.get("task", id))!.revision; const input = { command: "accept", expectedRevision: revision, idempotencyKey: randomUUID() };
         await tasks.command(brand, id, input); await tasks.command(brand, id, input);
+        await command(id, "accept", {}, brand);
         expect((await repo.list("taskActivity")).filter(a => a.data.kind === "accept")).toHaveLength(1); expect((await repo.list("domainEvent")).filter(e => e.data.eventType === "TASK_ACCEPTED")).toHaveLength(1);
         await expect(tasks.command(brand, id, { ...input, reason: "changed" })).rejects.toMatchObject({ status: 409 });
         await expect(tasks.command(admin, id, { command: "save", expectedRevision: revision, content: payload(), idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
@@ -115,14 +116,19 @@ for (const mode of ["mock", "sqlite"] as const) describe(`${mode} G04 actual tas
         expect((await repo.get("task", id))!.data).toMatchObject({ authorId: "user-admin", assignmentNeedsAttention: false });
     });
     it("AC-04-03 SA-08/13 multi-context clones and manual cycles/additional product tasks keep old state independent", async () => {
-        await setup(); await repo.transaction(s => { s.create("membership", { id: "gsg-in-b", contextId: ctx2, data: { userId: "user-price", role: "operator", status: "active", scope: "B", internalPriceAccess: false, activatedAt: identity.clock(), suspendedAt: null } }); });
+        await setup(); await repo.transaction(s => { s.create("membership", { id: "gsg-in-b", contextId: ctx2, data: { userId: "user-price", role: "operator", status: "active", scope: "B", internalPriceAccess: false, activatedAt: identity.clock(), suspendedAt: null } });
+            for (const [userId, role] of [["user-gsg","operator"],["user-luna","brand"]] as const) s.create("membership",{id:`third-${userId}`,contextId:"ctx-sg-a-luna",data:{userId,role,status:"active",scope:"third synthetic fixture",internalPriceAccess:false,activatedAt:identity.clock(),suspendedAt:null}});
+            s.create("product",{id:"product-third",contextId:"ctx-sg-a-luna",data:s.get("product","product-serum")!.data});
+        });
         const c = payload(); c.requirements[0].productIds = ["product-serum"];
-        const result = await tasks.create(admin, { targets: [target, { ...target, contextId: ctx2, ownerId: "user-price", coAssigneeIds: [], productIds: ["product-cream"] }], content: c, category: "spot", idempotencyKey: randomUUID() });
+        const result = await tasks.create(admin, { targets: [target, { ...target, contextId: ctx2, ownerId: "user-price", coAssigneeIds: [], productIds: ["product-cream"] }, { ...target, contextId:"ctx-sg-a-luna", coAssigneeIds:[], productIds:["product-third"] }], content: c, category: "spot", idempotencyKey: randomUUID() });
+        expect(new Set(result.ids).size).toBe(3); const independentBefore = await Promise.all(result.ids.slice(1).map(id=>repo.get("task",id)));
         const other = (await tasks.detail(admin, result.ids[1])).draft!; expect(other.deadline.responsibleUserId).toBe("user-price"); expect(other.requirements[0].productIds).toEqual(["product-cream"]);
         await command(result.ids[0], "publish"); await command(result.ids[0], "accept", {}, brand); const old = await repo.get("task", result.ids[0]);
         const copy = await command(result.ids[0], "duplicate", { cycle: { label: "10월 회차", start: "2026-10-01", end: "2026-10-31" } });
         expect(await repo.get("task", result.ids[0])).toEqual(old); expect((await repo.get("task", copy.ids[0]))!.data).toMatchObject({ status: "draft", currentRequestId: null, cycle: { sourceTaskId: result.ids[0] } });
         expect((await repo.get("task", result.ids[1]))!.data.status).toBe("draft");
+        expect(await Promise.all(result.ids.slice(1).map(id=>repo.get("task",id)))).toEqual(independentBefore);
         await command(result.ids[0], "hold", { reason: "잠시 보류" }); await expect(command(result.ids[0], "accept", {}, brand)).rejects.toMatchObject({ status: 409 }); await command(result.ids[0], "cancel", { reason: "합의 취소" }); await command(result.ids[0], "resume", { reason: "명시 재개" });
         expect((await repo.get("task", result.ids[0]))!.data.status).toBe("requested");
     });
