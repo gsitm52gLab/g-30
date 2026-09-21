@@ -1442,7 +1442,9 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+      "next_action": "Draft DoR only; implementation unassigned pending shared-schema writer release and exact accepted base binding.",
+      "packet_draft": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/task-draft.json",
+      "dor_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/dor-task.json"
     },
     {
       "id": "G09",
@@ -1993,7 +1995,7 @@
   "accepted_commit": "37b7fe1912ebe383991d94540aff7e8a23ab7631",
   "current_goal": "G07",
   "next_action": "prd owns G07 server/schema, goals independently builds exact G05 historical link consumer on accepted37b. Full G07 UI after frozen server contract/root internal merge.",
-  "state_version": 86,
+  "state_version": 87,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -2020,7 +2022,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T15:51:01.333413+00:00",
+  "updated_at": "2026-09-21T15:59:06.407604+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
