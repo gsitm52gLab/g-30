@@ -18,7 +18,7 @@ import { blankContent, blankRequirement, requirementTypes } from '@/domain/tasks
 import { blankDraft, type AnswerInput, type DraftContent } from '@/domain/submissions/types';
 import { evaluateAnswers } from '@/domain/submissions/evaluate';
 import { parseAnswerInput } from '@/domain/submissions/validate';
-import { blankFileBinding } from '@/domain/products/types';
+import { blankFileBinding, blankRetailPrice } from '@/domain/products/types';
 import { MAX_FILE_BYTES } from '@/domain/files/validate';
 const A = 'ctx-jp-a-luna', admin = tokenFor('user-admin'), brand = tokenFor('user-luna'), co = tokenFor('user-co'), team = tokenFor('user-team');
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=', 'base64');
@@ -33,8 +33,11 @@ for (const mode of ['mock', 'sqlite'] as const)
         async function textDraft(id: string, text = '답변'): Promise<DraftContent> { const w = await sub.workspace(brand, id); return { ...blankDraft(), answers: [{ requestId: w.request.id, requirementKey: 'answer', productId: null, type: 'long_text', input: { text } }] }; }
         async function submissionInput(id: string, mode: 'partial' | 'full' = 'full') { const w = await sub.workspace(brand, id); return { baseRequestId: w.request.id, expectedDraftRevision: w.draft!.revision, expectedTaskRevision: w.taskRevision, mode, idempotencyKey: randomUUID() }; }
         async function upload(id: string, name = 'proof.png', clientItemId = randomUUID(), bytes = png) { const w = await sub.workspace(brand, id); return files.upload(brand, id, w.request.id, [{ clientItemId, name, type: 'image/png', bytes }]); }
-        afterEach(async () => { repo?.close(); if (dir)
-            await rm(dir, { recursive: true, force: true }); });
+        afterEach(async () => {
+            repo?.close();
+            if (dir)
+                await rm(dir, { recursive: true, force: true });
+        });
         it('SA15/16/17 saves incomplete draft, validates before completeness, partial/full are immutable independent from acceptance/completion', async () => {
             await setup();
             const c = payload();
@@ -74,8 +77,10 @@ for (const mode of ['mock', 'sqlite'] as const)
             draft.productSelections = [{ productId: p.productId, expectedCommonRevision: p.commonRevision, expectedContextRevision: p.contextRevision, bindingIds: [], retailPriceVersionId: null, asOfDate: '2026-09-21' }];
             await save(id, draft);
             const input = await submissionInput(id), before = await Promise.all(['submission', 'productUseSnapshot', 'audit', 'domainEvent', 'commandReceipt', 'task'].map(kind => repo.list(kind as 'task')));
-            await expect(new SubmissionService(identity, stage => { if (stage === 'submit')
-                throw new Error('injected submit'); }).submit(brand, id, input)).rejects.toThrow('injected submit');
+            await expect(new SubmissionService(identity, stage => {
+                if (stage === 'submit')
+                    throw new Error('injected submit');
+            }).submit(brand, id, input)).rejects.toThrow('injected submit');
             expect(await Promise.all(['submission', 'productUseSnapshot', 'audit', 'domainEvent', 'commandReceipt', 'task'].map(kind => repo.list(kind as 'task')))).toEqual(before);
             const results = await Promise.all([sub.submit(brand, id, input), sub.submit(brand, id, { ...input, idempotencyKey: randomUUID() })]);
             expect(results[0]).toEqual(results[1]);
@@ -180,6 +185,57 @@ for (const mode of ['mock', 'sqlite'] as const)
             const second = (await sub.submit(brand, id, await submissionInput(id))).ids[0];
             expect((await sub.snapshot(brand, second)).products[0].common.name).toBe('수정된 현재 상품');
             expect(JSON.stringify(v1)).not.toMatch(/internalPrice|1700|0\.4/);
+        });
+        it('actual product-scoped condition ancestry and typed invalid values keep exact denominator without author-provided flags', async () => {
+            await setup();
+            const c = payload();
+            c.requirements = [{ ...blankRequirement('parent', 'choice'), label: '선택', options: ['yes', 'no'], productIds: ['product-serum'] }, { ...blankRequirement('child', 'number'), label: '조건 수량', productIds: ['product-serum'], condition: { key: 'parent', equals: 'yes' } }, { ...blankRequirement('date', 'date'), label: '날짜', required: false }];
+            const id = await task(c, ['product-serum']), w = await sub.workspace(brand, id), p = await products.detail(brand, 'product-serum', A);
+            const d: DraftContent = { ...blankDraft(), answers: [{ requestId: w.request.id, requirementKey: 'parent', productId: 'product-serum', type: 'choice', input: { selected: ['no'] } }, { requestId: w.request.id, requirementKey: 'child', productId: 'product-serum', type: 'number', input: { value: 'invalid stale hidden' } }, { requestId: w.request.id, requirementKey: 'date', productId: null, type: 'date', input: { value: '2026-02-30', precision: 'date', timezone: 'Asia/Seoul' } }], productSelections: [{ productId: 'product-serum', expectedCommonRevision: p.commonRevision, expectedContextRevision: p.contextRevision, bindingIds: [], retailPriceVersionId: null, asOfDate: '2026-09-21' }] };
+            await save(id, d);
+            expect((await sub.workspace(brand, id)).draftEvaluation).toMatchObject({ required: 1, satisfied: 1, invalid: 1 });
+            await expect(sub.submit(brand, id, await submissionInput(id, 'partial'))).rejects.toMatchObject({ code: 'INVALID_ANSWERS' });
+            d.answers.pop();
+            await save(id, d);
+            const submission = (await sub.submit(brand, id, await submissionInput(id))).ids[0];
+            expect((await sub.snapshot(brand, submission)).evaluation.items.find(i => i.requirementKey === 'child')?.status).toBe('not_applicable');
+            d.answers[0] = { ...d.answers[0], input: { selected: ['yes'] } } as AnswerInput;
+            await save(id, d);
+            expect((await sub.workspace(brand, id)).draftEvaluation).toMatchObject({ required: 2, invalid: 1 });
+            await expect(sub.draft(brand, id, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: (await sub.workspace(brand, id)).draft!.revision, content: { ...d, answers: [{ ...d.answers[0], productId: null }] }, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 422 });
+        });
+        it('actual capture uses selected dated retail version rather than future latest and rolls back invalid selection', async () => {
+            await setup();
+            const id = await task(payload(), ['product-serum']);
+            await products.command(brand, 'product-serum', { command: 'save_retail', contextId: A, price: { ...blankRetailPrice(), currency: 'JPY', amount: '0', effectiveFrom: '2026-09-01', effectiveTo: '2026-09-30' }, expectedPriceRevision: 0, idempotencyKey: randomUUID() });
+            const first = await products.detail(brand, 'product-serum', A);
+            await products.command(brand, 'product-serum', { command: 'save_retail', contextId: A, price: { ...blankRetailPrice(), currency: 'JPY', amount: '999999999999999999999.99', effectiveFrom: '2026-10-01' }, expectedPriceRevision: first.retail.revision, idempotencyKey: randomUUID() });
+            const p = await products.detail(brand, 'product-serum', A), d = await textDraft(id);
+            d.productSelections = [{ productId: p.productId, expectedCommonRevision: p.commonRevision, expectedContextRevision: p.contextRevision, bindingIds: [], retailPriceVersionId: p.retail.current!.id, asOfDate: '2026-09-21' }];
+            await save(id, d);
+            await expect(sub.submit(brand, id, await submissionInput(id))).rejects.toMatchObject({ status: 422 });
+            expect(await repo.list('submission')).toHaveLength(0);
+            expect(await repo.list('productUseSnapshot')).toHaveLength(0);
+            d.productSelections[0].retailPriceVersionId = first.retail.current!.id;
+            await save(id, d);
+            const snapshot = await sub.snapshot(brand, (await sub.submit(brand, id, await submissionInput(id))).ids[0]);
+            expect(snapshot.products[0]).toMatchObject({ retailPriceVersionId: first.retail.current!.id, retailPrice: { amount: '0' }, retailSelection: { asOfDate: '2026-09-21', rule: 'explicit_version_within_stated_dates' } });
+        });
+        it('brand direct known unpublished GSG request file cannot be laundered through submission; preserved request upload DTO', async () => {
+            await setup();
+            const id = await task(), fs = new FileService(identity, dir), file = (await fs.upload(admin, id, [{ name: 'request.png', type: 'image/png', bytes: png }], 'public')).files[0];
+            expect(Object.keys(file).sort()).toEqual(['id', 'name', 'bytes', 'mime', 'sha256', 'preview', 'visibility'].sort());
+            const d = await textDraft(id);
+            d.artifacts = [{ fileVersionId: file.id, role: 'evidence', answer: null }];
+            await expect(save(id, d)).rejects.toMatchObject({ status: 422 });
+            expect((await sub.workspace(brand, id)).availableFiles.some(f => f.id === file.id)).toBe(false);
+            await expect(fs.download(brand, file.id, id, 'original')).rejects.toMatchObject({ status: 404 });
+            await taskCommand(id, 'save', { content: { ...payload(), referenceFileIds: [file.id] } });
+            await taskCommand(id, 'publish');
+            d.answers[0].requestId = (await sub.workspace(brand, id)).request.id;
+            await save(id, d);
+            await sub.submit(brand, id, await submissionInput(id));
+            expect((await fs.download(team, file.id, id, 'original')).bytes).toEqual(png);
         });
         it('persisted unknown nested extensions never cross live draft/snapshot output and same-key replay is allowlisted', async () => {
             await setup();
