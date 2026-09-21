@@ -1,16 +1,14 @@
 # Execution checkpoint
 
-State version: 38
-Updated: 2026-09-21T11:33:48.609619+00:00
+State version: 42
+Updated: 2026-09-21T11:50:28.324441+00:00
 Active Goal: existing user Goal, ACTIVE
 Accepted product commit: `cec612fbeb3795e233d07121a54db9ac96adbf4b`
 
-G00/G01/G02 initial stage ACCEPTED. G04 exact candidate `7f958972023cf2d37127c0d8bef01f1cedd50e31` is VERIFYING in `/Users/evan/workspace/gs-hale/.worktrees/g04-verify` by workflow; implementer goals is running final isolated checks/packaging in g04-impl. Final implementation report remains pending and must be reviewed before integration. Findings CR01–06/I01/I02 require independent closure. No G04 acceptance or root product integration yet.
+G00/G01/G02 initial stage ACCEPTED. G04 attempt2 frozen candidate `3304c5b97096699f00ea6863f30df8b715745301` in `/Users/evan/workspace/gs-hale/.worktrees/g04-fix2` assembled by main from runner ea5cc46 and state1f3dd853. goals executes fresh combined checks on4141/4144. workflow finishes original7f independent FAIL report with V01(defaultrunner) andV02(resume), preserving all raw evidence. New independent candidate assignment follows; no root product merge or G04acceptance yet.
 
-Canonical state: `.execution/run-plan.json`; private evidence: `.execution/private/runs/RUN-20260921-01/`. Preserve original .env, main/origin, untracked docs/execution-v2 and all failed evidence. G06-before-G05 preferred after G04 ACCEPTED; G06 current work is preparation only.
+prd runner-fix1 and goals state-fix1 source/evidence remain immutable. Main reviewed120+105 subcandidateartifact hashes and9+14 command/log pairs. Both defects remain pending independent closure. Current state/next action authoritative in `.execution/run-plan.json`.
 
-Next: receive both reports, inspect exact-SHA evidence, fix if needed, serial root merge and integrated regression. Whole Goal remains incomplete.
+Next: independent exact3304 verification, serial root merge and integrated regression. G06 beforeG05 after G04accepted; G06 current work preparation only. All19checkpoints/91AC/A01–26/AI13/SA64/D10 remain tracked. Preserve .env/main/origin/untracked docs/execution-v2 and original sessions. Latest actual session log prefix hashes collected11:47:56UTC, final archive/sanitization pending.
 
-State update 39 at 2026-09-21T11:40:42.354005+00:00: G04 NEEDS_FIX. Exact7f README default E2E independent22pass/4fail. Narrow runner/docs repair in g04-runner-fix1 by prd on ports4149/4150; workflow continues original candidate verification. Main reviewed424artifact hashes,42command pairs and actual final counts; no G04 acceptance.
-
-State update 40 at 2026-09-21T11:42:30.169337+00:00: G04-V02 actual accepted→hold→resume loses progress and repeated accept200 cannot restore. goals owns separate state-fix1 worktree6paths/4141+4144; prd owns runner-fix1 fourpaths/4149+4150. Workflow original7f evidence remains immutable.
+Update 2026-09-21T11:51:48.214002+00:00: original7f verification-result is final FAIL with V01/V02,363 artifacts. Independent workflow now verifies3304 in g04-verify2 on4142/4145 under G04/2/verification-task.json.

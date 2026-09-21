@@ -378,13 +378,13 @@
       "dependencies": [
         "G02"
       ],
-      "state": "NEEDS_FIX",
+      "state": "VERIFYING",
       "required_for_product_completion": true,
-      "candidate_commit": "7f958972023cf2d37127c0d8bef01f1cedd50e31",
+      "candidate_commit": "3304c5b97096699f00ea6863f30df8b715745301",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
-      "attempt": 1,
+      "attempt": 2,
       "owned_paths": [
         "src/domain/records.ts",
         "src/domain/constraints.ts",
@@ -421,7 +421,7 @@
         ".gitignore",
         "src/app/layout.tsx"
       ],
-      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-impl",
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-fix2",
       "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1",
       "acceptance": [
         {
@@ -461,7 +461,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Parallel disjoint runner/docs and lifecycle fixes from7f; workflow completes original immutable candidate verification; main assembles and reverifies new candidate before integration.",
+      "next_action": "Exact3304 independent reverify and final combined implementation evidence review; close V01/V02 and all current G04 gaps before root integration.",
       "base_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/task.json",
       "ownership_addenda": [
@@ -631,12 +631,16 @@
       ],
       "internal_integration_commit": "986511c929d4aa837cc7e76d18ee94df4e0ce1f2",
       "internal_integration_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/subintegration/ui-fix1-merge.json",
-      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g04-verify",
-      "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/verification-task.json",
-      "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/implementation-result.json",
-      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/verification-result.json",
-      "implementation_report_status": "REVIEWED_WITH_OPEN_RUNNER_DEFECT",
-      "main_candidate_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/main-candidate-review.json"
+      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g04-verify2",
+      "verification_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-task.json",
+      "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/implementation-result.json",
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/verification-result.json",
+      "implementation_report_status": "ASSEMBLED_CHECK_PENDING",
+      "main_candidate_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/main-candidate-review.json",
+      "repair_base_commit": "7f958972023cf2d37127c0d8bef01f1cedd50e31",
+      "prior_verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/verification-result.json",
+      "prior_main_candidate_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/main-candidate-review.json",
+      "internal_repair_assembly": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/2/subintegration/merge-result.json"
     },
     {
       "id": "G05",
@@ -1381,8 +1385,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
   "current_goal": "G04",
-  "next_action": "Parallel disjoint runner/docs and lifecycle fixes from7f; workflow completes original immutable candidate verification; main assembles and reverifies new candidate before integration.",
-  "state_version": 40,
+  "next_action": "Exact3304 independent reverify and final combined implementation evidence review; close V01/V02 and all current G04 gaps before root integration.",
+  "state_version": 42,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1405,11 +1409,11 @@
   ],
   "integration_branch": "run/integration",
   "integration_worktree": "/Users/evan/workspace/gs-hale",
-  "implementation_branch": "run/g04-impl",
+  "implementation_branch": "run/g04-fix2",
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T11:42:30.169337+00:00",
+  "updated_at": "2026-09-21T11:51:48.214002+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
