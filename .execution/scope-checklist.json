@@ -207,9 +207,11 @@
       "status": "PASS_CURRENT_G05_STAGE",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
       ],
-      "scope_note": "Actual read/accept/schedule/hold/partial/full distinct. Actual external wait/physical/manual completion states remain G09/G11/G12."
+      "scope_note": "Actual read/accept/schedule/hold/partial/full distinct. Actual external wait/physical/manual completion states remain G09/G11/G12.",
+      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS."
     },
     {
       "id": "SA-16",
@@ -221,9 +223,11 @@
       "verification_idea": "v1텍스트/원본.ai/확인PDF/링크 제출 후v2수정. v1본문·값·파일·댓글·검토·전달 참조 해시/ID불변. 업로드만으로 제출상태 변화0",
       "status": "PASS_CURRENT_G05_STAGE",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
       ],
-      "scope_note": "Actual text/typed/artifact/link/provenance/version immutable; actual comments/review/external delivery consumers G09/G10/G11 pending."
+      "scope_note": "Actual text/typed/artifact/link/provenance/version immutable; actual comments/review/external delivery consumers G09/G10/G11 pending.",
+      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS."
     },
     {
       "id": "SA-17",
@@ -502,8 +506,12 @@
       "owner_note": "G09",
       "requirement": "브랜드가독립문의또는업무연결문의 생성, 줄글/첨부, 업무전환시원대화보존. FR-011",
       "verification_idea": "GSG요청이없는브랜드가문의시작가능. 나중에업무연결해도원messageID/첨부/시각불변. 담당제출권한제한으로독립문의작성을막지않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G09_SCOPE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
+      ],
+      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS.",
+      "remaining": "G18 final regression; G13 delivery/G03 fullhome separate."
     },
     {
       "id": "SA-36",
@@ -513,8 +521,12 @@
       "owner_note": "G09",
       "requirement": "질문별4상태·외부상대/보낸시각/GSG담당/다음확인일/최근결과, 자동접수/내부메모≠답변. FR-013·019/BR-010·011·017",
       "verification_idea": "5질문중4답변1외부대기fixture에서홈잔여1. 접수메모추가해도대기유지. 해결후추가질문으로재개하고과거해결시각유지",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G09_SCOPE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
+      ],
+      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS.",
+      "remaining": "G18 final regression; G13 delivery/G03 fullhome separate."
     },
     {
       "id": "SA-37",
@@ -524,8 +536,12 @@
       "owner_note": "G09",
       "requirement": "팝업/상세 공통대화·파일·읽음, 전송중/실패/재전송·새메시지·실시간/누락복구. FR-011",
       "verification_idea": "두실제계정/탭에서읽음일치. 연결끊김동안2메시지→재연결해2개만추가, 같은clientMessageId재전송1개. 내부메모실시간payload비노출",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G09_SCOPE",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json"
+      ],
+      "current_g09_stage": "Actual inquiry firstsend/private draft/partial upload, exact conversation popup+detail+files+read, 5/4/1 externalwait, reopen, SSE catchup/current revoke, CAS/idempotency/newPID verified; five current AC PASS.",
+      "remaining": "G18 final regression; G13 delivery/G03 fullhome separate."
     },
     {
       "id": "SA-38",
