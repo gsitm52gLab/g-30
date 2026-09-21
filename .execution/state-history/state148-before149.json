@@ -3234,11 +3234,7 @@
         "sha256": "77d9f107f2d67f45a86e98b634f9508186e8be493a4c8f18cb6b99c8293c7921"
       },
       "ui_implementer_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
-      "ui_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-ui",
-      "full_ui_draft": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui-full-task-draft.json",
-        "sha256": "abefd0b657aa0866e4af2f68f89b9715812158b34eaa9d5984ecebad86628393"
-      }
+      "ui_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-ui"
     },
     {
       "id": "G17",
@@ -3293,10 +3289,6 @@
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/task-draft.json",
         "sha256": "acf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3"
-      },
-      "provider_call_fact_addendum": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/provider-call-fact-addendum.json",
-        "sha256": "d40bdf9f84599046c183ed031d108e0f13180b978e08d281484e92a0d06bc6b6"
       }
     },
     {
@@ -3369,10 +3361,6 @@
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G18/task-draft.json",
         "sha256": "549761cb50668ada90e3ff2c3bb0bd763f666d712f7fcd4208523ede9819f77e"
-      },
-      "closure_worksheet_preparation": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G18/closure-worksheet-state148.json",
-        "sha256": "d4c82588cb985cdb5e3a4e4ad67164b83ca07764f2ff5167755c5662c792f706"
       }
     }
   ],
@@ -3392,7 +3380,7 @@
   "accepted_commit": "0804a4a1a750ab4dee149036659e212480230242",
   "current_goal": "G16",
   "next_action": "G16 exclusive full-server in progress; G13 own pure checks. Review typed G16 freeze then assign G16 UI and release shared server lease for G13. G17 real API remains mandatory NOT_RUN.",
-  "state_version": 149,
+  "state_version": 148,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3423,7 +3411,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T22:19:33.617730+00:00",
+  "updated_at": "2026-09-21T22:16:33.840620+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

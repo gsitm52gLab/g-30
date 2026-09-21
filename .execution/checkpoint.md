@@ -1,3 +1,7 @@
+# State149 latest — audit worksheet and server boundary addendum
+
+Accepted0804 still13/19. Root finalaudit worksheet script outputs207 distincttrackingrows (91AC/26A/13AI/64SA/10D/2subgroups/1mandatoryOpenAI), currentrefs hashchecked errors0; all finalstatusNOT_EVALUATED, no tests/acceptance inferred. Regeneratefinalstate. G17provider-call-fact addendum d40b separates engine choice/network attempt/schema success; fresh GSG afterIO mandatory. G16fullUI draft abefd ready, workflow8purecomponents checking; prd server meaningful tests pending; goalsownreadadapters ongoing. GoalACTIVE.
+
 # State148 latest — owned parallel implementation, shared schema serialized
 
 Accepted0804 remains13/19. PrdG16fullserver exclusivecommon0013. WorkflowG16UI purepresentation only newg16-ui e1213d1 packet77d9, noAPI guess. GoalsG13puref54744focused/lint/typecheck root081d review22artifacts8source/2cmd; now ownactualproducerreadadapters packet eac3, still sharedlease0. Root targeted stalecopy census6items assigns G13normaldelivery/taskcopy,G16AI/G11/G10 UI labels,G18READMEchronology; allmustclose final,no productacceptanceinferred. G17 actualOpenAI NOT_RUN.
