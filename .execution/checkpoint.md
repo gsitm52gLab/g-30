@@ -1,20 +1,12 @@
-# RUN-20260921-01 checkpoint
+# Execution checkpoint
 
-- Goal ACTIVE confirmed by get_goal after user resume. Full PRD/G00–18, 91 AC, A01–26, AI13 still required. G00/G01 ACCEPTED: 2/19 checkpoints,9/91 AC. Remaining82AC NOT_RUN. No whole-product completion.
-- Canonical integration cwd `/Users/evan/workspace/gs-hale`, branch `run/integration`. Latest accepted product SHA `9e291b2b05607157f425656b12ccb24930672e0f` (G01). RootHEAD may advance with execution metadata. Original main1f108fe and origin preserved, nofetch/push/APIcall.
-- Canonical runtime `.execution/run-plan.json` state_version25. Worktree copies historical. Traceability A26/AI13, scope-checklist64, deferred-checks10 remain authoritative. Existing untracked docs/execution-v2 preserved, not binding.
-- G00 accepted d143710: foundation adapter/schema/seed/mock/SQLite/tooling verified; evidence privateG00/1/main-acceptance.json. No later product feature claims.
-- G01 candidate073ed7f independently FAILED due scoped member response leaking another member global adminGrant. Evidence privateG01/1/verification-result.json,162artifacts/17commandhashes reviewed, main-rejection.json. Failure remains preserved; fourG01AC narrowlypassed but A19blocked.
-- G01 repair92e588f independently PASS at .worktrees/g01-verify2, port4115;127artifacts/11commandhashes reviewed. Split peer identity6fields from self login/me capabilities. Only3fileschanged. Originaldefectsamefixturefixed. Unit56, browser14mock+14SQLite, independentHTTP82/browser23/static4passed; detailedunchangedprobes explicitlyNOT_RERUN.
-- G01 integrated9e291b2 regressed independently at .worktrees/g01-regression, port4113released.95productfilesbyteidenticalto92e,8.executionmetafilesdiffer.133artifact/12commandhashesreviewed;unit56/browser28/HTTP82/browserassertions23/adapterrestart3/static4PASS. Noopenproductdefect. G01/2/main-acceptance.json authoritative. Actual G04/G05 submission-author connection remainsD01; product persistence expansionD10. NoG02–18 claims.
-- G01 historical implementation failures/logs retained. Two old failureDOM invitation links were redacted without originals;explicitretentionlimitation. Independent actualtrace originals private; sanitized reports separate. Integritychecker supports regressionmanifest verified_candidate_commit alias; no originalmanifestchanged.
-- G02 VERIFIED attempt1; independent initial-scope PASS with323artifact/18command-report-log hashes reviewed, no current defect. Integrated regression pending. Final candidate a3db4d02f01fc4288de8b3607657ac23d4db977b by /root/prd; previous9859e02 full-suite evidence retained with NOT_RERUN on newSHA. Main reviewed331 artifacts/32command-log pairs/86source comparison files and16owned paths. G02-M01 hardcoded isolation port resolved with E2E_PORT/E2E_AUX_PORT. Exact detached verifier .worktrees/g02-verify by /root/workflow, ports4122/4125, packet privateG02/1/verification-task.json. No G02 acceptance yet; current HTTP/RSC vs harness vs D02–05 remain separate.
-- `/root/workflow` (01a0c307-fd0c-7d41-bb8a-43ee5f85f03a) G02 independent verification complete; integrated regression pending, ports4122/4125; futureintegration4123/4126. `/root/goals` (01a0c307-c975-75b1-b96a-5a5c4e448aec) G18 final audit preparation complete/reviewed; available forfutureimplementation/repairs. Do not restart runningagents.
-- Preparations G01/G02/G04(G05 included)/G06(G07)/G08(G09)/G10(G11G12)/G13(G14)/G15(G16G17) reviewed/indexed in private preparation-review-index.json. Allpreparation NOT_RUN. G06/main-handoff-notes.md flags commonproduct/file-scope compatibility;resolveagainstacceptedfilecontracts, notnewfeaturegate.
-- Planned next: G02accepted→G04. PreferG06commonproductcontractbeforeG05snapshotconsumer. Afteracceptedproducers, independentbranchescanparallelizewithnonoverlaptype/module/files; central schema/auth/seed/lockfileonewriter. Keep currentDAG, no dependentimplementationearly.
-- Applicable AGENTS: readinstalled version-matchedNextguide beforecode; Next16.3.5/React19.3/TS6/Node24/npm11 baseline. Sourcesexecution-v1 andfetchedNotionfinalplan read. Currentobjective .execution/objective.md overridesoldinstructions. RepositorymainAI materialreference onlyAIimplementationphase;earlierprompteditdidnotauthorizeimmediatefetch.
-- .envpreserved/ignored;notcopiedtoagents. LatestmodelreadatG17; knownaliasgpt-6 astra→gpt-6-astra onlysamenormalization. ActualconfiguredOpenAI synthetic/public response+schema/grounding/usage mandatory. Nomonetarycap. Actualmail/realExcel/expert/productionunverifiedlimits separate.
-- ActualsourceJSONL4 paths/sessionUUID/hash checkpoints in private session-log-manifest.json, prior manifests retained. Rawprivate logs notpublic;no inventedtranscript. Finalarchive/redactedderivative stilltodo.
-- Next: letG02implementercontinue; inspectcandidateandhashes→independentexactcandidateverification→repairifneeded→serialmerge→integratedSHAregression→ACCEPTED. Continueall19modules; nofinalpartialcompletion.
+State version: 27
+Updated: 2026-09-21T10:50:09.785645+00:00
+Active Goal: existing user Goal, ACTIVE
+Accepted product commit: `cec612fbeb3795e233d07121a54db9ac96adbf4b`
 
-- G04 task-draft revision2 and readiness-review prepared, notassigned. Source5.2 external milestone/date/counterpart omission added separately from brand deadline. G09 current-home inquiry count versus G03 complete-home sequence recorded. G18 final audit preparation reviewed; allfutureexecution NOT_RUN.
+G00/G01/G02 initial stage ACCEPTED. G04 IMPLEMENTING in `/Users/evan/workspace/gs-hale/.worktrees/g04-impl` from exact accepted SHA.
+
+Next: independent verification of G04 candidate, serial integration and exact-SHA regression. Prefer G06 before G05 to stabilize common product/file contracts. G02 future actual file/search/Excel/notification/AI producers remain required. 19 checkpoints and all PRD/A/AI conditions remain tracked; no whole Goal completion.
+
+Canonical state: `.execution/run-plan.json`; private evidence: `.execution/private/runs/RUN-20260921-01/`. Preserve existing evidence, .env, main/origin and untracked docs/execution-v2.

@@ -192,10 +192,10 @@
       "dependencies": [
         "G01"
       ],
-      "state": "VERIFIED",
+      "state": "ACCEPTED",
       "required_for_product_completion": true,
       "candidate_commit": "a3db4d02f01fc4288de8b3607657ac23d4db977b",
-      "integration_commit": null,
+      "integration_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
       "attempt": 1,
@@ -230,39 +230,89 @@
         {
           "id": "AC-02-01",
           "expected": "다른 컨텍스트의 ID를 읽기/쓰기 API에 넣으면 거부하고 제목·본문·개수도 노출하지 않는다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G02_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G02_POLICY_AND_EXISTING_PATHS_ONLY",
+          "scope_note": "Current routes plus applicable policy contract; future producer and channel delivery are deferred explicitly.",
+          "POLICY_HARNESS": "PASS",
+          "EXISTING_HTTP_OR_RSC": "PASS_FOR_CURRENT_IMPLEMENTED_ROUTES",
+          "DEFERRED_REAL_ENDPOINT": "NOT_RUN"
         },
         {
           "id": "AC-02-02",
           "expected": "브랜드 응답/내보내기/검색에서 내부 가격·원문 필드가 제거된다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G02_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G02_POLICY_AND_EXISTING_PATHS_ONLY",
+          "scope_note": "Current routes plus applicable policy contract; future producer and channel delivery are deferred explicitly.",
+          "POLICY_HARNESS": "PASS",
+          "EXISTING_HTTP_OR_RSC": "PASS_FOR_CURRENT_IMPLEMENTED_ROUTES",
+          "DEFERRED_REAL_ENDPOINT": "NOT_RUN"
         },
         {
           "id": "AC-02-03",
           "expected": "파일 URL을 아는 비회원도 원본·미리보기·다운로드에 접근할 수 없다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G02_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G02_POLICY_AND_EXISTING_PATHS_ONLY",
+          "scope_note": "Policy original/preview/download source+reference matrix only; no actual file endpoint.",
+          "POLICY_HARNESS": "PASS",
+          "EXISTING_HTTP_OR_RSC": "NOT_RUN_NO_IMPLEMENTED_FILE_ENDPOINT",
+          "DEFERRED_REAL_ENDPOINT": "NOT_RUN"
         },
         {
           "id": "AC-02-04",
           "expected": "같은 컨텍스트의 비담당 팀원은 공개 업무 조회만 가능하고 제출 변경은 거부된다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G02_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G02_POLICY_AND_EXISTING_PATHS_ONLY",
+          "scope_note": "Current routes plus applicable policy contract; future producer and channel delivery are deferred explicitly.",
+          "POLICY_HARNESS": "PASS",
+          "EXISTING_HTTP_OR_RSC": "PASS_FOR_CURRENT_IMPLEMENTED_ROUTES",
+          "DEFERRED_REAL_ENDPOINT": "NOT_RUN"
         },
         {
           "id": "AC-02-05",
           "expected": "권한 변경 후 검색·알림·AI 결과까지 새 권한이 적용된다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_INITIAL_G02_STAGE",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/verification-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/regression-result.json",
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+          ],
+          "stage": "INITIAL_G02_POLICY_AND_EXISTING_PATHS_ONLY",
+          "scope_note": "Current routes plus applicable policy contract; future producer and channel delivery are deferred explicitly.",
+          "POLICY_HARNESS": "PASS",
+          "EXISTING_HTTP_OR_RSC": "PASS_FOR_CURRENT_IMPLEMENTED_ROUTES",
+          "DEFERRED_REAL_ENDPOINT": "NOT_RUN"
         }
       ],
-      "next_action": "Serial integrate exact independently verified a3db candidate then assign integrated regression",
+      "next_action": "G04 unblocked; actual future producer paths remain required in D02-D05 and SA-03",
       "base_commit": "9e291b2b05607157f425656b12ccb24930672e0f",
       "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/implementation-result.json",
       "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g02-verify",
-      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/verification-result.json"
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/verification-result.json",
+      "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g02-regression",
+      "accepted_at": "2026-09-21T10:50:09.785645+00:00",
+      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/regression-result.json",
+      "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
+      "open_defects": []
     },
     {
       "id": "G03",
@@ -328,16 +378,46 @@
       "dependencies": [
         "G02"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": null,
+      "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
       "verifier_session_id": null,
-      "attempt": 0,
-      "owned_paths": [],
-      "actual_worktree_cwd": null,
-      "evidence_root": ".execution/private/runs/<run-id>/G04/<attempt>/",
+      "attempt": 1,
+      "owned_paths": [
+        "src/domain/records.ts",
+        "src/domain/constraints.ts",
+        "src/domain/tasks/**",
+        "src/domain/files/**",
+        "src/server/tasks/**",
+        "src/server/files/**",
+        "src/server/events/**",
+        "src/server/policy/**",
+        "src/server/auth/service.ts",
+        "src/server/http/**",
+        "src/server/workspace.ts",
+        "src/server/db/seed.ts",
+        "src/server/db/migrations/**",
+        "src/fixtures/**",
+        "src/app/tasks/**",
+        "src/app/projects/**",
+        "src/app/api/tasks/**",
+        "src/app/api/projects/**",
+        "src/app/api/templates/**",
+        "src/app/api/files/**",
+        "src/features/tasks/**",
+        "src/features/projects/**",
+        "src/components/**",
+        "tests/**",
+        "scripts/verify-tasks*",
+        "scripts/verify-files*",
+        "package.json",
+        "package-lock.json",
+        "README.md"
+      ],
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g04-impl",
+      "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1",
       "acceptance": [
         {
           "id": "AC-04-01",
@@ -376,7 +456,9 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+      "next_action": "Implement complete G04 and actual reference-file foundation; return candidate and evidence for independent verification",
+      "base_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/1/task.json"
     },
     {
       "id": "G05",
@@ -1119,10 +1201,10 @@
   "secret_policy": "env runtime only; no values in packets/logs/Git",
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
-  "accepted_commit": "9e291b2b05607157f425656b12ccb24930672e0f",
-  "current_goal": "G02",
-  "next_action": "Serial integrate exact independently verified a3db candidate then assign integrated regression",
-  "state_version": 25,
+  "accepted_commit": "cec612fbeb3795e233d07121a54db9ac96adbf4b",
+  "current_goal": "G04",
+  "next_action": "Implement complete G04 and actual reference-file foundation; return candidate and evidence for independent verification",
+  "state_version": 27,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1145,11 +1227,11 @@
   ],
   "integration_branch": "run/integration",
   "integration_worktree": "/Users/evan/workspace/gs-hale",
-  "implementation_branch": "run/g02-impl",
+  "implementation_branch": "run/g04-impl",
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T10:42:01.027355+00:00",
+  "updated_at": "2026-09-21T10:50:09.785645+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

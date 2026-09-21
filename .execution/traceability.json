@@ -14,11 +14,12 @@
         "G02"
       ],
       "summary": "3요소 컨텍스트·조합 고유·격리·독립 행사 예외",
-      "status": "PARTIAL_G01_ACCEPTED",
+      "status": "PARTIAL_G01_G02_ACCEPTED",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
       ],
-      "remaining": "G02 permission matrix and downstream actual task/submission/file integration still required."
+      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
     },
     {
       "id": "A02",
@@ -29,11 +30,12 @@
         "G02"
       ],
       "summary": "신원/멤버십·초대·중지·재배정",
-      "status": "PARTIAL_G01_ACCEPTED",
+      "status": "PARTIAL_G01_G02_ACCEPTED",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
       ],
-      "remaining": "G02 permission matrix and downstream actual task/submission/file integration still required."
+      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
     },
     {
       "id": "A03",
@@ -238,8 +240,11 @@
         "G14"
       ],
       "summary": "서버 전 경로 권한·가격/파일/AI 격리",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PARTIAL_G01_G02_ACCEPTED",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+      ],
+      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
     },
     {
       "id": "A20",
@@ -252,11 +257,13 @@
         "G14"
       ],
       "summary": "동시 변경·멱등성·DB 영속성",
-      "status": "PARTIAL_G00_G01_ACCEPTED",
+      "status": "PARTIAL_G01_G02_ACCEPTED",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json"
-      ]
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+      ],
+      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
     },
     {
       "id": "A21",

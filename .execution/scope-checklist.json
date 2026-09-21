@@ -38,8 +38,11 @@
       "owner_note": "G02",
       "requirement": "같은 컨텍스트 팀원은 공개 조회, 주/공동담당만 답변 수정. GSG 대리 기록은 제공자/기록자 분리. 원안3절, FR-020·024, BR-014·023",
       "verification_idea": "비담당 공개 조회 성공/타인 제출403, 공동담당 제출 성공. GSG 기록자가 브랜드 제공자와 다른 값으로 남음. 운영자 범위와 내부 가격권한을 각각 검사",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G02_CONTRACT",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+      ],
+      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
     },
     {
       "id": "SA-04",
@@ -50,8 +53,11 @@
       "owner_note": "G02+후행/G18",
       "requirement": "조회/쓰기 외 파일 원본·preview·download, count/order/page, export, 알림, 감사, AI 입력/결과 격리. 원안3·13절",
       "verification_idea": "각 실제 endpoint를 소유 모듈 권한행렬에 추가. 다른 context/정지사용자 직주소 요청에서 제목·개수·가격·본문 누출0. G02 초기 harness만으로 후행 HTTP까지 완료라고 쓰지 않음",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS_CURRENT_G02_CONTRACT",
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json"
+      ],
+      "remaining": "Actual downstream producer/delivery integration remains required; see D01-D05, D10 and G02 regression deferred_checks. Policy harness is not real future endpoints."
     },
     {
       "id": "SA-05",
