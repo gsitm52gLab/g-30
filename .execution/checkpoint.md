@@ -1,3 +1,45 @@
+# Current checkpoint — state153
+
+2026-09-21T22:57:14.300184+00:00; accepted0804a4a1a750ab4dee149036659e212480230242 still13/19. G16 ai_verify exact839c independent fresh514/check/build/HTTP22+6skip/28/history10 reportedlypass, ownbrowsercountercases ongoing, no finalpacket/acceptance yet. G13 serverebc final rootreview12865:729artifacts/459Gitproductpairs/17cmd/231HTTP/25historicalresponse; normalold176rows DB24P, extraintentionalG12corruption15P+executionfailure1+9NOTRUN separate. prd fullUI and workflow readonly independentprep de45; .worktrees/g13-verification atserverebc, ports4245/46reservedbutruntimependingfinalUI. New G14drafte11e and G03nav/homeaddendum63e6; no dependency bypass. Allcommonserverleasefree. G17 actualconfiguredprovider still mandatoryNOT_RUN.
+
+# Current checkpoint — state152
+
+2026-09-21T22:50:34.197458+00:00; accepted product0804a4a1a750ab4dee149036659e212480230242; 13/19. G16 combined839c exact independent ai_verify worktree g16-verification ports4241/42. Root UI review e1bc verified471artifacts/655sources/767reusepairs/12commands/42browserrows/44traceCRC; original2fail and71invalidcapture excluded. G13 typedbdb commonlease RELEASED, root13cb reviewed606unit/build; prd fullUI task8a5a with normalContextBarpulse, goals own HTTP/history. G17 configuredactualOpenAI NOT_RUN mandatory. Untracked execution-v2 preserved.
+
+# State151 latest — G16 server author evidence reviewed; G13 UI split
+
+Accepted0804 remains13/19, GoalACTIVE. G16 server final20e4fd3 rootmain-final-review8b696050 verified457private+4ownedhistory artifacts/615Git source/65changed/25commands/7reusebindings/368HTTPbodies/392acceptedoldsrc/104oldrows12SQL. Fresh runtime mock22P6SQLiteonlyskip/DB28P/history10P; original14P1F13NOTRUN preserved; earlier512unit+bridge4P20filtered sourcebound notfinal514fresh. WholeG16 UI/independent/realOpenAI notdone. Workflow fullUI earlyd041 exactcheck/browser now; afterward additive20e4 harness/doc merge requested, runtime ddb identical. Narrow union assertion+READMEG10 lease0e180 granted. Independent G16draft9b7a ready notassigned, ai_verifyidle.
+
+G13 goals e5ad firstserver focused82P; root staticreview found accepted manualbrand shipping responsibleID filteredout by GSG-only recipient. Author reproducing/fixing within commonexclusivelease, root concern saved (no rootruntimeclaim). Earlierfull590P4F migrationnames preserved, correctionpending. Prd new G13pureUI packet630590 active in .worktrees/g13-ui branche5adbase, newcontrolled components only no routes/controller/shared/nav/task/README. G16 ownserverlease released; G13common stillgoals. Root+goals+prd+workflow=4 active.
+
+# State150 latest — G16 typed server frozen; G13 exclusive common lease
+
+Existing Goal ACTIVE, accepted product0804a4a1a750ab4dee149036659e212480230242 remains13/19. Root reviewed G16 server774 (512unit/build, actual HTTP still separate), G15 capability bridge ddb (7artifacts/3commands/613-source exactbindings/4P20filtered). Root bridge review c70a547. G16 pureUI fe333 reviewed e82788; workflow now owns fullUI packet30bd, merge774+ddb, no common files. Prd ownHTTP/history proof continues; reported mock22P6SQLite-onlyskip/DB28P pending root review, old H15 fixtureexpectation failure preserved. G16 independent ai_verify not yet assigned combined candidate.
+
+G13 source repair ed56 root960c review34artifacts11snapshots406productidentity32priorartifacts; actual campaign brand-recipient suppression reproduced4red and repaired4new+6regression10P14filtered. Not delivery/dedupe proof. Goals now EXCLUSIVE common records/constraints/policy/0014 and narrow producer binding under full-server lease1e855, additive774 schema alignment. G16 common and two G15 bridge paths RELEASED. 0013frozen-notaccepted;0014assigned. Root+prd+workflow+goals active, ai_verify idle. G17 actualAPI mandatoryNOT_RUN; no costcap. G18 final207row worksheet remains preparation only.
+
+# State149 latest — audit worksheet and server boundary addendum
+
+Accepted0804 still13/19. Root finalaudit worksheet script outputs207 distincttrackingrows (91AC/26A/13AI/64SA/10D/2subgroups/1mandatoryOpenAI), currentrefs hashchecked errors0; all finalstatusNOT_EVALUATED, no tests/acceptance inferred. Regeneratefinalstate. G17provider-call-fact addendum d40b separates engine choice/network attempt/schema success; fresh GSG afterIO mandatory. G16fullUI draft abefd ready, workflow8purecomponents checking; prd server meaningful tests pending; goalsownreadadapters ongoing. GoalACTIVE.
+
+# State148 latest — owned parallel implementation, shared schema serialized
+
+Accepted0804 remains13/19. PrdG16fullserver exclusivecommon0013. WorkflowG16UI purepresentation only newg16-ui e1213d1 packet77d9, noAPI guess. GoalsG13puref54744focused/lint/typecheck root081d review22artifacts8source/2cmd; now ownactualproducerreadadapters packet eac3, still sharedlease0. Root targeted stalecopy census6items assigns G13normaldelivery/taskcopy,G16AI/G11/G10 UI labels,G18READMEchronology; allmustclose final,no productacceptanceinferred. G17 actualOpenAI NOT_RUN.
+
+# State147 latest — G16 full server and G13 pure checks
+
+Accepted0804 remains13/19. G16 pure e108 root673e review450unit/build; full server prd exclusive0013/G10/G11 continues. Narrow seed corpus report and forged missing-run NOT_FOUND test expectation addendum authorized. G13 prep28refs matched; requested/expected guidance retains certainty, app-open normal sync approved with no closed-app/email delivery claim. G13 pure f547732 checks underway, common lease NOT_GRANTED. G16 typed freeze needed for UI and G13 shared lease. G17 actual OpenAI NOT_RUN mandatory.
+
+# State146 latest — G11 ACCEPTED; G16 full server and G13 pure module authorized
+
+Accepted0804a4a 13/19. G11regression52f5 rootf286review546artifacts593Git/cwd9exit0/31CRC3clickedRSC/461unit28browser12HTTP14UI. Historical233rows unchanged migration1/repeat0total12,5originalfilesunchanged. G16prd ownpuree1087ce check450 thenbuild; full-server-lease nowexclusive afteradditivemergeaccepted0804,0013/G10exactfinding/G11actualAIresidual. G13goals formalserver-task ownpuretypes/date/eligibility only on0804,0014reserved NO commonlease untilG16typedfreeze. G16independentai_verifyprepared94fa root915a review19refs all13evalcasesNOT_RUN. G17actualAPI stillmandatoryNOT_RUN.
+
+# State145 latest — G11 serial union under targeted regression
+
+Acceptedcd7 12/19 remains. G11ce049 independentffb24 root77ae3review1722artifacts528Git/cwd31cmd21exit0/10exit1,48CRC153literalHTTP/427unit40rawbrowser,17ownbusiness9UI5history4IO. Allhelpererrors retained; ownnonprice/mobileclickedbody notcaptured vsstandard40actualchannels separate. Rootclarifies originalinitialrace two runs1P1F notverifier2FAIL phrase. Rootmerge0804a4a 9conflicts resolvedbothrecords/constraints/taskentry/readme;7migrationtestcounts12, allSQL1..12original. Bindingba8f593nonledger458both69G1554G11same12uniondelta. Formalregression7866 workflow newg11-regression4231/32 bounded28+freshcheck/build+ownseams.
+
+PrdG16server-taskd2a8 ownpurephase oncd7; no commonlease beforeG11acceptedbase. Ai_verifyG16readonlyverifierprep, root+3active. G17realAPI mandatoryNOT_RUN. GoalACTIVE.
+
 # State144 latest — G15 ACCEPTED, G16 owned pure implementation authorized
 
 Acceptedcd7c434 12/19. Rootregressionb16d8a review445artifacts581Git/cwd9cmd32CRC425unit28rawbrowser44own+1mockskip. OriginalhelperSSR404fail2 preserved, narrowtailvalidNextstreamed200+404digest/canaryabsence. G17actualAPI NOT_RUN. G16prd formalserver-task ownedpurecorpus/types/validators only, commonleaseNOT_GRANTED pendingrootG11union. G11ce049 independentffb24 PASS received1722artifacts rootreviewnext, 9expectedconflicts thenworkflowregression. GoalACTIVE.

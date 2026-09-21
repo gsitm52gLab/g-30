@@ -304,7 +304,7 @@ UI 자체 검사(원본 결과·실패 및 합본 독립 검증은 별도): `npm
 
 The corrections server uses current task permissions and actual immutable G05 submissions. GET `/api/corrections?taskId=...` returns public batches and exact source choices; only GSG receives the separate staff opinion/draft/review section. POST `/api/corrections` supports `save_opinion`, `save_draft`, `publish`, `reflect`, `resolve`, and `record_review`. Client types are exported from `src/server/corrections/contracts.ts`.
 
-Internal opinions append versions. Published batches and their source draft are immutable; late opinions require an explicit follow-up batch. Brand assignees record reflection against a later actual submission, then GSG records individual resolution. Uploading or submitting does not resolve corrections. Previous reviews are references only; AI candidates return `AI_NOT_CONNECTED` until the actual later producer exists.
+Internal opinions append versions. Published batches and their source draft are immutable; late opinions require an explicit follow-up batch. Brand assignees record reflection against a later actual submission, then GSG records individual resolution. Uploading or submitting does not resolve corrections. Previous reviews are references only. G16 human-reviewed AI candidates can be deliberately connected to a server-verified exact submitted target; this creates an internal opinion, without automatic brand publication or a live provider claim.
 
 Public preview: GET `/api/corrections/drafts/:id/preview` (GSG only). Exact batch: GET `/api/corrections/:id`. Target-file links use `/api/corrections/files/:id` and recheck the current batch/item plus original file authority before and after file IO. Internal opinion files use existing internal task uploads; no draft or upload releases them to brands.
 
@@ -339,17 +339,17 @@ CAMPAIGNS_MODE=sqlite E2E_PORT=4219 E2E_AUX_PORT=4220 npx tsx scripts/verify-cam
 
 일반 화장품의 일본어 POP·리플렛만 지원합니다. 텍스트 10,000자, PDF 10 MiB/선택 최대 10페이지, 이미지 최대 4개/합계 10 MiB입니다. 분류 미확인·약용·패키지·SDS·Illustrator 파일은 지원 대상으로 추정하지 않습니다. 저장한 입력을 읽으면 선택·읽음·일부 읽음·읽지 못함·제외 구간과 원본을 함께 확인할 수 있습니다. 이미지 인식은 사람의 원문 대조가 필요합니다.
 
-**원문 읽기와 결과 저장만 연결되어 있습니다.** 근거 분석·외부 모델 호출은 G16/G17 후행이며 읽기 성공은 법적 적합성이나 사람 검토 완료가 아닙니다. 전송 대상 확인은 현재 권한과 서버에 등록된 정확한 합성 자료 해시만 확인하고 실제 호출은 하지 않습니다. 실제 기밀 입력을 공개 체크박스로 전송 허용하는 기능은 없습니다.
+**원문 읽기와 근거 분석은 별도 실행입니다.** GSG는 이 입력 버전의 분석 화면에서 G16 합성 데모와 사람 검토로 이어갈 수 있습니다. 실제 외부 모델 호출은 G17 대상이며 읽기 성공은 법적 적합성이나 사람 검토 완료가 아닙니다. 전송 대상 확인은 현재 권한과 서버에 등록된 정확한 합성 자료 해시만 확인하고 실제 호출은 하지 않습니다. 실제 기밀 입력을 공개 체크박스로 전송 허용하는 기능은 없습니다.
 
 입력은 계정·컨텍스트별 sessionStorage에 최대 24시간 복구용으로 보관하며 파일 바이트는 보관하지 않습니다. 실패 파일은 다시 선택해 같은 의도로 재시도합니다. 저장 성공 후 조회 실패는 **저장 결과 다시 읽기**, 대기는 **대기 작업 이어 읽기**로 이어갑니다. 401/403/404에서는 보호 자료와 로컬 복구값을 지웁니다. 새 버전 저장 충돌은 작성값을 유지한 채 현재 버전을 명시적으로 비교합니다.
 
 자체 UI 검사 명령: `npm run check`, `npm run build`, `E2E_PORT=4233 E2E_AUX_PORT=4234 npm run test:e2e -- ai-input`, 같은 포트의 `npm run test:e2e:db -- ai-input`. 기본 runner는 모드·프로젝트·스펙별로 서버/DB를 격리합니다. 이 설명은 전체 G15 수용 판정이 아닙니다.
 
-합본 마이그레이션: 현재 SQL은 `0001`–`0012`, 총 12개입니다. 기존 G12 구성에는 `0011-completion.sql`과 `0012-ai-input.sql`을 추가하며, G11 또는 G15 격리 구성에는 없는 번호만 추가합니다. 원 SQL 바이트·적용 이력·파일은 보존하며 검사 시 원본 DB와 sidecar·파일부터 별도 위치로 복사합니다. 위 모듈별 과거 격리 구성 설명의 개수는 해당 시점의 구성입니다.
+G11/G15 합본 시점의 SQL은 `0001`–`0012`, 총 12개였습니다. G16은 원 바이트를 유지하며 `0013-ai-review.sql`을 추가합니다. 기존 G12 구성에는 `0011-completion.sql`과 `0012-ai-input.sql`을 추가하며, G11 또는 G15 격리 구성에는 없는 번호만 추가합니다. 원 SQL 바이트·적용 이력·파일은 보존하며 검사 시 원본 DB와 sidecar·파일부터 별도 위치로 복사합니다. 위 모듈별 과거 격리 구성 설명의 개수는 해당 시점의 구성입니다.
 
 ## 외부 진행·수동 완료 화면 (G11)
 
-업무 상세의 **외부 진행·업무 완료**에서 현재 요청과 제출 당시 기준, 문의·수정·행사 잔여 상태를 확인합니다. GSG는 빈 메모로도 완료할 수 있으며, 완료 당시 기록은 재개 뒤에도 보존됩니다. 외부 전달 기록은 기존 요청·제출·상품 사용본·파일의 정확한 버전을 선택하며 실제 발송·승인·납품을 실행하지 않습니다. 새 후속 업무를 만든 뒤 연결에 실패하면 이미 생성한 업무를 보존하고 연결만 재시도합니다. 브랜드는 현재 권한으로 공개 기록을 확인합니다. AI 결과는 아직 연결 전입니다.
+업무 상세의 **외부 진행·업무 완료**에서 현재 요청과 제출 당시 기준, 문의·수정·행사 잔여 상태를 확인합니다. GSG는 빈 메모로도 완료할 수 있으며, 완료 당시 기록은 재개 뒤에도 보존됩니다. 외부 전달 기록은 기존 요청·제출·상품 사용본·파일의 정확한 버전을 선택하며 실제 발송·승인·납품을 실행하지 않습니다. 새 후속 업무를 만든 뒤 연결에 실패하면 이미 생성한 업무를 보존하고 연결만 재시도합니다. 브랜드는 현재 권한으로 공개 기록을 확인합니다. 현재 GSG AI 잔여 상태는 정확한 분석 실행·실패·미검토 후보에서 계산하며 수동 완료를 차단하지 않습니다. 과거 미연결 기록은 그대로 보존하고 브랜드에는 일정한 비공개·접근 불가 표현을 사용합니다.
 
 UI 검사: `npm run test:e2e -- completion` / `npm run test:e2e:db -- completion` (각 spec·프로젝트별 독립 저장소와 쿠키).
 
@@ -360,3 +360,13 @@ UI 검사: `npm run test:e2e -- completion` / `npm run test:e2e:db -- completion
 컨텍스트 바가 있는 일반 업무 화면을 열거나 다시 포커스하면 현재 본인의 앱 알림을 POST 동기화합니다. 보이는 동안 30초 간격으로 확인하며 서버의 100건 chunk와 `hasMore`를 따릅니다. 알림 읽음·안 읽음은 공지 확인, 수락, 문의 읽음, 제출, 업무 완료를 바꾸지 않습니다. 이메일·앱을 닫은 동안의 cron은 미연동입니다. 권한 변경 시 화면의 보호된 내용과 복구 요청을 비우며, 일시적인 실패에서는 같은 명령 키/본문과 작성값을 유지합니다.
 
 UI 자체 검사: `E2E_PORT=4229 E2E_AUX_PORT=4230 npm run test:e2e -- 'scheduling-.*|notifications-.*'` 및 같은 환경의 `npm run test:e2e:db -- 'scheduling-.*|notifications-.*'`. 각 spec·viewport는 새 서버/DB/파일 경로를 사용합니다. 이 문구는 실행 성공 또는 독립 수용을 주장하지 않으며 정확한 결과는 private evidence의 candidate-bound 보고서에 기록합니다.
+
+## AI 근거·사람 검토 (G16)
+
+GSG는 **AI 입력·읽기 → 근거 분석·사람 검토**에서 정확한 입력 버전의 읽기 결과를 선택하고 **합성 데모 분석 실행**을 명시적으로 수행합니다. `/ai-review`는 목록, `/ai-review/inputs/[id]?context=…&versionId=…`는 버전별 실행, `/ai-review/runs/[id]?context=…`는 정확한 결과, `/ai-review/corpus?context=…&releaseId=…`는 배포 소유의 읽기 전용 근거 자료입니다. 현재 엔진은 합성 데모이며 실제 외부 모델 호출·법률 정확도 평가가 아닙니다. 실제 provider는 G17 검증 대상입니다.
+
+원문 위치와 실제 읽은 범위, 위험 수준과 확신도, 공식 법적 근거와 업계 보조 지침을 구분합니다. 일본어 발췌와 사전 정렬된 비공식 한국어 번역에는 버전·검수 상태가 표시됩니다. 미확인 인용·분리된 후보·과거 corpus를 숨기지 않으며 후보 0개를 적법 확인으로 표시하지 않습니다. 사람의 수락·수정·기각은 사유와 불변 이력을 남기고 원문 또는 공개 상태를 자동 변경하지 않습니다.
+
+실제 제출의 정확한 문안·파일에 해당하는 수락/수정 후보만 사용자가 명시적으로 G10 내부 의견으로 저장할 수 있습니다. 서버가 제공하지 않은 답변 대상을 추정하지 않습니다. 브랜드 공개는 G10의 별도 초안·미리보기·공개 행동입니다. AI 분석·corpus·raw·검토 기록은 GSG 내부이며 현재 권한이 없으면 보호 내용과 브라우저 복구 입력을 비웁니다. 일시 저장 실패는 같은 요청 ID를 유지하고 409 충돌은 최신 기록 확인과 명시 재적용으로 처리합니다.
+
+화면 검사: `E2E_PORT=4237 E2E_AUX_PORT=4238 npm run test:e2e -- ai-review`, `E2E_PORT=4237 E2E_AUX_PORT=4238 npm run test:e2e:db -- ai-review`. 모드·PC/390px·스펙별 실제 결과를 별도 보존합니다. 자체 검사와 독립 검증·통합 회귀·전체 G16 수용은 구분합니다.

@@ -139,3 +139,7 @@ Exact1512 independentlyverified, serial953 fullsourceidentical andfresh integrat
 ## G16 implementation choices (state142, preparation only)
 
 PRD16 forbids automatic brand disclosure. Analysis/result/human decisions default to GSG internal, deliberate G10 publication stays separate. A labeled synthetic adapter enables keyless demos; it never impersonates OpenAI or silently replaces live failures. Curated legal sources are deployment-owned versioned releases with reproducible publication and a read-only viewer. Old translations remain historical but stale translations are excluded from current retrieval. New migration0013 is reserved; no implementation lease until G15 is ACCEPTED. These routine choices require no extra user decision.
+
+
+## 2026-09-21T22:12:49.700703+00:00 — G13 delivery and current certainty
+Requested/expected date guidance preserves its certainty; only confirmed dates use confirmed deadline wording. App-open authenticated CSRF sync is the ordinary in-app delivery path, with explicit absence of closed-app cron/email delivery. Source-bound dates are edited through their producer, never silently overridden. G16 synthetic engine does not count as G17 actual OpenAI success. Narrow existing test expectation deltas preserve original denial and reseed semantics.

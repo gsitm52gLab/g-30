@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "rule": "Root allocates new migration filename; immutable accepted SQL bytes stay unchanged. File count is actual checkout migrations, never inferred from highest reserved number. Reservation does not grant schema lease or mark implementation complete.",
-  "at": "2026-09-21T21:35:15.851055+00:00",
+  "at": "2026-09-21T22:50:34.197458+00:00",
   "reservations": [
     {
       "id": "0001",
@@ -67,19 +67,25 @@
       "id": "0011",
       "file": "0011-completion.sql",
       "goal": "G11",
-      "state": "AUTHOR_CONTRACT_FROZEN_SHARED_LEASE_RELEASED"
+      "state": "ACCEPTED_G11"
     },
     {
       "id": "0012",
       "file": "0012-ai-input.sql",
       "goal": "G15",
-      "state": "AUTHOR_FROZEN_SHARED_LEASE_RELEASED"
+      "state": "ACCEPTED_G15"
     },
     {
       "id": "0013",
       "file": "0013-ai-review.sql",
       "goal": "G16",
-      "state": "RESERVED_DRAFT_ONLY_NO_LEASE_DEPENDENCY_PENDING"
+      "state": "FROZEN_774_G16_NOT_ACCEPTED"
+    },
+    {
+      "id": "0014",
+      "file": "0014-scheduling-notifications.sql",
+      "goal": "G13",
+      "state": "FROZEN_BDB_G13_NOT_ACCEPTED"
     }
   ]
 }

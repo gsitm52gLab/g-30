@@ -373,10 +373,6 @@
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/task-draft.json",
         "sha256": "d18132b3295ed9f52592aa21b58ac0c5d5d2f433932afb45789755036a1356ab"
-      },
-      "home_navigation_addendum": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/navigation-home-review-addendum.json",
-        "sha256": "63e650e8fa6ac08cd199778746dee4ed3c66e74f0d49ab494c6173d8017f8241"
       }
     },
     {
@@ -2693,7 +2689,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd actual fullUI tests/freeze; workflow nonauthor readonly preparation on exact serverebc, fullruntime waits combinedcandidate. Root serverfinal12865 reviewed729 artifacts/231HTTP/25history bodies, no acceptance.",
+      "next_action": "goals own existingproducer read adapters while G16 exclusivecommon; puref54744PASS authorstage only",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/task-draft.json",
         "sha256": "96ae325b75e6aecb15b0face92814167bad7aa1658aa8165c35df4708f9750f4"
@@ -2703,7 +2699,7 @@
         "sha256": "fd995b73c986f4cf3a34cc8d5b6e91d4622b968d1944745546cb911456019db3"
       },
       "base_commit": "0804a4a1a750ab4dee149036659e212480230242",
-      "shared_lease": "RELEASED_AFTER_BDB_TYPED_FREEZE",
+      "shared_lease": "NOT_GRANTED_G16_HAS_EXCLUSIVE_LEASE",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/server-task.json",
       "server_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/server-task.json",
@@ -2720,62 +2716,7 @@
       "own_read_adapter_lease": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/own-source-adapter-lease.json",
         "sha256": "eac3d4755254186e8d6358e79c54e232a45c5fcf08d518d5a80a0a69b10f2b37"
-      },
-      "full_server_lease": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/full-server-lease.json",
-        "sha256": "1e8555ce91783e3881e18e5481f642154526c6480b670d7949e2d00eef5887bf"
-      },
-      "source_adapter_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/sources/main-source-review.json",
-        "sha256": "4311ab1641208e9756a5ecbc1f605ab27f4e7101c52926a63580eda930f83d66"
-      },
-      "source_adapter_repair_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/sources-repair1/main-repair-review.json",
-        "sha256": "960c782d4420103352d47e70335a6208079e9365ff0a8100c585df2ea1dcadf2"
-      },
-      "source_adapter_candidate": "ed56c9526c6c3dc5b0c820aeb7dad497ac9aa813",
-      "ui_pure_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/ui-pure-task.json",
-        "sha256": "63059008ab6aac99ac11773b3297ee00ab6feb0bdee2961dd752aa8d8992d58e"
-      },
-      "ui_implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
-      "ui_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g13-ui",
-      "manual_recipient_review_followup": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/root-manual-recipient-review-followup.json",
-        "sha256": "4debf00da5c679defdd4fd921958deb7065b3af6052a9ae62f635d0e182b0b4e"
-      },
-      "typed_server_candidate": "bdb0b0474168c9feacd28f21bc8e07d4df0851c9",
-      "typed_server_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/server/main-contract-review.json",
-        "sha256": "13cb8d375ecdcc014a3817465aaa776446f4ee0da1ba4a3917024f392dfca4f6"
-      },
-      "ui_pure_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/ui/pure/main-pure-review.json",
-        "sha256": "da83f4166fe84fd882f6d14dd5d257e086646a5063586de23fe117c883b2522d"
-      },
-      "ui_full_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/ui-full-task.json",
-        "sha256": "8a5a09981dd8ea9656ff9f5d76fbb10b8f615a649b72263bd637b2a5ffe81596"
-      },
-      "server_candidate_commit": "ebc991247f5728dec6b357cb05a91be51aad610b",
-      "server_final_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/server/main-final-review.json",
-        "sha256": "12865c623469078cd42bdcb45704fbe52f425597c79e62a5b101d14203943431"
-      },
-      "server_result": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/server/implementation-result.json",
-        "sha256": "a86e104f8b5600ff8ba49584cfe6953c5c0a72aad77d8b3f83acbfec9663ac94"
-      },
-      "verification_draft": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/verification-task-draft.json",
-        "sha256": "562e7b7e23f1db2324f0fc5315adc9529af1b8d44c2a2b45225a5eea13b26655"
-      },
-      "verifier_preparation_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/verifier-preparation-task.json",
-        "sha256": "de45b9f3dacd535f760e4425b5f063d9e199667924a9a9fd2990bbb3ddc3aa5b"
-      },
-      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g13-verification",
-      "server_lease_status": "ALL_SERVER_AND_OWN_SCRIPTS_FROZEN_RELEASED"
+      }
     },
     {
       "id": "G14",
@@ -2838,10 +2779,6 @@
       "preparation_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/main-preparation-review.json",
         "sha256": "a5d810e8f973fdde31fa745c9be5b55877d385118d40e6b8f95f5f545f199c3c"
-      },
-      "task_draft": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/task-draft.json",
-        "sha256": "e11e55058f830263dbb8513c952f35e3494ed0d8516b5a71c51da01981869553"
       }
     },
     {
@@ -3175,12 +3112,12 @@
       "dependencies": [
         "G15"
       ],
-      "state": "VERIFYING",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
-      "candidate_commit": "839c972eea15a6634910d08579b3cddc4ee03cc4",
+      "candidate_commit": null,
       "integration_commit": null,
       "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
-      "verifier_session_id": "01a0c5c7-c60d-7eb0-b570-b5b65a92cbde",
+      "verifier_session_id": null,
       "attempt": 0,
       "owned_paths": [],
       "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g16-server",
@@ -3223,7 +3160,7 @@
           "evidence": []
         }
       ],
-      "next_action": "ai_verify nonauthor exact839c fresh independent verification. Root reviews results then serial integration regression. G17 actual provider still mandatory NOT_RUN.",
+      "next_action": "prd fullserver exclusivecommon +workflow purepresentation onfrozenpuretypes; fullUI/G13common after typedfreeze",
       "source_discovery": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/source-discovery/discovery-result.json",
         "sha256": "4c7d03ae48d90a142f0c0b707a304203a4d381097c9a694ddf4f9c4958de8410",
@@ -3258,7 +3195,7 @@
         "sha256": "f7e605436b162ebf86c260fa1b27716f06a08f34b4d649679ea894bba61cd89d"
       },
       "base_commit": "0804a4a1a750ab4dee149036659e212480230242",
-      "shared_lease": "RELEASED_AFTER_774_TYPED_FREEZE",
+      "shared_lease": "EXCLUSIVE_SERVER_REGISTRATION_AND_G10_G11_CONNECTORS",
       "adoption_preparation": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/adoption-preparation.json",
         "sha256": "fd5355d0f3adb1285566909cea12cd9bfb29e2cc278fc7f7eaa27c28780e7464"
@@ -3297,65 +3234,7 @@
         "sha256": "77d9f107f2d67f45a86e98b634f9508186e8be493a4c8f18cb6b99c8293c7921"
       },
       "ui_implementer_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
-      "ui_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-ui",
-      "full_ui_draft": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui-full-task-draft.json",
-        "sha256": "abefd0b657aa0866e4af2f68f89b9715812158b34eaa9d5984ecebad86628393"
-      },
-      "typed_server_candidate": "774ecfbf155533d6a216b37ddc1c93aca7db1cd0",
-      "typed_server_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/server/main-contract-review.json",
-        "sha256": "95682be9168c18e60c1105bcc109dba94e852dff3b1a3d718cbd9a7f727b322b"
-      },
-      "bridge_candidate": "ddb63b59e6a6dd7e6b5836cfbb729a8fa6dd526e",
-      "bridge_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/server/main-bridge-review.json",
-        "sha256": "c70a547ee07c04f18821adefd99d6e1743d4b63e8cb75f1c2214dd08f5f91fa1"
-      },
-      "bridge_lease": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/g15-capability-bridge-lease.json",
-        "sha256": "58fe775a08c07f0ff306aa89c0890071df7e53facda0720d8ba73a4f60f7b814"
-      },
-      "bridge_lease_status": "RELEASED",
-      "ui_pure_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui/main-pure-review.json",
-        "sha256": "e82788cb4f53a4b9b9ae934f541b5c01ee5aed77bc01a7ce97f10d0f09312d48"
-      },
-      "ui_full_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui-full-task.json",
-        "sha256": "30bd86ca6b8517870d0a3cf1e5969d346e4f1b4cd4b6ed1e6ce6678ba312fbcf"
-      },
-      "server_candidate_commit": "20e4fd3b8b056d2c6849e345fc54e0a4070a7b60",
-      "server_final_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/server/main-final-review.json",
-        "sha256": "8b6960506a05069f20e5679e716e890376315dd31ebad187e82a8918fbc9200a"
-      },
-      "server_lease_status": "FROZEN_RELEASED",
-      "ui_bridge_addendum": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui-bridge-impact-addendum.json",
-        "sha256": "0e18072f53dd9e3d776337dd498e8e88c906fefd81a8060791aac5a0141180fd"
-      },
-      "verification_draft": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/verification-task-draft.json",
-        "sha256": "9b7a27a3571e26f064db60cc343f2ef9ea9d0f6b8401e39ac90857fe78940324"
-      },
-      "ui_full_review": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui/full/main-full-review.json",
-        "sha256": "e1bc03094055edc6df1624329f96ce0518e541295dda30ed03e690ccde1478cf"
-      },
-      "ui_result": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui/full/implementation-result.json",
-        "sha256": "3bb96709fc7e475e8beb523c9bee5309a598de96531fed25688bc1347f1107b0"
-      },
-      "verification_task": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/verification-task.json",
-        "sha256": "0530d5187035ed86047c4dc60a77ff88a0deee375397f6a31f2d9e91aae2626f"
-      },
-      "verification_oracle": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/verifier-oracle-clarification.json",
-        "sha256": "3496b320fa7cf6f42fb2074be1cdf8224eb88868a67e45822132ffb4e3d0dd53"
-      },
-      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-verification"
+      "ui_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g16-ui"
     },
     {
       "id": "G17",
@@ -3410,10 +3289,6 @@
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/task-draft.json",
         "sha256": "acf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3"
-      },
-      "provider_call_fact_addendum": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/provider-call-fact-addendum.json",
-        "sha256": "d40bdf9f84599046c183ed031d108e0f13180b978e08d281484e92a0d06bc6b6"
       }
     },
     {
@@ -3486,10 +3361,6 @@
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G18/task-draft.json",
         "sha256": "549761cb50668ada90e3ff2c3bb0bd763f666d712f7fcd4208523ede9819f77e"
-      },
-      "closure_worksheet_preparation": {
-        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G18/closure-worksheet-state148.json",
-        "sha256": "d4c82588cb985cdb5e3a4e4ad67164b83ca07764f2ff5167755c5662c792f706"
       }
     }
   ],
@@ -3508,8 +3379,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "0804a4a1a750ab4dee149036659e212480230242",
   "current_goal": "G16",
-  "next_action": "G16 ai_verify exact839c independent runtime; G13 prd fullUI and workflow nonauthor preparation. Root finalserver review12865 done; G14/G03 drafts ready, gateddependencies. Accepted13/19 unchanged.",
-  "state_version": 153,
+  "next_action": "G16 exclusive full-server in progress; G13 own pure checks. Review typed G16 freeze then assign G16 UI and release shared server lease for G13. G17 real API remains mandatory NOT_RUN.",
+  "state_version": 148,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3540,7 +3411,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T22:57:14.300184+00:00",
+  "updated_at": "2026-09-21T22:16:33.840620+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
