@@ -1,3 +1,7 @@
+# Current checkpoint — state153
+
+2026-09-21T22:57:14.300184+00:00; accepted0804a4a1a750ab4dee149036659e212480230242 still13/19. G16 ai_verify exact839c independent fresh514/check/build/HTTP22+6skip/28/history10 reportedlypass, ownbrowsercountercases ongoing, no finalpacket/acceptance yet. G13 serverebc final rootreview12865:729artifacts/459Gitproductpairs/17cmd/231HTTP/25historicalresponse; normalold176rows DB24P, extraintentionalG12corruption15P+executionfailure1+9NOTRUN separate. prd fullUI and workflow readonly independentprep de45; .worktrees/g13-verification atserverebc, ports4245/46reservedbutruntimependingfinalUI. New G14drafte11e and G03nav/homeaddendum63e6; no dependency bypass. Allcommonserverleasefree. G17 actualconfiguredprovider still mandatoryNOT_RUN.
+
 # Current checkpoint — state152
 
 2026-09-21T22:50:34.197458+00:00; accepted product0804a4a1a750ab4dee149036659e212480230242; 13/19. G16 combined839c exact independent ai_verify worktree g16-verification ports4241/42. Root UI review e1bc verified471artifacts/655sources/767reusepairs/12commands/42browserrows/44traceCRC; original2fail and71invalidcapture excluded. G13 typedbdb commonlease RELEASED, root13cb reviewed606unit/build; prd fullUI task8a5a with normalContextBarpulse, goals own HTTP/history. G17 configuredactualOpenAI NOT_RUN mandatory. Untracked execution-v2 preserved.
