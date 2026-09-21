@@ -32,11 +32,15 @@
       "status": "PASS_CURRENT_G05_PATHS",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
-      "remaining": "Future G08/G09/G10/G15 file/reference owners require currentauth verification; finalG18 whole file matrix.",
-      "current_g05_stage": "PASS current actual task/product/submission upload/original/preview/download/reuse paths; new future owners require own current-auth checks"
+      "remaining": "Future G09/G10/G15 actual file/reference owners and finalG18 whole file matrix.",
+      "current_g05_stage": "PASS current actual task/product/submission upload/original/preview/download/reuse paths; new future owners require own current-auth checks",
+      "current_g08_stage": "Current notice original/reference/file/upload/read/replay authority including afterIO verified; later owners remain.",
+      "current_g07_stage": "Addactual evidence reference original/preview/download/revoke; futureG09/G10/G15/G18 remain"
     },
     {
       "id": "D03",
@@ -50,9 +54,12 @@
       "expected": "Price/private fields absent in actual product API/HTML/search/count/Excel/export/audit",
       "status": "NOT_RUN",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
-      "current_g06_stage": "Current product paths only; Excel/global search/export/audit remain"
+      "current_g06_stage": "Current product paths only; Excel/global search/export/audit remain",
+      "current_g07_stage": "Addcurrent Excel/template/export/SSR/RSC product/material channels, globalG14 andG18 remainNOT_RUN",
+      "remaining": "G14 global search and future actual consumer channels/finalG18 remain."
     },
     {
       "id": "D04",
@@ -65,7 +72,10 @@
       ],
       "expected": "Revoked membership is enforced for actual notice/message/event/notification delivery, including open subscriptions",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json"
+      ],
+      "current_g08_stage": "Actual current notice paths and UI clear on loss of current membership/target verified; G09stream/G13consumer/G18 remaining."
     },
     {
       "id": "D05",
@@ -107,10 +117,12 @@
       "expected": "Durable request change/outbox is consumed into real app notification with proper recipients and deduplication",
       "status": "NOT_RUN",
       "evidence": [
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
-      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition."
+      "remaining": "Actual downstream producers still NOT_RUN; see G04 main acceptance and original expected condition.",
+      "current_g08_stage": "NOTICE_PUBLISHED/NOTICE_REVISED durable atomic event producer/version identity verified only; G13 actualnotification delivery remains."
     },
     {
       "id": "D08",
@@ -142,7 +154,8 @@
       "status": "NOT_RUN",
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
       "origin_goals": [
         "G05",
@@ -176,7 +189,8 @@
       "source": "PRD-06 AC-06-03, G06/preparation.md sections6/10 and G05/preparation.md section5",
       "current_g06_stage": "Contract only, producer and downstream consumer groups remain NOT_RUN",
       "current_g05_stage": "PASS actual sameUoW G05 product/context/publicretail/file capture and subsequent G06 edits preserve prior",
-      "remaining": "Actual G07/G10/G11/G15 exact reference consumers not yet implemented/verified."
+      "remaining": "G10/G11/G15 actual historical consumers and finalG18 remain.",
+      "current_g07_stage": "AddG07realhistoricalconsumer to downstreamgroup, G10/G11/G15/G18remain; do not mark wholeD09PASS"
     },
     {
       "id": "D10",
@@ -196,12 +210,16 @@
       "evidence": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
-      "remaining": "Later inquiries/completion/evidence/import/notification/AI records and finalG18 persistence still required.",
+      "remaining": "Future module migrations/entities/newPID and finalG18 remain.",
       "current_g06_stage": "Current product persistence only; later records remain required",
-      "current_g05_stage": "PASS current identity/tasks/products/submissions/receipts restart; later record types remain required"
+      "current_g05_stage": "PASS current identity/tasks/products/submissions/receipts restart; later record types remain required",
+      "current_g08_stage": "Actual distinctPID/relogin notice versions/read/file/event/receipt persist; later entities remain.",
+      "current_g07_stage": "Addpopulatedmissing-siblingSQL migration/oldrecords/files/newPID proof, futuremodulemigrations/finalG18 remain"
     }
   ]
 }

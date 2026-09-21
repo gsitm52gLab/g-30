@@ -2,8 +2,10 @@
 export interface ResourceScope {
     id: string;
     contextId: string | null;
-    kind: "notice" | "context" | "membership" | "task" | "product" | "inquiry" | "file" | "search" | "export" | "notification" | "audit" | "ai_input" | "ai_result" | "account";
+    kind: "evidence" | "notice" | "context" | "membership" | "task" | "product" | "inquiry" | "file" | "search" | "export" | "notification" | "audit" | "ai_input" | "ai_result" | "account";
     visibility: "public" | "internal" | "draft";
+    /** Private inquiry drafts are restricted even for GSG administrators. */
+    privateOwnerId?: string;
     assigneeUserId?: string;
     coAssigneeUserIds?: readonly string[];
     recipientUserId?: string;
@@ -17,12 +19,13 @@ export interface ResourceScope {
 }
 
 export const actionKinds = {
+    "evidence.read": "evidence", "evidence.edit": "evidence", "evidence.assess": "evidence",
     "notice.read": "notice", "notice.manage": "notice",
     "context.read": "context", "context.create": "context",
     "membership.manage": "membership", "account.manage": "account",
     "task.read": "task", "task.manage": "task", "submission.write": "task", "task.complete": "task",
     "product.read": "product", "product.edit": "product", "price.read": "product",
-    "inquiry.create": "inquiry",
+    "inquiry.create": "inquiry", "inquiry.read": "inquiry", "inquiry.write": "inquiry", "inquiry.manage": "inquiry",
     "file.original": "file", "file.preview": "file", "file.download": "file",
     "search.read": "search", "export.read": "export", "notification.read": "notification",
     "audit.read": "audit", "ai.input.read": "ai_input", "ai.result.read": "ai_result",

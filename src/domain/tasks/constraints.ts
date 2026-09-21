@@ -11,7 +11,9 @@ export function taskRelations<K extends RecordKind>(s: UnitOfWork, kind: K, inpu
         const d = input.data as import("./types").FileVersionData;
         if (d.submissionUpload && (!d.taskId || s.get("requestVersion", d.submissionUpload.requestId)?.data.taskId !== d.taskId)) throw new StoreError("INVALID_RECORD");
         if (d.submissionUpload && s.list("fileVersion").some(f => f.id !== input.id && f.data.submissionUpload?.key === d.submissionUpload!.key)) throw new StoreError("CONFLICT");
-        if (d.owner?.kind === "notice") {
+        if (d.owner?.kind === "inquiry") {
+            if (d.taskId !== null || d.submissionUpload || s.get("conversation",d.owner.conversationId)?.contextId !== input.contextId) throw new StoreError("INVALID_RECORD");
+        } else if (d.owner?.kind === "notice") {
             if (d.taskId !== null || d.submissionUpload || s.get("notice",d.owner.noticeId)?.contextId !== input.contextId) throw new StoreError("INVALID_RECORD");
         } else if (d.owner?.kind === "product") {
             const cp = s.get("contextProduct", d.owner.contextProductId);

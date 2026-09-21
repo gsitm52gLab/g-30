@@ -1,10 +1,32 @@
 # GS HALE
 
+## G09 문의 합본 후보
+
+이 내부 후보는 수용된 G07 자료·Excel과 G08 공지에 G09 서버·UI를 합칩니다. 합본 자체 검사와 독립 검증·전체 모듈 수용은 구분합니다. `src/server/inquiries/contracts.ts`는 client type-only 진입점이고 `readInquirySummary(store, principal, contextId, clock, taskId?)`는 같은 UoW에서 홈/업무가 사용할 현재 권한 집계입니다.
+
+브랜드는 `POST /api/inquiries`의 `{contextId,taskId:null|id,idempotencyKey}`로 비공개 초안을 만듭니다. 초안은 현재 작성자만 읽으며 GSG/admin도 볼 수 없습니다. `POST /api/inquiries/:id/files?visibility=public`에 multipart `files`와 같은 순서의 `clientItemIds`를 1~10개 전송합니다. 파일별 ready/failed 응답과 같은 키 재시도는 기존 파일을 보존합니다. 업로드만으로 질문을 공개하지 않습니다. 실제 파일 선택 후 `POST /api/inquiries/:id`의 `publish_first`를 명시 전송하며 제목, 첫 내용, 양수 초안 revision을 사용합니다.
+
+`GET /api/inquiries?context=...`는 공개된 참여 문의만 집계합니다. 같은 브랜드/컨텍스트의 다른 브랜드 사용자는 참여자가 아닙니다. `GET /api/inquiries/:id`는 팝업과 상세가 함께 쓸 원본입니다. 공개 후 GSG는 명시 answer/state/internal_note/link_task를, 브랜드는 question/supplement를 사용합니다. comment/acknowledgement/read는 질문을 해결하지 않습니다. 답변과 업무·제출·완료는 별개입니다.
+
+`GET /api/inquiries/:id/events?after=...` 및 `/stream?after=...`는 저장된 이벤트와 actor/conversation/view에 묶인 opaque cursor를 사용합니다. 상세의 cursor 이후를 연결하고, cursor가 유효하지 않으면 상세를 다시 읽습니다. SSE `inquiry` 사건의 JSON과 `unavailable` 오류를 구별합니다. 공개/내부 위치는 분리되어 내부 메모가 공개 cursor·revision·정렬 시각을 바꾸지 않습니다. 모든 전달과 파일 읽기는 현재 권한을 다시 검사합니다.
+
+파일은 정확한 `conversationId`와 `messageId` 참조로 읽습니다. 미전송 ready 파일은 현재 업로더만 읽으며 공개 메시지에 포함된 선택 파일만 상대에게 보입니다. 내부 파일의 공개 메시지 재사용이나 다른 업무/상품으로의 문의 파일 재사용은 제공하지 않습니다. 401/403/404는 보호 데이터·복구 입력을 제거하고, 409/503에서는 허용된 입력과 성공 파일·이미 만들어진 업무 ID를 보존합니다. 같은 intent를 재시도하고 새 질문/업무를 자동 생성하지 않습니다.
+
+현재 migration은 `0001`~`0009` 총 9개입니다. 수용된 G09 통합 체인(`0001`~`0008`)에는 `0009`만, 이전 G10 분기(`0001`~`0005`, `0007`, `0009`)에는 빠진 `0006`과 `0008`을 추가합니다. 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
+
+```sh
+npm run build
+INQUIRIES_MODE=mock E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inquiries-http.ts
+INQUIRIES_MODE=sqlite E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inquiries-http.ts
+```
+
+검사 포트는 자신이 소유한 빈 두 포트로 바꿉니다. `INQUIRIES_HTTP_ROOT`는 매 실행 새 DB/파일 폴더를 만들 부모 경로(기본 `.local/g09-http`), `INQUIRIES_HTTP_REPORT`는 새 보고서 경로입니다. 응답 원문·해시·실제 SSE 프레임·PID 종료를 private 증거로 보존하므로 과거 보고서와 같은 경로를 덮어쓰지 마세요. mock 검사는 private IPC 저장소 관찰을 위해 별도 자식 부팅을 사용하고, SQLite는 일반 `next start` 두 프로세스와 새 PID/실제 재로그인을 검사합니다. 제품의 테스트 전용 endpoint는 없습니다. 브라우저 문의 화면·홈·팝업의 검증과 독립 수용은 이 서버 검사와 별개입니다.
+
 **Healthcare & Aesthetic Launch Enablement** · **해외 헬스케어 진출의 모든 일**
 
 현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
 
-G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본에 이어 이 후보는 G05 실제 답변 서버 계약을 추가합니다. 답변 UI는 별도 작업에서 연결하며 증빙·Excel, 검토·완료·문의·AI의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
+G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본, G05 실제 답변 UI/API, G07 증빙·Excel, G08 공지를 보존하며 G09 문의 UI/API를 합칩니다. 이 후보는 후행 검토·완료·AI나 G09 독립 수용의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
 
 ## 설치·실행
 
@@ -139,7 +161,7 @@ GS HALE은 해외 헬스케어 진출에 필요한 모든 일을 하나의 흐�
 
 참고자료는 인증된 `POST /api/files?taskId=...`에서 업로드하며 `GET /api/files/:id?taskId=...&mode=download|original|preview`에서 원본과 참조 업무의 최신 권한을 모두 검사합니다. private 파일 저장소는 기본 `.data/files`, 선택 환경변수 `FILE_STORAGE_DIR`입니다. 웹 public 폴더가 아닙니다. 1개 25MiB·1회 10개 제한과 이름/확장자/MIME/기본 signature 검사를 적용하고, PDF/PNG/JPEG만 브라우저 미리보기를 제공합니다. 다른 허용 형식은 원본 다운로드로 확인합니다. 악성코드 백신/파일 내용의 전문가 검토를 수행했다고 주장하지 않습니다. 과거 공개 요청의 정확한 FileVersion은 새 버전 이후에도 현재 권한이 있는 사용자가 조회할 수 있습니다.
 
-G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 상품 스냅샷(G06)은 연결됐으며 이 후보의 실제 답변 서버(G05)는 UI 작업과 검증을 진행 중입니다. GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. 기존 G04 과거 답변 검사의 합성 prior-submission과 실제 G05 제출을 구별합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
+G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 상품 스냅샷(G06)과 실제 답변 UI·서버(G05)는 선행 단계에서 통합·검증되었습니다. GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. 기존 G04 과거 답변 검사의 합성 prior-submission과 실제 G05 제출을 구별합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
 
 ```bash
 npm run check
@@ -161,7 +183,7 @@ HTTP 검사기는 새 `.data/g04-http-*` DB/파일과 별도 쿠키 이름을 �
 
 공통 정보 변경은 공유된 현재 정보를 갱신합니다. 미리보기에는 읽을 수 있는 적용 컨텍스트만 표시하고 숨겨진 대상의 이름·수·가격·파일은 반환하지 않습니다. 저장 명령은 각 common/context/price의 revision과 idempotencyKey를 사용합니다. `captureProductUse`는 후속 제출 트랜잭션에서 쓸 정확한 common/context/file 버전과 명시적으로 선택한 소비자가 버전을 저장합니다. 최신 가격을 당일 적용 가격으로 자동 간주하지 않습니다.
 
-G06의 상품 UI/API는 통합·브라우저 검사·독립 검증과 메인 수용을 마친 단계입니다. 초기 prior-use 레코드는 계약 검증용이며 실제 제출이 아닙니다. 이 G05 서버 후보는 실제 제출 트랜잭션에서 상품 사용본을 만들지만 G05 전체 수용을 뜻하지 않습니다. G07 증빙 집계/Excel, G10 검토, G11 완료 연결은 후속 의무입니다. 자료 집계는 연결 전 `connected:false`와 `null`로 표시합니다.
+G06의 상품 UI/API는 통합·브라우저 검사·독립 검증과 메인 수용을 마친 단계입니다. 초기 prior-use 레코드는 계약 검증용이며 실제 제출이 아닙니다. G05는 실제 제출 트랜잭션에서 상품 사용본을 만들며 선행 단계에서 수용되었습니다. 현재 G07 서버 후보는 증빙 집계/Excel을 연결하며, G10 검토·G11 완료는 후속 의무입니다. G07 자료 집계는 연결된 상태의 실제 요청·미제출·미확인 수를 반환하며 신규 상품의 0과 조회 실패를 구별합니다.
 
 상품 서버 검사기는 새 전용 DB/파일·쿠키와 자신의 프로세스를 사용합니다. SQLite 모드는 두 포트에서 실제 동시 수정/중복 등록을 확인하고 종료·재시작·재로그인 후 정확한 상품/가격/파일/스냅샷을 비교합니다. mock 모드의 fixture 준비는 검사 전용 IPC이며 제품 API에 준비용 경로를 추가하지 않습니다. 과거 사용 스냅샷은 명시적 fixture이며 실제 G05 제출 완료로 계산하지 않습니다.
 
@@ -200,9 +222,49 @@ SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
 
 저장된 공개 요청의 항목 구조가 손상된 경우 `REQUEST_INVALID`409로 답변 쓰기를 거부합니다. 읽기 평가는 `needs_reconfirmation`, `canSubmitFull:false`, 요청 구조 확인 필요를 표시합니다. 비정상 상품 범위를 공통 항목으로 바꿔 제출을 허용하지 않습니다. GSG가 실제 요청 편집에서 규칙을 확인·정정한 뒤 다시 공개하고, 작성자는 유지한 답변을 명시적으로 비교·재적용합니다. 정상 값의 알 수 없는 추가 키는 공개 출력에서 제외하지만 합법적인 제출은 유지합니다. 이 답변 구조 검사는 후행 GSG 수동 완료의 강제 승인 게이트가 아닙니다.
 
-## G08 공지·가이드 서버 계약 후보
+## G07 증빙·표준 Excel 통합 후보
 
-현재 G08은 서버 계약 후보이며 공지 UI·브랜드 홈·PC/모바일 통합과 독립 수용은 아직 완료되지 않았습니다. 공지 1건은 명시적인 컨텍스트 1개를 소유합니다. GSG는 공지·FAQ·업무 가이드·양식을 초안으로 저장하고 브랜드 보기의 공개 내용 투영을 확인한 뒤 새 불변 버전으로 공개합니다. 개정은 과거 본문·첨부·읽음을 덮어쓰지 않습니다.
+G07 자료·Excel UI/API와 V01~V03 수정이 포함된 통합 후보입니다. 수용된 G08과의 합본 자체·독립 검증 및 G07 수용은 아직 완료되지 않았습니다. 현업 원본 Excel 검증은 원본 미확보로 `NOT_RUN`이며, 합성 표준 `.xlsx`의 실제 검증과 구분합니다.
+
+증빙은 공개 요청/실제 제출/상품 자료의 정확한 파일 버전을 참조합니다. 파일을 복제하지 않고 상품별 적용 상태와 이력을 분리합니다. 적용 확인은 인증 승인·유효성 판단이 아닙니다. 업로드/증빙 등록만으로 제출하지 않으며, 증빙의 해당 없음은 공개 요청의 필수 항목을 면제하지 않습니다. 상품 자료 수는 현재 공개 요청과 실제 제출을 같은 표 projector로 집계합니다.
+
+Excel은 `GET /api/imports?context=ID`의 허용 열/한도를 받아 표준 양식을 사용합니다. `GET /api/imports/workbook?context=ID&kind=template|export`로 새 workbook을 생성합니다. `POST /api/imports/source?context=ID`에 multipart `file` 하나 → `POST /api/imports/preview`의 시트/헤더/열/행 선택 → `POST /api/imports/apply`의 명시적 반영 순서입니다. 한 배치는 선택한 컨텍스트 하나이며 모든 행의 `contextKey`가 일치해야 합니다. 숫자로 저장한 제품 코드·SKU·JAN·ITF의 손실된 0은 복구하지 않습니다. 업데이트의 빈 셀은 기존 값을 유지하고 `clearFields`로만 명시적으로 비웁니다.
+
+미리보기는 업무 DB를 변경하지 않고 권한을 확인한 비공개 임시 분석본만 저장합니다. `IMPORT_STORAGE_DIR`(기본 `.data/imports`)는 사용자별 최대 50개, 24시간 정리 대상이며 미리보기 적용 유효 시간은 30분입니다. 성공 배치·출처·버전·재시도 영수증은 DB에 영속됩니다. 동기 단일 트랜잭션에서 전체 CAS와 오류를 확인한 뒤 전부 반영합니다. 인증/가격 권한은 재시도 때도 현재 상태로 확인합니다.
+
+분석은 `exceljs@4.4.0`, `yauzl@3.4.0`와 설치된 `tsx`를 별도 Node 프로세스에서 사용합니다. ExcelJS 하위 `uuid`만 `11.1.1`로 고정해 버퍼 경계 advisory의 수정 버전을 사용하며, CJS/조건부 서식 workbook 호환성을 검사합니다. 10MiB 원본, ZIP 512개 항목/항목 32MiB/총 64MiB, 20시트/300,000 실제 셀, 선택 자료 5,000행·100열, 셀 32,767문자, 10초 제한과 256MiB V8 old-space 한도를 적용합니다. V8 한도는 프로세스 총 RSS 한도가 아닙니다. 암호화·매크로·수식 계산·외부 workbook/OLE 연결은 지원하지 않으며 링크를 실행하거나 가져오지 않습니다. `.xls` 보관은 기존 첨부 기능으로 가능하지만 Excel 가져오기는 `.xlsx`만 지원합니다.
+
+계약 검사는 작업 worktree 루트에서 다음과 같이 실행합니다. 실제 실행 결과와 실패 원본은 별도의 비공개 실행 증거에 남깁니다.
+
+```sh
+npm ci
+npm run check
+npm run build
+npx vitest run tests/unit/evidence.test.ts tests/unit/imports.test.ts tests/unit/imports-parser.test.ts tests/unit/products.test.ts tests/unit/repositories.test.ts
+# production build 이후, 비어 있는 자신 소유의 포트 사용
+IMPORTS_MODE=mock E2E_PORT=4171 npx tsx scripts/verify-imports-http.ts
+IMPORTS_MODE=sqlite E2E_PORT=4172 npx tsx scripts/verify-imports-http.ts
+```
+
+`IMPORTS_HTTP_REPORT`로 과거 결과를 덮어쓰지 않는 보고서 경로를 지정합니다. 검사기는 `.local/g07-http` 아래 새 전용 DB·파일·분석본과 포트별 쿠키를 사용하며 모든 실제 HTTP 응답·해시·자신의 서버 종료를 남깁니다. SQLite에서는 종료 후 새 PID·재로그인과 불변 원장 해시를 확인합니다. 동시 재시도는 실제 HTTP 요청을 겹쳐 보내 한 배치 응답을 확인하며, 별도 프로세스 간 동시 Excel 반영은 이 검사기에 포함하지 않습니다.
+
+저장된 배치 결과의 알려진 필드 구조가 손상되면 `STORAGE_UNAVAILABLE`503으로 안전하게 실패합니다. 원본 배치 기록을 다시 쓰지 않고 관리자 확인을 요청합니다. 정상 데이터의 알 수 없는 추가 키는 공개 DTO에서 제외합니다. 일반 링크 표시값에 매크로 관련 단어가 있다는 이유만으로 거부하지 않으며 실제 OOXML content type·요소·관계와 파일 구조를 검사합니다.
+
+
+G07 XLSX 입력은 SpreadsheetML의 실제 namespace URI와 local name으로 해석합니다. 표준 URI에 연결된 `x:` 등 접두사나 기본 namespace는 같은 의미로 처리하며, 구조 이름의 잘못된 URI·DTD·매크로·외부 통합문서 연결은 거부합니다. 원본 ZIP의 크기·CRC·경로 검사를 먼저 수행하고 제한된 메모리에서 ExcelJS용 XML/ZIP을 재직렬화합니다. 원본 업로드 bytes 기준 SHA와 셀의 정확한 숫자 문자열·앞자리 0·수식 거부 정책은 유지합니다. 이것이 모든 XLSX 확장 기능 또는 미확보 현업 양식의 호환성 보장은 아닙니다. `saxes@5.0.1`과 `jszip@3.10.2`는 기존 설치 버전을 direct exact dependency로 명시했습니다(ISC, JSZip의 MIT 라이선스 선택).
+
+접두사가 있는 합성 원본 세 종류의 실제 업로드→미리보기→반영/거부 회귀는 다음처럼 실행합니다. 서버/DB/파일은 매번 별도로 생성합니다.
+
+```bash
+IMPORTS_NAMESPACE_ONLY=1 IMPORTS_MODE=mock E2E_PORT=4191 npx tsx scripts/verify-imports-http.ts
+IMPORTS_NAMESPACE_ONLY=1 IMPORTS_MODE=sqlite E2E_PORT=4192 npx tsx scripts/verify-imports-http.ts
+```
+
+기본 E2E 실행기는 실행 회차·프로젝트·spec마다 DB, 일반 첨부 저장소와 `IMPORT_STORAGE_DIR`를 모두 별도로 생성합니다. 외부에서 물려받은 import 경로도 해당 spec의 `import_staging`으로 덮고 실행 summary에 경로를 남깁니다. 이전 staging은 삭제하지 않으며 실제 50개 보관 제한도 유지합니다.
+
+## G08 공지·가이드
+
+G08 공지 UI·브랜드 홈·PC/모바일·서버는 독립 검증과 루트 통합 회귀를 거쳐 수용된 상태입니다. 이 G07 합본에서의 공존 회귀는 별도 검증합니다. 공지 1건은 명시적인 컨텍스트 1개를 소유합니다. GSG는 공지·FAQ·업무 가이드·양식을 초안으로 저장하고 브랜드 보기의 공개 내용 투영을 확인한 뒤 새 불변 버전으로 공개합니다. 개정은 과거 본문·첨부·읽음을 덮어쓰지 않습니다.
 
 전체 대상은 해당 컨텍스트의 활성 브랜드 사용자라는 규칙이며 나중에 합류한 활성 사용자도 읽을 수 있습니다. 선택 대상의 빈 목록은 대상 없음입니다. 공개 당시 알림용 사용자 목록은 저장하지만 읽기 권한으로 고정하지 않습니다. 과거 버전과 파일도 현재 대상 권한 및 해당 과거 버전의 대상 권한을 함께 확인합니다. 읽음은 서버의 사용자·버전·시각 기록이며 업무 수락·제출·완료를 변경하지 않습니다. GSG만 대상/확인 명단을 받고 브랜드는 본인의 확인 사실을 받습니다.
 
@@ -210,7 +272,7 @@ SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
 
 파일 API는 기존 경로에 `?noticeId=...`와 선택 `versionId=...` 참조를 추가합니다. 기존 25MiB/10개와 private 저장소 규칙을 유지합니다. 업로드된 초안 파일은 공개 버전에 포함되기 전 브랜드가 읽거나 다른 자료에 재사용할 수 없습니다. 과거 버전에서 제거된 파일은 허용된 과거 공지 주소에서 정확한 바이트로 조회하며, 비동기 읽기 전후 권한을 다시 검사합니다. 공지 전용 파일 owner 추가는 기존 task/product 파일 원장을 다시 쓰지 않습니다.
 
-새 `0007-notices.sql`은 G07의 예약된 0006 뒤 번호입니다. 이 독립 분기는 선행 승인 5개 migration과 0007을 적용하며 G07과 직렬 통합되면 둘 다 적용합니다. 공개 버전·읽음은 불변이고 공개 pointer/event/audit/receipt는 하나의 transaction입니다. `NOTICE_PUBLISHED`/`NOTICE_REVISED` 사건은 G13 알림 소비 계약이며 실제 전달 완료를 뜻하지 않습니다.
+`0007-notices.sql`과 G07의 `0006-evidence-imports.sql`을 모두 유지합니다. 현재 통합본의 migration은 `0001`~`0009` 총 9개이며, 기존 DB에는 아직 적용하지 않은 파일만 추가합니다. 적용된 파일의 내용과 checksum은 바꾸지 않습니다. 공개 버전·읽음은 불변이고 공개 pointer/event/audit/receipt는 하나의 transaction입니다. `NOTICE_PUBLISHED`/`NOTICE_REVISED` 사건은 G13 알림 소비 계약이며 실제 전달 완료를 뜻하지 않습니다.
 
 ```sh
 npm ci
@@ -227,6 +289,17 @@ NOTICES_MODE=sqlite E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notic
 ```
 
 `NOTICES_HTTP_ROOT`는 런타임 부모(기본 `.local/g08-http`), `NOTICES_HTTP_REPORT`는 새 결과 경로입니다. 보고서는 실제 요청·응답 본문 파일/hash, assertion 단위 결과, PID/종료와 저장소 경로를 기록합니다. 원 보고서를 보존하려면 새 경로를 쓰세요. HTTP로 실제 업무와 제출을 만든 뒤 공지 읽음 전후 업무·요청·활동·제출·상품 캡처·파일 원장을 비교합니다. 공지 파일의 상품/다른 공지 재사용과 원본·참조 양측 권한도 검사합니다. 신규 멤버/알 수 없는 저장 확장 키 준비는 제품 endpoint가 없는 private IPC/저장소 fixture이며 읽기 권한은 실제 HTTP로 검사합니다. late fault와 비동기 파일 읽기 중 철회는 양 adapter 단위 검사, 기존 데이터 migration은 별도 `notices-migration.test.ts`가 확인합니다. UI·HTML/RSC·독립 검증은 별도 증거가 필요합니다.
+
+### 문의 UI — G09 내부 구현 후보
+
+현재 컨텍스트의 **문의**에서 브랜드가 비공개 초안을 만든 뒤 제목·메시지·파일을 준비하고 **첫 질문 보내기**로 전송합니다. 업무 담당이 아니어도 새 문의를 시작할 수 있습니다. 질문의 답변·보완·확인 회신·외부 확인 대기를 명시적으로 구분하며, GSG 홈에서 질문별 남은 수와 다음 확인일을 확인합니다. 팝업과 전체 상세는 같은 서버 대화·파일·읽음 기록을 사용합니다. 대화는 업무 수락·자료 제출·완료와 별개이고, 알림 배달은 G13 후행입니다.
+
+파일은 최대 10개/개당 25 MiB입니다. 성공한 업로드를 유지하며 실패 항목만 같은 파일로 재시도하거나 명시적으로 제외합니다. 메시지 응답 유실은 같은 의도로 재시도하고, 전송 성공 후 조회만 실패하면 **저장 결과 다시 읽기**를 사용합니다. 업무 생성 후 문의 연결이 실패하면 실제 생성된 업무 ID를 보존하고 **이미 만든 업무 연결만 다시 시도**합니다. 재생성하지 않습니다.
+
+미전송 입력과 업로드된 파일 참조는 계정·컨텍스트·문의별로 sessionStorage에 최대 24시간/8건/건당 180,000자 보관합니다. 파일 바이트는 저장하지 않아 실패 파일은 새로고침 후 다시 선택해야 합니다. 복구 전에 실제 현재 권한을 확인하며 401/403/404에서는 문의 화면·목록·커서·보관 입력을 지웁니다. 이 로컬 보관 기간은 서버 초안 삭제 정책이 아닙니다.
+
+UI 자체 검사(원본 결과·실패 및 합본 독립 검증은 별도): `npm run check`, `npm run build`, 이후 `E2E_PORT=4213 E2E_AUX_PORT=4214 npm run test:e2e -- inquiries` 및 동일 포트의 `npm run test:e2e:db -- inquiries`. 기본 runner가 모드/프로젝트/스펙마다 별도 DB·서버를 만듭니다. 실제 실행 기록은 할당된 비공개 evidence에 보존하며 이 설명 자체가 G09 수용 판정은 아닙니다.
+
 # G10 corrections server
 
 The corrections server uses current task permissions and actual immutable G05 submissions. GET `/api/corrections?taskId=...` returns public batches and exact source choices; only GSG receives the separate staff opinion/draft/review section. POST `/api/corrections` supports `save_opinion`, `save_draft`, `publish`, `reflect`, `resolve`, and `record_review`. Client types are exported from `src/server/corrections/contracts.ts`.
@@ -235,4 +308,4 @@ Internal opinions append versions. Published batches and their source draft are 
 
 Public preview: GET `/api/corrections/drafts/:id/preview` (GSG only). Exact batch: GET `/api/corrections/:id`. Target-file links use `/api/corrections/files/:id` and recheck the current batch/item plus original file authority before and after file IO. Internal opinion files use existing internal task uploads; no draft or upload releases them to brands.
 
-Run the existing `npm ci`, `npm run db:setup`, `npm run check`, and `npm run build` setup/check commands. Migration `0009-corrections.sql` adds constraints without changing previous SQL. This isolated branch has accepted 0001–0005 and0007 plus0009 (seven); later module assembly must derive its actual union rather than hardcode this local total. G10 UI, downstream notification delivery and independent acceptance are separate stages.
+Run the existing `npm ci`, `npm run db:setup`, `npm run check`, and `npm run build` setup/check commands. Migration `0009-corrections.sql` adds constraints without changing previous SQL. This combined branch contains 0001 through 0009 (nine). A previous accepted G09 database gains only 0009; the previous isolated G10 chain gains 0006 and 0008. Existing applied SQL bytes and records remain unchanged. The actual corrections UI is available at `/tasks/:id/corrections?context=...`; downstream notification delivery and independent acceptance remain separate stages.
