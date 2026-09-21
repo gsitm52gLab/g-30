@@ -1,3 +1,9 @@
+# State151 latest — G16 server author evidence reviewed; G13 UI split
+
+Accepted0804 remains13/19, GoalACTIVE. G16 server final20e4fd3 rootmain-final-review8b696050 verified457private+4ownedhistory artifacts/615Git source/65changed/25commands/7reusebindings/368HTTPbodies/392acceptedoldsrc/104oldrows12SQL. Fresh runtime mock22P6SQLiteonlyskip/DB28P/history10P; original14P1F13NOTRUN preserved; earlier512unit+bridge4P20filtered sourcebound notfinal514fresh. WholeG16 UI/independent/realOpenAI notdone. Workflow fullUI earlyd041 exactcheck/browser now; afterward additive20e4 harness/doc merge requested, runtime ddb identical. Narrow union assertion+READMEG10 lease0e180 granted. Independent G16draft9b7a ready notassigned, ai_verifyidle.
+
+G13 goals e5ad firstserver focused82P; root staticreview found accepted manualbrand shipping responsibleID filteredout by GSG-only recipient. Author reproducing/fixing within commonexclusivelease, root concern saved (no rootruntimeclaim). Earlierfull590P4F migrationnames preserved, correctionpending. Prd new G13pureUI packet630590 active in .worktrees/g13-ui branche5adbase, newcontrolled components only no routes/controller/shared/nav/task/README. G16 ownserverlease released; G13common stillgoals. Root+goals+prd+workflow=4 active.
+
 # State150 latest — G16 typed server frozen; G13 exclusive common lease
 
 Existing Goal ACTIVE, accepted product0804a4a1a750ab4dee149036659e212480230242 remains13/19. Root reviewed G16 server774 (512unit/build, actual HTTP still separate), G15 capability bridge ddb (7artifacts/3commands/613-source exactbindings/4P20filtered). Root bridge review c70a547. G16 pureUI fe333 reviewed e82788; workflow now owns fullUI packet30bd, merge774+ddb, no common files. Prd ownHTTP/history proof continues; reported mock22P6SQLite-onlyskip/DB28P pending root review, old H15 fixtureexpectation failure preserved. G16 independent ai_verify not yet assigned combined candidate.

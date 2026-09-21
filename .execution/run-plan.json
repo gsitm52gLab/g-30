@@ -2689,7 +2689,7 @@
           "evidence": []
         }
       ],
-      "next_action": "goals full server after additive merge774 onto repaireded56; freeze typed API/check/build and release common lease, then actual HTTP/history/dedupe and UI assignment.",
+      "next_action": "goals exclusive fullserver actual manual responsible-person reproduction/fix and typedfreeze; prd own pure controlled UI parallel, no server/controller/route ownership.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/task-draft.json",
         "sha256": "96ae325b75e6aecb15b0face92814167bad7aa1658aa8165c35df4708f9750f4"
@@ -2729,7 +2729,17 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/1/sources-repair1/main-repair-review.json",
         "sha256": "960c782d4420103352d47e70335a6208079e9365ff0a8100c585df2ea1dcadf2"
       },
-      "source_adapter_candidate": "ed56c9526c6c3dc5b0c820aeb7dad497ac9aa813"
+      "source_adapter_candidate": "ed56c9526c6c3dc5b0c820aeb7dad497ac9aa813",
+      "ui_pure_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/ui-pure-task.json",
+        "sha256": "63059008ab6aac99ac11773b3297ee00ab6feb0bdee2961dd752aa8d8992d58e"
+      },
+      "ui_implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+      "ui_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g13-ui",
+      "manual_recipient_review_followup": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G13/root-manual-recipient-review-followup.json",
+        "sha256": "4debf00da5c679defdd4fd921958deb7065b3af6052a9ae62f635d0e182b0b4e"
+      }
     },
     {
       "id": "G14",
@@ -3173,7 +3183,7 @@
           "evidence": []
         }
       ],
-      "next_action": "workflow full UI on frozen774+ddb, prd own HTTP/history evidence; exact combined candidate then independent ai_verify. G17 actual call still NOT_RUN.",
+      "next_action": "workflow exact d041 UI check/browser then merge20e4 test+doc delta for combined freeze; independent ai_verify then integration. Server20e4 root reviewed457+4artifacts/615sources/25commands/368bodies, no whole acceptance.",
       "source_discovery": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/source-discovery/discovery-result.json",
         "sha256": "4c7d03ae48d90a142f0c0b707a304203a4d381097c9a694ddf4f9c4958de8410",
@@ -3274,6 +3284,20 @@
       "ui_full_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui-full-task.json",
         "sha256": "30bd86ca6b8517870d0a3cf1e5969d346e4f1b4cd4b6ed1e6ce6678ba312fbcf"
+      },
+      "server_candidate_commit": "20e4fd3b8b056d2c6849e345fc54e0a4070a7b60",
+      "server_final_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/server/main-final-review.json",
+        "sha256": "8b6960506a05069f20e5679e716e890376315dd31ebad187e82a8918fbc9200a"
+      },
+      "server_lease_status": "FROZEN_RELEASED",
+      "ui_bridge_addendum": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/ui-bridge-impact-addendum.json",
+        "sha256": "0e18072f53dd9e3d776337dd498e8e88c906fefd81a8060791aac5a0141180fd"
+      },
+      "verification_draft": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G16/verification-task-draft.json",
+        "sha256": "9b7a27a3571e26f064db60cc343f2ef9ea9d0f6b8401e39ac90857fe78940324"
       }
     },
     {
@@ -3427,8 +3451,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "0804a4a1a750ab4dee149036659e212480230242",
   "current_goal": "G16",
-  "next_action": "G16 UI and own server evidence, G13 exclusive common server implementation. Root reviews exact candidates; no acceptance until independent and integration regression. G17 actual OpenAI remains mandatory NOT_RUN.",
-  "state_version": 150,
+  "next_action": "G16 workflow full UI checks then exactcombined independent; G13 goals exclusive server recipient repair/freeze + prd pureUI. Root reviews bindings and remaining exact requirements. G17 actual OpenAI still mandatoryNOT_RUN.",
+  "state_version": 151,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3459,7 +3483,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-21T22:33:40.092530+00:00",
+  "updated_at": "2026-09-21T22:39:38.328003+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
