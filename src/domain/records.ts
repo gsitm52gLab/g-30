@@ -1,3 +1,4 @@
+import type { CampaignRecords } from './campaigns/records';
 import type { EvidenceData, EvidenceVersionData, EvidenceLinkData, EvidenceAssessmentData } from './evidence/types';
 import type { ImportBatchData } from './imports/types';
 import type { NoticeData, NoticeVersionData, NoticeReadData } from './notices/types';
@@ -96,7 +97,7 @@ export interface ProductData extends CommonProductExtension {
     status: "draft" | "active" | "archived";
     missingMaterials: number;
 }
-export interface RecordDataMap {
+export interface RecordDataMap extends CampaignRecords {
     evidence: EvidenceData;
     evidenceVersion: EvidenceVersionData;
     evidenceLink: EvidenceLinkData;

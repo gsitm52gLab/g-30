@@ -1,3 +1,4 @@
+import { campaignRelations } from './campaigns/constraints';
 import { evidenceRelations } from './evidence/constraints';
 import { noticeRelations } from './notices/constraints';
 import { submissionRelations } from './submissions/constraints';
@@ -6,6 +7,7 @@ import { productRelations } from "./products/constraints";
 import { taskRelations } from "./tasks/constraints";
 /** Same constraints for mock/SQLite; SQL adds cross-process uniqueness. */
 export function checkRelations<K extends RecordKind>(store: UnitOfWork, kind: K, input: RecordInput<K>) {
+    campaignRelations(store, kind, input);
     evidenceRelations(store, kind, input);
     noticeRelations(store, kind, input);
     taskRelations(store, kind, input);

@@ -1,3 +1,4 @@
+import { campaignRequestSource,materialProductIds } from '@/server/tasks/campaign-request';
 import { createHash } from 'node:crypto';
 import type { StoredRecord, UnitOfWork } from '@/domain/records';
 import type { DraftContent, StoredAnswer, SubmissionDraftData } from '@/domain/submissions/types';
@@ -25,7 +26,7 @@ export class SubmissionService {
         return this.identity.repo.transaction(s => {
             const p = this.identity.principal(s, token), { task, request } = this.editable(s, p, taskId);
             assertRequest(task, input.baseRequestId);
-            const content = parseDraft(input.content, request.id, request.data.content, task.data.productIds);
+            const content = parseDraft(input.content, request.id, request.data.content, materialProductIds(s,task,request));
             const fileIssues = contentFiles(content).flatMap(fileVersionId => { try {
                 publicFile(s, p, task, fileVersionId, this.clock);
                 return [];
@@ -45,7 +46,7 @@ export class SubmissionService {
                     return [{ productId: selection.productId, code: 'UNAVAILABLE' as const }];
                 }
             });
-            return { requestId: request.id, evaluation: safeEvaluation(request.data.content, content.answers), fileIssues, productIssues, missingProductIds: task.data.productIds.filter(id => !content.productSelections.some(v => v.productId === id)), invalidLinkIndexes: content.links.flatMap((link, index) => validLink(link) ? [] : [index]) };
+            return { requestId: request.id, evaluation: safeEvaluation(request.data.content,content.answers,request.data.content,false,campaignRequestSource(s,request)?.noMaterials===true), fileIssues, productIssues, missingProductIds: materialProductIds(s,task,request).filter(id => !content.productSelections.some(v => v.productId === id)), invalidLinkIndexes: content.links.flatMap((link, index) => validLink(link) ? [] : [index]) };
         });
     }
     async rebasePreview(token: string | undefined, taskId: string) { return this.identity.repo.transaction(s => rebasePreview(s, this.identity.principal(s, token), taskId, this.clock)); }
@@ -79,7 +80,7 @@ export class SubmissionService {
                     assertRequest(task, input.baseRequestId);
                     if (old && old.data.baseRequestId !== request.id)
                         fail('REQUEST_CHANGED', 409, '요청 변경 내용을 먼저 비교하고 초안을 전환해 주세요.');
-                    data = parseDraft(input.content, request.id, request.data.content, task.data.productIds);
+                    data = parseDraft(input.content, request.id, request.data.content, materialProductIds(s,task,request));
                 }
                 else if (command === 'rebase_apply') {
                     assertRequest(task, input.targetRequestId);
@@ -89,7 +90,7 @@ export class SubmissionService {
                     if (new Set(selected).size !== selected.length || selected.some(key => !preview.answers.some(a => answerKey(a) === key && a.compatible)))
                         fail('VALIDATION', 422, '호환되는 이전 답변만 명시적으로 이어받을 수 있습니다.');
                     const prior = contentDTO(old.data), answers = prior.answers.filter(a => selected.includes(answerKey(a))).map(a => ({ ...a, requestId: request.id }));
-                    data = parseDraft({ ...prior, answers, artifacts: prior.artifacts.filter(a => !a.answer || selected.includes(answerKey(a.answer))), productSelections: prior.productSelections.filter(v => task.data.productIds.includes(v.productId)) }, request.id, request.data.content, task.data.productIds);
+                    data = parseDraft({ ...prior, answers, artifacts: prior.artifacts.filter(a => !a.answer || selected.includes(answerKey(a.answer))), productSelections: prior.productSelections.filter(v => materialProductIds(s,task,request).includes(v.productId)) }, request.id, request.data.content, materialProductIds(s,task,request));
                 }
                 else {
                     assertRequest(task, input.baseRequestId);
@@ -129,13 +130,13 @@ export class SubmissionService {
                     fail('CONFLICT', 409, '업무가 변경되었습니다. 최신 상태를 확인해 주세요.');
                 if (draft.data.baseRequestId !== request.id)
                     fail('REQUEST_CHANGED', 409, '초안을 현재 요청으로 전환해 주세요.');
-                const content = parseDraft(contentDTO(draft.data), request.id, request.data.content, task.data.productIds);
-                const evaluation = safeEvaluation(request.data.content, content.answers);
+                const content = parseDraft(contentDTO(draft.data), request.id, request.data.content, materialProductIds(s,task,request));
+                const evaluation = safeEvaluation(request.data.content,content.answers,request.data.content,false,campaignRequestSource(s,request)?.noMaterials===true);
                 if (evaluation.invalid || content.links.some(l => !validLink(l)))
                     fail('INVALID_ANSWERS', 422, '입력한 값의 형식과 링크 설명을 확인해 주세요. 빈 필수 항목은 부분 제출할 수 있습니다.');
                 if (mode === 'full' && !evaluation.canSubmitFull)
                     fail('MISSING_REQUIRED', 422, '필수 항목을 채우거나 부분 제출을 선택해 주세요.');
-                if (task.data.productIds.some(id => !content.productSelections.some(v => v.productId === id)))
+                if (materialProductIds(s,task,request).some(id => !content.productSelections.some(v => v.productId === id)))
                     fail('PRODUCT_SELECTION_REQUIRED', 422, '연결된 각 상품의 정확한 버전과 자료·소비자가 선택을 확인해 주세요.');
                 const files = contentFiles(content).map(id => publicFile(s, p, task, id, this.clock)), previous = latestSubmission(s, task), submissionId = newId();
                 const productUseIds = content.productSelections.map(selection => {

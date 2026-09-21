@@ -25,6 +25,9 @@ export function taskRelations<K extends RecordKind>(s: UnitOfWork, kind: K, inpu
         const d = input.data as import("./types").RequestVersionData;
         if (s.list("requestVersion").some(r => r.data.taskId === d.taskId && r.data.sequence === d.sequence)) throw new StoreError("CONFLICT");
         if (d.previousId && s.get("requestVersion", d.previousId)?.data.taskId !== d.taskId) throw new StoreError("INVALID_RECORD");
+        if(d.source){const x=d.source,v=s.get('campaignVersion',x.campaignVersionId),base=s.get('requestVersion',x.originalRequestId),selection=x.selectionVersionId?s.get('campaignSelection',x.selectionVersionId):null,fact=x.sourceFactId?s.get('campaignExternalFact',x.sourceFactId):null;
+            if(x.kind!=='campaign_selection'||!v||v.contextId!==input.contextId||v.data.taskId!==d.taskId||v.data.campaignId!==x.campaignId||v.data.requestId!==base?.id||base.data.taskId!==d.taskId||d.publishedBy!==x.actorId||!s.get('user',x.actorId)||x.noMaterials!==(d.content.requirements.length===0)||x.selectionVersionId&&selection?.data.campaignVersionId!==v.id||x.sourceFactId&&fact?.data.campaignVersionId!==v.id)throw new StoreError('INVALID_RECORD');
+        }
     }
     if (kind === "templateVersion") {
         const d = input.data as import("./types").TemplateVersionData;

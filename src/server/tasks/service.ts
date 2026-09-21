@@ -1,3 +1,4 @@
+import { campaignRequestSource } from './campaign-request';
 import { resolveProduct, visibleProductRelations } from "@/server/products/access";
 import { latestSubmission } from "@/server/submissions/read";
 import { safeEvaluation } from "@/server/submissions/projection";
@@ -264,14 +265,14 @@ export class TaskService {
             const liveRequest = live ? s.get("requestVersion",live.data.requestId) : null;
             const previous = prior ? s.get("requestVersion", prior.data.requestId) : null;
             const request = current ? this.projectedContent(s, p, current.data.content, internal) : null;
-            const projectedVersions = versions.map(v => projectedVersion(v, this.projectedContent(s,p,v.data.content,internal)));
+            const projectedVersions = versions.map(v => projectedVersion(v,this.projectedContent(s,p,v.data.content,internal),campaignRequestSource(s,v)));
             const fileIds = new Set([...projectedVersions.flatMap(v=>v.content.referenceFileIds), ...(internal ? row.data.draft?.referenceFileIds ?? [] : [])]);
             const files = s.list("fileVersion", row.contextId!).filter(f => fileIds.has(f.id) || internal && f.data.taskId === taskId).filter(f => internal || f.data.visibility === "public").filter(f => visibleFile(s,p,f,taskScope(row),this.clock)).map(f => ({ id: f.id, name: f.data.originalName, bytes: f.data.bytes, mime: f.data.mime, sha256: f.data.sha256, preview: f.data.preview, visibility: f.data.visibility }));
             return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal && row.data.draft ? projectedRequest(row.data.draft, true, this.projectedContent(s,p,row.data.draft,true,row.id).referenceFileIds) : null, request,
                 versions: projectedVersions,
                 activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)).map(projectedActivity),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
-                requirementStatus: current && live ? safeEvaluation(current.data.content,live.data.answers,liveRequest?.data.content??null,true).items.map(projectedRequirementStatus) : current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
+                requirementStatus: current && live ? safeEvaluation(current.data.content,live.data.answers,liveRequest?.data.content??null,true,campaignRequestSource(s,current)?.noMaterials===true).items.map(projectedRequirementStatus) : current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
                 submissionConnection: current ? "공개 요청에 답변을 저장하고 제출할 수 있습니다" : "요청 공개 후 답변할 수 있습니다", submissionSummary: live ? { id:live.id,sequence:live.data.sequence,requestId:live.data.requestId,mode:live.data.mode,submittedAt:live.data.submittedAt,isCurrentRequest:live.data.requestId===current?.id } : null, completionConnection: "업무 완료는 준비 중입니다", notificationConnection: "앱 알림은 준비 중입니다" };
         });
     }

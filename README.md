@@ -267,3 +267,18 @@ NOTICES_MODE=sqlite E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notic
 ```
 
 `NOTICES_HTTP_ROOT`는 런타임 부모(기본 `.local/g08-http`), `NOTICES_HTTP_REPORT`는 새 결과 경로입니다. 보고서는 실제 요청·응답 본문 파일/hash, assertion 단위 결과, PID/종료와 저장소 경로를 기록합니다. 원 보고서를 보존하려면 새 경로를 쓰세요. HTTP로 실제 업무와 제출을 만든 뒤 공지 읽음 전후 업무·요청·활동·제출·상품 캡처·파일 원장을 비교합니다. 공지 파일의 상품/다른 공지 재사용과 원본·참조 양측 권한도 검사합니다. 신규 멤버/알 수 없는 저장 확장 키 준비는 제품 endpoint가 없는 private IPC/저장소 fixture이며 읽기 권한은 실제 HTTP로 검사합니다. late fault와 비동기 파일 읽기 중 철회는 양 adapter 단위 검사, 기존 데이터 migration은 별도 `notices-migration.test.ts`가 확인합니다. UI·HTML/RSC·독립 검증은 별도 증거가 필요합니다.
+
+### PR 행사 서버 계약 (G12)
+
+`/api/campaigns`의 목록·명령, `/:id`의 공개 버전·이력, `/:id/preview`, `/catalogs`, `/summary?taskId=…`와 인증된 `/files/:id` 경로를 제공합니다. GSG가 공개한 메뉴 정의를 브랜드가 선택하면 같은 업무의 새 요청 버전에 선택 범위와 실제 기록자·승인 원본 출처를 고정합니다. 일반 요청 항목과 미공개 초안, 과거 제출본은 유지하며 기존 답변은 명시적으로 새 요청에 전환합니다. 미선택·불참의 현재 자료 요구는 제외하고, 이미 신청한 불참의 외부 사실은 취소 협의 보류로 별도 보존합니다. 캠페인·업무 요청·조건 의존성 충돌은 기존 기록을 유지하고 409로 재확인을 요청합니다. 송장·파일만으로 실물 수령이나 업무 완료를 처리하지 않습니다.
+
+행사 UI·실제 알림 발송은 별도 구현 단계입니다. 자체 서버 검사에는 합성 데이터만 사용합니다.
+
+```sh
+npm run check
+npm run build
+CAMPAIGNS_MODE=mock E2E_PORT=4219 E2E_AUX_PORT=4220 npx tsx scripts/verify-campaigns-http.ts
+CAMPAIGNS_MODE=sqlite E2E_PORT=4219 E2E_AUX_PORT=4220 npx tsx scripts/verify-campaigns-http.ts
+```
+
+검사마다 고유 DB·파일 디렉터리를 만들며 `CAMPAIGNS_HTTP_ROOT`, `CAMPAIGNS_HTTP_REPORT`로 별도 증거 위치를 지정할 수 있습니다. SQLite 검사는 일반 `next start` 및 실제 두 프로세스 경합·재시작을 사용합니다. mock 검사는 프로세스 내 저장소 관찰을 위해 테스트 자식 서버를 사용하며 운영 경로에 테스트 API를 추가하지 않습니다. 보고서의 실제 검사 수·계층을 확인하세요.
