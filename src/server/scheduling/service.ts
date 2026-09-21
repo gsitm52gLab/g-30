@@ -17,7 +17,7 @@ export class SchedulingService {
         return this.identity.repo.transaction(s => {
             const p = currentActor(s, this.identity.principal(s, token), contextId, this.clock);
             if (options.taskId) sourceTask(s, p, options.taskId, this.clock);
-            const items = scheduleSources(s, p, contextId, this.clock).map(row => calendarDTO(row, this.clock)).filter(r => (!options.taskId || r.taskId === options.taskId) && (!options.kind || r.kind === options.kind) && (!options.from || r.calendar.dueDay !== null && r.calendar.dueDay >= options.from) && (!options.to || r.calendar.dueDay !== null && r.calendar.dueDay <= options.to)).sort((a, b) => (a.calendar.dueDay ?? '9999').localeCompare(b.calendar.dueDay ?? '9999') || a.logicalKey.localeCompare(b.logicalKey));
+            const items = scheduleSources(s, p, contextId, this.clock).map(row => calendarDTO(s, p, row, this.clock)).filter(r => (!options.taskId || r.taskId === options.taskId) && (!options.kind || r.kind === options.kind) && (!options.from || r.calendar.dueDay !== null && r.calendar.dueDay >= options.from) && (!options.to || r.calendar.dueDay !== null && r.calendar.dueDay <= options.to)).sort((a, b) => (a.calendar.dueDay ?? '9999').localeCompare(b.calendar.dueDay ?? '9999') || a.logicalKey.localeCompare(b.logicalKey));
             const tasks = s.list('task', contextId).flatMap(t => decide(s, p, 'task.manage', taskScope(t), this.clock).allowed ? [{ id: t.id, title: t.data.title }] : []);
             const actors = p.user.data.role === 'gsg' ? s.list('user').flatMap(u => { const taskIds = tasks.filter(t => actionRecipientIds(s, s.get('task', t.id)!, u.id).length).map(t => t.id); return taskIds.length ? [{ id: u.id, label: u.data.name, role: u.data.role, taskIds }] : []; }) : [];
             return { contextId, items, total: items.length, capabilities: { create: tasks.length > 0 }, tasks, actors, delivery: { inApp: 'app_open_sync' as const, email: 'not_connected' as const, background: 'not_connected' as const } };
@@ -26,7 +26,7 @@ export class SchedulingService {
     async detail(token: string | undefined, id: string) { return this.identity.repo.transaction(s => {
         const p = this.identity.principal(s, token), v = manualSchedule(s, p, id, this.clock);
         const versions = s.list('scheduleVersion', v.row.contextId!).filter(r => r.data.scheduleId === id).sort((a, b) => b.data.sequence - a.data.sequence).flatMap(r => { const dto = visibleSource(() => manualVersionDTO(s, p, id, this.clock, r)); return dto ? [dto] : []; });
-        return { id, contextId: v.row.contextId!, revision: v.row.revision, currentVersionId: v.version.id, current: manualVersionDTO(s, p, id, this.clock, v.version), calendar: calendarDTO(v.source, this.clock), versions, capabilities: { manage: decide(s, p, 'task.manage', taskScope(v.task), this.clock).allowed } };
+        return { id, contextId: v.row.contextId!, revision: v.row.revision, currentVersionId: v.version.id, current: manualVersionDTO(s, p, id, this.clock, v.version), calendar: calendarDTO(s, p, v.source, this.clock), versions, capabilities: { manage: decide(s, p, 'task.manage', taskScope(v.task), this.clock).allowed } };
     }); }
     async command(token: string | undefined, input: unknown) {
         const x = object(input, ['command', 'contextId', 'scheduleId', 'expectedRevision', 'content', 'reason', 'idempotencyKey']);

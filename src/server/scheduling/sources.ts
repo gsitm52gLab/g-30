@@ -11,7 +11,7 @@ import { menuProgress } from '@/server/campaigns/read';
 import { menuIdentityKey } from '@/domain/campaigns/types';
 import { activeInquiry, staff } from '@/server/inquiries/access';
 import { questions } from '@/server/inquiries/projection';
-import { currentActor, sourceTask, brandRecipientIds, recipientFacts, activeRecipientIds } from './access';
+import { currentActor, sourceTask, brandRecipientIds, recipientFacts, ownerRecipientIds } from './access';
 import { sourceDeadline, sourceText, taskActionUrl } from './projection';
 import type { SourceSchedule } from './types';
 
@@ -36,7 +36,7 @@ export function taskSchedules(s: UnitOfWork, principal: Principal, taskId: strin
     for (const m of request.data.content.milestones) {
         if (m.visibility !== 'public' && m.visibility !== 'internal') unavailable();
         if (m.visibility === 'internal' && p.user.data.role !== 'gsg') continue;
-        result.push({ ...base, logicalKey: `task:${task.id}:milestone:${m.id}`, kind: m.kind, source: { kind: 'task_milestone', targetId: task.id, versionId: request.id, itemKey: sourceText(m.id) }, deadline: sourceDeadline(m.deadline), visibility: m.visibility, nextAction: '외부 일정 진행 확인', need: { kind: 'responsible_action', taskStatus: task.data.status, sourceAvailable: true, pending: true, recipientRole: 'gsg', participationActive: true }, ...recipientFacts(p, activeRecipientIds(s, task.contextId!, [m.deadline.responsibleUserId], 'gsg')), reminderSupport: 'current_need' });
+        result.push({ ...base, logicalKey: `task:${task.id}:milestone:${m.id}`, kind: m.kind, source: { kind: 'task_milestone', targetId: task.id, versionId: request.id, itemKey: sourceText(m.id) }, deadline: sourceDeadline(m.deadline), visibility: m.visibility, recipientPolicy: 'external_gsg', nextAction: '현재 GSG 업무 담당자의 외부 일정 진행 확인', need: { kind: 'responsible_action', taskStatus: task.data.status, sourceAvailable: true, pending: true, recipientRole: 'gsg', participationActive: true }, ...recipientFacts(p, ownerRecipientIds(s, task)), reminderSupport: 'current_need' });
     }
     return result;
 }
@@ -69,7 +69,7 @@ export function campaignSchedules(s: UnitOfWork, principal: Principal, campaignI
             }
             for (const followup of state.followups) if (item.key === `followup:${followup.definition.key}`) { pending = followup.status === 'pending'; nextAction = '행사 후속 자료 수령 확인'; }
             const duplicateSubmission = item.key === 'request';
-            result.push({ ...base, logicalKey: `campaign:${row.id}:${key}:${item.key}`, kind: item.kind, source: { kind: 'campaign', targetId: row.id, versionId: v.id, itemKey: `${key}:${item.key}` }, deadline: sourceDeadline(item.deadline), nextAction: duplicateSubmission ? '업무의 현재 제출 요청에서 안내' : nextAction, need: duplicateSubmission ? null : { kind: 'responsible_action', taskStatus: task.data.status, sourceAvailable: true, pending, recipientRole: 'gsg', participationActive: true }, ...recipientFacts(p, activeRecipientIds(s, task.contextId!, [item.deadline.responsibleUserId], 'gsg')), reminderSupport: duplicateSubmission ? 'source_schedule_only' : 'current_need' });
+            result.push({ ...base, logicalKey: `campaign:${row.id}:${key}:${item.key}`, kind: item.kind, source: { kind: 'campaign', targetId: row.id, versionId: v.id, itemKey: `${key}:${item.key}` }, deadline: sourceDeadline(item.deadline), recipientPolicy: duplicateSubmission ? 'task_assignees' : 'external_gsg', nextAction: duplicateSubmission ? '업무의 현재 제출 요청에서 안내' : `현재 GSG 업무 담당자의 ${nextAction}`, need: duplicateSubmission ? null : { kind: 'responsible_action', taskStatus: task.data.status, sourceAvailable: true, pending, recipientRole: 'gsg', participationActive: true }, ...recipientFacts(p, duplicateSubmission ? brandRecipientIds(s, task) : ownerRecipientIds(s, task)), reminderSupport: duplicateSubmission ? 'source_schedule_only' : 'current_need' });
         }
     }
     return result;

@@ -18,6 +18,7 @@ export interface SourceSchedule {
     unresolvedConflict: boolean;
     active: boolean;
     need: CurrentNeed | null;
+    actionOwnerIds: string[];
     recipient: CurrentRecipient | null;
     recipientState: 'current_recipient' | 'other_recipient' | 'needs_assignment';
     reminderSupport: 'current_need' | 'source_schedule_only';
