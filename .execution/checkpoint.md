@@ -24,3 +24,7 @@ G04 candidate fb493e69830461fbf3fa11be90d9b50c94b0e334 independently verified an
 ## State 50 — G06 server contract
 
 G06 server assigned to prd in .worktrees/g06-impl at accepted cc59987. Sole schema/file/policy writer; ports4161/4164, no .env. UI goals waits for reviewed concrete contract. Independent workflow will verify combined candidate.
+
+## State 53 — G06 server implementation continues
+
+Canonical accepted product remains cc59987. G06 server prd in .worktrees/g06-impl is sole shared writer; migration repository and two exact legacy fixture test leases added. Contract is not frozen yet; first typecheck failures preserved and being repaired. Goals UI and workflow verification plans reviewed, all NOT_RUN. G05 task-draft-v2 and G06 UI draft prepared without assignment. Material counts remain unconnected/null until G07. Goal active, no blocker.
