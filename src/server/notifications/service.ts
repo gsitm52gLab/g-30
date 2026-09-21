@@ -18,7 +18,7 @@ export class NotificationService {
         if (!row.contextId) unavailable();
         authorize(s, p, 'notification.read', { id: row.id, kind: 'notification', contextId: row.contextId, visibility: 'public', recipientUserId: row.data.recipientId }, this.clock);
         const current = resolvedDelivery(s, p, row.contextId, row.data.source, this.clock, false);
-        if (!current || current.key !== row.data.key || row.data.email !== 'not_connected') unavailable();
+        if (!current || current.key !== row.data.key || row.data.email !== 'not_connected' || row.data.actionUrl !== current.actionUrl || row.data.certainty !== null && !['confirmed', 'requested', 'expected', 'needs_confirmation'].includes(row.data.certainty)) unavailable();
         return current;
     }
     private dto(s: UnitOfWork, p: Principal, row: StoredRecord<'notification'>) {

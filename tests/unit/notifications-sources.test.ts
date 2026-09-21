@@ -70,11 +70,17 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G13 actual pro
         await repo.transaction(s => { const row = s.get('session', old.session.id)!; s.update('session', row.id, row.revision, { ...row.data, revokedAt: NOW }); });
         await expect(repo.transaction(s => notificationEventSource(s, old, id, () => NOW))).rejects.toMatchObject({ status: 401 });
     });
-    it('S13-04 old G04 schedule event precision is explicitly unavailable; no latest-activity guess', async () => {
+    it('S13-04 actual G04 activity IDs are exact; legacy request-only event precision stays unavailable', async () => {
         await setup(); const tasks = new TaskService(identity);
         for (const day of ['2026-09-22', '2026-09-23']) { const t = (await repo.get('task', taskId))!; await tasks.command(brand, taskId, { command: 'schedule', expectedRevision: t.revision, reason: '일정 조정 '+day, deadline: { ...blankContent().deadline, value: day, responsibleUserId: 'user-luna' }, idempotencyKey: randomUUID() }); }
         const e = await events('TASK_SCHEDULE_CHANGE_REQUESTED'); expect(e).toHaveLength(2);
-        for (const row of e) expect(await read(gsg, (s, p) => notificationEventSource(s, p, row.id, () => NOW))).toMatchObject({ disposition: 'eligible', sourcePrecision: 'activity_unavailable', source: { versionId: row.data.sourceVersionId } });
+        for (const row of e) {
+            const activity = (await repo.get('taskActivity', row.data.sourceVersionId!))!; expect(activity.data.kind).toBe('schedule');
+            expect(await read(gsg, (s, p) => notificationEventSource(s, p, row.id, () => NOW))).toMatchObject({ disposition: 'eligible', sourcePrecision: 'exact', source: { versionId: activity.id } });
+        }
+        // Historical pre-G13 format fixture: retain unknown precision instead of picking either new activity.
+        const legacy = await repo.transaction(s => s.create('domainEvent', { id: randomUUID(), contextId, data: { ...e[0].data, sourceVersionId: s.get('task', taskId)!.data.currentRequestId! } }));
+        expect(await read(gsg, (s, p) => notificationEventSource(s, p, legacy.id, () => NOW))).toMatchObject({ disposition: 'eligible', sourcePrecision: 'activity_unavailable', source: { versionId: legacy.data.sourceVersionId } });
     });
     it('S13-05 G08 draft0, exact published recipients/current AND historical audience, read state untouched', async () => {
         await setup(); const notices = new NoticeService(identity), c = { ...blankNotice(), title: '실제 공지', body: '공개 본문', audience: { mode: 'selected' as const, userIds: ['user-luna'] } };

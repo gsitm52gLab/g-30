@@ -65,4 +65,4 @@ export function canonicalEvent(s: UnitOfWork, source: DeliverySource): string | 
     if (!origin || origin.selectionVersionId || origin.sourceFactId) return null;
     return s.list('domainEvent', e.contextId!).find(v => v.data.eventType === 'CAMPAIGN_PUBLISHED' && v.data.targetId === origin.campaignId && v.data.sourceVersionId === origin.campaignVersionId)?.id ?? null;
 }
-export function readCommand(input: unknown) { const x = object(input, ['read', 'expectedRevision', 'idempotencyKey']); if (typeof x.read !== 'boolean') unavailable(); return { ...x, read: x.read }; }
+export function readCommand(input: unknown) { const x = object(input, ['read', 'expectedRevision', 'idempotencyKey']); if (typeof x.read !== 'boolean') unavailable(); return { read: x.read, expectedRevision: x.expectedRevision, idempotencyKey: str(x.idempotencyKey, 160, true) }; }
