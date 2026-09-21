@@ -29,7 +29,7 @@ try {
  firstOpenAt=new Date().toISOString();db=openDatabase(targetDb);
  check('copy-before-open',copyCompletedAt<=firstOpenAt&&copies.length>=4);
  const before=db.prepare('SELECT * FROM records ORDER BY kind,id').all() as Raw[],beforeText=JSON.stringify(before),ledger=db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as {name:string;sha256:string}[];
- const expected=label==='g11-ui'?[1,2,3,4,5,6,7,8,9,10,11,12]:[1,2,3,4,5,6,7,8,9,10];
+ const expected=label==='g11-ui'?[1,2,3,4,5,6,7,8,9,10,11]:[1,2,3,4,5,6,7,8,9,10];
  check('historical-sql-membership',JSON.stringify(ledger.map(r=>Number(r.name.slice(0,4))))===JSON.stringify(expected));check('historical-populated',before.length>50);
  // Align only the COPY with prerequisite SQL through0013, preserving historical metadata; G13 is then measured separately.
  const baselineDir=path.join(destination,'baseline-sql');await mkdir(baselineDir);for(const f of (await readdir('src/server/db/migrations')).filter(f=>/^\d+.*\.sql$/.test(f)&&Number(f.slice(0,4))<14))await copyFile(path.join('src/server/db/migrations',f),path.join(baselineDir,f));
