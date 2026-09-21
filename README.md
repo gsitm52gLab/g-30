@@ -229,7 +229,7 @@ IMPORTS_MODE=sqlite E2E_PORT=4172 npx tsx scripts/verify-imports-http.ts
 저장된 배치 결과의 알려진 필드 구조가 손상되면 `STORAGE_UNAVAILABLE`503으로 안전하게 실패합니다. 원본 배치 기록을 다시 쓰지 않고 관리자 확인을 요청합니다. 정상 데이터의 알 수 없는 추가 키는 공개 DTO에서 제외합니다. 일반 링크 표시값에 매크로 관련 단어가 있다는 이유만으로 거부하지 않으며 실제 OOXML content type·요소·관계와 파일 구조를 검사합니다.
 
 
-G07 XLSX 입력은 SpreadsheetML의 실제 namespace URI와 local name으로 해석합니다. 표준 URI에 연결된 `x:` 등 접두사나 기본 namespace는 같은 의미로 처리하며, 구조 이름의 잘못된 URI·DTD·매크로·외부 통합문서 연결은 거부합니다. 원본 ZIP의 크기·CRC·경로 검사를 먼저 수행하고 제한된 메모리에서 ExcelJS용 XML/ZIP을 재직렬화합니다. 원본 저장 bytes/SHA와 셀의 정확한 숫자 문자열·앞자리 0·수식 거부 정책은 유지합니다. 이것이 모든 XLSX 확장 기능 또는 미확보 현업 양식의 호환성 보장은 아닙니다. `saxes@5.0.1`과 `jszip@3.10.2`는 기존 설치 버전을 direct exact dependency로 명시했습니다(ISC, JSZip의 MIT 라이선스 선택).
+G07 XLSX 입력은 SpreadsheetML의 실제 namespace URI와 local name으로 해석합니다. 표준 URI에 연결된 `x:` 등 접두사나 기본 namespace는 같은 의미로 처리하며, 구조 이름의 잘못된 URI·DTD·매크로·외부 통합문서 연결은 거부합니다. 원본 ZIP의 크기·CRC·경로 검사를 먼저 수행하고 제한된 메모리에서 ExcelJS용 XML/ZIP을 재직렬화합니다. 원본 업로드 bytes 기준 SHA와 셀의 정확한 숫자 문자열·앞자리 0·수식 거부 정책은 유지합니다. 이것이 모든 XLSX 확장 기능 또는 미확보 현업 양식의 호환성 보장은 아닙니다. `saxes@5.0.1`과 `jszip@3.10.2`는 기존 설치 버전을 direct exact dependency로 명시했습니다(ISC, JSZip의 MIT 라이선스 선택).
 
 접두사가 있는 합성 원본 세 종류의 실제 업로드→미리보기→반영/거부 회귀는 다음처럼 실행합니다. 서버/DB/파일은 매번 별도로 생성합니다.
 
@@ -237,3 +237,5 @@ G07 XLSX 입력은 SpreadsheetML의 실제 namespace URI와 local name으로 해
 IMPORTS_NAMESPACE_ONLY=1 IMPORTS_MODE=mock E2E_PORT=4191 npx tsx scripts/verify-imports-http.ts
 IMPORTS_NAMESPACE_ONLY=1 IMPORTS_MODE=sqlite E2E_PORT=4192 npx tsx scripts/verify-imports-http.ts
 ```
+
+기본 E2E 실행기는 실행 회차·프로젝트·spec마다 DB, 일반 첨부 저장소와 `IMPORT_STORAGE_DIR`를 모두 별도로 생성합니다. 외부에서 물려받은 import 경로도 해당 spec의 `import_staging`으로 덮고 실행 summary에 경로를 남깁니다. 이전 staging은 삭제하지 않으며 실제 50개 보관 제한도 유지합니다.
