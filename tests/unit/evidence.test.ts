@@ -92,6 +92,13 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(row.counts.unconfirmed).toBe(pendingCount-1);
             expect(row.counts.missing).toBe(missingBefore+1);
             expect((await sub.workspace(brand, taskId)).submittedEvaluation!.evaluation.missing).toBe(1);
+            const beforeRevision = await service.detail(brand,d.id);
+            await service.command(brand,d.id,{command:'revise',expectedRevision:beforeRevision.revision,source,metadata:{...beforeRevision.current.metadata,title:'개정 질문지 정보'},productIds:['product-serum'],idempotencyKey:randomUUID()});
+            const revisedCell=(await service.table(brand,A)).rows.find(r=>r.productId==='product-serum')!.cells.find(c=>c.taskId===taskId&&c.requirementKey==='doc')!;
+            expect(revisedCell.evidenceLinks).toHaveLength(1);
+            expect(revisedCell.evidenceLinks[0].status).toBe('pending');
+            expect(revisedCell.status).toBe('content_confirmation');
+            expect((await service.detail(brand,d.id)).versions.find(v=>v.id===beforeRevision.current.id)!.links[0].assessments[0].status).toBe('correction_needed');
         });
         it('fresh scope/current file authorization, assessment role, CAS, and late rollback enforced', async () => {
             await setup();

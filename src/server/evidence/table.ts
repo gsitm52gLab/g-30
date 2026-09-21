@@ -61,6 +61,7 @@ export function materialTable(s: UnitOfWork, p: Principal, contextId: string, cl
             const evidenceLinks = s.list('evidenceLink', contextId).filter(l => l.data.active && l.data.productId === r.product.id).flatMap(l => {
                 try {
                     const value = resolveLink(s, p, l.id, clock), source = value.version.data.source;
+                    if (s.get('evidence', value.version.data.evidenceId)?.data.currentVersionId !== value.version.id) return [];
                     // The exact bytes must be present in the actual answer, never only in inventory.
                     if (!latest || !fileIds.includes(value.file.id))
                         return [];
