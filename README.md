@@ -2,9 +2,9 @@
 
 **Healthcare & Aesthetic Launch Enablement** · **해외 헬스케어 진출의 모든 일**
 
-현재 후보는 G00 실행·저장 기반과 **G01 컨텍스트·사용자 관리**입니다. 합성 자료로 실제 서버 로그인, 컨텍스트 생성·전환, 초대 수락·재발급, 계정/멤버십 중지, 브랜드 담당자/GSG 책임자 재배정과 변경 이력을 제공합니다. 홈 → 업무 → 상품의 기존 조회도 서버 인증과 컨텍스트 범위를 확인합니다.
+현재 후보는 G00 실행·저장 기반, **G01 컨텍스트·사용자 관리와 G02 서버 권한 기반**입니다. 합성 자료로 실제 서버 로그인, 컨텍스트 생성·전환, 초대 수락·재발급, 계정/멤버십 중지, 브랜드 담당자/GSG 책임자 재배정과 변경 이력을 제공합니다. 홈 → 업무 → 상품의 기존 조회와 관리 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
 
-G02의 전 채널 정책 행렬과 G03~G18의 전체 업무 작성·제출·상품 CRUD·파일·Excel·문의·AI는 아직 구현하지 않았습니다. 현재 과거 작성자 참조는 합성 Task 레코드이며, 실제 제출/버전 경로와 연결한 회귀 검사는 G04/G05/G18에서 수행해야 합니다. 외부기관 계정, 실제 이메일 발송, 실제 API 호출은 없습니다.
+G02는 현재 API/HTML/RSC와 전 채널 정책 harness를 구분합니다. G03~G18의 전체 업무 작성·제출·상품 CRUD·파일·Excel·문의·AI는 아직 구현하지 않았습니다. 현재 과거 작성자 참조는 합성 Task 레코드이며, 실제 제출/버전 경로와 연결한 회귀 검사는 G04/G05/G18에서 수행해야 합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
 
 ## 설치·실행
 
@@ -75,7 +75,33 @@ Next/CLI는 현재 프로젝트의 환경 로딩 규칙을 사용합니다. `.en
 
 G01에서는 설치된 Next **16.3.5**의 authentication·cookies·route-handlers 가이드를 읽고 DB 세션과 서버 DAL을 구성했습니다. 버전은 accepted package/lockfile 그대로이며 신규 의존성은 없습니다. G00 때 참조한 `/Users/evan/workspace/hackathon`의 앱/fixture/DB를 복사하거나 원본을 변경하지 않았습니다. 공개 패키지 license·scaffold 검토는 G00 증거에 남아 있습니다.
 
-다음 모듈은 `src/server/auth/service.ts`의 principal/hasScope를 재사용하고 새 mutation마다 동일 UoW 내부 최신 상태 검사를 추가해야 합니다. G02는 generic read/write/internal-price 정책 harness, G04/G05는 실제 업무·제출 작성자 연결, G18은 존재하는 전 채널 및 전체 영속성 회귀를 소유합니다. 이번 구현이 그 후행 경로를 검증했다는 뜻은 아닙니다.
+다음 모듈은 `src/server/auth/service.ts`의 principal과 `src/server/policy/`의 action/resource 정책을 소비하고 새 mutation마다 동일 UoW 내부 최신 상태 검사를 추가해야 합니다. G04/G05는 실제 업무·제출 작성자 연결, G18은 존재하는 전 채널 및 전체 영속성 회귀를 소유합니다. 현재 G02 구현이 그 후행 경로를 검증했다는 뜻은 아닙니다.
+
+## G02 정책과 검증 경계
+
+`policy.ts`는 세션/계정·현재 멤버십·관리/가격 grant를 같은 동기 transaction에서 다시 읽습니다. 클라이언트 역할이나 이전 요청의 capability를 권한으로 사용하지 않습니다. 알 수 없는 action/kind/공개 범위는 거부하며, 타 범위/없는 자료는 동일한 404 응답입니다. 내부 원문 접근과 가격 접근은 별개입니다. 회원 관리의 peer identity에는 다른 사용자의 adminGrant를 포함하지 않고, 본인의 세션 DTO에만 명시 grant를 제공합니다.
+
+`projection.ts`는 현재 업무·상품·컨텍스트·회원·감사 DTO를 허용 필드로 구성합니다. 내부 공급가/공급률은 브랜드와 가격 권한 없는 GSG에게 필드 자체가 없습니다. 현재 합성 업무의 `notes`는 공개 안내입니다. 기존 `contributorIds`는 이력이며 공동담당 권한으로 해석하지 않습니다. G04는 실제 공개/초안 및 현재 주/공동담당 메타데이터를 생산해야 합니다. 기존 G00/G01 task/product adapter의 공개 합성 미리보기 의미를 미래 초안에 그대로 적용하지 마세요.
+
+현재 연결: 모든 인증/컨텍스트 관리 API와 홈·업무·상품 HTML/RSC. 부트스트랩 로그인/초대 수락/CSRF와 데이터 없는 health는 인증 전 예외입니다. 일반 응답은 no-store이며 body는 읽는 중 16KiB에서 제한하고 입력 키를 검사합니다. 429는 Retry-After를 제공합니다.
+
+후행 계약만 검사한 경로: 파일 original/preview/download와 원본·참조 범위, 제출 lead/co/team, 가격·검색/정렬/페이지/count·Excel/export, 알림 수신자, 감사, AI 입력/결과와 원본 범위. 정책은 원본과 모든 참조의 현재 권한을 확인하고 projection 이후 검색/집계를 수행합니다. `projectChannel`은 최소 harness 계약이며 각 모듈은 실제 DTO allowlist와 HTTP/파일 검사를 추가해야 합니다. 해당 endpoint를 만들거나 검증했다고 주장하지 않습니다. D02~D05 및 G18 회귀 의무는 남습니다. GSG 완료 정책은 잔여 질문/외부 대기/AI 실패를 승인 게이트로 삼지 않습니다.
+
+```bash
+npm run check
+npm run build
+E2E_PORT=4121 APP_ORIGIN=http://127.0.0.1:4121 npm run test:e2e
+E2E_PORT=4121 APP_ORIGIN=http://127.0.0.1:4121 npm run test:e2e:db
+E2E_PORT=4121 node --import tsx scripts/verify-policy-http.ts
+E2E_PORT=4121 node --import tsx scripts/verify-policy-browser.ts
+node --import tsx scripts/verify-policy-isolation.ts
+```
+
+권한 HTTP 검사기는 합성 전용 DB와 4121 서버를 직접 생성해 중첩 비공개 marker·실제 cookie/CSRF·HTML/RSC·권한 철회·재시작·DB 오류를 검사합니다. isolation 검사는 **예약된 4121/4124 두 포트**와 독립 DB/쿠키를 사용합니다. 다른 서버가 쓰는 포트라면 실행하지 말고 슬롯을 다시 지정하도록 검사기를 조정하세요. 기본 제품 APP_ORIGIN은 3000으로 유지하며 검증 포트를 제품 기본값으로 바꾸지 않습니다. 미래 API는 harness 검사로만 기록합니다.
+
+HTTP 검사의 직접 `_rsc` 요청은 프로토콜 probe입니다. 별도 browser 검사는 비공개 합성 marker를 저장한 SQLite에서 PC/모바일의 실제 Link 이동·prefetch가 만든 RSC 응답과 화면을 확인합니다. 로그인 요청/인증 헤더는 수집하지 않고 응답의 안전한 본문·경로·hash·비공개 필드 부재를 기록합니다. 각 서버 검사는 같은 포트를 사용하므로 순서대로 실행하세요.
+
+`EVIDENCE_ROOT`로 보고서 위치를 지정할 수 있으며 각 실행은 timestamp가 다른 보고서를 남깁니다. `scripts/verify-policy-command.py --requirements AC-02-01,A19 --level HTTP label -- <command>`는 실제 명령/cwd/exit/시각/요구 ID/로그 hash를 남깁니다. 기록기에는 `EVIDENCE_ROOT`가 필요합니다. command 수와 unit test/HTTP assertion/UI scenario 수를 합쳐 부풀리지 않으며 실패·재시도는 별도 이력으로 보존합니다.
 
 ## 데모/발표 도입
 

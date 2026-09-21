@@ -7,8 +7,26 @@ export function requestToken(request: Request) { const name = authConfig().cooki
 export function json(data: unknown, status = 200) { return NextResponse.json(data, { status, headers: { "Cache-Control": "no-store, private", "Referrer-Policy": "no-referrer" } }); }
 export function sessionCookie(response: NextResponse, token: string, expiresAt: string) { const c = authConfig(); response.cookies.set(c.cookieName, token, { httpOnly: true, sameSite: "lax", secure: c.secure, path: "/", expires: new Date(expiresAt) }); }
 export async function readBody(request: Request, keys: string[]) { if (!request.headers.get("content-type")?.startsWith("application/json"))
-    fail("VALIDATION", 422, "JSON 요청이 필요합니다."); const raw = await request.text(); if (raw.length > 16384)
-    fail("VALIDATION", 422, "입력 내용이 너무 큽니다."); let body; try {
+    fail("VALIDATION", 422, "JSON 요청이 필요합니다.");
+    const reader = request.body?.getReader();
+    const chunks: Uint8Array[] = [];
+    let length = 0;
+    if (reader) {
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                length += value.byteLength;
+                if (length > 16384) {
+                    await reader.cancel();
+                    fail("VALIDATION", 422, "입력 내용이 너무 큽니다.");
+                }
+                chunks.push(value);
+            }
+        } finally { reader.releaseLock(); }
+    }
+    const raw = Buffer.concat(chunks).toString("utf8");
+    let body; try {
     body = JSON.parse(raw);
 }
 catch {
@@ -26,11 +44,14 @@ export async function route(request: Request, action: (service: IdentityService,
     return await action(service, token);
 }
 catch (error) {
-    if (error instanceof AuthError)
-        return json({ error: { code: error.code, message: error.message } }, error.status);
+    if (error instanceof AuthError) {
+        const response = json({ error: { code: error.code, message: error.status === 404 ? "자료를 찾을 수 없습니다." : error.message } }, error.status);
+        if (error.status === 429) response.headers.set("Retry-After", "900");
+        return response;
+    }
     if (error instanceof StoreError) {
         const status = error.code === "CONFLICT" ? 409 : error.code === "NOT_FOUND" ? 404 : error.code === "INVALID_RECORD" ? 422 : 503;
-        return json({ error: { code: error.code, message: status === 409 ? "이미 존재하거나 변경된 자료입니다. 새로고침해 주세요." : status === 503 ? "저장소를 사용할 수 없습니다. 입력을 유지한 채 다시 시도해 주세요." : "자료와 입력을 확인해 주세요." } }, status);
+        return json({ error: { code: error.code, message: status === 404 ? "자료를 찾을 수 없습니다." : status === 409 ? "이미 존재하거나 변경된 자료입니다. 새로고침해 주세요." : status === 503 ? "저장소를 사용할 수 없습니다. 입력을 유지한 채 다시 시도해 주세요." : "자료와 입력을 확인해 주세요." } }, status);
     }
     return json({ error: { code: "STORAGE_UNAVAILABLE", message: "처리하지 못했습니다. 입력을 유지한 채 다시 시도해 주세요." } }, 503);
 } }
