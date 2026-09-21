@@ -363,3 +363,32 @@ GSG는 **AI 입력·읽기 → 근거 분석·사람 검토**에서 정확한 �
 실제 제출의 정확한 문안·파일에 해당하는 수락/수정 후보만 사용자가 명시적으로 G10 내부 의견으로 저장할 수 있습니다. 서버가 제공하지 않은 답변 대상을 추정하지 않습니다. 브랜드 공개는 G10의 별도 초안·미리보기·공개 행동입니다. AI 분석·corpus·raw·검토 기록은 GSG 내부이며 현재 권한이 없으면 보호 내용과 브라우저 복구 입력을 비웁니다. 일시 저장 실패는 같은 요청 ID를 유지하고 409 충돌은 최신 기록 확인과 명시 재적용으로 처리합니다.
 
 화면 검사: `E2E_PORT=4237 E2E_AUX_PORT=4238 npm run test:e2e -- ai-review`, `E2E_PORT=4237 E2E_AUX_PORT=4238 npm run test:e2e:db -- ai-review`. 모드·PC/390px·스펙별 실제 결과를 별도 보존합니다. 자체 검사와 독립 검증·통합 회귀·전체 G16 수용은 구분합니다.
+
+## OpenAI 연결·실행 이력 (G17)
+
+이 절은 앞선 G15/G16 단계의 외부 연결 예정 설명을 갱신합니다. GSG의 입력별 분석 화면에서 **합성 데모**와 **OpenAI**를 명시적으로 선택합니다. 외부 AI 설정은 컨텍스트별이며, 사용 중지·연결 설정·키 존재 여부·모델을 보여 줍니다. 키 내용은 브라우저로 보내지 않습니다. 일반 앱은 서버의 `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL`을 사용합니다. 기존 `gpt-6 astra` 표기는 `gpt-6-astra`로만 정규화하며 다른 모델로 자동 대체하지 않습니다.
+
+정확한 서버 등록 해시와 현재 원본·참조 권한을 다시 확인한 읽기 구간만 전송합니다. 실행·외부 시도·응답·구조/근거 검증·사람 판단은 별개입니다. SDK 자동 재시도는 없으며 429/서버 오류는 같은 실행에서 최대 3회 명시적으로 시도합니다. 시간 초과·중단은 외부 결과 불확실성을 보존하고 중복 처리 가능성을 확인한 뒤 재시도합니다. 키·인증·권한을 수정했다면 **서버 설정 확인 후 같은 실행 재시도**를 사용합니다. 모델·주소·컨텍스트 설정 변경은 새 실행 기준입니다.
+
+제공된 입력/캐시 읽기/캐시 쓰기/출력/추론 사용량과 공식 요율 기준일을 기록합니다. 추론은 출력에 포함됩니다. 누락되거나 일치하지 않는 사용량·모델·처리 방식은 비용을 산정 불가로 표시하며 0으로 만들지 않습니다. 금액 상한은 없습니다. 기술 제한은 화면에 표시합니다. AI 장애 중에도 상품·제출·문의·사람 검토·GSG 수동 완료를 사용할 수 있고 실패는 잔여 상태로 보존합니다.
+
+합성 오류 검사는 실제 OpenAI에 접속하지 않습니다. 프로덕션 Next 경로를 사용하고 검사 자식 프로세스의 SDK fetch만 가로챕니다. 각각 고유 DB·파일·쿠키를 사용합니다. 기본 E2E runner에서는 이 전용 오류 스펙이 명시적으로 제외되며 아래 runner로 실행합니다. `.env`나 API 키 없이 재현할 수 있습니다.
+
+```sh
+npm ci
+npm run check
+npm run build
+AI_PROVIDER_MODE=mock E2E_PORT=4247 E2E_AUX_PORT=4248 node --conditions=react-server --import tsx scripts/verify-ai-provider-http.ts
+AI_PROVIDER_MODE=sqlite E2E_PORT=4247 E2E_AUX_PORT=4248 node --conditions=react-server --import tsx scripts/verify-ai-provider-http.ts
+AI_PROVIDER_MODE=mock E2E_PORT=4247 node --conditions=react-server --import tsx scripts/verify-ai-provider-ui.ts
+AI_PROVIDER_MODE=sqlite E2E_PORT=4247 node --conditions=react-server --import tsx scripts/verify-ai-provider-ui.ts
+node --conditions=react-server --import tsx scripts/verify-ai-provider-history.ts
+```
+
+`AI_PROVIDER_ROOT`/`AI_PROVIDER_REPORT`는 HTTP·UI 증거 위치, `AI_PROVIDER_HISTORY_ROOT`/`AI_PROVIDER_HISTORY_REPORT`는 과거 DB 복사 검사 위치입니다. G17 격리 기준은 기존 `0001`–`0013` 13개와 새 `0015-ai-provider.sql`이며, 후속 합본의 `0014`와 구분합니다. 원 SQL·DB·파일은 변경하지 않고 복사본에만 이행합니다.
+
+실제 제공자 검증은 별도 명시 명령입니다. 배포 소유의 승인된 합성 문안만 정상 앱 경로로 보내며 유료 요청이 발생할 수 있습니다. `AI_PROVIDER_ENV_FILE`로 기존 설정 파일을 지정하고 키를 명령행 값으로 쓰거나 복사하지 않습니다. 일반 오류/UI 검사를 실호출 성공으로 세지 않습니다. 실제 응답 성공 역시 전문가 법률 정확도 검증과 별개입니다.
+
+```sh
+AI_PROVIDER_ENV_FILE=/absolute/path/to/existing/.env E2E_PORT=4247 node --conditions=react-server --import tsx scripts/verify-ai-provider-live.ts
+```
