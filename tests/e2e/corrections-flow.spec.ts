@@ -1,10 +1,87 @@
-import {test,expect} from '@playwright/test';
-import {seed,open,opinionUI,batchUI,button,field,settled,login,produce,getWorkspace,chooseTarget,capture,retain,recordJSON,canary,ctx} from '../fixtures/corrections-ui';
-test.afterEach(async({page},info)=>retain(page,info));
-test('G10 UI-A AC10-01/02 actual five items exact old opinion preview public selective reflection separate resolution',async({page},info)=>{
- test.setTimeout(150000);const {id,v1}=await seed(page);await open(page,id);const o=await opinionUI(page,v1),old=o.currentVersionId!;const history=page.getByText(`의견 v1 · 외부 기관 의견 ·`,{exact:false});await history.click();await button(page,'이 의견 v1에서 새 버전 작성').click();await field(page,'의견 원문 · 내부 전용').fill(canary+'_NEW_VERSION');await button(page,'의견 버전 저장').click();await settled(page);expect((await getWorkspace(page,id)).staff!.opinions[0].versions).toHaveLength(2);
- await batchUI(page,v1,[old],5);const preview=page.getByRole('region',{name:'브랜드 보기 미리보기'});await expect(preview).not.toContainText(canary);await expect(preview).toContainText('PUBLIC_G10_UI_SELECTED_5');await capture(page,info,'gsg-preview');await button(preview,'이 묶음 공개하기').click();await settled(page);const b=(await getWorkspace(page,id)).batches[0];expect(b.items).toHaveLength(5);expect(b.items.every(i=>i.state.status==='pending')).toBe(true);
- await login(page,'luna@example.test');const v2=await produce(page,id,'원본 v2');expect((await getWorkspace(page,id)).batches[0].items.every(i=>i.state.status==='pending')).toBe(true);await open(page,id);await expect(button(page,'내부 의견')).toHaveCount(0);await expect(page.locator('body')).not.toContainText(canary);const region=page.getByRole('article',{name:'공개 묶음 v1'});for(let n=1;n<=2;n++){const item=page.getByRole('region',{name:`공개 항목 ${n}`,exact:true});await item.getByRole('checkbox',{name:`항목 ${n} 반영 대상으로 선택`,exact:true}).check();await chooseTarget(item,v2);await field(item,`반영 설명 ${n}`).fill(n===1?'엠블럼 수정본':'파일은 제출했으나 잘못된 문구가 남음');}await button(region,'선택한 2개 항목 반영 제출').click();await settled(page);let current=(await getWorkspace(page,id)).batches[0];expect(current.items.map(i=>i.state.status)).toEqual(['reflected','reflected','pending','pending','pending']);await capture(page,info,'brand-two-reflections');
- await login(page);await open(page,id);for(let n=1;n<=2;n++){const item=page.getByRole('region',{name:`공개 항목 ${n}`,exact:true});await item.getByRole('checkbox',{name:`항목 ${n} 해소 확인 대상으로 선택`,exact:true}).check();await item.getByRole('combobox',{name:`해소 판단 ${n}`,exact:true}).selectOption(n===1?'resolved':'needs_confirmation');await field(item,`판단 사유 ${n}`).fill(n===1?'실제 엠블럼 확인':'잘못 보낸 파일의 문구를 다시 확인');}await button(page,'선택한 2개 항목 해소 판단 저장').click();await settled(page);current=(await getWorkspace(page,id)).batches[0];expect(current.items.map(i=>i.state.status)).toEqual(['resolved','needs_confirmation','pending','pending','pending']);expect(current.items.slice(2).every(i=>i.state.revision===0)).toBe(true);expect(current.items[0].history.reflections[0].recordedBy).toBe('user-luna');expect(current.items[0].history.resolutions[0].resolvedBy).toBe('user-admin');expect(current.contentHash).toBe(b.contentHash);await capture(page,info,'gsg-one-resolved-wrong-file');await recordJSON(info,'actual-five-item-oracle',{v1,v2,before:b,after:current});
- await login(page,'team@example.test');await page.goto(`/tasks/${id}?context=${ctx}`);const rsc:{url:string;status:number;body?:string;error?:string}[]=[];page.on('response',r=>{if(r.url().includes('/corrections')&&r.headers()['content-type']?.includes('text/x-component'))void r.text().then(body=>rsc.push({url:r.url(),status:r.status(),body})).catch(e=>rsc.push({url:r.url(),status:r.status(),error:String(e)}));});await page.getByRole('link',{name:'수정 취합·검토 기록 ↗',exact:true}).click();await expect(page.getByRole('navigation',{name:'수정 검토 화면'})).toBeVisible();await expect(page.getByRole('checkbox')).toHaveCount(0);await expect(page.locator('body')).toContainText('PUBLIC_G10_UI_SELECTED_1');await expect(page.locator('body')).not.toContainText(canary);const html=await(await page.request.get(`/tasks/${id}/corrections?context=${ctx}`)).text();expect(html).toContain('PUBLIC_G10_UI_SELECTED_1');expect(html).not.toContain(canary);const api=JSON.stringify(await getWorkspace(page,id));expect(api).not.toContain(canary);expect(api).toContain('PUBLIC_G10_UI_SELECTED_1');await recordJSON(info,'team-clicked-rsc',{responses:rsc,status:rsc.some(x=>x.body?.includes('PUBLIC_G10_UI_SELECTED_1'))?'OBSERVED_PUBLIC_BODY':'BODY_NOT_VERIFIED'});for(const r of rsc)if(r.body)expect(r.body).not.toContain(canary);
+import { test, expect } from '@playwright/test';
+import { seed, open, opinionUI, batchUI, button, field, settled, login, produce, getWorkspace, chooseTarget, capture, retain, recordJSON, canary, ctx } from '../fixtures/corrections-ui';
+test.afterEach(async ({ page }, info) => retain(page, info));
+test('G10 UI-A AC10-01/02 actual five items exact old opinion preview public selective reflection separate resolution', async ({ page }, info) => {
+    test.setTimeout(150000);
+    const { id, v1 } = await seed(page);
+    await open(page, id);
+    const o = await opinionUI(page, v1), old = o.currentVersionId!;
+    const history = page.getByText(`의견 v1 · 외부 기관 의견 ·`, { exact: false });
+    await history.click();
+    await button(page, '이 의견 v1에서 새 버전 작성').click();
+    await field(page, '의견 원문 · 내부 전용').fill(canary + '_NEW_VERSION');
+    await button(page, '의견 버전 저장').click();
+    await settled(page);
+    expect((await getWorkspace(page, id)).staff!.opinions[0].versions).toHaveLength(2);
+    await batchUI(page, v1, [old], 5);
+    const preview = page.getByRole('region', { name: '브랜드 보기 미리보기' });
+    await expect(preview).not.toContainText(canary);
+    await expect(preview).toContainText('PUBLIC_G10_UI_SELECTED_5');
+    await capture(page, info, 'gsg-preview');
+    await button(preview, '이 묶음 공개하기').click();
+    await settled(page);
+    const b = (await getWorkspace(page, id)).batches[0];
+    expect(b.items).toHaveLength(5);
+    expect(b.items.every(i => i.state.status === 'pending')).toBe(true);
+    await login(page, 'luna@example.test');
+    const v2 = await produce(page, id, '원본 v2');
+    expect((await getWorkspace(page, id)).batches[0].items.every(i => i.state.status === 'pending')).toBe(true);
+    await open(page, id);
+    await expect(button(page, '내부 의견')).toHaveCount(0);
+    await expect(page.locator('body')).not.toContainText(canary);
+    const region = page.getByRole('article', { name: '공개 묶음 v1' });
+    for (let n = 1; n <= 2; n++) {
+        const item = page.getByRole('region', { name: `공개 항목 ${n}`, exact: true });
+        await item.getByRole('checkbox', { name: `항목 ${n} 반영 대상으로 선택`, exact: true }).check();
+        await chooseTarget(item, v2);
+        await field(item, `반영 설명 ${n}`).fill(n === 1 ? '엠블럼 수정본' : '파일은 제출했으나 잘못된 문구가 남음');
+    }
+    await button(region, '선택한 2개 항목 반영 제출').click();
+    await settled(page);
+    let current = (await getWorkspace(page, id)).batches[0];
+    expect(current.items.map(i => i.state.status)).toEqual(['reflected', 'reflected', 'pending', 'pending', 'pending']);
+    await capture(page, info, 'brand-two-reflections');
+    await login(page);
+    await open(page, id);
+    for (let n = 1; n <= 2; n++) {
+        const item = page.getByRole('region', { name: `공개 항목 ${n}`, exact: true });
+        await item.getByRole('checkbox', { name: `항목 ${n} 해소 확인 대상으로 선택`, exact: true }).check();
+        await item.getByRole('combobox', { name: `해소 판단 ${n}`, exact: true }).selectOption(n === 1 ? 'resolved' : 'needs_confirmation');
+        await field(item, `판단 사유 ${n}`).fill(n === 1 ? '실제 엠블럼 확인' : '잘못 보낸 파일의 문구를 다시 확인');
+    }
+    await button(page, '선택한 2개 항목 해소 판단 저장').click();
+    await settled(page);
+    current = (await getWorkspace(page, id)).batches[0];
+    expect(current.items.map(i => i.state.status)).toEqual(['resolved', 'needs_confirmation', 'pending', 'pending', 'pending']);
+    expect(current.items.slice(2).every(i => i.state.revision === 0)).toBe(true);
+    expect(current.items[0].history.reflections[0].recordedBy).toBe('user-luna');
+    expect(current.items[0].history.resolutions[0].resolvedBy).toBe('user-admin');
+    expect(current.contentHash).toBe(b.contentHash);
+    await capture(page, info, 'gsg-one-resolved-wrong-file');
+    await recordJSON(info, 'actual-five-item-oracle', { v1, v2, before: b, after: current });
+    await login(page, 'team@example.test');
+    await page.goto(`/tasks/${id}?context=${ctx}`);
+    const rsc: {
+        url: string;
+        status: number;
+        body?: string;
+        error?: string;
+    }[] = [];
+    page.on('response', r => { if (r.url().includes('/corrections') && r.headers()['content-type']?.includes('text/x-component'))
+        void r.text().then(body => rsc.push({ url: r.url(), status: r.status(), body })).catch(e => rsc.push({ url: r.url(), status: r.status(), error: String(e) })); });
+    await page.getByRole('link', { name: '수정 취합·검토 기록 ↗', exact: true }).click();
+    await expect(page.getByRole('navigation', { name: '수정 검토 화면' })).toBeVisible();
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
+    await expect(page.locator('body')).toContainText('PUBLIC_G10_UI_SELECTED_1');
+    await expect(page.locator('body')).not.toContainText(canary);
+    const html = await (await page.request.get(`/tasks/${id}/corrections?context=${ctx}`)).text();
+    expect(html).toContain('PUBLIC_G10_UI_SELECTED_1');
+    expect(html).not.toContain(canary);
+    const api = JSON.stringify(await getWorkspace(page, id));
+    expect(api).not.toContain(canary);
+    expect(api).toContain('PUBLIC_G10_UI_SELECTED_1');
+    await recordJSON(info, 'team-clicked-rsc', { responses: rsc, status: rsc.some(x => x.body?.includes('PUBLIC_G10_UI_SELECTED_1')) ? 'OBSERVED_PUBLIC_BODY' : 'BODY_NOT_VERIFIED' });
+    for (const r of rsc)
+        if (r.body)
+            expect(r.body).not.toContain(canary);
 });
