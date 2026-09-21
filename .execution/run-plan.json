@@ -884,7 +884,8 @@
         "src/server/repositories/mock.ts",
         "src/server/repositories/sqlite.ts",
         "tests/unit/repositories.test.ts",
-        "tests/unit/tasks.test.ts"
+        "tests/unit/tasks.test.ts",
+        "scripts/db.ts"
       ],
       "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-impl",
       "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1",
@@ -920,13 +921,14 @@
           "evidence": []
         }
       ],
-      "next_action": "Parallel G06 UI on fixed cab contract and server CR01-03 repair/HTTP; review exact combined candidate after serial internal assembly.",
+      "next_action": "Finish G06 UI and server migration diagnostic selfchecks; freeze and serially assemble combined candidate, then independent verification.",
       "base_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
       "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/task.json",
       "ownership_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-1.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-2.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-3.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-3.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/ownership-addendum-4.json"
       ],
       "contract_addenda": [
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/contract-clarification-1.json",
@@ -1030,7 +1032,16 @@
       "latest_server_candidate": "93b0fce4bab394b0f14d0a29a5b4dd5d757bc230",
       "main_contract_fix1_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix1-review.json",
       "main_contract_fix2_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-contract-fix2-review.json",
-      "contract_delta2": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/contract-delta-2.md"
+      "contract_delta2": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/contract-delta-2.md",
+      "bound_verification_plan": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/verification-plan-bound-v1.json",
+      "server_http_observation": {
+        "status": "IMPLEMENTER_REPORTED_MAIN_REVIEW_PENDING",
+        "mock_assertions": 53,
+        "sqlite_assertions": 58,
+        "candidate": "b5d2c8d",
+        "runner_modified": true,
+        "note": "Author reports source identical to93b, two helper failures preserved; final exactSHA packet pending."
+      }
     },
     {
       "id": "G07",
@@ -1672,8 +1683,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
-  "next_action": "Parallel G06 UI on fixed cab contract and server CR01-03 repair/HTTP; review exact combined candidate after serial internal assembly.",
-  "state_version": 57,
+  "next_action": "Finish G06 UI and server migration diagnostic selfchecks; freeze and serially assemble combined candidate, then independent verification.",
+  "state_version": 58,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1700,7 +1711,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T12:55:55.997057+00:00",
+  "updated_at": "2026-09-21T13:04:01.257311+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
