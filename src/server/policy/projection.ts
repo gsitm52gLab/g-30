@@ -35,7 +35,9 @@ export function privateFields(data: object, decision: Extract<Decision, { allowe
 export function projectTask(store: UnitOfWork, principal: Principal, row: StoredRecord<"task">, clock?: Clock) {
     const decision = authorize(store, principal, "task.read", taskScope(row), clock);
     const d = row.data;
+    const submitted = store.list("submission", row.contextId!).filter(v=>v.data.taskId===row.id).sort((a,b)=>b.data.sequence-a.data.sequence)[0];
     return { ...metadata(row), data: {
+        submissionSummary: submitted ? { id:submitted.id,sequence:submitted.data.sequence,requestId:submitted.data.requestId,mode:submitted.data.mode,isCurrentRequest:submitted.data.requestId===d.currentRequestId,submittedAt:submitted.data.submittedAt } : null,
         title: d.title, category: d.category, description: d.description, status: d.status,
         assigneeId: d.assigneeId, ownerId: d.ownerId, deadline: d.deadline, nextAction: d.nextAction,
         productIds: strings(d.productIds), notes: strings(d.notes), authorId: d.authorId,

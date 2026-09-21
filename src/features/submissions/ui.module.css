@@ -1,0 +1,3 @@
+@media (max-width: 600px) {
+  .commitActions > button { flex: 1 1 130px; min-width: 130px; white-space: normal; }
+}

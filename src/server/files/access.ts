@@ -1,7 +1,7 @@
 import type { Clock, StoredRecord, UnitOfWork } from "@/domain/records";
 import type { Principal } from "@/server/auth/service";
 import { fail, unavailable } from "@/server/auth/errors";
-import { authorize } from "@/server/policy/policy";
+import { authorize, decide } from "@/server/policy/policy";
 import { taskScope } from "@/server/policy/projection";
 import { resolveProduct, productContextScope } from "@/server/products/access";
 import type { ResourceScope } from "@/server/policy/types";
@@ -46,6 +46,16 @@ export function originalScope(s: UnitOfWork, p: Principal, file: StoredRecord<"f
     authorize(s, p, "task.read", taskScope(task), clock);
     return taskScope(task);
 }
+/** Only stored public request/submission inclusion releases a task file for reuse. */
+export function isPublishedTaskFile(s: UnitOfWork, file: StoredRecord<"fileVersion">): boolean {
+    const task = file.data.taskId ? s.get("task", file.data.taskId) : null;
+    return !!task && task.contextId === file.contextId && taskScope(task).visibility === "public" &&
+        (s.list("requestVersion", file.contextId!).some(v => v.data.taskId === task.id && v.data.content.referenceFileIds.includes(file.id)) ||
+         s.list("submission", file.contextId!).some(v => v.data.taskId === task.id && v.data.fileVersionIds.includes(file.id)));
+}
+export function canReadTemporarySubmissionFile(s: UnitOfWork, p: Principal, file: StoredRecord<"fileVersion">, target: ResourceScope, clock: Clock): boolean {
+    return !!file.data.submissionUpload && target.kind === "task" && target.id === file.data.taskId && decide(s, p, "submission.write", target, clock).allowed;
+}
 /** For selecting a reference: target need not contain the file yet. Both scopes are fresh. */
 export function canReferenceFile(s: UnitOfWork, p: Principal, file: StoredRecord<"fileVersion">, target: ResourceScope, clock: Clock) {
     if (file.contextId !== target.contextId)
@@ -53,9 +63,9 @@ export function canReferenceFile(s: UnitOfWork, p: Principal, file: StoredRecord
     const origin = originalScope(s, p, file, clock);
     authorize(s, p, "file.original", { id: file.id, contextId: file.contextId, kind: "file", visibility: file.data.visibility, originalScope: origin, referenceScope: target }, clock);
     const ownTask = origin.kind === "task" && target.kind === "task" && origin.id === target.id;
-    if (file.data.visibility === "public" && origin.kind === "task" && !ownTask) {
-        const published = origin.visibility === "public" && s.list("requestVersion", file.contextId!).some(version => version.data.taskId === origin.id && version.data.content.referenceFileIds.includes(file.id));
-        if (!published) fail("VALIDATION", 422, "다른 업무의 참고자료는 원본 공개 요청에 포함된 뒤 연결해 주세요.");
+    if (file.data.visibility === "public" && origin.kind === "task" && !isPublishedTaskFile(s, file)) {
+        if (!ownTask || !(file.data.submissionUpload ? canReadTemporarySubmissionFile(s, p, file, target, clock) : p.user.data.role === "gsg"))
+            fail("VALIDATION", 422, "원본 공개 요청 또는 실제 제출에 포함된 자료만 연결할 수 있습니다.");
     }
     return origin;
 }

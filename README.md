@@ -4,7 +4,7 @@
 
 현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
 
-G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. 실제 답변 제출(G05), 독립 상품 CRUD·스냅샷(G06), 증빙·Excel(G07), 문의·AI 등 후행 기능은 아직 연결되지 않았습니다. 과거 답변 검사는 저장된 합성 prior-submission 계약 fixture이며 실제 제출 생산자 연결은 G05/G18의 책임입니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
+G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본에 이어 이 후보는 G05 실제 답변 서버 계약을 추가합니다. 답변 UI는 별도 작업에서 연결하며 증빙·Excel, 검토·완료·문의·AI의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
 
 ## 설치·실행
 
@@ -59,9 +59,9 @@ npm run test:e2e:db
 
 `npm run verify`는 브라우저 설치를 제외한 위 검사를 순서대로 수행합니다. `check`는 lint·typecheck·단위 테스트이며 mock/SQLite의 정상·반례·시간 경계·권한·원자 rollback을 포함합니다. `identity:races`는 서로 다른 네 자식 프로세스로 SQLite 중복 이메일 초대와 동일 초대 수락을 경합시킵니다. `identity:restart`는 production 서버 A를 실제 종료한 뒤 같은 DB의 서버 B에서 새 로그인·멤버십·대기/소비 초대·철회 쿠키·재배정/작성자/감사 보존을 HTTP로 확인합니다. `db:restart`는 별도의 G00 최소 adapter 검사입니다.
 
-`test:e2e`와 `test:e2e:db`는 `scripts/run-e2e.ts`를 통해 desktop → mobile을 별도 Playwright 프로세스로 순차 실행합니다. 각 프로젝트는 새 production 서버·DB/메모리 fixture·파일 저장 경로·쿠키 이름을 사용합니다. 두 프로젝트의 정상 로그인 횟수가 한 서버의 인증 제한에 누적되지 않으며 제품의 인증 제한과 테스트 assertion은 그대로입니다. `verify`도 이 격리 명령을 사용합니다. `npm run build`와 Chromium 설치를 먼저 완료하세요.
+`test:e2e`와 `test:e2e:db`는 `scripts/run-e2e.ts`를 통해 desktop → mobile 순서로 실행합니다. 설치된 Playwright CLI의 `--list`로 실제 선택된 테스트를 먼저 확인한 뒤, 각 프로젝트의 테스트 파일(spec)마다 새 production 서버·DB/메모리 fixture·파일 저장 경로·쿠키 이름을 사용합니다. 서로 다른 파일의 정상 로그인 횟수가 한 서버의 인증 제한에 누적되지 않으며 제품의 인증 제한과 테스트 assertion은 그대로입니다. 기존 파일/줄 번호·grep·grep-invert 선택을 유지한 채 설정의 정확한 파일 조건을 교집합으로 적용하고, 실행 결과의 test ID를 최초 선택과 대조하여 누락·중복·추가 선택이면 실패합니다. `verify`도 이 격리 명령을 사용합니다. `npm run build`와 Chromium 설치를 먼저 완료하세요.
 
-기본 `E2E_PORT=4111`을 각 프로젝트가 순서대로 사용하고, `E2E_AUX_PORT`를 지정하면 mobile은 그 포트를 사용합니다. 지정하지 않으면 `E2E_PORT`와 같습니다. 사용 중인 서버를 재사용하거나 종료하지 않습니다. 테스트마다 다른 사용자의 작업 서버와 충돌하지 않는 예약 포트를 지정하세요. 각 서버의 `APP_ORIGIN`과 고유 쿠키 이름은 실행기가 포트/프로젝트로 설정하며 제품 기본 포트 3000은 유지됩니다. DB는 `.local/e2e-<mode>-<run-id>/<project>/fixture.db`, 파일은 같은 디렉터리의 `files/`에 보존됩니다(mock의 DB 경로는 예약만 하고 DB 파일을 만들지 않음).
+기본 `E2E_PORT=4111`을 각 프로젝트가 순서대로 사용하고, `E2E_AUX_PORT`를 지정하면 mobile은 그 포트를 사용합니다. 지정하지 않으면 `E2E_PORT`와 같습니다. 사용 중인 서버를 재사용하거나 종료하지 않습니다. 테스트마다 다른 사용자의 작업 서버와 충돌하지 않는 예약 포트를 지정하세요. 각 서버의 `APP_ORIGIN`과 고유 쿠키 이름은 실행기가 포트/프로젝트로 설정하며 제품 기본 포트 3000은 유지됩니다. DB는 `.local/e2e-<mode>-<run-id>/<project>/<순번-spec>/fixture.db`, 파일은 같은 디렉터리의 `files/`에 보존됩니다(mock의 DB 경로는 예약만 하고 DB 파일을 만들지 않음).
 
 CLI는 `--project=desktop`, `--project mobile`을 지원하며 반복 옵션으로 둘을 선택할 수 있습니다. 프로젝트를 생략하면 둘 다 실행합니다. 테스트 파일/행, `--grep`/`--grep-invert`, `--list`, `--headed` 등 나머지 인자는 shell 조합 없이 Playwright에 전달합니다. 잘못된 프로젝트·옵션·무일치 필터와 테스트 실패는 nonzero exit입니다. 격리를 우회하는 `--config/-c`, `--reporter`, `--output`과 상주 `--ui`는 명시 거부합니다. 보고서/산출물은 환경변수로 지정하세요. 직접 `npx playwright test` 대신 아래 wrapper 명령을 사용합니다.
 
@@ -77,7 +77,7 @@ npm run test:e2e -- --project desktop --list
 E2E_PORT=4149 E2E_AUX_PORT=4150 E2E_REPORT=.local/review/e2e.json E2E_ARTIFACTS=.local/review/artifacts npm run test:e2e
 ```
 
-`run-id`는 UTC 시각+무작위 접미사입니다. `E2E_REPORT=/path/e2e.json`이면 `/path/e2e.<run-id>.summary.json`에 명령·cwd·exit·건수·서버 PID/종료·DB/파일/쿠키 경로를 기록하고, 원본 Playwright JSON은 `e2e.<run-id>.desktop.json`과 `e2e.<run-id>.mobile.json`입니다. 기본 prefix는 `.local/e2e-results.json`입니다. 콘솔이 정확한 summary 절대경로를 출력합니다. `E2E_ARTIFACTS=/path/artifacts`이면 `/path/artifacts/<run-id>/<project>/test-results/`에 trace/화면을, 그 상위에 `runner.log`·`server.log`를 남깁니다(기본 root `test-results`). 프로젝트와 재실행 사이에 원본을 덮어쓰지 않습니다. summary의 test 건수는 command 건수와 별개이며 `--list`는 실행 통과로 세지 않습니다.
+`run-id`는 UTC 시각+무작위 접미사입니다. `E2E_REPORT=/path/e2e.json`이면 `/path/e2e.<run-id>.summary.json`에 명령·cwd·exit·건수·서버 PID/종료·DB/파일/쿠키 경로를 기록하고, 프로젝트 집계 JSON은 `e2e.<run-id>.desktop.json`과 `e2e.<run-id>.mobile.json`입니다. 원본 CLI 선택은 `.<project>.discovery.json`, 파일별 원본 결과는 `.<project>.<순번-spec>.json`에 보존합니다. summary의 `projects[].files[]`에는 파일별 명령·선택 ID·PID·종료·실행 건수와 selection 검증을 기록하며, 실행 전 실패로 보고되지 않은 선택 항목은 `not_run_test_count`로 남깁니다. 기본 prefix는 `.local/e2e-results.json`입니다. 콘솔이 정확한 summary 절대경로를 출력합니다. `E2E_ARTIFACTS=/path/artifacts`이면 `/path/artifacts/<run-id>/<project>/<순번-spec>/test-results/`에 trace/화면을, 그 상위에 `runner.log`·`server.log`를 남깁니다(기본 root `test-results`). 프로젝트·파일·재실행 사이에 원본을 덮어쓰지 않습니다. summary의 test 건수는 command 건수와 별개이며 `--list`는 실제 CLI 선택만 기록하고 서버를 시작하지 않으며 실행 통과로 세지 않습니다. CLI 선택이 실행 중 달라지거나 파일 실행이 실패하면 전체 명령도 실패합니다.
 
 기본 trace/자동 screenshot 설정은 꺼져 있습니다. G04 여정은 로그인 후 명시 trace·화면과 실패 DOM을 private 산출물로 남깁니다. 보고서는 환경 덤프/인증 헤더/DB 원문을 출력하지 않습니다. 증거는 합성 자료여도 비공개 보관하며 실패 로그를 삭제하거나 성공으로 재명명하지 않습니다. `RESTART_REPORT`, `IDENTITY_RESTART_REPORT`, `IDENTITY_RACES_REPORT`는 해당 검사기의 선택 출력입니다. 구현자 자기검증과 독립 검증/통합 회귀는 별개입니다.
 
@@ -139,7 +139,7 @@ GS HALE은 해외 헬스케어 진출에 필요한 모든 일을 하나의 흐�
 
 참고자료는 인증된 `POST /api/files?taskId=...`에서 업로드하며 `GET /api/files/:id?taskId=...&mode=download|original|preview`에서 원본과 참조 업무의 최신 권한을 모두 검사합니다. private 파일 저장소는 기본 `.data/files`, 선택 환경변수 `FILE_STORAGE_DIR`입니다. 웹 public 폴더가 아닙니다. 1개 25MiB·1회 10개 제한과 이름/확장자/MIME/기본 signature 검사를 적용하고, PDF/PNG/JPEG만 브라우저 미리보기를 제공합니다. 다른 허용 형식은 원본 다운로드로 확인합니다. 악성코드 백신/파일 내용의 전문가 검토를 수행했다고 주장하지 않습니다. 과거 공개 요청의 정확한 FileVersion은 새 버전 이후에도 현재 권한이 있는 사용자가 조회할 수 있습니다.
 
-G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 실제 답변 제출(G05), 상품 스냅샷(G06), GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. G04의 과거 답변 검사는 명시적 합성 prior-submission 레코드, 프로젝트 완료 분리는 합성 완료 상태로 검사합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 요청 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
+G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 상품 스냅샷(G06)은 연결됐으며 이 후보의 실제 답변 서버(G05)는 UI 작업과 검증을 진행 중입니다. GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. 기존 G04 과거 답변 검사의 합성 prior-submission과 실제 G05 제출을 구별합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
 
 ```bash
 npm run check
@@ -153,7 +153,7 @@ E2E_PORT=4141 APP_ORIGIN=http://127.0.0.1:4141 npm run test:e2e:db
 
 HTTP 검사기는 새 `.data/g04-http-*` DB/파일과 별도 쿠키 이름을 사용하며 자신의 서버만 종료합니다. SQLite 모드는 실제 서버 종료·재기동 후 재로그인하여 요청 버전·활동 순서·원본 byte hash를 비교합니다. mock은 메모리 모드이므로 프로세스 종료 후 업무 영속성을 주장하지 않습니다. `TASKS_HTTP_REPORT`와 브라우저 `E2E_REPORT`/`E2E_ARTIFACTS`는 선택 보고서 경로입니다. 실제 `.env`·외부 API·메일은 필요하지 않습니다.
 
-## G06 상품 서버 계약 (UI 통합 전 내부 단계)
+## G06 상품 UI·API 계약
 
 브랜드 공통 상품은 기존 Product ID를 유지하고, 컨텍스트별 SKU·JAN·등록/판매/출시 정보·프로젝트·파일 연결과 소비자가/내부 공급가를 별도 버전으로 저장합니다. `npm run db:setup`은 migration 0004와 모든 기존 상품의 원본 보존 이행을 실행합니다. 이미 이행한 상품은 다시 덮어쓰지 않으며 모호한 기존 용량 문자열은 원문으로 남깁니다.
 
@@ -161,7 +161,7 @@ HTTP 검사기는 새 `.data/g04-http-*` DB/파일과 별도 쿠키 이름을 �
 
 공통 정보 변경은 공유된 현재 정보를 갱신합니다. 미리보기에는 읽을 수 있는 적용 컨텍스트만 표시하고 숨겨진 대상의 이름·수·가격·파일은 반환하지 않습니다. 저장 명령은 각 common/context/price의 revision과 idempotencyKey를 사용합니다. `captureProductUse`는 후속 제출 트랜잭션에서 쓸 정확한 common/context/file 버전과 명시적으로 선택한 소비자가 버전을 저장합니다. 최신 가격을 당일 적용 가격으로 자동 간주하지 않습니다.
 
-이 내부 단계에서 상품 API·파일 권한·SQLite 재시작은 서버 자체검사 대상으로 검증합니다. 제품 UI 통합·브라우저 검증과 독립 수용은 아직 완료되지 않았습니다. 초기 prior-use 레코드는 계약 검증용이며 G05의 실제 제출 생산자가 아닙니다. G07 증빙 집계/Excel, G10 검토, G11 완료 연결은 후속 의무입니다. 자료 집계는 연결 전 `connected:false`와 `null`로 표시합니다.
+G06의 상품 UI/API는 통합·브라우저 검사·독립 검증과 메인 수용을 마친 단계입니다. 초기 prior-use 레코드는 계약 검증용이며 실제 제출이 아닙니다. 이 G05 서버 후보는 실제 제출 트랜잭션에서 상품 사용본을 만들지만 G05 전체 수용을 뜻하지 않습니다. G07 증빙 집계/Excel, G10 검토, G11 완료 연결은 후속 의무입니다. 자료 집계는 연결 전 `connected:false`와 `null`로 표시합니다.
 
 상품 서버 검사기는 새 전용 DB/파일·쿠키와 자신의 프로세스를 사용합니다. SQLite 모드는 두 포트에서 실제 동시 수정/중복 등록을 확인하고 종료·재시작·재로그인 후 정확한 상품/가격/파일/스냅샷을 비교합니다. mock 모드의 fixture 준비는 검사 전용 IPC이며 제품 API에 준비용 경로를 추가하지 않습니다. 과거 사용 스냅샷은 명시적 fixture이며 실제 G05 제출 완료로 계산하지 않습니다.
 
@@ -173,3 +173,29 @@ npm run products:migration-check
 ```
 
 `PRODUCTS_HTTP_REPORT`는 보고서 경로를 지정하며 실제 요청/상태/응답 hash와 프로세스 종료를 남깁니다. `E2E_PORT`/`E2E_AUX_PORT`는 비어 있는 자신 소유 슬롯으로 함께 바꿀 수 있습니다. 기존 원장에 이행할 수 없는 상품이 있으면 전체 데이터 이행을 원복하고 CLI에 G06 모듈·상품 ID·원본 컨텍스트 ID·허용된 사유만 표시합니다. 원문 값·비공개 가격·stack을 진단에 넣지 않으며 API의 일반 오류 응답도 그대로 유지합니다.
+
+## G05 답변 서버 계약
+
+`src/server/submissions/contracts.ts`가 입력/출력 타입 진입점입니다. 현재 공개 요청에 대해 브랜드 주·공동 담당자 또는 허용 GSG가 공유 초안을 저장합니다. 팀 비담당자는 공개 제출만 읽으며 미제출 초안/임시파일은 받지 않습니다. GSG 대리는 실제 자료 제공자와 로그인 기록자를 구분합니다.
+
+- `GET /api/tasks/:id/submissions`: 신선한 권한으로 초안, 실제 제출/이력, 후보 파일/상품을 조회합니다. `draftEvaluation`은 편집 초안, `submittedEvaluation`은 실제 최신 제출을 현재 요청에 대조한 진행입니다.
+- `POST /api/tasks/:id/submission-evaluation`: `{baseRequestId,content}`를 쓰기 없이 검사합니다. 8종 입력·조건 계층·필수 누락을 계산합니다. 자유문자 규격의 `check:auto`도 실행 가능한 규칙이 아니므로 사람 확인 대기이며 자동 검증 완료가 아닙니다.
+- `POST /api/tasks/:id/submission-draft`: `save`, `rebase_apply`, `copy_submission` 명령. 요청 ID와 공유 초안 revision을 검사합니다. 숫자 `-` 등 입력 중 값은 보존하고 제출 시 유효성을 검사합니다. `GET`은 요청 변경 후 명시적 이어받기 미리보기입니다.
+- `POST /api/tasks/:id/submissions`: 저장한 초안의 부분/전체 제출. 같은 초안 revision은 한 번만 소비합니다. 요청·상품·파일의 정확한 버전, 감사, 이벤트, 멱등 응답, 업무 진행을 한 transaction으로 기록합니다. 전체 제출은 구조적 충족이며 검토 승인/실물 수령/업무 완료가 아닙니다.
+- `GET /api/submissions/:id`: 불변 과거 제출과 당시 상품 사용본. 현재 권한과 원본/참조 권한은 다시 확인합니다.
+- `POST /api/tasks/:id/submission-files?requestId=...`: multipart `files`와 같은 순서의 `clientItemIds` 각 1~10개. `{items:[{clientItemId,state:'ready',file}|{clientItemId,state:'failed',error}]}`로 성공을 유지하고 실패 파일만 재시도합니다. 파일당 25MiB와 기존 MIME·시그니처 검사를 적용하며 전역 `/api/files` 응답은 변경하지 않습니다.
+
+모든 변경 요청은 기존 Origin/CSRF/세션 정책을 사용합니다. `REQUEST_CHANGED`, `DRAFT_CHANGED`, `CONFLICT` 409에서 입력과 준비된 파일 ID를 유지하고 최신 조회/명시적 비교·재선택을 사용합니다. 업로드/초안 저장은 제출 상태를 바꾸지 않습니다. 임시 참조 제외는 물리 삭제가 아니며, 공개 요청 또는 실제 불변 제출에 포함되어야 다른 업무/상품이 재사용할 수 있습니다. 외부 링크는 서버가 수집하지 않고 내용 미고정으로 보존합니다. 보류/취소 중 초안 저장은 가능하고 새 제출은 재개 후 가능합니다.
+
+합성 단위 검사는 `npx vitest run tests/unit/submissions.test.ts`이며 mock/SQLite 양쪽에서 실제 생성·부분/전체·v2·CAS·멱등·권한·업로드·요청변경·상품 캡처·rollback을 검사합니다. `0005-submissions.sql`은 업무당 공유 초안, 순번/초안 소비/파일 재시도 키의 고유성과 제출 불변성을 추가합니다. 실패저장 복구는 승인된 사용자/컨텍스트/업무/요청별 bounded sessionStorage 계약을 후속 UI가 구현하며 원시 File bytes/쿠키는 저장하지 않습니다.
+
+G05 실제 HTTP 검사는 production build 후 아래처럼 자신이 소유한 비어 있는 두 포트를 사용합니다. 검사기는 실제 API로 합성 답변을 만들고 mock/SQLite를 각각 확인합니다. SQLite에서는 두 서버의 CAS/중복 제출과 실제 종료·새 PID 재기동·재로그인을 검사합니다. 환경/쿠키/기밀 API는 필요하지 않습니다.
+
+```bash
+SUBMISSIONS_MODE=mock E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
+SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
+```
+
+`SUBMISSIONS_HTTP_ROOT`는 새 고유 DB/파일 런타임 디렉터리의 부모(기본 `.local/g05-http`), `SUBMISSIONS_HTTP_REPORT`는 요청 상태·응답 hash·assertion 결과·프로세스 종료 보고서 경로입니다. 과거 보고서를 덮어쓰지 않게 새 경로를 사용하세요. SQLite 검사의 private fixture는 실제 생성된 레코드의 읽기·해시 대조만 하며, mock은 같은 읽기 전용 관찰을 IPC로 수행합니다. 실제 UI·브라우저·복구 및 독립 검증은 별도 실행 증거로 구분합니다.
+
+저장된 공개 요청의 항목 구조가 손상된 경우 `REQUEST_INVALID`409로 답변 쓰기를 거부합니다. 읽기 평가는 `needs_reconfirmation`, `canSubmitFull:false`, 요청 구조 확인 필요를 표시합니다. 비정상 상품 범위를 공통 항목으로 바꿔 제출을 허용하지 않습니다. GSG가 실제 요청 편집에서 규칙을 확인·정정한 뒤 다시 공개하고, 작성자는 유지한 답변을 명시적으로 비교·재적용합니다. 정상 값의 알 수 없는 추가 키는 공개 출력에서 제외하지만 합법적인 제출은 유지합니다. 이 답변 구조 검사는 후행 GSG 수동 완료의 강제 승인 게이트가 아닙니다.

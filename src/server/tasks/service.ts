@@ -1,5 +1,7 @@
 import { resolveProduct, visibleProductRelations } from "@/server/products/access";
-import { canReferenceFile } from "@/server/files/access";
+import { latestSubmission } from "@/server/submissions/read";
+import { safeEvaluation } from "@/server/submissions/projection";
+import { canReferenceFile, visibleFile } from "@/server/files/access";
 import { createHash, randomUUID } from "node:crypto";
 import type { UnitOfWork, StoredRecord } from "@/domain/records";
 import type { RequestContent, PriorSubmissionData } from "@/domain/tasks/types";
@@ -126,8 +128,10 @@ export class TaskService {
             });
         });
     }
-    private resumeStatus(s: UnitOfWork, row: StoredRecord<"task">): "requested" | "in_progress" | "partial" {
+    private resumeStatus(s: UnitOfWork, row: StoredRecord<"task">): "requested" | "in_progress" | "partial" | "submitted" {
         if (row.data.resumeStatus) return row.data.resumeStatus;
+        const live = latestSubmission(s,row);
+        if (live && live.data.requestId === row.data.currentRequestId) return live.data.mode === "full" ? "submitted" : "partial";
         // Legacy paused rows have no saved progress. Only the current version's actual
         // acceptance can restore in_progress; old versions never imply new acceptance.
         return row.data.currentRequestId && s.list("taskActivity", row.contextId!).some(a =>
@@ -140,7 +144,7 @@ export class TaskService {
         if (!c.description.trim() || !c.requirements.length) fail("VALIDATION", 422, "공개 설명과 요청 항목을 작성해 주세요.");
         const previous = row.data.currentRequestId ? s.get("requestVersion", row.data.currentRequestId) : null;
         const version = s.create("requestVersion", { id: id(), contextId: row.contextId, data: { taskId: row.id, sequence: (previous?.data.sequence ?? 0) + 1, previousId: previous?.id ?? null, templateVersionId, content: c, publishedBy: p.user.id, publishedAt: this.clock(), changedKeys: c.requirements.filter(q => !previous?.data.content.requirements.some(old => JSON.stringify(old) === JSON.stringify(q))).map(q => q.key) } });
-        s.update("task", row.id, row.revision, { ...row.data, visibility: "public", status: row.data.status === "draft" ? "requested" : row.data.status, title: c.title, description: c.description, deadline: c.deadline.value, nextAction: c.nextAction, currentRequestId: version.id, draft: preservedDraft ?? c, templateVersionId });
+        s.update("task", row.id, row.revision, { ...row.data, visibility: "public", status: row.data.status === "draft" || row.data.submissionProgress && ["partial","submitted","in_progress"].includes(row.data.status) ? "requested" : row.data.status, resumeStatus: row.data.submissionProgress && ["on_hold","cancelled"].includes(row.data.status) ? "requested" : row.data.resumeStatus, title: c.title, description: c.description, deadline: c.deadline.value, nextAction: c.nextAction, currentRequestId: version.id, draft: preservedDraft ?? c, templateVersionId });
         this.audit(s, p, row.contextId, "task.published", row.id, { requestVersionId: previous?.id ?? null }, { requestVersionId: version.id, sequence: version.data.sequence });
         this.event(s, p, row.contextId, previous ? "TASK_REQUEST_REVISED" : "TASK_PUBLISHED", row.id, version.id); return version;
     }
@@ -169,7 +173,7 @@ export class TaskService {
                     if (cmd === "resume" && !paused) fail("CONFLICT", 409, "보류 또는 취소한 업무만 재개할 수 있습니다.");
                     const status = cmd === "hold" ? "on_hold" : cmd === "cancel" ? "cancelled" : this.resumeStatus(s, row);
                     if (status === row.data.status) return { ids: [row.id] };
-                    const resumeStatus = cmd === "resume" ? null : paused ? this.resumeStatus(s, row) : row.data.status as "requested" | "in_progress" | "partial";
+                    const resumeStatus = cmd === "resume" ? null : paused ? this.resumeStatus(s, row) : row.data.status as "requested" | "in_progress" | "partial" | "submitted";
                     s.update("task", row.id, row.revision, { ...row.data, status, resumeStatus });
                     this.audit(s, p, row.contextId!, "task.state", row.id, { status: row.data.status, resumeStatus: row.data.resumeStatus ?? null }, { status, resumeStatus, reason });
                     this.event(s, p, row.contextId!, `TASK_${cmd.toUpperCase()}`, row.id, row.data.currentRequestId ?? null);
@@ -256,17 +260,19 @@ export class TaskService {
             const versions = s.list("requestVersion", row.contextId!).filter(v => v.data.taskId === taskId).sort((a,b) => b.data.sequence - a.data.sequence);
             const current = versions.find(v => v.id === row.data.currentRequestId);
             const prior = s.list("priorSubmission", row.contextId!).filter(v => v.data.taskId === taskId).sort((a,b) => b.createdAt.localeCompare(a.createdAt))[0] ?? null;
+            const live = latestSubmission(s,row);
+            const liveRequest = live ? s.get("requestVersion",live.data.requestId) : null;
             const previous = prior ? s.get("requestVersion", prior.data.requestId) : null;
             const request = current ? this.projectedContent(s, p, current.data.content, internal) : null;
             const projectedVersions = versions.map(v => projectedVersion(v, this.projectedContent(s,p,v.data.content,internal)));
             const fileIds = new Set([...projectedVersions.flatMap(v=>v.content.referenceFileIds), ...(internal ? row.data.draft?.referenceFileIds ?? [] : [])]);
-            const files = s.list("fileVersion", row.contextId!).filter(f => fileIds.has(f.id) || internal && f.data.taskId === taskId).filter(f => internal || f.data.visibility === "public").map(f => ({ id: f.id, name: f.data.originalName, bytes: f.data.bytes, mime: f.data.mime, sha256: f.data.sha256, preview: f.data.preview, visibility: f.data.visibility }));
+            const files = s.list("fileVersion", row.contextId!).filter(f => fileIds.has(f.id) || internal && f.data.taskId === taskId).filter(f => internal || f.data.visibility === "public").filter(f => visibleFile(s,p,f,taskScope(row),this.clock)).map(f => ({ id: f.id, name: f.data.originalName, bytes: f.data.bytes, mime: f.data.mime, sha256: f.data.sha256, preview: f.data.preview, visibility: f.data.visibility }));
             return { task: projectTask(s, p, row, this.clock), canManage: internal, canRespond: decide(s,p,"submission.write",taskScope(row),this.clock).allowed, draft: internal && row.data.draft ? projectedRequest(row.data.draft, true, this.projectedContent(s,p,row.data.draft,true,row.id).referenceFileIds) : null, request,
                 versions: projectedVersions,
                 activities: s.list("taskActivity", row.contextId!).filter(a => a.data.taskId === taskId).sort((a,b)=>(a.data.sequence??0)-(b.data.sequence??0)).map(projectedActivity),
                 history: s.list("audit", row.contextId!).filter(a => a.data.targetId === taskId).map(projectAudit), files,
-                requirementStatus: current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
-                submissionConnection: "답변 제출은 준비 중입니다", completionConnection: "업무 완료는 준비 중입니다", notificationConnection: "앱 알림은 준비 중입니다" };
+                requirementStatus: current && live ? safeEvaluation(current.data.content,live.data.answers,liveRequest?.data.content??null,true).items.map(projectedRequirementStatus) : current ? evaluateRequirements(projectedRequest(current.data.content,true,stringList(current.data.content.referenceFileIds)), prior?.data as PriorSubmissionData ?? null, previous ? projectedRequest(previous.data.content,true,stringList(previous.data.content.referenceFileIds)) : null).map(projectedRequirementStatus) : [],
+                submissionConnection: current ? "공개 요청에 답변을 저장하고 제출할 수 있습니다" : "요청 공개 후 답변할 수 있습니다", submissionSummary: live ? { id:live.id,sequence:live.data.sequence,requestId:live.data.requestId,mode:live.data.mode,submittedAt:live.data.submittedAt,isCurrentRequest:live.data.requestId===current?.id } : null, completionConnection: "업무 완료는 준비 중입니다", notificationConnection: "앱 알림은 준비 중입니다" };
         });
     }
     async catalog(token: string | undefined, contextId: string) {

@@ -1,3 +1,4 @@
+import type { SubmissionData, SubmissionDraftData } from './submissions/types';
 import type { CommonProductExtension, ProductVersionData, ContextProductData, ContextProductVersionData, PriceData, RetailPriceVersionData, InternalPriceVersionData, ProductUseSnapshotData } from "./products/types";
 import type { TaskExtension, RequestVersionData, TemplateVersionData, ProjectData, TaskActivityData, PriorSubmissionData, DomainEventData, CommandReceiptData, FileVersionData } from "./tasks/types";
 /** Foundation records plus module-owned typed extensions. */
@@ -74,7 +75,7 @@ export interface TaskData extends TaskExtension {
     assigneeId: string;
     ownerId: string;
     description: string;
-    status: "draft" | "requested" | "in_progress" | "partial" | "completed" | "on_hold" | "cancelled";
+    status: "draft" | "requested" | "in_progress" | "partial" | "submitted" | "completed" | "on_hold" | "cancelled";
     deadline: string | null;
     nextAction: string;
     productIds: string[];
@@ -93,6 +94,8 @@ export interface ProductData extends CommonProductExtension {
     missingMaterials: number;
 }
 export interface RecordDataMap {
+    submission: SubmissionData;
+    submissionDraft: SubmissionDraftData;
     productVersion: ProductVersionData;
     contextProduct: ContextProductData;
     contextProductVersion: ContextProductVersionData;

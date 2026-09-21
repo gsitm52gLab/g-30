@@ -29,6 +29,7 @@
     "identity:races": "tsx scripts/verify-identity-races.ts",
     "tasks:http": "tsx scripts/verify-tasks-http.ts",
     "products:http": "tsx scripts/verify-products-http.ts",
+    "submissions:http": "tsx scripts/verify-submissions-http.ts",
     "products:migration-check": "tsx scripts/verify-products-migration-cli.ts"
   },
   "dependencies": {

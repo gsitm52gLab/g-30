@@ -54,5 +54,5 @@ export function projectedProject(row: StoredRecord<"project">, visible: Set<stri
     return {...recordMetadata(row),data:{title:text(d.title),status:option(d.status,["active","completed"],"active"),createdBy:text(d.createdBy),taskIds:stringList(d.taskIds).filter(id=>visible.has(id)),dependencies:objects(d.dependencies).filter(e=>visible.has(e.before)&&visible.has(e.after)).map(e=>({before:text(e.before),after:text(e.after)}))}};
 }
 export function projectedRequirementStatus(r: ReturnType<typeof evaluateRequirements>[number]) {
-    return {requirementKey:text(r.requirementKey),productId:nullableText(r.productId),label:text(r.label),status:option(r.status,["not_applicable","needs_reconfirmation","prior_received","missing","optional"],"missing"),humanReviewPending:r.humanReviewPending===true,sourceRequestId:nullableText(r.sourceRequestId)};
+    return {requirementKey:text(r.requirementKey),productId:nullableText(r.productId),label:text(r.label),status:option(r.status === "invalid" ? "needs_reconfirmation" : r.status === "received" ? "prior_received" : r.status,["not_applicable","needs_reconfirmation","prior_received","missing","optional"],"missing"),humanReviewPending:r.humanReviewPending===true,sourceRequestId:nullableText(r.sourceRequestId)};
 }

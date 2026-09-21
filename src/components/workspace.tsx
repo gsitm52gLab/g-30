@@ -1,4 +1,5 @@
 import Link from "next/link";
+import {SubmissionProgress} from "@/features/submissions/views";
 import type { Workspace } from "@/server/workspace";
 import type { StoredRecord } from "@/domain/records";
 export function ContextBar({ workspace }: {
@@ -12,12 +13,12 @@ export function EmptyState({ title, detail }: {
 }) { return <div className="empty-state"><span aria-hidden="true" className="empty-mark">—</span><h2>{title}</h2><p>{detail}</p></div>; }
 export function StorageFailure() { return <section role="alert" className="notice error"><h1>자료를 불러오지 못했습니다</h1><p>저장소 연결 또는 환경 설정을 확인한 후 다시 시도해 주세요. DB 자료를 불러오지 못했을 때 예시 자료로 바꾸지 않습니다.</p><Link className="button" href="/">다시 시도</Link></section>; }
 export const categoryLabels = { onboarding: "신규 입점", spot: "스팟 업무" };
-export const taskLabels = { draft: "내부 초안", requested: "요청됨", in_progress: "진행 중", partial: "부분 제출", completed: "GSG 업무 완료", on_hold: "보류", cancelled: "취소" };
+export const taskLabels = { draft: "내부 초안", requested: "요청됨", in_progress: "진행 중", partial: "부분 제출", submitted: "제출됨", completed: "GSG 업무 완료", on_hold: "보류", cancelled: "취소" };
 export const productLabels = { draft: "등록 준비", active: "판매 중", archived: "보관" };
 export function TaskList({ tasks, users }: Pick<Workspace, "tasks" | "users">) {
     if (!tasks.length)
         return <EmptyState title="아직 등록된 업무가 없습니다" detail="현재 컨텍스트에 연결된 업무가 없습니다."/>;
-    return <div className="task-list">{tasks.map(task => <article className="task-row" key={task.id}><div className="task-main"><div className="row-tags"><span className="small-label">{categoryLabels[task.data.category]}</span><span className={`badge ${task.data.status}`}>{taskLabels[task.data.status]}</span></div><Link className="item-title" href={`/tasks/${task.id}?context=${task.contextId}`}>{task.data.title}<span aria-hidden="true"> ↗</span></Link><p>{task.data.nextAction}</p></div><div className="task-meta"><span>{users.find(u => u.id === task.data.assigneeId)?.data.name ?? "담당자 확인 필요"}</span><strong>{task.data.deadline ?? "기한 미정"}</strong></div></article>)}</div>;
+    return <div className="task-list">{tasks.map(task => <article className="task-row" key={task.id}><div className="task-main"><div className="row-tags"><span className="small-label">{categoryLabels[task.data.category]}</span><span className={`badge ${task.data.status}`}>{taskLabels[task.data.status]}</span></div><Link className="item-title" href={`/tasks/${task.id}?context=${task.contextId}`}>{task.data.title}<span aria-hidden="true"> ↗</span></Link><p>{task.data.nextAction}</p><SubmissionProgress value={task.data.submissionSummary}/></div><div className="task-meta"><span>{users.find(u => u.id === task.data.assigneeId)?.data.name ?? "담당자 확인 필요"}</span><strong>{task.data.deadline ?? "기한 미정"}</strong></div></article>)}</div>;
 }
 export function ProductCards({ products }: {
     products: StoredRecord<"product">[];
