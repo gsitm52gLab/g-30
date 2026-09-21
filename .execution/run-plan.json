@@ -850,16 +850,40 @@
         "G02",
         "G04"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTING",
       "required_for_product_completion": true,
       "candidate_commit": null,
       "integration_commit": null,
-      "implementer_session_id": null,
+      "implementer_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "verifier_session_id": null,
-      "attempt": 0,
-      "owned_paths": [],
-      "actual_worktree_cwd": null,
-      "evidence_root": ".execution/private/runs/<run-id>/G06/<attempt>/",
+      "attempt": 1,
+      "owned_paths": [
+        "src/domain/records.ts",
+        "src/domain/constraints.ts",
+        "src/domain/products/**",
+        "src/domain/tasks/constraints.ts",
+        "src/domain/tasks/types.ts",
+        "src/server/products/**",
+        "src/server/tasks/service.ts",
+        "src/server/tasks/projection.ts",
+        "src/server/files/**",
+        "src/server/policy/**",
+        "src/server/workspace.ts",
+        "src/server/db/migrations/0004-products.sql",
+        "src/server/db/seed.ts",
+        "src/data/products/**",
+        "src/data/fixtures.ts",
+        "src/app/api/products/**",
+        "src/app/api/files/**",
+        "src/app/api/tasks/**",
+        "tests/unit/products*",
+        "tests/unit/products/**",
+        "scripts/verify-products*",
+        "README.md",
+        "package.json"
+      ],
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g06-impl",
+      "evidence_root": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1",
       "acceptance": [
         {
           "id": "AC-06-01",
@@ -892,7 +916,9 @@
           "evidence": []
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행"
+      "next_action": "prd sole shared server/schema/file owner prepares concrete contract; UI assigned afterward in separate worktree.",
+      "base_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
+      "task_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/server/task.json"
     },
     {
       "id": "G07",
@@ -1534,8 +1560,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "cc59987fc70f2799cf1703950e5932b7b4b64ada",
   "current_goal": "G06",
-  "next_action": "Assign G06 server/shared contract at accepted cc59987, then separate UI after fixed contract; G05 waits for stable product capture contract.",
-  "state_version": 49,
+  "next_action": "prd sole shared server/schema/file owner prepares concrete contract; UI assigned afterward in separate worktree.",
+  "state_version": 50,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1562,7 +1588,7 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T12:26:19.572306+00:00",
+  "updated_at": "2026-09-21T12:26:44.527032+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

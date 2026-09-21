@@ -20,3 +20,7 @@ Update 2026-09-21T12:19:22.512326+00:00: finalfb independentlyPASS, main264hashe
 ## State 49 — G04 accepted current stage
 
 G04 candidate fb493e69830461fbf3fa11be90d9b50c94b0e334 independently verified and integrated cc59987fc70f2799cf1703950e5932b7b4b64ada passed impact regression. Main reviewed actual artifacts, command records and raw counts. G06 may start; real G05/G11/G13 producer obligations remain. Goal remains active.
+
+## State 50 — G06 server contract
+
+G06 server assigned to prd in .worktrees/g06-impl at accepted cc59987. Sole schema/file/policy writer; ports4161/4164, no .env. UI goals waits for reviewed concrete contract. Independent workflow will verify combined candidate.
