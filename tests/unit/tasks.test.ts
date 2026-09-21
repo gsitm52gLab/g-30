@@ -147,7 +147,10 @@ for (const mode of ["mock", "sqlite"] as const) describe(`${mode} G04 actual tas
         await command(id,"publish");
         const before=await Promise.all([repo.get("task",id),repo.list("requestVersion"),repo.list("taskActivity"),repo.list("templateVersion"),repo.list("project")]);
         const b=await tasks.detail(brand,id), g=await tasks.detail(admin,id), preview=await tasks.preview(admin,id), catalog=await tasks.catalog(admin,ctx), project=await tasks.project(brand,"v03-project");
-        expect(JSON.stringify({b,g,preview,catalog,project})).not.toContain(marker);
+        const nonpriceToken=(await identity.login(undefined,{email:"gsg@example.test",password:DEMO_PASSWORD})).token;
+        const nonprice=await tasks.detail(nonpriceToken,id),nonpriceCatalog=await tasks.catalog(nonpriceToken,ctx);
+        expect(JSON.stringify({b,g,preview,catalog,project,nonprice,nonpriceCatalog})).not.toContain(marker);
+        expect(nonprice.draft!.internalOriginal).toBe(clean.internalOriginal);
         const {internalOriginal,internalMemo,...publicContent}=clean;
         expect(b.request).toEqual(publicContent);expect(b.versions[1].content).toEqual(publicContent);expect(b.versions[1].changedKeys).toEqual(["description"]);expect(preview.content).toEqual(publicContent);
         expect(g.draft).toEqual(clean);expect(g.request).toEqual(clean);expect(catalog.templates.find(t=>t.id==="v03-template")!.content).toEqual(clean);
