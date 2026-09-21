@@ -108,7 +108,7 @@
       "dependencies": [
         "G00"
       ],
-      "state": "VERIFYING",
+      "state": "VERIFIED",
       "required_for_product_completion": true,
       "candidate_commit": "92e588fb524655eb932501627e584b1b19804abe",
       "integration_commit": null,
@@ -149,21 +149,21 @@
           "evidence": []
         }
       ],
-      "next_action": "Independently verify new G01 attempt2 candidate and D01 resolution, then serial integration/regression if clean",
+      "next_action": "Serial merge verified candidate and independent regression at exact integrated SHA",
       "base_commit": "d1437100dfb0013550d321f1f755641dcd075336",
       "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g01-verify2",
       "implementation_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/implementation-result.json",
       "repair_base_commit": "073ed7f7c6f2d27cbdaddda75477c488a8d9ae3e",
-      "open_defects": [
+      "open_defects": [],
+      "prior_verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/1/verification-result.json",
+      "prior_main_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/1/main-rejection.json",
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/verification-result.json",
+      "resolved_defects": [
         {
           "id": "G01-D01",
-          "severity": "P1",
-          "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/1/verification/reports/scoped-grant-repro.json",
-          "status": "FIX_CANDIDATE_AWAITING_VERIFICATION"
+          "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/verification-result.json"
         }
-      ],
-      "prior_verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/1/verification-result.json",
-      "prior_main_decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/1/main-rejection.json"
+      ]
     },
     {
       "id": "G02",
@@ -1074,7 +1074,7 @@
   "accepted_commit": "d1437100dfb0013550d321f1f755641dcd075336",
   "current_goal": "G01",
   "next_action": "Implement G01 full context/user/invitation/auth/reassignment vertical flow; return candidate for independent verification",
-  "state_version": 17,
+  "state_version": 18,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -1100,6 +1100,6 @@
   "initial_commit": "1f108fe",
   "source_objective_sha256": "63584c4d17da43ada41d8f6a89f472d3ec3e9004f87fb167ef5a8e2b0b47b988",
   "session_log_manifest": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/session-log-manifest.json",
-  "updated_at": "2026-09-21T09:39:50.398390+00:00",
+  "updated_at": "2026-09-21T09:45:14.180761+00:00",
   "traceability_path": ".execution/traceability.json"
 }

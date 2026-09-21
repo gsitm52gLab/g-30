@@ -13,3 +13,4 @@
 {"at": "2026-09-21T09:32:47.403171+00:00", "task": "G01", "from": "NEEDS_FIX", "to": "IMPLEMENTING", "attempt": 2, "defect": "G01-D01", "candidate": "073ed7f7c6f2d27cbdaddda75477c488a8d9ae3e", "state_version": 15}
 {"at": "2026-09-21T09:37:52.380101+00:00", "task": "G01", "kind": "prior_candidate_independent_result_reviewed", "attempt": 1, "verdict": "FAIL", "current_attempt": 2, "state_version": 16, "decision": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/1/main-rejection.json"}
 {"at": "2026-09-21T09:39:50.398390+00:00", "task": "G01", "from": "IMPLEMENTING", "to": "VERIFYING", "attempt": 2, "candidate": "92e588fb524655eb932501627e584b1b19804abe", "state_version": 17}
+{"at": "2026-09-21T09:45:14.180761+00:00", "task": "G01", "from": "VERIFYING", "to": "VERIFIED", "attempt": 2, "candidate": "92e588fb524655eb932501627e584b1b19804abe", "state_version": 18}
