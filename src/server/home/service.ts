@@ -137,7 +137,7 @@ export class HomeService {
           const v = c.data.currentVersionId ? await s.get('campaignVersion', c.data.currentVersionId) : null;
           if (c.data.currentVersionId && !v) unavailable();
           const published = v ? await campaignVersion(s, p, v, clock) : null;
-          result.campaigns.push({ id: c.id, taskId: task.id, title: canManage ? campaignDraft(c.data.draft).title : published!.title, taskTitle: task.data.title, contextId: ctx, url: `/tasks/${encodeURIComponent(task.id)}/campaigns?context=${encodeURIComponent(ctx)}` });
+          result.campaigns.push({ id: c.id, taskId: task.id, title: canManage ? campaignDraft(c.data.draft).title : published!.title, taskTitle: task.data.title, contextId: ctx, url: `/tasks/${encodeURIComponent(task.id)}/campaigns?context=${encodeURIComponent(ctx)}&campaign=${encodeURIComponent(c.id)}` });
         }
       }
       result.tasks.sort((a, b) => (a.deadline?.value ?? 'z').localeCompare(b.deadline?.value ?? 'z') || a.id.localeCompare(b.id));
