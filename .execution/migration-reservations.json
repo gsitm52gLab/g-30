@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "rule": "Root allocates new migration filename; immutable accepted SQL bytes stay unchanged. File count is actual checkout migrations, never inferred from highest reserved number. Reservation does not grant schema lease or mark implementation complete.",
-  "at": "2026-09-21T23:46:01.968310+00:00",
+  "at": "2026-09-22T00:41:57.725451+00:00",
   "reservations": [
     {
       "id": "0001",
@@ -91,7 +91,7 @@
       "id": "0015",
       "file": "0015-ai-provider.sql",
       "goal": "G17",
-      "state": "FROZEN_AC53_G17_NOT_ACCEPTED"
+      "state": "ACCEPTED_G17"
     },
     {
       "id": "0016",

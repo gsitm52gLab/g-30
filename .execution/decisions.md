@@ -155,3 +155,7 @@ G13 exactf48e independently verified and integrated regression reviewed. Origina
 
 ## 2026-09-22T00:12:50.582242+00:00 — SDK envelope boundary and typed search handoff
 Independent G17-V01 uses real object:response and exposes SDK addOutputText before application metadata preservation; earlier author fixture omitted discriminator. Preserve original failing evidence, fix author-owned transport only, then new candidate independent validation. Actual configured verification call waits for repaired final path. G14 server typed7cf19 author634/check/build evidence reviewed; lease released, runtime/UI/independent still pending.
+
+
+### 2026-09-22T00:41:57.725451+00:00 — G17 acceptance and G03 canonical preparation
+G17 actual response/usage and error paths passed independent and integration review; no additional API call was necessary because provider source bytes were unchanged. Final legal accuracy remains unverified. G03 adopts separate all-GSG urgency and self-only delivered unread counts; Brand mine material counts; exact-submission external-use review cue without send/approval inference. G03 implementation still waits for G14 acceptance.

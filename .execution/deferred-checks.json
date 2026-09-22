@@ -105,7 +105,10 @@
       ],
       "expected": "AI input/result/source access uses current server context permissions and no cross-context retrieval",
       "status": "NOT_RUN",
-      "evidence": []
+      "evidence": [
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/main-acceptance.json"
+      ],
+      "current_g17_stage": "PASS_CURRENT_PROVIDER_PROVENANCE_FAILURE_BASICWORK_AND_HISTORY_G18_FINAL_PENDING"
     },
     {
       "id": "D06",
@@ -181,7 +184,8 @@
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/main-acceptance.json"
       ],
       "origin_goals": [
         "G05",
@@ -219,7 +223,8 @@
       "current_g07_stage": "AddG07realhistoricalconsumer to downstreamgroup, G10/G11/G15/G18remain; do not mark wholeD09PASS",
       "current_g10_stage": "PASS currentcorrection/private/public/review/version/permissionandpersistenceroutes; futurewholeunion notyet",
       "current_g15_stage": "PASS_CURRENT_INPUT_EXTRACTION_PROVENANCE_AND_LOCAL_TRANSFER_BOUNDARY",
-      "current_g11_stage": "PASS_MANUAL_COMPLETION_EXTERNAL_AND_REOPEN_ACTUAL_PRODUCERS_AI_PENDING"
+      "current_g11_stage": "PASS_MANUAL_COMPLETION_EXTERNAL_AND_REOPEN_ACTUAL_PRODUCERS_AI_PENDING",
+      "current_g17_stage": "PASS_CURRENT_PROVIDER_PROVENANCE_FAILURE_BASICWORK_AND_HISTORY_G18_FINAL_PENDING"
     },
     {
       "id": "D10",
@@ -246,7 +251,8 @@
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/main-acceptance.json",
         "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json",
-        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/main-acceptance.json"
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/main-acceptance.json",
+        "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/main-acceptance.json"
       ],
       "current_g04_stage": "PASS_CURRENT_PATHS_OR_CONTRACT_ONLY",
       "remaining": "G10/G11/G12/AI/search later entities and finalG18 persistence remain.",
@@ -258,7 +264,8 @@
       "current_g10_stage": "PASS currentcorrection/private/public/review/version/permissionandpersistenceroutes; futurewholeunion notyet",
       "current_g12_stage": "PASS actualcampaign/request/materialselection/physicalfacts/privacy/persistence and mobileclosure; consumer delivery/completion/search/home pending.",
       "current_g15_stage": "PASS_CURRENT_INPUT_EXTRACTION_PROVENANCE_AND_LOCAL_TRANSFER_BOUNDARY",
-      "current_g11_stage": "PASS_MANUAL_COMPLETION_EXTERNAL_AND_REOPEN_ACTUAL_PRODUCERS_AI_PENDING"
+      "current_g11_stage": "PASS_MANUAL_COMPLETION_EXTERNAL_AND_REOPEN_ACTUAL_PRODUCERS_AI_PENDING",
+      "current_g17_stage": "PASS_CURRENT_PROVIDER_PROVENANCE_FAILURE_BASICWORK_AND_HISTORY_G18_FINAL_PENDING"
     }
   ]
 }
