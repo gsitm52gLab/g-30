@@ -221,5 +221,12 @@
         "immutable_ai_provider_delete"
       ]
     }
+  ],
+  "postgres_only": [
+    {
+      "name": "0016-revision-width.sql",
+      "postgres_sha256": "be6f77e37d50bccfa9347b01af7c6f85aaa30085a8a9d143976bb032784bbfa9",
+      "purpose": "BIGINT revisions retain exact JavaScript-safe integer range; not G14 SQLite0016"
+    }
   ]
 }

@@ -17,7 +17,7 @@ if (!envFile || !evidenceFile) throw new Error('Usage: verify-postgres-foundatio
 const envBytes = readFileSync(envFile), beforeHash = createHash('sha256').update(envBytes).digest('hex');
 const config = parsePostgresConfig({ ...parseEnv(envBytes.toString()), SUPABASE_DB_SCHEMA: 'gs_hale_sb_foundation_20260922' });
 const schema = quoteSchema(config.schema), id = `foundation-${randomUUID()}`;
-const plannedCheckCount = 18 + mappings.migrations.reduce((count, migration) => count
+const plannedCheckCount = 21 + mappings.migrations.reduce((count, migration) => count
   + migration.indexes.filter(name => name !== 'records_kind_context').length
   + migration.triggers.filter(name => !name.endsWith('reference_insert')).length, 0);
 const result = {
@@ -46,14 +46,33 @@ try {
       assert.equal(tls.encrypted, true); assert.equal(tls.authorized, true);
       const namespaces = await client.query('SELECT nspname FROM pg_namespace ORDER BY nspname');
       result.inventory = { existing_namespace_count: namespaces.rowCount, target_preexisted: namespaces.rows.some(r => r.nspname === config.schema), tls_authorized: tls.authorized, tls_protocol: tls.getProtocol() };
+      if (result.inventory.target_preexisted) {
+        const history = await client.query(`SELECT name FROM ${schema}.schema_migrations`);
+        const rows = await client.query(`SELECT kind,id,context_id,data,revision::text AS revision,created_at,updated_at FROM ${schema}.records ORDER BY kind,id`);
+        result.inventory.applied_migration_count = history.rowCount;
+        result.inventory.record_count = rows.rowCount;
+        result.inventory.records_sha256 = createHash('sha256').update(JSON.stringify(rows.rows)).digest('hex');
+      } else {
+        result.inventory.applied_migration_count = 0;
+        result.inventory.record_count = 0;
+        result.inventory.records_sha256 = createHash('sha256').update('[]').digest('hex');
+      }
       await client.query('COMMIT');
     } finally { client.release(); }
   });
-  await check('explicit migrations apply current 0001–0015 atomically', async () => {
-    const migration = await migratePostgres(config); assert.equal(migration.total, 15);
-    assert.equal(migration.applied, result.inventory.target_preexisted ? 0 : 15);
+  await check('explicit migrations apply baseline 0001–0015 plus PG-only 0016 atomically', async () => {
+    const migration = await migratePostgres(config); assert.equal(migration.total, 16);
+    assert.equal(migration.applied, 16 - Number(result.inventory.applied_migration_count));
   });
   if (result.counts.fail) throw new Error('Migrations unavailable');
+  await check('additive migration preserves every pre-existing record byte representation', async () => {
+    const client = await connect(pool);
+    try {
+      const rows = await client.query(`SELECT kind,id,context_id,data,revision::text AS revision,created_at,updated_at FROM ${schema}.records ORDER BY kind,id`);
+      assert.equal(rows.rowCount, result.inventory.record_count);
+      assert.equal(createHash('sha256').update(JSON.stringify(rows.rows)).digest('hex'), result.inventory.records_sha256);
+    } finally { client.release(); }
+  });
   await check('repeated migrations apply zero', async () => { assert.equal((await migratePostgres(config)).applied, 0); });
   await check('changed applied checksum rejects without changing history', async () => {
     const changed = readMigrations(); changed[0] = { ...changed[0], sql: changed[0].sql + '\n-- changed' };
@@ -152,6 +171,26 @@ try {
   const rawClient = await connect(pool);
   try {
     const rawInsert = (kind: string, suffix: string, data: Record<string, unknown>) => rawClient.query(`INSERT INTO ${schema}.records VALUES($1,$2,$3,$4::jsonb,1,$5,$5)`, [kind, `${id}-${suffix}`, contextId, JSON.stringify(data), new Date().toISOString()]);
+    await check('BIGINT revisions cross signed 32-bit boundary without losing CAS or metadata', async () => {
+      const record = await repository.transaction(s => s.create('checkpoint', fixture('bigint')));
+      await rawClient.query(`UPDATE ${schema}.records SET revision=$1::bigint WHERE kind='checkpoint' AND id=$2`, ['2147483647', record.id]);
+      assert.equal((await other.get('checkpoint', record.id))?.revision, 2147483647);
+      const updated = await repository.transaction(s => s.update('checkpoint', record.id, 2147483647, { value: 'over 32-bit' }));
+      assert.equal(updated.revision, 2147483648); assert.equal(updated.createdAt, record.createdAt);
+      await assert.rejects(other.transaction(s => s.update('checkpoint', record.id, 2147483647, { value: 'stale' })), { code: 'CONFLICT' });
+    });
+    await check('MAX_SAFE_INTEGER revision is exact and overflow/fractional writes roll back', async () => {
+      const record = await repository.transaction(s => s.create('checkpoint', fixture('max-safe')));
+      await rawClient.query(`UPDATE ${schema}.records SET revision=$1::bigint WHERE kind='checkpoint' AND id=$2`, ['9007199254740990', record.id]);
+      const max = await repository.transaction(s => s.update('checkpoint', record.id, Number.MAX_SAFE_INTEGER - 1, { value: 'last exact value' }));
+      assert.equal(max.revision, Number.MAX_SAFE_INTEGER);
+      assert.equal((await other.list('checkpoint')).find(r => r.id === record.id)?.revision, Number.MAX_SAFE_INTEGER);
+      await assert.rejects(repository.transaction(s => s.update('checkpoint', record.id, Number.MAX_SAFE_INTEGER, { value: 'must rollback' })), { code: 'INVALID_RECORD' });
+      await assert.rejects(repository.transaction(s => s.update('checkpoint', record.id, 1.5, { value: 'invalid' })), { code: 'INVALID_RECORD' });
+      await assert.rejects(rawClient.query(`UPDATE ${schema}.records SET revision=$1::bigint WHERE kind='checkpoint' AND id=$2`, ['9007199254740992', record.id]), { code: '23514' });
+      const preserved = await other.get('checkpoint', record.id);
+      assert.equal(preserved?.revision, Number.MAX_SAFE_INTEGER); assert.equal(preserved?.data.value, 'last exact value');
+    });
     for (const map of mappings.migrations) {
       const sql = readFileSync(`src/server/postgres/migrations/${map.name}`, 'utf8');
       for (const index of map.indexes.filter(n => n !== 'records_kind_context')) {

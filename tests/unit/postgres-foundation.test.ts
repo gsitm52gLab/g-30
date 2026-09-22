@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { parsePostgresConfig, quoteSchema, loadSupabaseCa, CA_SHA256 } from '@/server/postgres/config';
 import { safePostgresError } from '@/server/postgres/errors';
 import { readMigrations } from '@/server/postgres/migrate';
+import { decodeRevision } from '@/server/postgres/revision';
 import { checkRelations as asyncRelations } from '@/server/postgres/relations';
 import { checkRelations } from '@/domain/constraints';
 import { createMockRepository } from '@/server/repositories/mock';
@@ -56,7 +57,7 @@ describe('Supabase strict configuration and redaction', () => {
 });
 describe('explicit 0001–0015 migration and relation parity inventory', () => {
   it('maps every immutable SQLite source checksum, index and trigger with no silent source drift', () => {
-    const migrations = readMigrations(); expect(migrations).toHaveLength(15);
+    const migrations = readMigrations(); expect(migrations).toHaveLength(16);
     for (const source of mappings.migrations) {
       const original = readFileSync(path.join('src/server/db/migrations', source.name), 'utf8');
       const target = migrations.find(m => m.name === source.name)!;
@@ -67,6 +68,7 @@ describe('explicit 0001–0015 migration and relation parity inventory', () => {
       expect(target.sql).not.toMatch(/json_extract|RAISE\(ABORT|json_valid/);
     }
     for (const source of relationSources) expect(createHash('sha256').update(readFileSync(source.source)).digest('hex')).toBe(source.sha256);
+    for (const source of mappings.postgres_only) expect(migrations.find(m => m.name === source.name)?.sha256).toBe(source.postgres_sha256);
   });
   it('matches sync relation decisions on valid fixture inserts, duplicates and missing parents', async () => {
     const repository = createMockRepository();
@@ -88,5 +90,14 @@ describe('explicit 0001–0015 migration and relation parity inventory', () => {
       expect(asyncResult).toBe(syncResult);
     }
     repository.close();
+  });
+});
+
+describe('lossless BIGINT revision decoding', () => {
+  it.each([1, '1', '2147483647', '2147483648', String(Number.MAX_SAFE_INTEGER)])('retains exact safe revision %s', value => {
+    expect(decodeRevision(value)).toBe(Number(value));
+  });
+  it.each([0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1, '9007199254740992', '9223372036854775807', '-1', '0', '1.5', '1e3', '', null, {}, Infinity, NaN])('rejects unsafe/corrupt revision %s', value => {
+    expect(() => decodeRevision(value)).toThrow('INVALID_RECORD');
   });
 });

@@ -1,6 +1,6 @@
 # SQLite to PostgreSQL migration inventory
 
-The original SQLite files/checksums are unchanged. Detailed hashes and exact index/trigger names are in `src/server/postgres/migrations/source-map.json`. G14 0016 is not part of this checkpoint.
+The original SQLite files/checksums are unchanged. Detailed hashes and exact index/trigger names are in `src/server/postgres/migrations/source-map.json`. G14 SQLite 0016 is not part of this checkpoint. PostgreSQL-only 0016 widens revisions to BIGINT with a JavaScript-safe bound, preserving the prior 15 checksums and every existing record. Future G14 SQL receives its own later PostgreSQL version.
 
 | Version | Indexes | Triggers | Preserved area |
 | --- | ---: | ---: | --- |
@@ -21,3 +21,7 @@ The original SQLite files/checksums are unchanged. Detailed hashes and exact ind
 | 0015-ai-provider.sql | 4 | 2 | ai-provider |
 
 All original named indexes and trigger predicates are carried into explicit schema-qualified PostgreSQL scripts. JSON fields remain typed JSONB; no product record limit was added. Domain FK-like references and exceptional legacy context changes are in async relation checkers and `updatedContext`; PostgreSQL adds the two original SQL insert reference triggers. There is intentionally no unsafe record-delete API. SQL index/trigger negatives in the real proof cover each named definition, while full product journeys remain a follow-up integration gate.
+
+| PostgreSQL-only version | Purpose |
+| --- | --- |
+| 0016-revision-width.sql | ALTER revision to BIGINT, retain positivity and require revision ≤ 9007199254740991. No record reset, deletion or rewritten history. |

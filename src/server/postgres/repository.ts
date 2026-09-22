@@ -4,10 +4,11 @@ import { begin, connect, createPostgresPool, query } from './client';
 import { quoteSchema, type PostgresConfig } from './config';
 import type { AsyncRecordRepository, AsyncUnitOfWork } from './types';
 import { checkRelations } from './relations';
+import { decodeRevision } from './revision';
 
-interface Row { kind: RecordKind; id: string; context_id: string | null; data: StoredRecord['data']; revision: number; created_at: string; updated_at: string }
+interface Row { kind: RecordKind; id: string; context_id: string | null; data: StoredRecord['data']; revision: number | string; created_at: string; updated_at: string }
 function decode<K extends RecordKind>(row: Row): StoredRecord<K> {
-  return { kind: row.kind as K, id: row.id, contextId: row.context_id, data: row.data as StoredRecord<K>['data'], revision: row.revision, createdAt: row.created_at, updatedAt: row.updated_at };
+  return { kind: row.kind as K, id: row.id, contextId: row.context_id, data: row.data as StoredRecord<K>['data'], revision: decodeRevision(row.revision), createdAt: row.created_at, updatedAt: row.updated_at };
 }
 function reader(client: PoolClient, table: string): Pick<AsyncUnitOfWork, 'get' | 'list'> {
   return {
