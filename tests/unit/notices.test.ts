@@ -137,7 +137,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             await expect(repo.transaction(async (s) => (await s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } as unknown as typeof original.data })))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
             // Native write guards are not weakened. Simulate an adapter read corruption below the service boundary.
             const corrupt = (r: StoredRecord | null) => r?.kind === 'noticeVersion' && r.id === v ? { ...r, data: { ...r.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } } : r;
-            const wrapped: RecordRepository = { ...repo, transaction: async (operation) => repo.transaction(s => operation(new Proxy(s, { get(target, prop: keyof UnitOfWork) { return (...args: unknown[]) => { const result = Reflect.apply(target[prop], target, args); return prop === 'get' ? corrupt(result) : prop === 'list' ? result.map(corrupt) : result; }; } }))) };
+            const wrapped: RecordRepository = { ...repo, transaction: async (operation) => repo.transaction(s => operation(new Proxy(s, { get(target, prop: keyof UnitOfWork) { return async (...args: unknown[]) => { const result = await Reflect.apply(target[prop], target, args); return prop === 'get' ? corrupt(result) : prop === 'list' ? result.map(corrupt) : result; }; } }))) };
             const faulty = new NoticeService(new IdentityService(wrapped, () => NOW));
             await expect(faulty.detail(brand, id)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
             await expect(faulty.list(brand, A)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
