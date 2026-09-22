@@ -29,8 +29,10 @@ describe('Supabase strict configuration and redaction', () => {
     expect(config.runtime.password).toBe('synthetic@password');
     expect(config.runtime.port).toBe(6543); expect(config.migration?.port).toBe(5432);
   });
-  it.each(['', '/rest/v1', '/rest/v1/', '/storage/v1', '/storage/v1/'])('normalizes known API path %s', suffix => {
-    expect(parsePostgresConfig({ ...env, SUPABASE_URL: env.SUPABASE_URL + suffix }).schema).toBe('gs_hale');
+  it.each([undefined, '', 'malformed', 'https://other.supabase.co', env.SUPABASE_URL + '/rest/v1/', env.SUPABASE_URL + '/arbitrary?key=synthetic'])('SQL configuration is independent of Storage API URL %s', value => {
+    const config = parsePostgresConfig({ ...env, SUPABASE_URL: value }, 'migration');
+    expect(config.runtime.user).toBe('postgres.syntheticproject');
+    expect(config.migration?.user).toBe('postgres.syntheticproject');
   });
   it.each([
     ['DATABASE_URL', undefined], ['DIRECT_URL', undefined],
@@ -38,11 +40,11 @@ describe('Supabase strict configuration and redaction', () => {
     ['DIRECT_URL', env.DIRECT_URL.replace(':5432/', ':6543/')],
     ['DATABASE_URL', env.DATABASE_URL.replace('sslmode=require', 'sslmode=disable')],
     ['DATABASE_URL', env.DATABASE_URL + '&sslrootcert=/unsafe'],
-    ['DATABASE_URL', env.DATABASE_URL.replace('postgres.syntheticproject', 'postgres.other')],
+    ['DATABASE_URL', env.DATABASE_URL.replace('postgres.syntheticproject', 'postgres')],
+    ['DATABASE_URL', env.DATABASE_URL.replace('postgres.syntheticproject', 'postgres.invalid-project')],
+    ['DIRECT_URL', env.DIRECT_URL.replace('postgres.syntheticproject', 'postgres.other')],
     ['DATABASE_URL', env.DATABASE_URL.replace('pooler.supabase.com', 'attacker.test')],
     ['DATABASE_URL', env.DATABASE_URL.replace('/postgres?', '/other?')],
-    ['SUPABASE_URL', env.SUPABASE_URL + '/arbitrary'],
-    ['SUPABASE_URL', env.SUPABASE_URL + '?key=secret'],
     ['SUPABASE_DB_SCHEMA', 'public'], ['SUPABASE_DB_SCHEMA', 'gs_hale; DROP SCHEMA public'],
     ['SUPABASE_POOL_MAX', '0'], ['SUPABASE_POOL_MAX', '21'],
   ])('rejects unsafe/missing %s without echoing it', (field, value) => {

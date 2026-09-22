@@ -59,10 +59,13 @@ export function parsePostgresConfig(env: Record<string, string | undefined>, pur
   const ca = loadSupabaseCa();
   let project: string;
   try {
-    const api = new URL(env.SUPABASE_URL || '');
-    if (api.protocol !== 'https:' || api.username || api.password || api.search || api.hash || !['/', '/rest/v1', '/rest/v1/', '/storage/v1', '/storage/v1/'].includes(api.pathname) || api.port || !/^[a-z0-9]+\.supabase\.co$/.test(api.hostname)) throw new Error();
-    project = api.hostname.split('.')[0];
-  } catch { throw new PostgresConfigurationError('SUPABASE_URL'); }
+    // SQL pooler credentials identify their project independently of the Storage/Data API URL.
+    // connection() below still enforces the allowed host, port, protocol, DB and strict TLS.
+    const database = new URL(env.DATABASE_URL || '');
+    const poolerUser = /^[A-Za-z_][A-Za-z0-9_]*\.([a-z0-9]+)$/.exec(decodeURIComponent(database.username));
+    if (!poolerUser) throw new Error();
+    project = poolerUser[1];
+  } catch { throw new PostgresConfigurationError('DATABASE_URL'); }
   const schema = env.SUPABASE_DB_SCHEMA || 'gs_hale'; quoteSchema(schema);
   const max = integer(env.SUPABASE_POOL_MAX, 4, 20, 'SUPABASE_POOL_MAX');
   return {
