@@ -1,294 +1,47 @@
-## State 178 — Goal active / G14 독립 검증 + Supabase 기반 병렬 구현
+# GS HALE checkpoint — state182 / Goal active
 
-실제 Goal active를 확인하고 첨부 목표 원문을 읽었다. 최신 사용자 Supabase·g-30·push 지시는 v3를 통해 계속 우선 적용한다. G14 합본 후보 fa2491b, 별도 PostgreSQL async/TLS/SQL 기반과 private Storage transport 구현을 격리 worktree에 배정했다. 메인+서브세션 3개, package/lock은 DB 기반 구현자 단독 소유. G03은 G14 수용 전 착수하지 않는다. 기존 16/19 accepted는 과거 환경이며 새 Supabase 수용 0/18.
+Actual Goal re-observed active through get_goal on 2026-09-22 after the user continuation. No second Goal created. Latest user wanted background work; no return to synchronous broad questioning. Previous turn is PROGRESS: code integrated/pushed and real deployed auth + populated screens observed.
 
-## State 177 — Supabase 자격증명 읽기 전용 확인 / Goal paused
+## Authoritative scope
 
-DATABASE_URL/Transaction pooler와 DIRECT_URL/Session pooler 모두 TLS 1.3·서버 인증서/hostname 검증을 포함한 READ ONLY SELECT 1 성공. Storage 인증 읽기 HTTP 200. public 테이블 0개, gs-hale-private 버킷 없음. 원격 데이터 변경 0회. 앱 통합/Vercel 환경변수 검증은 미실행. Goal 재개 전까지 제품 구현은 시작하지 않는다. 기존 16/19 수용 기록은 유지하고 신규 SB-01~18은 모두 NOT_RUN이다. v3 계약과 다음 실행 프롬프트를 따른다.
+Read objective: `/Users/evan/.codex/attachments/92660f2b-c827-486c-8372-a53d8450c415/pasted-text-1.txt`. Preserve complete PRD-00..18 / 91 AC, A01..26 and supplemental SB-01..18. Latest changes require Supabase PostgreSQL/private Storage and allow normal non-force push to origin g-30. Goal is not complete. Historical accepted16/19 at ddb88d is mock/SQLite acceptance only; current async/Supabase requires revalidation. Remaining original G14/G03/G18 plus Storage/Excel/OCR/Supabase final audit.
 
-# Latest state176 — 2026-09-22T01:40:45.740480+00:00
+Notion original fetch returned Authentication required in this continuation. Read the complete619-line local preserved `리테일_운영플랫폼_최종통합_상세기획_v3_검토용.md` under `/Users/evan/Documents/Codex/2026-09-21/cj/outputs`. Do not claim fresh Notion read. Original documents/user changes remain preserved; no Notion mutation.
 
-Goal remains paused; user requested Supabase + g-30 preparation before explicit restart. New execution-v3 contract/full prompt and 18 NOT_RUN supplemental ACs. Prior accepted16/19 at ddb is preserved as historical local evidence, not Supabase acceptance. origin now g-30; legacy-gs-hale retained. New main85bcb tree equals historical f3f868c, allowing history connection without product changes. Preparation branch run/supabase-transition; main unchanged. Supabase Storage read-only HTTP200, target private bucket absent, DATABASE_URL/DIRECT_URL pending. Source/doc independent review 01a0c6bc resolved2P2, runtime NOT_RUN. G14 arrived UI verification c0035e1 / consumer author e2af76de / G03 readonly navigation8b6143 require main review after restart. No automatic Goal activation.
+## Git and release
 
-# Latest state175 — 2026-09-22T01:00:49.788223+00:00
+Root/integration cwd `/Users/evan/workspace/gs-hale`, branch `run/supabase-transition`, origin `https://github.com/gsitm52gLab/g-30.git`, old remote `legacy-gs-hale` preserved. Current source HEAD/main `eece434adf3793fd7a603f997eee15f729c4eef0` after normal ff integration. User untracked `docs/execution-v2/`, root.env, worktrees and historical failure artifacts preserved. Never force/reset/delete originals.
 
-Accepted16ddb. Root preliminarycombined4093417 (106consumer+25aeUI) preserved801source bytes, READMEonlyappendresolution; stillNOTACCEPTED andlatestauthor01f helperchangesmustmerge. Prd provider own713unit/build, actualHTTP finalmock12P5sqlitefaultSKIP/sqlite17P; actualoldG17 14SQL->16P06sixP, providerhistory10P/audithistory20P; finalpacketpending. Original8P1F8NOT_RUNtwomodes/publicbaseline andoldSQL15assumption failures preserved. WorkflowUI25ae independent636/24browser/10restart/own20 actualaccountswitchprice/heldAPI-RSC PASS reported; ownhelper201/DTOerrors preserved, finalpacketpending. GoalsG03 readonlyroute/nav task59f652 on frozen409 gitshow, noimplbeforeG14accepted. G18ai_verify preparation91e5 root7ff1 reviewed48refs24Git207uniqueJSONpointers/newPASS0; agentidle independentwholeappnonauthor. G18currentmigration15observationdatedddb, finalunion16rederive.
+Production `https://g-30-pi.vercel.app` GitHub Vercel status SUCCESS for eece434, deployment `H13c6Cc3vAmG7QwUcw6ZMMXNb4ug`. Current `vercel.json` explicit DATA_SOURCE=supabase and region bom1, same region as provided SQL pooler (ap-south-1). No secrets in vercel.json. SQL project derived from DATABASE_URL, no unnecessary SUPABASE_URL requirement for PostgreSQL. Strict TLS/host/port retained. DATABASE_URL runtime6543, DIRECT_URL migration5432; root.env server-only.
 
-# Latest state174 — 2026-09-22T00:52:59.154342+00:00
+Production schema `gs_hale` was absent, then explicit16PG migrations, seed49+products3+corpus2 succeeded. No prior user data deleted. Actual production csrf/login/me/storageMode supabase/logout/revoked-cookie HTTP passed. Root IAB freshly loaded home + clicked tasks + products: all real populated content and authenticated GSG header shown on db836e7. Earlier first-login StorageFailure and SSR200-only false-positive limitations preserved; fresh reads recovered. New eece434 document navigation after auth avoids cached RSC tree reuse. Exacteece production author browser5/5PASS: login fresh document, populated tasks/products, reload session, logout protected redirect. Independent source/unit20PASS; root737unitPASS. Root42artifact hashes verified, bounded auth release ACCEPTED; full Goal incomplete.
 
-Accepted16ddb. G14UI author25ae rootb8c864 reviewed1402artifacts816sources26commands81ZIP/24browser+10restart, 9nonzerohistoricalcommands preserved. WorkflowindependentUI task a076696cdaedc842479c1eeec8b19a5c2a8d7ce9b0088bfe97ea99d4de829712 exact .worktrees/g14-ui-verification ports4263/64; wholeG14 stillrequiresproviderconsumerunion. Prd7382consumer continues withP04sourceboundary116a7 clarifiedfault vs actualmembershiprevoke, no unsupportednewAPI. ai_verifyG18readonlyprep207finishing; goalsidle. G03/G18dependenciespending.
+## Current agents and file ownership
 
-# Latest state173 — 2026-09-22T00:48:49.539943+00:00
+- prd: `/root/prd`, session01a0c307-c975-75b1-b96a-5a5c4e448aec. Auth release lead in `.worktrees/sb-auth-ui-fix`, eece434. Author build/type/lint + auth4/notices16 pass; independent scope reviewer20pass. Finish actual production browser/final packet, then `storage-harness-repair/task.json` (SHA74a083ed5c65fb3fe7611f7d532366a4e728b312bc61dd267746ae6f761ba34e), new `.worktrees/sb-storage-harness-fix`. Only Storage adversarial fixture repair (not product module/shared schema) until separately assigned integration.
+- sb_postgres_foundation: session01a0c6d2-9533-7e73-9c43-20958cbd1f83. Independent Storage primitives result complete: `storage-independent/result.json` SHAa5becafbf92293f1112877e0be952e0cd79c19d899d35060d9c8b955a608c8b8. 38unit+new8+actual15pass; originaladversarial6pass1fixturefail. Actual same-bytes upsert did NOT change version; actual owned delete/recreate samebytes DID change version and olddescriptor Range refusedINTEGRITY. Original failure retained. Now assigned G14 async/Supabase port task SHA b62cb0507120b37a7f5c911a72e2676a8159baa197ff334d3b1d7613caf5c88e in `g14-async-port/task.json`. Exclusive shared audit records/constraints/PGmigration lease; SQLite0016 exact original, PG0017 next because PG0016revision-width immutable. Baseeece434, sourcefa2491b. No root edits/push.
+- supabase_scope_review: session01a0c6bc-d9f3-73f1-ae63-d88781905c0a, independent nonauthor reviewer. Auth eece43420pass packet under `auth-durability/navigation-fix/independent/result.json` SHAd2284711d93e6d32b246e6a8b7911b61e90a3ffcd5498bf9ee4130ea8e63977b. Available to verify Storage harness repair, then G14 exact candidate. Never repair product and labelPASS.
 
-Accepted16ddb. G14UI goals25ae helperonly correction after workflow sourceonly diagnosis6f732/root4dc116 (14Git sources), focusedactualT04lateRSC+revoke/T05productCAS+lostreply PASS; fullmatrixpending. PrdG14providerconsumer7382 running own6paths, actualproducerred6 preserved expectedmissingconsumer notnewacceptedG17defect. ai_verify reactivation succeeded; readonlyG18auditprep task2b05 in .worktrees/g18-audit-preparation ddb, frozenstate172inputmap0b902 root+3slots; noimplementation/runtime. Workflowidle available onceG14combinedcandidate ready, G03 stillgateG14.
+Maximum root+3. Finish already-running process/agent before new assignment. Do not start application Storage shared schema edits while G14 lease active; read-only inventory/planning may proceed.
 
-# Latest state172 — 2026-09-22T00:43:54.979600+00:00
+## Evidence and pending regression
 
-Accepted16ddb; G14serialunion candidate7382 server4646+acceptedddb constructed in .worktrees/g14-union, audit/providerSQL inventory16 allpriorbytespreserved; 2mergeconflicts and9testhelperinventory updates documented. Prd consumer task d72b740137cb22fe065b5fada76c5877fd0f7c76cf96f8f98e673e8de092118c ports4255/56 owns only6paths, noactualAPI. GoalsUI50ec helper405 T04 afterT01-03PASS; workflow readonly exactroute diagnosis 58255697f4402ea7a341a2ac194271cf1813c798bde1404384bbd98a38f3598f then goalsownrepair/rerun. G14independentwhole/notaccepted, G03gate andG18 unchanged.
+Private prefix `.execution/private/runs/RUN-20260921-01/SUPABASE/`.
+- `auth-durability/`: foundation/core/consumers, union builds, production inventory/migration/seed, two-server tests, deployment snapshots, raw first failures.
+- Original async candidatefb9dd23 buildPASS, authunit91PASS. IndependenttwoServer22pass1browser30stimeout; empty-context HTTP200 was not populated screen proof; no erased failures.
+- Root exactdb836e7 fullunit733:731pass2fail corruption-test proxy Promise.map. Fixed only proxy await in eece434; fullroot737PASS0FAIL0skip (`root-full-unit-repair.json/.log`). InstallrootPASS. No broad fullbrowser/API currentSupabase regression claimed.
+- `auth-durability/production-smoke-1790045079344.json`: auth valid; SSR200 entries only transport. `root-production-semantic-check.json` provides later actual CUA assertions. Not originalJSONL.
+- `G14-final-verification/verification-result.json`: exactfa2491b historical local mock/SQLite independent713unit +179groupchecks/11mode applicabilityskip. Root15commandloghashesmatch. Not currentasync/Supabase accepted. Port and newvalidationneeded.
+- `storage-independent/` primitives validation + one fixtureassumptionFAIL; all ownedremoteobjects cleaned, bucketpreserved. No fullapplicationStorageclaim.
 
-# Latest state171 — 2026-09-22T00:41:57.725451+00:00
+## Next actions
 
-G17 ACCEPTED: accepted16/19 product ddb88d940a36f64febd3ecdbd0ceffd380ef3c61. Final a0d independent PASS302349 with actual1call; integrated regression0e967 root8212 reviewed1359artifacts730sources17commands16ZIP/92sourcepairs. fresh669unit, G17HTTP39P3skip+UI8P, G13HTTP49P7skip+UI8P, old13history10P and2actualDB28P4PIDs. No additionalcalls; all priorfailures retained. G14 server4646 frozen, goalsUI944b product/636checkbuild helperfixture fixes underway. Root serial unionddb+4646 then prd narrowproviderconsumer patch6cases. G03readonlyprep0bbdb/root53cde 18+32canonicalsources verified; gateG14 unchanged. G18 final and207rowaudit/README pending. Userdocs preserved.
+1. Auth release packet reviewed: navigation-fix/root-evidence-review.json, 42artifact hashes match. Continue background implementation; no repeated auth broad tests absent changes.
+2. Commit/push reviewedmetadata on transition branch only; do not unnecessarily deploymetadata to main. Agentprd may push only boundedauth release (alreadydone); further productintegration rootsupervised.
+3. Verify repairedStorageprimitivecandidate independently then integrate5primitivefiles and rerunaffectedtests. Plan async DB grants/finalize/read/Excel/AI wiring after G14sharedcontractfrozen.
+4. G14port→independentverification→serialintegration/regression→ACCEPTED before dependentG03integration. No originalfeaturedeleted.
+5. Finish allSupabase18supplemental gates and finalG03/G18audit; mandatoryactualOpenAI still needs newSupabase flow, historicalG17livecall is notcurrentnewbackendproof. Avoid unnecessary repeatcalls.
 
-# Latest state170 — 2026-09-22T00:35:13.150156+00:00
+No new payments, external emails, private work data transmission, destructive git, or original data deletion. Currentmain push/deploy is explicitly user-authorized. Full Goal remains active; do not complete based on narrow login proof.
 
-Rootserialproductintegration **ddb88d940a36f64febd3ecdbd0ceffd380ef3c61**, NOTACCEPTED untilregression; accepted15f48e. G17 independenta0d finalPASS302349/root447349 reviewed568artifacts662sources15commands8ZIP, actualconfiguredOpenAI1/7assertions root3cfe confirmsnormalNext2PIDs29UTF16approvedliteral, schema/no_candidates groundinginsufficient/humanrequired legalApprovalfalse, usage2678input2675write29output estimate0.0349175. G17externalactuallevelPASSscoped; finalintegrationpending. Fourmergeconflicts preserved/resolvedadditiveG13+G17,15SQLunchanged,77providerpathsidentical; narrowtesthistorySQLmembershipupdates only. Rootfirstregexresolutionassert failedbeforewrite and diffcheckmarkers preserved. Workflow task167c995 exact .worktrees/g17-regression ddb ports4259/60 doingcheck/build G13G17HTTP/UI+FS-copy2chains/filehistory; NOextraAPI/env. G14server4646finalreview0f4d verified836artifacts734sources39cmd; b3product unchanged. GoalsUIactive4261/62. PRDreadonlyG17consumerprepared8290/root44da, futurepatchafterG17ACCEPTED; nowG03canonicalhomeprep816f inunchangedg14-server4646. G18READMEconsolidationprepff586 stale5fragments, noedit yet. Userdocs unchanged.
-
-# Latest state169 — 2026-09-22T00:24:19.094967+00:00
-
-G14 actualcurrentassignee b3c77a18d04bca5be781492dd65198d8451d0c52 author636/check/build reviewed9fd311. goalsUI formallyassigned4409cd81 in .worktrees/g14-ui exactb3 rootfffromunused7cf, ports4261/62, no NotificationPulse/currentassignee separateactor. prd ownruntime/historycontinues. Workflow G17exacta0d643 finalindependent V01/V02+actualminimum1 task13fad running. Accepted15f48e noadvance. Previousfailurepackets/hashpreserved. Commonleasesreleased. G03/G18 pending.
-
-# Latest state168 — 2026-09-22T00:21:58.093299+00:00
-
-GoalACTIVE.15/19acceptedf48e. G17newfinala0d643 author575unit/build/33artifact457sourcepairs5commands root3d995; publicSDKpostsameopts+withResponsewholedeadline. Workflow assignedexact.worktrees/g17-verification-repair2 task13fad, ports4259/60, closureV01/V02 +actualminimum1afterofflinePASS. Previous4cfd independentFAIL V02 actual45,012old vs48,001new watchdog root887794; original9ddFAIL preserved. G14assignee gap actual2F/18filteredskip, prd ownrepair addendum0177; newtypedfreeze forthcoming. GoalsUIwaitingnewbase, unused7cfUIwtpreserved. G14unionAIauditfuturegap preparation022325, finalverifierdraftdf4a ready NOTASSIGNED. Allcommonleasesreleased. userdocs untouched.
-
-# Latest state167 — 2026-09-22T00:17:44.578917+00:00
-
-G17 9dd independent FAILpacket8a97/root5fd49 reviewed1576artifacts662sources17commands36ZIP. V01repair4cfd author568unit/build reviewed9439; SDKasResponse bypassesbodydeadline staticobservation073f, rootassigned narrowauthorbodyrepair e207 plusworkflow independent4cfd repro0174 in .worktrees/g17-verification-repair1, actualAPI0HELD. Original9dd evidence untouched. G14 typed7cf19 root13db reviewed; UIworktree .worktrees/g14-ui created+task66fa ready NOTASSIGNED pendinggoalsG17repair. prd ownHTTP/history continues androotcurrentassignee-vsactor gap queried. Allleasescommonreleased; userdocs untouched; accepted15f48e noadvance.
-
-# Latest state166 — 2026-09-22T00:12:50.582242+00:00
-
-Goal ACTIVE. Accepted15/19 f48e; root+prd/goals/workflow. G17 independent9dd confirmed V01 real object:response malformed output/content throws inside SDK before safe metadata; author goals narrowrepair4cfd finalcheck/build underway. workflow old9dd unaffected groups continue, actualOpenAI0 HELD until repaired candidate. Failure early-findings and main-v01-review retained. G14 typedserver7cf19 frozen634unit/build and root40artifacts54sources verified; commonlease RELEASED; prd ownHTTP/history continues. UI taskdraft-v2 intendedgoals afterV01repair; workflow remainsG14nonauthor. Userdocs execution-v2 untouched. Next exactrepair independent+minimumactualcall; G14UI then combinedindependent; G03 andG18 remain.
-
-# Current checkpoint — state165
-
-2026-09-22T00:02:51.620633+00:00; Workflow G17independent9dd4259/60; prd G14typed server/common0016; goals G14UI future aftertypedhandoff. Accepted15/19f48e. No AIintegrationacceptance yet. G17root1d60 verifies1843artifacts/720refs/457sources/914priorpairs/40commands/47ZIP; repaird02b raw0P4F→32P,13P5F→18P; actual40browser/16defaultskip keptseparate. RootgenericcopiedBeforeOpen hashchecker failure correctedwithoutdatachanges, recordedinreview. Formalverifierpacket f4a2753ca63a63b5746e5a8d5789eb5ffe18cad93472b9f8e781931ff3c01e16. Actualauthor07c1call preserved; finalindependentcallrequired. G14goals UI onlyaftertypednotyetassigned.
-
-# Current checkpoint — state164
-
-2026-09-21T23:53:33.292470+00:00; prd G14server/common0016; goalsG17finalUI; workflowboundedG17readonlyrepairpreparation thenG14typedUI orG17independent asresourceallows. Root G03currentreadiness only. Accepted15/19f48e. G14UIprep460c/root339f5inputs21sources verified. ai_verify followup tool thread-limit failed beforework; exactfailure retained, existingworkflow readonlyrepair taske938 assigned(no runtime). G03sourceaddendum has18sourcebindings: existingkanban/coassignment/timeline retained; ProductCards placeholder currentlyunused, avoidfalsevisibledefect. Goal ACTIVE, userenv/v2 unchanged.
-
-# Current checkpoint — state163
-
-2026-09-21T23:47:37.748962+00:00; G14prd server/common0016; workflowG14 readonlyUIprep, noimplbeforetypedhandoff. G17goalsHTTP/UI/history on117b repairedprovider; independentdraft7783 waitsfinal. Accepted15/19f48e. G14ui taskb9f4 owncreatedreadonlyf48e worktree. G17rootread117b delta: explicitconfigrestart/currentbasis/unknownack andsafeparsemetadata; author560check/build source toreviewfinalpacket, red5green18 retained. Authorlive07c remains1call, finalindependent1required. No additionalcommonG17edits whileG14leaseactive.
-
-# Current checkpoint — state162
-
-2026-09-21T23:46:01.968310+00:00; G13ACCEPTED15/19f48e. G14prd serverfirst/common0016 andnarrowproducerleases. G17goalsfullruntime afterrepairs; authoractualcallverified, independentpending. Workflow/ai_verify idleavailable. RootG13regressiond26f verifies453artifacts707source9cmd20ZIP/1097prior; mobileactualtraceviewedreadcontrolsfit390. G14formalserver packetc924742066dae6083cd6bc499d8b168229d1027904e32e2a72cb52754d3ffa83 basef48e newworktree, depsallaccepted, UI/G17corewritesforbidden. NewSQL0016 countactual14+1 (0015reservedG17notinbase).
-
-# Current checkpoint — state161
-
-2026-09-21T23:41:00.637902+00:00; G13 exactf48e integrationregression(workflow); G17 ownerrorrecovery/fullUI/runtime(goals), actualauthor07cprovider1verifiedbutnotaccepted. G14 startsafterG13ACCEPTED. Accepted14/19. RootG13ccbbb verifies1097artifacts707source21cmd58ZIP; serialf48e all723nonledger0c97same. Taskregressione42f; ports4253/54. G17typedprep b151/rootnewreview source44/32snapshot, staticS01/S02 authorhandling, S03falsealarmwithdrawn. Livec326 actualsyntheticcall1 response/schema/usage0.03488estimate/no legalapproval; independentNOT_RUN. Userenv/v2 preserved.
-
-# Current checkpoint — state160
-
-2026-09-21T23:34:48.493151+00:00; G13 independent closing then0c97testrepairclosure; G17 interrupted/baseURL repair and fullUI/runtime. G14 fulltaskv2 ready awaitingG13ACCEPTED; accepted14/19. Rootrepair681b verifies68artifacts701src7cmd5ZIPinclold4fresh103chunks; old390btestFAIL retained. Workflowformalclosure dab4 thenfinalcandidate0c97; unchangedprooffresh0. G17recovery482d explicitunknownacknowledgement/currentCAS/max3/lateclaimguard; commonlease free. G14draft20acf noassignment.
-
-# Current checkpoint — state159
-
-2026-09-21T23:32:14.396085+00:00; G13 committedtestrepair plus exact390b remaining independent; G17 fullUI/runtime and recovery investigation. G14 prepared/rootreviewed, gatedG13acceptance. Accepted14/19; actualOpenAI NOT_RUN. G17root539b32sources34artifacts13SQL2commands; commonlease RELEASED. G14root3d9f63sources8inputs32archivalpairs; noimplementation. G13TEST01 raw19P1F confirmedteardown pendingbody; product103 delivered, no productPASSsubstitute. H09lease9f13 requires exactcode, no409mislabel. Allfailures/userenv/v2 preserved.
-
-# Current checkpoint — state158
-
-2026-09-21T23:24:39.469534+00:00; G13workflow exact390b independent; G17goals fullstackcommon0015/package; G14prd readonly390b source/audit ownership update. G17independentplan66ed root984f ready; realAPI still NOT_RUN. Accepted14/19. Root G17narrowtest49lease2505 approved (explicitmissingconfig, no network), oldG16 authority/history assertions intact. G17doc32132ca root3610; currentmodelgpt-6 astra alias, officialbasevalid/keyPresent only notkeyvalid. G14currentpreptaske68 sourcephaseonly noimplementationbeforeG13accepted. Independent G17 actualminimalconfiguredcall once requiredafterfinalfreeze; no callnow. Alluserenv/untrackedv2 preserved.
-
-# Current checkpoint — state157
-
-2026-09-21T23:22:11.344023+00:00; G13 workflow independentexact390b ports4245/46; goalsG17fullstack common0015/package, ai_verifyG17readonlyplan. Accepted60b99 fourteen checkpoints, G14/G03/G18 remain gated. G13combinedroot71bc:701sources/13artifacts/559prior/31UI27moduleSQL14parentidentical; READMEonlymanualmerge. Authorfresh608/46/build, broad50UI2skip6restartfresh0reused. Formalverificationpacket issued, ownreadonlyprep36b9groups linked. Noacceptancebyselfcheck.
-
-# Current checkpoint — state156
-
-2026-09-21T23:19:39.145158+00:00; accepted60b99 remains14/19. CorrectedG16 ledgerpathschema only; readinessoriginalstate155failurepreserved5ea7b05, proof unchanged. Root+goalsG17fullstackcommon0015/package+prdG13union+ai_verifyG17readonlyindependentprep8ca7 active. WorkflowG13 independentawaitingcombinedfreeze. G17actualAPI NOT_RUN.
-
-# Current checkpoint — state155
-
-2026-09-21T23:18:04.844542+00:00; G16 ACCEPTED14/19 exact60b99; goalsG17 fullstackexclusivecommon0015/package, prdG13 additiveunionthenworkflow independent; G14/G03/G18 gatedcontinue. G16mainacceptance referencesf3cf/e1b3 rootrawreviews. G17docpreflight32ca root3610 validatescachewrite inputpartition/currentofficialdocs; actualprovider stillNOT_RUN. G13root2311 reviews559artifacts677source75ZIP14cmd and50UI+2skip6newPID; priorfailurepreserved. NewG13combined taskREADMEonlyconflict. G17 commonleaseactive; SQL14frozenotherbranch, SQL15newreserved. Userenv/v2 preserved.
-
-# Current checkpoint — state154
-
-2026-09-21T23:08:42.730964+00:00; G16 exact60b99 integration bounded regression ai_verify; G13 prd final UI9a8 evidence/next full union, G17 goals read-only latest configuration/documentation preflight. Accepted13/19 pending regression. G16root f3cf verified1571artifacts/693sources/18cmd/66ZIP/476HTTP+53own valid,72authorcollision excluded; integration productallbyteidentical839c sourcebinding2a8. G17prep42source root505d decisions approved, no implementation before G16accepted. G13 repair lease5259, verifier plan36b/rootddcd now ledger. G14 notice exact version alreadysupported sourceclarification6c86. Allcommonleases free. User execution-v2 preserved.
-
-# Current checkpoint — state153
-
-2026-09-21T22:57:14.300184+00:00; accepted0804a4a1a750ab4dee149036659e212480230242 still13/19. G16 ai_verify exact839c independent fresh514/check/build/HTTP22+6skip/28/history10 reportedlypass, ownbrowsercountercases ongoing, no finalpacket/acceptance yet. G13 serverebc final rootreview12865:729artifacts/459Gitproductpairs/17cmd/231HTTP/25historicalresponse; normalold176rows DB24P, extraintentionalG12corruption15P+executionfailure1+9NOTRUN separate. prd fullUI and workflow readonly independentprep de45; .worktrees/g13-verification atserverebc, ports4245/46reservedbutruntimependingfinalUI. New G14drafte11e and G03nav/homeaddendum63e6; no dependency bypass. Allcommonserverleasefree. G17 actualconfiguredprovider still mandatoryNOT_RUN.
-
-# Current checkpoint — state152
-
-2026-09-21T22:50:34.197458+00:00; accepted product0804a4a1a750ab4dee149036659e212480230242; 13/19. G16 combined839c exact independent ai_verify worktree g16-verification ports4241/42. Root UI review e1bc verified471artifacts/655sources/767reusepairs/12commands/42browserrows/44traceCRC; original2fail and71invalidcapture excluded. G13 typedbdb commonlease RELEASED, root13cb reviewed606unit/build; prd fullUI task8a5a with normalContextBarpulse, goals own HTTP/history. G17 configuredactualOpenAI NOT_RUN mandatory. Untracked execution-v2 preserved.
-
-# State151 latest — G16 server author evidence reviewed; G13 UI split
-
-Accepted0804 remains13/19, GoalACTIVE. G16 server final20e4fd3 rootmain-final-review8b696050 verified457private+4ownedhistory artifacts/615Git source/65changed/25commands/7reusebindings/368HTTPbodies/392acceptedoldsrc/104oldrows12SQL. Fresh runtime mock22P6SQLiteonlyskip/DB28P/history10P; original14P1F13NOTRUN preserved; earlier512unit+bridge4P20filtered sourcebound notfinal514fresh. WholeG16 UI/independent/realOpenAI notdone. Workflow fullUI earlyd041 exactcheck/browser now; afterward additive20e4 harness/doc merge requested, runtime ddb identical. Narrow union assertion+READMEG10 lease0e180 granted. Independent G16draft9b7a ready notassigned, ai_verifyidle.
-
-G13 goals e5ad firstserver focused82P; root staticreview found accepted manualbrand shipping responsibleID filteredout by GSG-only recipient. Author reproducing/fixing within commonexclusivelease, root concern saved (no rootruntimeclaim). Earlierfull590P4F migrationnames preserved, correctionpending. Prd new G13pureUI packet630590 active in .worktrees/g13-ui branche5adbase, newcontrolled components only no routes/controller/shared/nav/task/README. G16 ownserverlease released; G13common stillgoals. Root+goals+prd+workflow=4 active.
-
-# State150 latest — G16 typed server frozen; G13 exclusive common lease
-
-Existing Goal ACTIVE, accepted product0804a4a1a750ab4dee149036659e212480230242 remains13/19. Root reviewed G16 server774 (512unit/build, actual HTTP still separate), G15 capability bridge ddb (7artifacts/3commands/613-source exactbindings/4P20filtered). Root bridge review c70a547. G16 pureUI fe333 reviewed e82788; workflow now owns fullUI packet30bd, merge774+ddb, no common files. Prd ownHTTP/history proof continues; reported mock22P6SQLite-onlyskip/DB28P pending root review, old H15 fixtureexpectation failure preserved. G16 independent ai_verify not yet assigned combined candidate.
-
-G13 source repair ed56 root960c review34artifacts11snapshots406productidentity32priorartifacts; actual campaign brand-recipient suppression reproduced4red and repaired4new+6regression10P14filtered. Not delivery/dedupe proof. Goals now EXCLUSIVE common records/constraints/policy/0014 and narrow producer binding under full-server lease1e855, additive774 schema alignment. G16 common and two G15 bridge paths RELEASED. 0013frozen-notaccepted;0014assigned. Root+prd+workflow+goals active, ai_verify idle. G17 actualAPI mandatoryNOT_RUN; no costcap. G18 final207row worksheet remains preparation only.
-
-# State149 latest — audit worksheet and server boundary addendum
-
-Accepted0804 still13/19. Root finalaudit worksheet script outputs207 distincttrackingrows (91AC/26A/13AI/64SA/10D/2subgroups/1mandatoryOpenAI), currentrefs hashchecked errors0; all finalstatusNOT_EVALUATED, no tests/acceptance inferred. Regeneratefinalstate. G17provider-call-fact addendum d40b separates engine choice/network attempt/schema success; fresh GSG afterIO mandatory. G16fullUI draft abefd ready, workflow8purecomponents checking; prd server meaningful tests pending; goalsownreadadapters ongoing. GoalACTIVE.
-
-# State148 latest — owned parallel implementation, shared schema serialized
-
-Accepted0804 remains13/19. PrdG16fullserver exclusivecommon0013. WorkflowG16UI purepresentation only newg16-ui e1213d1 packet77d9, noAPI guess. GoalsG13puref54744focused/lint/typecheck root081d review22artifacts8source/2cmd; now ownactualproducerreadadapters packet eac3, still sharedlease0. Root targeted stalecopy census6items assigns G13normaldelivery/taskcopy,G16AI/G11/G10 UI labels,G18READMEchronology; allmustclose final,no productacceptanceinferred. G17 actualOpenAI NOT_RUN.
-
-# State147 latest — G16 full server and G13 pure checks
-
-Accepted0804 remains13/19. G16 pure e108 root673e review450unit/build; full server prd exclusive0013/G10/G11 continues. Narrow seed corpus report and forged missing-run NOT_FOUND test expectation addendum authorized. G13 prep28refs matched; requested/expected guidance retains certainty, app-open normal sync approved with no closed-app/email delivery claim. G13 pure f547732 checks underway, common lease NOT_GRANTED. G16 typed freeze needed for UI and G13 shared lease. G17 actual OpenAI NOT_RUN mandatory.
-
-# State146 latest — G11 ACCEPTED; G16 full server and G13 pure module authorized
-
-Accepted0804a4a 13/19. G11regression52f5 rootf286review546artifacts593Git/cwd9exit0/31CRC3clickedRSC/461unit28browser12HTTP14UI. Historical233rows unchanged migration1/repeat0total12,5originalfilesunchanged. G16prd ownpuree1087ce check450 thenbuild; full-server-lease nowexclusive afteradditivemergeaccepted0804,0013/G10exactfinding/G11actualAIresidual. G13goals formalserver-task ownpuretypes/date/eligibility only on0804,0014reserved NO commonlease untilG16typedfreeze. G16independentai_verifyprepared94fa root915a review19refs all13evalcasesNOT_RUN. G17actualAPI stillmandatoryNOT_RUN.
-
-# State145 latest — G11 serial union under targeted regression
-
-Acceptedcd7 12/19 remains. G11ce049 independentffb24 root77ae3review1722artifacts528Git/cwd31cmd21exit0/10exit1,48CRC153literalHTTP/427unit40rawbrowser,17ownbusiness9UI5history4IO. Allhelpererrors retained; ownnonprice/mobileclickedbody notcaptured vsstandard40actualchannels separate. Rootclarifies originalinitialrace two runs1P1F notverifier2FAIL phrase. Rootmerge0804a4a 9conflicts resolvedbothrecords/constraints/taskentry/readme;7migrationtestcounts12, allSQL1..12original. Bindingba8f593nonledger458both69G1554G11same12uniondelta. Formalregression7866 workflow newg11-regression4231/32 bounded28+freshcheck/build+ownseams.
-
-PrdG16server-taskd2a8 ownpurephase oncd7; no commonlease beforeG11acceptedbase. Ai_verifyG16readonlyverifierprep, root+3active. G17realAPI mandatoryNOT_RUN. GoalACTIVE.
-
-# State144 latest — G15 ACCEPTED, G16 owned pure implementation authorized
-
-Acceptedcd7c434 12/19. Rootregressionb16d8a review445artifacts581Git/cwd9cmd32CRC425unit28rawbrowser44own+1mockskip. OriginalhelperSSR404fail2 preserved, narrowtailvalidNextstreamed200+404digest/canaryabsence. G17actualAPI NOT_RUN. G16prd formalserver-task ownedpurecorpus/types/validators only, commonleaseNOT_GRANTED pendingrootG11union. G11ce049 independentffb24 PASS received1722artifacts rootreviewnext, 9expectedconflicts thenworkflowregression. GoalACTIVE.
-
-# State143 latest — G15 integrated, bounded regression assigned
-
-Root serialintegration cd7c434432dc92d393f6036981c2aadc8e508e29 preserveslatestledger and543nonledgerpaths byteidentical d8d0, binding9621…. Accepted246 remains11/19 untilregression. Independent repaired28662 PASS rootb2f09 review1397artifacts575Git/cwd16cmd106CRC337HTTP76raw425+222P1mockskip, sourcebound22+54fresh0. DEFclosedexactd8d0; original8977FAIL+8helpererrors remain. Four helpernumericHTTPstatus collisions rawrechecked. Genericchecker --candidate metadataflag failed becauseartifactmanifestnocandidatefield, actualmanualstartup/commands/Gitbindingsverified, nofilehashmismatch. Formalregression1a2c… ai_verify detachedg15-regression4235/36 bounded20G15+G12/G10union/ownminimal/newPID notwholecore repeat.
-
-G11ce049 authorfinal934245/manifest1468 root0d0e review1557artifacts510Git/snapshot/cwd484unchangedpairs22cmd93CRC40rawPASS427unit+19newPID,8oldsourcefilesunchanged. Workflow independentce049 reports427/build40browserPASS, own15+remainingongoing originaltwofixture422preserved. G11unionpreviewf6b7… nineconflicts README/legacypage/records/constraints/5migrationcounttests; noactualunionyet. Goalsdoneidle; prddoneidle G16draftready afterG15accepted. G17actualcallNOT_RUN.
-
-# State142 latest — both G15 repair and G11 completion independently validating
-
-Accepted246 stays11/19 GoalACTIVE. G15d8d0 independentai_verify reports425/build+76UIpassed, owncausalfirstharnesswrongbusyexpectation retained correctioninprogress finalpacketpending. Rootprior8ownreports334HTTPbody semantic0a791, actualnonemptyRSC2component/context/inputIDpositive7a350 (textfetchedclientAPI, zero-byteRSCexcluded). Integrationregressiondraft5d645… ready notassigned.
-
-G11 authorad3 original32UI+19restartPASS then actualinitialreadA(submittedrev3) overwritesnewfocusB(completedrev4) reproduced twice1P1F. Productfixce049f5ef9365afc4dbf9dd8be290d0282be9523 onlycontroller+new2casetest, originalPOSTfollowup3PASS notdefect. Rootdiffread; workflow formal689fdf… detachedg11-verification-final4231/32 whole7groups+40browser, priorad3taskb319 superseded fornewruntime. Goalsfinalproofongoing. G16prdread-only76f576… root942c…11inputs22sources0errors; serverdraftf7e605… GSGinternal/labeledsynthetic/deploymentcorpus/new0013 reservedonly. No G16implementationuntilG15accepted. G17 actualAPI mandatoryNOT_RUN.
-
-# State141 latest — repaired AI candidate under independent closure
-
-Accepted246 remains11/19 GoalACTIVE. G15 originalb1dd FAIL89773 retained:71P1F/72 plus deterministic DEF-G15-V01. Root1373artifacts573sources85CRC19cmd review3105; dedup f2f243 corrects raw aggregatealiases142P2F to72actual71P1F. Narrowrepair d8d0 author449f result/21ea manifest; rootacf79 review369artifacts575Git/cwd10cmd40CRC40rawPASS,425check/build. Formal983250 independentai_verify newdetachedg15-verification-repair1 ports4235/36. Server/parser/history unchangedsourceboundfresh0; no acceptance yet.
-
-G11 fc82 UI product/ad3ad testonly freeze, goals8journeys validating. Originalmock4P4F harness distinctions preserved; current rendered protection+freshdeniedSSR/API/clickedRSC required, initialauthorizedSSR bytes not retroactively erasable. Root potential execute/refresh readticket concern sent for actual boundedrepro, not yetdefect. PrdG15repair leasesreleased, G16readonlycontract preparationonly. Need wholeG11 nonauthorverification thenserialintegration. G17 actualcallNOT_RUN.
-
-# State140 latest — independent G15 readiness race repair assigned
-
-Accepted246 remains11/19 GoalACTIVE. Ai_verify exactb1dd fresh425/check/build; actual72browser71PASS1FAIL (mockdesktopU14). Single narrowrerunPASS doesnoterase: DEF-G15-V01 high deterministic SQLite390 unknownV1 GET200held, stillenabledreadiness sendsoldknownV2runID→200allowedtrue, afterGETrelease unknownV1text+allowednotice. Provider0. Root6hash+ZIPCRC/actualPNGviewreviewe80e… currentb1ddcannotaccept. Formalrepairfa4a7… prdnewg15-readiness-fix b1dd ports4229/30 owns screen+newdeterministicrace only; server/API/schemafrozen. Ai_verifycontinues8groups onunchangedb1dd; newcandidateclosurelater.
-
-GoalsG15authorfinal4a20… manifesteda6… rootfinal6e41…1812artifacts525Git/worktree/snapshots490pairs20cmd73CRC72rawbrowser346HTTP+18historybody hashes. Firstrootintegrityc7fbc…six falseflags were intentionallymigratedupgradeDB/WAL/SHM copies, original15andpristinecopiesallmatch; correctedappendonlyfinalreview, no evidence edited. Author28mock+3skip/31DB, history28+26, sourcebound634unit425fresh0; cannotcloseindependentDEF.
-
-G11campaignauthorfinal2de379634ccc9001b233715e1d87e96d5e126231 onlynewHTTPscript vsfe2e frozenproduct; rootfinal939af…335artifacts483source19cmd246HTTPbody82basis, history686448…11originalsunchanged. Actual16mock+1skip/17DB/history35, originalrunnerwrong.error.code3P1Fpreserved. GoalsnowG11UIformalb66cd… newg11-ui exactfe2e ownsUI+entry/README4233/34; additive2dehelpermergeauthorized. Prdserverallleasesreleased thenG15UIrepair. Root+goals+prd+ai_verify4active; workflowidle historical intendedG11verifier. G16notstarted/G17realAPI mandatoryNOT_RUN.
-
-# State139 latest — G11 actual campaign contract reviewed, UI queued
-
-G11fe2e17e04d25d618e4b9c861b16fed3fc85cfd8e rootreview6efc11…29artifacts482Git/worktreesources9commands0errors, raw427unit/build andactual12newproducerunit subset. ExistingSQL1..11 unchanged; currentmaterial0/cancelhold/receiptunknown separated,6kindbasisCAS/currentauth/immutablehistory. PrdserverruntimeHTTP/FS-copyproof continues, newscript4614 first3P1F checker.error.code field error retained; productfe2eunchanged. GoalsUInewworktreeg11-ui exactfe2e formalqueuedb66cd… startsafterG15finalpacket, ownsUI+entry/README narrowlease. WorkflowwholeG11verifier; prd afterwardG16author whenG15ACCEPTED.
-
-G15b1dd independentai_verify running4235/36; goalsfinal72browser/54history authorreported HTTPpending, notaccepted. Rootaccepted24611/19. G18draft549761… 8finalauditgroups/all91AC stagedclosure preparedNOTASSIGNED. Evidencechecker nowaccepts dict/list manifests; actual29and581 hashchecks0errors, onewrongcandidateflag invocation preserved/rejected beforecorrectsource5229+integration246. No product test countchange.
-
-# State138 latest — G15 independent assigned to new nonauthor
-
-Accepted246 stays11/19. Newnonimplementer /root/ai_verify UUID01a0c5c7-c60d-7eb0-b570-b5b65a92cbde independentlyvalidates exactb1ddba38fdce0b871549fe7d8a364fe71057004a innewdetachedg15-verification4235/36, formal32febb… sourceimmutable/noenv. Actualsession_meta/privateprefixbindingdf9c… verified. WorkflowG14doneidle; active root+goals+prd+ai_verify=4. PriorprdG15verification superseded; prdcontinueG11campaign thenUI, workflowwholeG11verifier.
-
-Goalsb1dd onlyCSRFcookieorder helperchange from634 productbytesidentical; historypositiveG12UI28/G15OCR26 andmockdesktop15 authorreported rootreviewpending. OriginalwrongpositiveG12malformedfixture503 retained. G14prepc3e0…32source+4inputs rootreview0errors. G03taskdraftd181… futurehome/nav/kanban/timeline/exactbranding NOTASSIGNED. G17actualAPI mandatoryNOT_RUN.
-
-# State137 latest — G11 campaign consumer assigned, G15 early freeze
-
-Accepted24636458b6fab6b93c6b215d9a627a5d84b26b98 stays11/19 GoalACTIVE. G15combined63430 sourcefreeze rootearlyreviewdbcf3b…151sourcepairs raw425unit/build PASS0errors, independentpending. Sharedlease released; authorhistoryhelper first17migrationassertionsPASS thenCSRF403 because pre-CSRFcookieheader harnessoracle, originalretained/test-onlyrepair pending. Goalsactualproof continues4233/34.
-
-Prd formalG11campaign-taskca19db… newworktreeg11-campaign ataccepted246 inputab313, exclusive narrowsharedunion0011+0010; actualsafeG12residual/CAS/immutablehistory connector, earlytypedfreeze then goalsUI, prdwholeG15independent afterward. RootG11serverfinal reviewed68f36… integrity4271…634artifacts424sources27commands; rawHTTPaddendum2a97…396responses, historical38/10originalfiles unchanged. Campaignprepb638…/verifierprep4314… completedreadonly. Workflow G14prep8d2e… read-only currentACL/searchproducer census, noimplementation. G12scopeaddendum1294…stale regression prose correctedappendonly. G17actualOpenAI mandatory stillNOT_RUN.
-
-# State136 latest — G12 ACCEPTED, G15 assembly assigned
-
-**Accepted24636458b6fab6b93c6b215d9a627a5d84b26b98, 11/19.** G12exactregression8a07296… PASS rootreview746448…581artifacts/9commands/15CRC0errors. Fresh391unit, mock6/SQLite6UI incl20geometry, own18HTTP+9browserchannel+5general/newPID assertions. Oldbroad/race/history fresh0. Original74eFAIL/B04invalid preserved; repaired5229 thenintegration246 all478nonledger bytesidentical. main-acceptance.json holdsstageboundaries G13reminders/G11residual/G03home/G14search/G18 mandatorypending. Regression copiedscope_limits staleNOTRUN integrationtext explicitly superseded by actualproof/rootreview; workflowaddendum requested, originalsunchanged.
-
-Goals formal **G15/combined-task.json**, newworktreeg15-combined branchrun/g15-combined baseaccepted246 ports4233/34; exclusivecommonrecords/constraints/taskdetail/README+7migrationcounttest lease. Mergefinal1eec preservingG09/G10/G12, 10expectedconflicts, actualSQL1..10+12=11; earlyfreeze then ownfinalproof. Wholeindependentprd only. G15 UI/serverreviews complete, nofeatureacceptance yet.
-
-PrdG11finalab3138 (cafserverproduct identical2newHTTPscripts only), author372sourcebound/29mock+5skip/34DB/historical28 and634artifacts424source27cmd471rawHTTP announced. Rootfinalreviewpending; prdreadonlycampaign-consumer-preparation now assigned, noediting sharedlease heldG15. G11UI draft notassigned. Workflow G12done, correctionaddendum only. G17actualAPIstillNOT_RUN GoalACTIVE.
-
-# State135 latest — G12 integrated, acceptance regression pending
-
-Rootserialmerge **24636458b6fab6b93c6b215d9a627a5d84b26b98**, all478nonledgerpaths identical repaired5229. Workflow formalregressiond35828b305744dced4137b8258d77d0952f9ad0580920398b6b5592096b07364 newdetachedg12-regression4231/32, boundedcheck/build/UI-B+union+stronglayout/ownseams/newPID; oldfunctionalproof sourceboundfresh0. Repairedindependent9cff772… PASS rootreview3fd3d7…503artifacts24CRC9commands40geometrystate0errors, actualmobilePNGrootviewed. Original74eFAIL/mobileB04invalid nevererased. Rootrawaddendum8d1f93… actual3RSC+API/SSR positivepublic/privateabsence andhelperfailureclassification. **Accepted remains95310/19 untilregressionreview.**
-
-G15finalUI1eec rootreview8463708d29034ac5870b3b83ea09360b8340b2a658388e8b28f1f1e3bbb15864; integrity56a0fc…937artifacts300Git/worktree24commands74CRC56rawbrowser0errors. LatestCSS freshbuild+geometry4, functional56/unit348/restart9 sourceboundfresh0, weakR10 excluded. Goalspreparation6fe996… reads union10conflicts withG12base; originalSQL1..10+12=11;7migrationtestcounts and ownFS-copyhistoryhelper needed. Formalcombined afterG12accepted, notassignedyet.
-
-PrdG11 now d55ee98 adds2ownscriptsonly; caf891 serverproductimmutable. Actualmockinitial7PASS1FAIL incorrectwholeDTOhash includesdistinctexternalActionID URLs; correctingtestexactIDs/contenthash/bytes, originalredretained. No server productchange. G11 UI draftbdca873… readyNOTASSIGNED. G13futuretaskdraft96ae325… preparedonly. G17actualOpenAIstillNOT_RUN.
-
-# State134 latest — mobile defects repaired, independent closure pending
-
-Accepted953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6 stays10/19 GoalACTIVE. G12 original74e independent **FAIL** G12-V01 configured390→425 clipping; weakB04 invalidated. Rootreview909f0d34…3582artifacts/4inputs/319CRC24commands noerrors. Narrow CSS+layouttest5229e8ca author391/build+mock8/DB8,20rawgeometry rootreview40b04da…198artifacts0errors. Workflow formal9197afa… newdetachedg12-layout-verification ports4231/32, changedlayout fresh +unchangedserverproof fresh0; no integration untilnewPASS.
-
-G11 servercaf891 typedcontract rootreview7c4fb2f9…26artifacts31changedGit/worktree8commands0errors;372unit/build. Sharedlease RELEASED. Prd resumed actualHTTP/race/restart/copyfirsthistory afterG12repair, currentHTTP proofpending. G11 UI later. Ownverificationdraftaa4bf3… NOTASSIGNED.
-
-G15 latest1eec0ce CSS-only after5df actual190charLatin title overflow (configured390 vsinner1560/full4366), source red preserved. Authorreports final4stronggeometryPASS +build; prior56functional/9restart counts sourceboundfresh0, oldweakR10 notgeometryproof. Finalpacket/rootreviewpending; wholeindependentprd only. G16 SA59/60/61 scopeaddendum938e974… and mobilegeometryguardaea99e… nowtracked. G17actualminimumOpenAIcallstillNOT_RUN mandatory.
-
-# State133 latest — G11 server underway, G12 author reviewed
-
-Accepted953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6 stays10/19 GoalACTIVE. PrdformalG11/server-task911609858919e0b5405bd447ae3928b75b06791d830dcbd75f3f5d42e17b2215 new .worktrees/g11-server branchrun/g11-server exact953,ports4229/30,noenv; exclusivecommonserverrecords/constraints/0011/tasksservice/submissionread, noUIphase. DraftDoR29sourceverified. NarrowG05testoracleaddendumd5afbe8094a044781349a1367090eb85a61ef14f2c43afdc95d8c0d10539e476 permits UI-E andR12 connected:true ANDnot_completed preservingpartial/allotherassertions. Needearlycontractfreeze thenHTTP/race/historyfinal; eventualgoalsUI whileprdindependentG15 possible.
-
-G12authorfinal74e result4196ab72c587ed4bdc9fd9bacda4c172fa982b586db8878a9d59b95044acaf53; rootfinalreviewde2dfb4ab74eb8df13aef83639a6493a0fd7ca3cd6ae6f221d0c3044e6f6cfb3, integrity2cfb5dc3d01894fbaea12948398073924cdfbaa480a567761c12407a7401a702:1234artifacts/461sourcepairs/20commands15exit0+5nonzero/72CRC/48rawreports68browserPASS; rawreviewecf3eb85b849d19386ce12b50709b21429d96c9449ef14520259864e5e6d9c1d checks293HTTP+38historyresponses/8actualclickedRSC4publicpositiveallprivateabsent/13originalfilesunchanged.391unit/build; HTTP31P3skip/34P. ThreeFS-copyDBs G10normal156/G12malformed196/G12normal202, allrowsledgerpreserved. G10history9positive insideexit1 duefollowingknownmalformedG12 503; rawfailcount0 omittedthrownassertion, rootexplicitlyrecords1harnessexpectationfailure, notwholePASS. AddednormalG12 separate10PASS. Rootactualdesktopcancelhold screenshotviewed, no newmobileviewclaimed. Workflowindependent fullsuite+own7groups running74e, sourceunchanged.
-
-GoalsG15UI initial1a97db6 +narrowqueuedrepair848397a940370654c952a8957e12810ac90c918a, original44060actualservice409 bothadapters retained and22unitPASS authorreported; actualHTTP/browserstillpending. README/taskdetail/legacypage narrowlease RELEASED at1a97. OwnUIcurrentlyeditingtypecheck/tests; nofinalcandidateyet. Rootreadqueuefixdiff, noindependentPASS.
-
-Newfutureprep: G16/eval13-contract-preparation96147b5d4234e5a941eaf09d35e450f83ad13b8c582970e2cb07d2a80c4c6974 distinguishes13perspectives from12categoryIDs/legalaccuracy; G17/task-draftacf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3 configuration/serverfreshboundary/fault/live/usage/nocap preparedNOTASSIGNED. Noactualenvkeyread/APIcall inprep. ActualG17 mandatorystillNOT_RUN.
-
-# State132 latest — G12 independent running
-
-Accepted remains953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6 10/19. G12combined frozen74e8c0aae4d13901491086c29ce6d2e357236162; author391unit/build, root458paths/1211Gitbytes/3cmdpairs reviewf151bbd66e1f6643fdeb3eff5c055a2eff6b9a015e24dbf1e33d16202d1f6c98. Workflowformal c2320ea5938e5338a0227e4c884ec672f0f95e54e3e3a2117226c84dd77dbae1, detachedg12-verification ports4231/32, fresh391/build thenunfilteredmock+own7groups running. Prdsamecandidateauthor UI40PASSreported, historicalG12 malformedfixture explicitoriginal503, addednormalUIhistoricalpositivecopy; finalpacketpending. Sharedsourcelease released.
-
-Goals G15UI current. Found queuedoriginalintentloss recoverygap rootservicecodeconfirmed; narrowservice/unit/HTTPrepairpacketb9f98eca0199f159a47abe27f72e26ecc4db813059c32dd09f08f69131ad8c0e: newcurrentauthorized matchingqueuedID receipt→sameexistingrun/attempt; preserveCAS/currentauth/concurrency, originalfailure required. G15README/taskentry narrowleaseaddendum9a4dc8cc33a8f3f4515869f111e7799e7b66b151f74b06e6f396292a82b41692 nowgranted while upcomingG11serveronly. WholeG15 independentdraft0af46736e45dcc4e325d92a1ffae13734c06166989da0e88a07a799ee747b45e prepared forprd (workflow/goalsauthors cannotverify).
-
-G11serverfirst draftf83d8c3a825093eaabc003f3a1b35497ce0cdac052c92841d38acff6c843e6e2 preparednotassigned; latestaccepted953 currently. Prd afterG12finalchecks, phaseownmodule+commonserver/submissionread only, no UI/README lease; earlytypedcontract freeze for eventualseparateUI. NoG12/AIunacceptedproducerclaim.
-
-# State131 latest — G15 UI dispatched
-
-Accepted product stays953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6; 10/19, Goal ACTIVE. Goals new .worktrees/g15-ui at44060, formalui-task f7c69a89561a664488c245d0dc65163a28e9e1afc4352f3fafcb426a529577e1 ownfeatures/routes/nav/tests ports4233/34, sharedREADME/taskentry deferred. Rootserverfinalreview89282c015d7825913bff441ceaff2abb4bc37aa8cc8715cccc1a62b5a5ebd88f:897artifacts/281source/27commands plusoriginal8+18historical sources unchanged; raw160+186HTTP read.346unit,28+3skip/31HTTP,45+4skip/106+3skip history distinctlevels. No UI/independent/OpenAI PASS yet.
-
-prd G12combined running exclusivecommonlease; workflow read-only ownprep complete planafd937f8ceae7c79cbf5878188d11d6e6383749c240eab8c7dbe6bc7da98b8b2 (7groups,0execution) awaits exactcombined. G11DoR29source+2input hashes verified; authornext after prd combinedchecks. State130 metadata correction preserved originalb192a21; compatible stringresultrefs restored707a9f8, readiness10/19,91AC,193pending,0integrityerrors.
-
-Latest dispatch: prd G12combined formalpacket126189e1727137581fbc0ab10a2c2408ada392b0c92d07e070a803fe187791a1, newworktree .worktrees/g12-combined baseaccepted953 branchrun/g12-combined ports4229/30; exclusivecommonrecords/constraints/task/submissionread/README lease. Earlyfreeze then workflow independent, authorownchecks mayfinish onunchangedcandidate.
-
-# State130 latest — G10 ACCEPTED
-
-Accepted product **953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6**,10/19 G00/G01/G02/G04/G05/G06/G07/G08/G09/G10. G10/1/main-acceptance.json 1828dce60a1ba4dd50b2fd17482b6f19faf96135482d0a42f2ad073108c27595; regressionreview 4780bd4d5cefa36d1e87839ebaf1fe85ae5f67901d3b12b87283a0eda3d14d54. Root461artifacts/12commands/409source/12CRC andprior3307unchanged reviewed. Fresh348unit,selectedmock4/DB4,HTTP17/UI14/restart3; oldfullsuite/corners/historyfresh0.
-
-prdG11 readonlyDoR complete(3a1e27dbd4dad2e0c14cb5dddd153d59e1c8ba346f4f37758daf21d895f87040), nextG12combined formalassignment pending after rootUIreview6c6d0f…; draftdbfd72… prepared9prospective mergeconflicts. WorkflowG12read-onlyverifierprep running(noactualvalidation/PASSyet). GoalsG15finalserver44060d35b638fac9c488f060102e5e90426ec24b check346/build,actualmock28+3skip/DB31/history45+106 authorreported finalpacketpending; product478OCRhashrepair unchanged. G15UIphase ownpaths draft ready, noleaseyet. G16taskdraft08f6892f… preparationonly.
-
-# GS HALE checkpoint — state129 latest
-
-Latest accepted stays92a463e57e58e4f569304d045e9bbe1f7a0ccd7b,9/19; GoalACTIVE. Root productintegration now **953155ddbcf0f9f4d203de436fd15b7fe9dfa6c6**, G10 regression pending.
-
-- workflow formalG10/1/regression-task.json SHA42939e438f1e798c55f194e9f8cc5b0114e8894b3ad73087854e39e3b31a9a2b; detached .worktrees/g10-regression exact953,ports4231/32,noenv. Final1512 independentresult a4d04d5c17eb745183e0cbf9e347fee0028ca5dc856c021200b3938a566e66d8; rootreview7478730ccbffb0fadd082e616e85a2bdb372a72f7834b0598e06a35fd2895ca8.3307artifact/409sourcepairs/23commands/280CRC allrootchecked. Raw152browser reports recount mock146P2skip/DB148P; fresh1512unit348,ownHTTP25/UI17/late6/race5/recovery3/DBboundary4 separateassertions; original345P1F and tsconfigerror preserved. Integration409andentirenonledgerbytes identical. Fresh boundedregression only; fullunchangedbrowser/history/corners reusefresh0.
-- prd G12UI frozen **cb109d3ecfbbe816d81f616fde94e4358db07111**. Actualpreviewdirtykeyorderbug and providerselectlabel/value mismatch repaired withoriginalraw evidence. FinalB/CbothmodesPC3908PASS; prior57fremaining14+14PASSsourceboundfresh0, notCdoublecount. HTTPmock31P3skip,DBrunning, finalpacketpending. Onlyworkflow independent wholeG12. CombinedafterrootUIreview andlatestacceptedG10; sharedschema nowreleased.
-- goals G15server earlycontract **21f6302bfe813dec2aa1e33dc793d60f31aca8f6**,340unit/build/root33source reviewed8ecd219c9d585a0c05e97673212693ab11f105fb1610083f695b4de20f976854. Sharedrecords/constraints/0012/NextleaseRELEASED. ActualNextmockHTTP16PASSthenOCR503 trueproducthashkeyorderbug. Narrowown snapshot.ts preserve extractorcode/confidence/location order +actualpersistedOCRunit fix authorized; originalhttp-mock-first andlogs preserved. NoAPI/UI/independentPASS yet. SamegoalsG15UIlater, prdwholeG15verifier remainsindependent.
-- G16main sourcecheck actualgit ls-remote origin refs/heads/main and--heads both exit0 stdoutempty; noavailablemainSHA,nofetch/mutation. localmain1f108baseline nolegalcorpus. RecordG16/repository-main-source-check.json d87e42f144047abb25002dafb52ff3d3b18c2abd23906f50b1ff19578dc7082d. Officialpublicfallback allowed. G17actualAPIstillNOT_RUN.
-
-Prior detailed context (state128 archive also preserved) follows; latest notes above supersede active status.
-
-# GS HALE checkpoint — state128
-
-Existing Goal ACTIVE unlimited, user says continue end to end. Root session01a0c281-e335-7a81-a808-36dd5305557e; logical/integration cwd `/Users/evan/workspace/gs-hale`, branchrun/integration. Latestaccepted product **92a463e57e58e4f569304d045e9bbe1f7a0ccd7b**, **9/19** G00/G01/G02/G04/G05/G06/G07/G08/G09. Rootledger7930788 beforestate128. User untracked docs/execution-v2, .env, main/origin preserved. DP-20260921-03 execution-v1 binding; objectiveattachment and.execution/objective.md previouslyread. Do notcreategoal/stopatpartial/markcomplete whilemandatoryunfinished. Priorcheckpoint archivedstate127-before128.
-
-## Active assignments (root +3)
-
-**workflow** UUID01a0c307-fd0c-7d41-bb8a-43ee5f85f03a is **G10 independent verifier**. Originaldetachedcwd.worktrees/g10-verification at3d57; formalG10/1/verification-task.json SHAafe061d8863926c8a213e34dd7ea54f2a6aedcb7d5ae9da32100477397f475a1. Ports4231/32 ownresources/noenv. Fresh originalci/buildPASS, originalcheck345P1F: `submissions.test.ts:187` wholeJSONregex matched1700 onlyinsideUUID8d170022-a8a6-4895-a90d-cefbdf43ba61. Confirmed exactdecodedresponse privatekeys/exactpricesabsent inverification/early-findings.json, originalraw345P1F preserved. Narrowdiagnostic2Pfilteredskip notclosure. Fullunfilteredmock **146P2SQLite-onlyskip**, SQLitefull currentlyrunning. ActualFS-copy-firsthistoricalchains18assertionsPASS. ReusedmigrationhelperrawreportauthorUUIDhardcoded, actualverifiercommandwrapperUUID mustbe distinguished (notfakeauthorsession).
-
-Test-onlyrepair authorgoals froze **1512dff0c948b3c9e82df9e43ff64c13e5f2ac13**: onlytests/unit/submissions.test.ts; recursive exactkeys+numeric/stringvalues withUUIDnormal andleakpositiveoracles; actualsourceprivatepricespositivecontrol. Authorfull348unitPASS. ResultG10/1/test-fix/implementation-result.jsone8f86f5d…, manifestfff23e09…, rootmain-test-fix-reviewf2eb8c773e5f48e240292bbc71f47ece6f670481ecd403234df262ef0980a707. Newdetachedcwd **.worktrees/g10-verification-repair1** at1512 prepared. Formalverification-repair1-addendum70694313e72152a5349342a98ed79b15f4171f76199ca496a90cc0db5155c676 sent. Finishold3d57fullsuitewithoutmutatingcheckout; new1512ci/check/build+pendingown7groups actualruntime afterportsreleased. Product/lock/config/README/runners/e2e byteidentical, completed3d57fullbrowser/historical sourceboundreusefresh0 allowed, no samefullsuite rerun needed. Finalcandidate1512; independent closure stillpending.
-
-IndependentG10 critical ownchecks: literal3itemSA38 scenario(notinflateauthor5item); actualG05S1/S2+files/ProductUse partialreflection vsGSGresolution; immutableprivateopinions/publicbatch/followup/pendingagency/wrongfile/humanreview oldapprovalnotinherited. Currentauth/API/HTML/actualclickedRSC/price. PRE01 heldpreview→switchdraft→no stale publish; PRE02 owncommittedPOST→differentauthorizedGSG savesbeforeGET→ownrevision retained/next409. ActualcommittedPOST/upload→membershiprevoke→purge→late response cannotrestore (CDPresponsephase upload, avoidroute.fetch emptyfileproxy). 2OSrace/rollback/newPID. Verifier cannotfixproduct. ResultG10/1/verification-result.jsonpending. OncePASSrootrawreview→serialintegrate→exactintegrationaffectedregression→ACCEPTED.
-
-**goals** UUID01a0c307-c975-75b1-b96a-5a5c4e448aec now **G15 persistedserver author**, cwd.worktrees/g15-server branchrun/g15-server basecd648ff1fc2407606e4449050e0388935ee65eca,ports4233/34/noenv/noAPI. FormalG15/server-task7bd5ce5f74ee2e1581b67279297816d1664e3ecd1cf8bff60fff3995f6a94eba. G10testfix completed/released, resumesG15. Own narrowrecords/constraints/files/policy/Nextconfig and0012-ai-input.sql; NO README/taskUI/package untillease. Actualserverimmutableinput/extraction/sourceversion/hash,currentauth+serverregisteredprovenance, asyncclaim/CAS/idempotence/restart, actualNextproductionworkerassetpath required. Clientpublic/syntheticcheckbox nevergrants externaltransfer; defaultunknown, exactserver syntheticregistry only planned. Frozenextractorinterface supported. MustfreezetypedAPIearly. **Same goals will own G15UI** so prd can independentlyverifywholeG15 (workflow authoredextractor cannotverifyG15). Currentservercodeunfrozen, noOpenAIcall.
-
-**prd** UUID01a0c307-9b54-7b83-b5eb-1b12b9a8553c is **G12 actualUI author**, cwd.worktrees/g12-ui base976525205b45d77b557df1cc9fa3ef70838c3243,ports4229/30/noenv. Formalui-taskbd100275ebf162606e24c8f1c66d4bf6506852593e5969faffc03fe023fd4104; taskentry/READMErelease6afeef94…. Actualtypedcatalog/menu/material/version/conflict/physical/followup formsconnected, firsttypecheck thenactualPC390mock/DB flowchecks. OwnnewcampaignUI +2taskentries+README; SourceRequestNotice literal '이 요청 버전의 자동 제출 대상 항목'. Additional **scripts/verify-campaigns-http.ts banner() exactliteral1place only** authorized `ui-banner-test-addendum.json` SHAdedd5231ceb1a4e53896e6d01c4b5400511de3f37a995dc1eaada150a4ab8e0b; H28/H29 semanticsretained, no serverchange. No schema/package. G12futurecombined rootassign onlyafterUIfreeze andsharedleasecoordination. G12/1/verification-task-draftf2b3ae61b3f3dcd6555637c6490a99d56504bf595e821fb377c5343c16b24014 readyNOTASSIGNED, intendedworkflow onlyindependentofbothauthors.
-
-## Reviewed author boundaries
-
-G10 combined3d57 originalproductmergeb214 +4fUI+accepted92a, root **main-combined-final-review4c7cdd954455f0f09919a01ea621581fe4945d5edf45857c21d398e2f2be1272**. Original6mergeconflicts preserved; records/constraints/inquiries/evidence/tasklinks retained;9immutableSQL. Own346unit/build; G10UI30+30(PC15+mobile15each), impact6+6; HTTPmock26+3SQLite-onlyskip/DB29; 2populatedoldchains18assertions.1299artifacts/405sourcepairs/11commands/60rawbrowserreports72cases/72traceCRC rootchecked. Originalfirst345P1migrationfixturefailure b214 correctedonlytestmembership<=7/final2addedtotal9 in3d57; noproductchanges. Sourceboundconstituentrootreviews G10server8b0380e0…(242unit/HTTP26+3/29 andG05impact), G10UI961ffc74…(56freshbrowser truePRE01/02closedauthorstage). Main visualaddendumda763ef… actualmobileview+4RSCprivatecanarychecks. Combinedfinalresult160bbee4… noindependent/acceptanceclaim yet.
-
-G12serverfinal976 resultcbcbc057…, root **aa84ff567d84e4c39f090c3d9f5c754588fb730a526027d943fcfd2c2a3dd4aa** checks1184artifacts/324source/38commands10historicalnonzero/293HTTPbody/165AClinks/12CRC. Unit302/build+G05HTTP57/61 onidenticalproductb3bb reusedfresh0; fresh976G12HTTP31+3skip/34,G04HTTP94/130. OnlytestH07menu3/4 addedat976. GenuineG12-PRE01 server2ed unselectedP2 falselyrequired inG07 matrix reproducedmock/DB0P2F30filterskip; minimalproductfixb3bb onlyevidence/table canonicalmaterialProductIds/approvedempty. Greenactualmatrix/list/detailP2zero. Currenttaskproductassociations append-only, speculativefutureunlink notcurrentbug. Canonicalpublishedcampaign/currentactivemenus writesimmutableG04request inoneUoW; G05explicitrebase; taskassociations/oldrequests/submissions/ProductUse preserved. Alreadyapplieddecline removescurrentautomaticmissing/reminders while retainingpriorfacts/cancellationhold; noautocancel. ActualG13delivery andG11completion notyetconnected.
-
-G15 standaloneextractor **cd648ff** byworkflow, result35a400aa…, manifestcbaee358…120artifacts/20commands/20changedfiles; root **81b39ec1f2fec22f1d11276d0b5d5d3fec5cd9ad2a89d5e6fc4bb22adea9f1da** actual326unit(includes12new)/build/8directextractscenarios. PDF.js6.3.289+Canvas1.0.9+Tesseract7+localjpnasset+Sharp; actualselectednative/scannedPDF/images. OCR94linepreserved/51lineunread, allOCRpartial; nofullcoverageclaim. Time/heap/RSS/output/resolutionlimits; RSSsampledisnothardOSsandbox. Clientcopiesbeforeawait; hashesimmutable; transferresolver requires serverregisteredsnapshothash+currentauth/provenance, notclientassertion. NoAPI/UI/persistedresolver/provider/modeltokenizer/deploymentverifiedatstandalone. Actual16pagecontactsheet rootviewed. InitialPDFcleanupAPI/Pillow/fontfailuresretained. Nextserveractualworkerpackaging is goalsassignment.
-
-## Source preparation and remaining gates
-
-G11 stillwaitsG10ACCEPTED +sharedleaseavailability. Requirements4aec4f… and **task-draft3d461495e1a211d3933148e854fcbcc6edf9b2b83c0c5ab57fc7d3f98f77c654** preparednotassigned. ManualGSGcompletion noforcedgate unresolved/externalwait/AIfailure/memoabsent; latestserverproducerresidualsnapshot immutable; reopenwithreason/history/followupactualtask; 2OSCAS. FutureactualG16AIfailure andG12cancellationhold consumers explicitlylaterdeferred, notfakeproducerPASS.
-DAG G11[05,06,09,10],G12[04,05,06],G13[08,09,10,11,12],G14[07,08,09,10,11,12,13],G03[07,08,09,11,12,13,14],G15[05,06],G16[15],G17[16],G18all. .execution/migration-reservations.json:0011completionreserved,0012G15serverleased; maxnumbernotactualSQLcount. Accepted SQL nevermodified. Sharedschemaonlyoneauthor; G12UIcurrenttaskentries+README separatefromG15server.
-
-G16 researchonly **source-curation-preparationb9e511c037853720c903517e140f1d8b218c3b52faf19f72c0f9e0fea8324190**. Publicprivate-evidencePDFs: MHLW2017standard6pp/explanation32pp; JCIA2026-07-24alpha58PDFspreads120kchars. p15=printed26–27(F8No1 exceptions/sourcecontext), p17=printed30–31(E7drynessfinewrinkles); bothactualrenderrootviewed. p12/p14/MHLWp3renderedbutnotrootviewed. pypdfextractall96pagesmanifestf884e6df…, extraction≠fullread. MHLW2011effects56 andseparatehandlingnotice4ppdownloaded; latterofficialnoticepp1–2 vsindustryappendix3–4 authorityseparate. MHLW2025-03-10ingredientnotice supersedes1985. No wholecopyrightJCIAguideinGit, minimalverifiedquotes/links+ownparaphrase andmachineunreviewedKorean; noexperttranslationreview.
-**New officialeGovAPI retrieval**: normalHTMLroot0lines earlier, but officialdocumentedAPIv2 `/law_data/335AC0000000145?asof=2026-09-22&elm=MainProvision-Article_66&response_format=json` actual200 Article66all3paragraphs+revisionmetadata read. Revision **335AC0000000145_20260521_505AC0000000063**, statusCurrentEnforced, enforcement2026-05-21. Fileegov-act66-asof20260922.json SHAeda87daf…; readingaddendum **f7c095cf67da4a534f30efbe216d76b3a55df0cf5888b5617e20649f8d8aafd2** supersedes selectedarticleunavailable limitation only; nofullstatute/expertreview/corpusimplementation. RootreadPDFskill priorsegment (informed), openai-docsskill prior (informed). Officialgpt-6-astra model/structuredoutputs docs actuallyopened preflightbc26546f…; accountAPI successNOTVERIFIED. Currentenvserveronly aliasifstillgpt-6 astra→gpt-6-astra exactsame model; noUSDcap. **G17 actualminimumAPI call stillNOT_RUN mandatory**.
-
-## Evidence / final constraints
-
-Rootorchestrates/reviews/integrates, authorsvsdifferentverifier. No source/env/userdataoverwrite, no realmail/privatebusiness Git/LLM, no push/deploy/publicmail/remoteactions. No newapproval neededforauthorizedlocalwork. ReadAGENTS/installedNextdocs beforecode. Currentgoalgetactiveunlimited; Koreanprogress~60sec, waits≤60. No partialfinalstop.
-G09ACCEPTED root2da8d439…, exact92a regressionc63deddd… and807independent. Fullunchanged116+2skip/118 sourceboundreusefresh0, freshselected6+6/314unit/build. Details archivedstate125/126. Allstageaccepted ACstillfinalG18crossmodulepending, readinessstate1279/19/91AC integrityerrors0, nottechnicalcomplete.
-Actual4sessionprefixmanifest5abd895b… privateoriginalmode600/dir700; originalpaths/sessionIDs/hashes recorded. Metadata-only40974record derivative879f2955… is notfulltranscript/executionproof; growingtailsawaitfinalcapture. No fabricatedJSONL. G07historicalcaveat oldreadonlySQLitebackup altered2SHMonly; durableDB/WAL/2799othersunchanged, caveatretained. **FilesystemcopyDB/WAL/SHM/files BEFORE anySQLiteopen**, evenreadonly. Neverrestoreoldhashes. Rootreviewhelperformat/ANSI/path mistakes preserved; correctedparsers only, no product/evidencechanges.
+State182 amendment: G14 task-amendment-01.json permits tests/unit/postgres-foundation.test.ts migration-count17 and optional postgres_name expectations only. Storage repair candidate880f15c author verifying; independent reviewer next. Final auth author packet actual execution session01a0c307-9b54-7b83-b5eb-1b12b9a8553c takes precedence over parent handle session for those commands.

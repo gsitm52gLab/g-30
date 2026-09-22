@@ -4135,8 +4135,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "User-authorized Supabase shared-session/login fix; platform Goal remains paused",
-  "next_action": "G14 async Supabase port and independent Storage harness verification; preserve full Goal scope. Auth/navigation release exacteece accepted only within bounded scope.",
-  "state_version": 182,
+  "next_action": "Finish independently verified login navigation cache boundary + unit-proxy regression correction, integrate Storage foundation after independent review, port G14 exact verified candidate to async/Supabase and verify, then G03/full Storage/Excel/OCR and complete original plus SB audit.",
+  "state_version": 181,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4171,7 +4171,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T03:01:53.518155+00:00",
+  "updated_at": "2026-09-22T02:53:03.319778+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -4246,7 +4246,7 @@
     "resume_plan": "docs/execution-v3/04-resume-plan.json",
     "historical_acceptance_is_not_supabase_acceptance": true,
     "runtime_status": "AUTH_MINIMUM_DEPLOYED_VERIFIED_FULL_REVALIDATION_REQUIRED",
-    "preflight": "Actual PostgreSQL runtime/auth and protected reads wired and deployed; Storage primitives independent verification pending repaired harness; full application Storage not yet wired.",
+    "preflight": "Real SQL/TLS credential preflight passed. Foundation candidate built and remotely tested; private Storage bucket created and primitives candidate ready. Neither wired into deployed app yet.",
     "origin": "https://github.com/gsitm52gLab/g-30.git",
     "previous_remote": "legacy-gs-hale",
     "source_review_session_id": "01a0c6bc-d9f3-73f1-ae63-d88781905c0a",
@@ -4256,7 +4256,7 @@
     "active_tasks": [
       {
         "id": "G14-FINAL-INDEPENDENT",
-        "state": "HISTORICAL_LOCAL_PASS_ASYNC_PORT_REQUIRED",
+        "state": "PASS_NOT_INTEGRATED",
         "session_id": "01a0c6d2-65c7-70e2-9e2f-0fb4f74dd58b",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g14-final-verification",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-final-verify-task.json",
@@ -4271,7 +4271,7 @@
       },
       {
         "id": "SB-DB-FOUNDATION",
-        "state": "INTEGRATED_BOUNDED_RUNTIME_VERIFIED",
+        "state": "INDEPENDENT_VERIFYING",
         "session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/sb-postgres-foundation",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/postgres-foundation-task.json",
@@ -4285,12 +4285,12 @@
           "package-lock.json"
         ],
         "evidence_dir": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/postgres-foundation",
-        "integration_acceptance": "Foundation and auth checks only; full SB acceptance incomplete",
+        "integration_acceptance": "NOT_RUN",
         "candidate_commit": "d6838bb6247fbb213187db624a411f51bb5fa429"
       },
       {
         "id": "SB-STORAGE-FOUNDATION",
-        "state": "INDEPENDENT_HARNESS_CHANGES_REQUESTED",
+        "state": "CANDIDATE_NOT_INDEPENDENTLY_VERIFIED",
         "session_id": "01a0c6d2-bbfc-7443-9085-2923497dc707",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/sb-storage-foundation",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation-task.json",
@@ -4304,8 +4304,7 @@
         "evidence_dir": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation",
         "integration_acceptance": "NOT_RUN",
         "candidate_commit": "2f5d0d11090a487bb3bad791b31f957a8332b12b",
-        "result": ".execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation/implementation-result.json",
-        "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-independent/result.json"
+        "result": ".execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation/implementation-result.json"
       }
     ],
     "current_deployment": {
@@ -4314,9 +4313,9 @@
       "team": "plai-developer-league-2026",
       "project": "g-30",
       "source_branch": "main",
-      "source_commit": "eece434adf3793fd7a603f997eee15f729c4eef0",
-      "deployment_id": "H13c6Cc3vAmG7QwUcw6ZMMXNb4ug",
-      "status": "Exact deployment login/navigation browser verified",
+      "source_commit": "db836e77a0b6757a200908fd009bfa853953a7ca",
+      "deployment_id": "3zPPy691rTq9V89YD3hC4mrMzHQ1",
+      "status": "Production runtime verified",
       "observed_via": "GitHub Vercel status plus actual production API and root IAB browser"
     },
     "auth_durability_contract": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/contract.json",
@@ -4326,29 +4325,13 @@
         "id": "SB-AUTH-CORE",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/core-task.json",
         "session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
-        "state": "INTEGRATED_BOUNDED_AUTH_VERIFIED"
+        "state": "IMPLEMENTING"
       },
       {
         "id": "SB-AUTH-CONSUMERS",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/consumers-task.json",
         "session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
-        "state": "INTEGRATED_BOUNDED_AUTH_VERIFIED"
-      }
-    ],
-    "current_parallel_tasks": [
-      {
-        "id": "G14-ASYNC-PORT",
-        "owner": "/root/sb_postgres_foundation",
-        "state": "IMPLEMENTING",
-        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-async-port/task.json",
-        "amendment": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-async-port/task-amendment-01.json"
-      },
-      {
-        "id": "STORAGE-HARNESS-REPAIR",
-        "owner": "/root/prd",
-        "state": "CANDIDATE_AUTHOR_VERIFYING",
-        "candidate": "880f15c27123383cf580fc2e58e4e7b41a32c401",
-        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-harness-repair/task.json"
+        "state": "IMPLEMENTING"
       }
     ]
   },
@@ -4378,25 +4361,13 @@
       "productsMigrated": 3,
       "corpusInserted": 2
     },
-    "production_runtime": "Login fresh-document home, clicked tasks/products, reload session and logout redirect actual production desktop Chromium5PASS/pageerrors0.",
+    "production_runtime": "Login/session/logout API PASS and real IAB fresh home→tasks→products populated content PASS; original first-login StorageFailure remains preserved, subsequent fresh request recovered.",
     "deadline": "2026-09-22T11:40:00+09:00",
     "deadline_met": false,
     "scope_override": "User requested minimum login checks and immediate push, deferred full regression.",
     "evidence": ".execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/",
-    "latest_production_commit": "eece434adf3793fd7a603f997eee15f729c4eef0",
+    "latest_production_commit": "db836e77a0b6757a200908fd009bfa853953a7ca",
     "supabase_runtime_failure_resolved": "SUPABASE_URL unnecessary PostgreSQL dependency removed; DATABASE_URL canonical identity; Vercel region bom1",
-    "full_goal_accepted": false,
-    "status": "ACCEPTED_BOUNDED_AUTH_RELEASE",
-    "final_verification": {
-      "root_unit_pass": 737,
-      "root_unit_fail": 0,
-      "root_unit_skip": 0,
-      "independent_unit_pass": 20,
-      "author_production_browser_pass": 5,
-      "author_production_browser_fail": 0,
-      "full_goal_accepted": false
-    },
-    "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/navigation-fix/implementation-result.json",
-    "root_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/navigation-fix/root-evidence-review.json"
+    "full_goal_accepted": false
   }
 }
