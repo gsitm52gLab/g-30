@@ -1,3 +1,4 @@
+import { searchTransaction } from '@/server/search/transaction';
 import { asyncFilter, asyncFlatMap, asyncMap } from "@/domain/async-collections";
 import { campaignRequestSource, materialProductIds } from '@/server/tasks/campaign-request';
 import { createHash } from 'node:crypto';
@@ -19,7 +20,7 @@ const hash = (v: unknown) => createHash('sha256').update(JSON.stringify(v)).dige
 export class SubmissionService {
     constructor(public identity: IdentityService, private fault?: (stage: string) => void) { }
     get clock() { return this.identity.clock; }
-    async workspace(token: string | undefined, taskId: string) { return this.identity.repo.transaction(async (s) => (await workspace(s, (await this.identity.principal(s, token)), taskId, this.clock))); }
+    async workspace(token: string | undefined, taskId: string) { return searchTransaction(this.identity.repo, async (s) => (await workspace(s, (await this.identity.principal(s, token)), taskId, this.clock))); }
     async snapshot(token: string | undefined, id: string) {
         return this.identity.repo.transaction(async (s) => {
             const p = (await this.identity.principal(s, token)), row = (await s.get('submission', id));

@@ -12,6 +12,7 @@ import { seed } from '@/server/db/seed';
 import { IdentityService } from '@/server/auth/service';
 import { HomeService } from '@/server/home/service';
 import { InquiryService } from '@/server/inquiries/service';
+import { SubmissionService } from '@/server/submissions/service';
 import { createHomeFixtures, A, B, type HomeActors } from './verify-home-fixtures';
 import type { HomeDTO } from '@/server/home/contracts';
 import { BRAND } from '@/domain/brand';
@@ -105,8 +106,9 @@ try {
       const after=await api.get(`/api/home?scope=context&context=${A}`,{timeout:120000});assert.equal(after.status(),200);const a=await after.json() as HomeDTO;assert.equal(a.counts.unresolved,b.counts.unresolved-1);assert.equal(a.counts.externalChecks,b.counts.externalChecks-1);
     }finally{await api.dispose();}
   });
-  await check('PG06 revoke own synthetic session denies API without cached home',async()=>{
-    await identity.logout(actor.team);const denied=await fetch(origin+`/api/home?scope=all`,{headers:{Cookie:`g03_home_proof=${actor.team}`}});assert.equal(denied.status,401);
+  await check('PG06 revoke own synthetic session denies fresh home and submission reads',async()=>{
+    const submissions=new SubmissionService(identity);await submissions.workspace(actor.team,fixture.todayTask);
+    await identity.logout(actor.team);await assert.rejects(submissions.workspace(actor.team,fixture.todayTask),{status:401});const denied=await fetch(origin+`/api/home?scope=all`,{headers:{Cookie:`g03_home_proof=${actor.team}`}});assert.equal(denied.status,401);
   });
 } catch { process.exitCode=1; }
 finally {await stop();await repo.close();save();console.log(JSON.stringify({report:path.join(root,'result.json'),passed:checks.filter(c=>c.status==='PASS').length,failed:checks.filter(c=>c.status==='FAIL').length,attachment:'NOT_RUN'}));}
