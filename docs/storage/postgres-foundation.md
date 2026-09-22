@@ -1,6 +1,6 @@
 # PostgreSQL foundation contract
 
-Scope: additive infrastructure for SB-01–04 and G00/G02 at the accepted SQLite 0001–0015 baseline. An additional PostgreSQL-only `0016-revision-width.sql` widens revision storage without changing any applied baseline checksum. This is not G14 SQLite 0016. The application still uses its existing mock/SQLite factory. This module does not claim full Supabase mode, Storage, Vercel, G14 0016, full fixture/bootstrap/import, or any complete SB acceptance gate.
+Scope: PostgreSQL infrastructure and the shared asynchronous application repository for authentication and protected workspace data. The factory supports explicit `DATA_SOURCE=supabase`, mock, and SQLite modes. An additional PostgreSQL-only `0016-revision-width.sql` widens revision storage without changing any applied baseline checksum. This is not G14 SQLite 0016. This release does not claim Storage binary migration, full regression, or completion of every SB acceptance gate.
 
 ## Async integration API
 
@@ -14,7 +14,7 @@ Transaction handles expire at callback completion. Unawaited pending operations 
 
 ## Configuration and TLS
 
-`parsePostgresConfig(env)` requires `DATABASE_URL` (Supavisor transaction pooler, 6543), `DIRECT_URL` (session pooler or direct, 5432), and `SUPABASE_URL`. URLs must refer to the same project. `SUPABASE_URL` may be an origin or the dashboard-copied `/rest/v1[/]` or `/storage/v1[/]` path; only the origin is used to identify the project. Other paths, URL userinfo, query and fragment are rejected. The original `.env` is never rewritten.
+`parsePostgresConfig(env)` requires `DATABASE_URL` (Supavisor transaction pooler, 6543) for runtime. Migration additionally requires `DIRECT_URL` (session pooler or direct, 5432) for the same project. The project is derived from the SQL pooler username; PostgreSQL does not require `SUPABASE_URL`, which belongs to the separate Data/Storage API configuration. SQL host, port, database, project and TLS checks remain enforced. The original `.env` is never rewritten.
 
 The module parses SQL URI components itself and sets `ssl.rejectUnauthorized=true`, expected hostname and TLS ≥1.2. A URI `sslmode=require` is accepted without replacing strict TLS; unsafe SSL options are rejected. Official public Supabase production CA (not a secret) is bundled at `src/server/postgres/tls/supabase-prod-ca-2021.crt`; hash and validity are checked before using it together with Node's normal trusted roots. The default asset path is relative to the server cwd; application/Vercel integration must include this asset explicitly in tracing and validate the deployed bundle.
 

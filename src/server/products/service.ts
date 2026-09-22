@@ -1,3 +1,4 @@
+import { searchTransaction } from '@/server/search/transaction';
 import { asyncFilter, asyncMap } from "@/domain/async-collections";
 import type { UnitOfWork } from "@/domain/records";
 import type { ProductFileBinding } from "@/domain/products/types";
@@ -57,14 +58,14 @@ export class ProductService {
                 unavailable();
             return (await receipt(s, p, contextId, "product.create", v, async () => {
                 const result = (await createProduct(s, p, this.clock, contextId, brandId, common, fields)), product = (await s.get("product", result.productId))!, cpId = result.contextProductId;
-                (await audit(s, p, this.clock, contextId, "product.created", product.id, {}, { name: common.name, code: common.code }));
-                (await s.create("domainEvent", { id: newId(), contextId, data: { eventType: "PRODUCT_CREATED", targetId: product.id, sourceVersionId: (await s.get("product", product.id))!.data.currentVersionId!, actorId: p.user.id, at: this.clock() } }));
+                const auditEvent = (await s.create("domainEvent", { id: newId(), contextId, data: { eventType: "PRODUCT_CREATED", targetId: product.id, sourceVersionId: (await s.get("product", product.id))!.data.currentVersionId!, actorId: p.user.id, at: this.clock() } }));
+                (await audit(s, p, this.clock, contextId, "product.created", product.id, {}, { name: common.name, code: common.code, commonVersionId: product.data.currentVersionId, contextVersionId: (await s.get("contextProduct", cpId))!.data.currentVersionId }, { references: [{ kind: 'domainEvent', id: auditEvent.id, role: 'source' }] }));
                 return { ids: [product.id, cpId] };
             }, () => this.fault?.("create")));
         });
     }
     async list(token: string | undefined, query: ProductListQuery = {}) {
-        return this.identity.repo.transaction(async (s) => {
+        return searchTransaction(this.identity.repo, async (s) => {
             const p = (await this.identity.principal(s, token));
             if (query.context)
                 (await authorize(s, p, "product.read", productContextScope(query.context, "products"), this.clock));
@@ -78,10 +79,10 @@ export class ProductService {
             return { mode: this.identity.repo.mode, contexts, items: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length, page, pageSize, materialCounts: { connected: true as const, requested: rows.reduce((n, r) => n + r.materialCounts.requested, 0), missing: rows.reduce((n, r) => n + r.materialCounts.missing, 0), unconfirmed: rows.reduce((n, r) => n + r.materialCounts.unconfirmed, 0) } };
         });
     }
-    async detail(token: string | undefined, productId: string, contextId: string) { return this.identity.repo.transaction(async (s) => (await productDetail(s, (await this.identity.principal(s, token)), (await resolveProduct(s, (await this.identity.principal(s, token)), contextId, productId, this.clock)), this.clock))); }
+    async detail(token: string | undefined, productId: string, contextId: string) { return searchTransaction(this.identity.repo, async (s) => (await productDetail(s, (await this.identity.principal(s, token)), (await resolveProduct(s, (await this.identity.principal(s, token)), contextId, productId, this.clock)), this.clock))); }
     async impact(token: string | undefined, productId: string, input: Record<string, unknown>) {
         const v = object(input, ["contextId", "common", "expectedCommonRevision"]), contextId = str(v.contextId, 160, true), next = commonInput(v.common);
-        return this.identity.repo.transaction(async (s) => {
+        return searchTransaction(this.identity.repo, async (s) => {
             const p = (await this.identity.principal(s, token)), r = (await resolveProduct(s, p, contextId, productId, this.clock, true));
             fresh(r.product, v.expectedCommonRevision);
             return { productId, commonRevision: r.product.revision, sharedCommonNotice, visibleContexts: (await visibleContexts(s, p, r, this.clock)), changes: commonDiff(r.common.data.common, next) };
@@ -107,6 +108,7 @@ export class ProductService {
                 (await authorize(s, p, "product.edit", productContextScope(str(v.targetContextId, 160, true), productId), this.clock));
             return (await receipt(s, p, contextId, `product.${productId}.${command}`, v, async () => {
                 let versionId: string | null = null;
+                const previousVersionId = ["save_common", "archive", "restore"].includes(command) ? r.common.id : ["save_context", "save_files"].includes(command) ? r.local.id : command === "save_retail" || command === "save_internal" ? (await s.list(command === "save_retail" ? "retailPrice" : "internalPrice", contextId)).find(x => x.data.contextProductId === r.relation.id)?.data.currentVersionId ?? null : null;
                 if (command === "save_common" || command === "archive" || command === "restore") {
                     fresh(r.product, v.expectedCommonRevision);
                     const common = command === "save_common" ? commonInput(v.common) : commonDTO(r.common.data.common);
@@ -148,8 +150,8 @@ export class ProductService {
                         (await s.update("task", task.id, task.revision, { ...task.data, productIds: [...task.data.productIds, productId] }));
                     versionId = task.id;
                 }
-                (await audit(s, p, this.clock, contextId, `product.${command}`, productId, {}, { versionId }));
-                (await s.create("domainEvent", { id: newId(), contextId, data: { eventType: `PRODUCT_${command.toUpperCase()}`, targetId: productId, sourceVersionId: versionId, actorId: p.user.id, at: this.clock() } }));
+                const auditEvent = (await s.create("domainEvent", { id: newId(), contextId, data: { eventType: `PRODUCT_${command.toUpperCase()}`, targetId: productId, sourceVersionId: versionId, actorId: p.user.id, at: this.clock() } }));
+                (await audit(s, p, this.clock, contextId, `product.${command}`, productId, { versionId: previousVersionId }, { versionId }, { references: [{ kind: 'domainEvent', id: auditEvent.id, role: 'source' }] }));
                 return { ids: [productId, ...versionId ? [versionId] : []] };
             }, () => this.fault?.(command)));
         });

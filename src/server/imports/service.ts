@@ -160,14 +160,14 @@ export class ImportService {
                             versionIds.push((await writeRetailPrice(s, p, this.clock, stage.contextId, productId!, target?.retailRevision ?? 0, plan.retail, source)).id);
                         if (plan.internal)
                             versionIds.push((await writeInternalPrice(s, p, this.clock, stage.contextId, productId!, target?.internalRevision ?? 0, plan.internal, source)).id);
-                        (await audit(s, p, this.clock, stage.contextId, 'product.import', productId!, {}, { batchId, row: plan.preview.row, versionIds }));
-                        (await s.create('domainEvent', { id: newId(), contextId: stage.contextId, data: { eventType: 'PRODUCT_IMPORTED', targetId: productId!, sourceVersionId: versionIds[0] ?? null, actorId: p.user.id, at: this.clock() } }));
+                        const auditEvent = (await s.create('domainEvent', { id: newId(), contextId: stage.contextId, data: { eventType: 'PRODUCT_IMPORTED', targetId: productId!, sourceVersionId: versionIds[0] ?? null, actorId: p.user.id, at: this.clock() } }));
+                        (await audit(s, p, this.clock, stage.contextId, 'product.import', productId!, {}, { batchId, row: plan.preview.row, versionIds }, { sensitivity: stage.privatePrice ? 'internal_price' : 'standard', references: [{ kind: 'importBatch', id: batchId, role: 'source' }, { kind: 'domainEvent', id: auditEvent.id, role: 'source' }] }));
                     }
                     rows.push({ row: plan.preview.row, action: plan.preview.action, productId, contextProductId, versionIds, expected: target });
                     this.fault?.(plan.preview.row);
                 }
                 (await s.create('importBatch', { id: batchId, contextId: stage.contextId, data: { actorId: p.user.id, appliedAt: this.clock(), sourceHash: stage.sourceHash, sourceName: stage.sourceName, schema: IMPORT_SCHEMA, previewId, sheetId: stage.input.sheetId, sheetName: stage.sheetName, headerRow: stage.input.headerRow, mapping: stage.input.mapping, includesInternalPrice: stage.privatePrice, rows } }));
-                (await audit(s, p, this.clock, stage.contextId, 'import.applied', batchId, {}, { sourceHash: stage.sourceHash, rows: rows.length }));
+                (await audit(s, p, this.clock, stage.contextId, 'import.applied', batchId, {}, { sourceHash: stage.sourceHash, rows: rows.length, sourceName: stage.sourceName }, { sensitivity: stage.privatePrice ? 'internal_price' : 'standard', references: [{ kind: 'importBatch', id: batchId, role: 'after' }] }));
                 return { ids: [batchId] };
             }));
         });

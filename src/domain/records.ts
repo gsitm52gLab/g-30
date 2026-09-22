@@ -1,3 +1,4 @@
+import type { StorageRecords } from './storage/types';
 import type { SchedulingRecords } from './scheduling/records';
 import type { NotificationRecords } from './notifications/records';
 import type { ProviderRecords } from './ai-provider/types';
@@ -74,6 +75,7 @@ export interface InvitationData {
     createdBy: string;
 }
 export interface AuditData {
+    detail?: import("./audit/types").AuditDetail;
     actorId: string;
     action: string;
     targetId: string;
@@ -105,7 +107,7 @@ export interface ProductData extends CommonProductExtension {
     status: "draft" | "active" | "archived";
     missingMaterials: number;
 }
-export interface RecordDataMap extends ProviderRecords, CorrectionRecords, CampaignRecords, CompletionRecords, AiReviewRecords, SchedulingRecords, NotificationRecords {
+export interface RecordDataMap extends StorageRecords, ProviderRecords, CorrectionRecords, CampaignRecords, CompletionRecords, AiReviewRecords, SchedulingRecords, NotificationRecords {
     aiInput: AiInputData;
     aiVersion: AiVersionData;
     aiAsset: AiAssetData;

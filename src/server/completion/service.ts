@@ -13,7 +13,7 @@ import * as safe from './stored';
 export class CompletionService {
     constructor(public identity: IdentityService, private fault?: (stage: string) => void) { }
     get clock() { return this.identity.clock; }
-    private async event(s: UnitOfWork, p: Principal, t: StoredRecord<'task'>, eventType: string, sourceVersionId: string) { (await s.create('domainEvent', { id: newId(), contextId: t.contextId, data: { eventType, targetId: t.id, sourceVersionId, actorId: p.user.id, at: this.clock() } })); }
+    private async event(s: UnitOfWork, p: Principal, t: StoredRecord<'task'>, eventType: string, sourceVersionId: string) { return (await s.create('domainEvent', { id: newId(), contextId: t.contextId, data: { eventType, targetId: t.id, sourceVersionId, actorId: p.user.id, at: this.clock() } })).id; }
     async workspace(token: string | undefined, taskId: string) { return this.identity.repo.transaction(async (s) => (await completionWorkspace(s, (await this.identity.principal(s, token)), taskId, this.clock))); }
     async snapshot(token: string | undefined, id: string) {
         return this.identity.repo.transaction(async (s) => {
@@ -59,8 +59,8 @@ export class CompletionService {
                     const previous = (await s.list('completionSnapshot', contextId)).filter(r => r.data.taskId === task.id).sort((a, b) => safe.count(b.data.sequence, 1) - safe.count(a.data.sequence, 1))[0];
                     const row = (await s.create('completionSnapshot', { id: newId(), contextId, data: { taskId: task.id, sequence: previous ? safe.count(previous.data.sequence, 1) + 1 : 1, previousCompletionId: previous?.id ?? null, basisHash: collected.basisHash, taskRevision: task.revision, statusBefore: task.data.status, basis: collected.basis, memo, completedBy: p.user.id, completedAt: this.clock() } }));
                     (await s.update('task', task.id, task.revision, { ...task.data, status: 'completed' }));
-                    (await audit(s, p, this.clock, contextId, 'task.manually_completed', task.id, { status: task.data.status }, { completionId: row.id, status: 'completed' }));
-                    (await this.event(s, p, task, 'TASK_MANUALLY_COMPLETED', row.id));
+                    const domainEventId = (await this.event(s, p, task, 'TASK_MANUALLY_COMPLETED', row.id));
+                    (await audit(s, p, this.clock, contextId, 'task.manually_completed', task.id, { status: task.data.status }, { completionId: row.id, status: 'completed', domainEventId }));
                     return { ids: [row.id] };
                 }
                 if (command === 'reopen') {
@@ -72,14 +72,14 @@ export class CompletionService {
                     const sub = (await latestSubmission(s, task)), status = sub?.data.requestId === task.data.currentRequestId ? (sub.data.mode === 'full' ? 'submitted' as const : 'partial' as const) : 'requested' as const;
                     const reopened = (await s.create('completionReopen', { id: newId(), contextId, data: { taskId: task.id, completionId: row.id, reason, resumedStatus: status, reopenedBy: p.user.id, reopenedAt: this.clock() } }));
                     (await s.update('task', task.id, task.revision, { ...task.data, status, resumeStatus: null }));
-                    (await audit(s, p, this.clock, contextId, 'task.reopened', task.id, { status: 'completed', completionId: row.id }, { status, reopenId: reopened.id }));
-                    (await this.event(s, p, task, 'TASK_REOPENED', reopened.id));
+                    const domainEventId = (await this.event(s, p, task, 'TASK_REOPENED', reopened.id));
+                    (await audit(s, p, this.clock, contextId, 'task.reopened', task.id, { status: 'completed', completionId: row.id }, { status, reopenId: reopened.id, domainEventId }));
                     return { ids: [reopened.id] };
                 }
                 if (command === 'record_external') {
                     const rows = (await s.list('completionExternalAction', contextId)).filter(r => r.data.taskId === task.id), row = (await s.create('completionExternalAction', { id: newId(), contextId, data: { ...action!, taskId: task.id, sequence: Math.max(0, ...rows.map(r => safe.count(r.data.sequence, 1))) + 1, recordedBy: p.user.id, recordedAt: this.clock() } }));
-                    (await audit(s, p, this.clock, contextId, 'external.action_recorded', task.id, {}, { externalActionId: row.id, effect: 'record_only' }));
-                    (await this.event(s, p, task, 'EXTERNAL_ACTION_RECORDED', row.id));
+                    const domainEventId = (await this.event(s, p, task, 'EXTERNAL_ACTION_RECORDED', row.id));
+                    (await audit(s, p, this.clock, contextId, 'external.action_recorded', task.id, {}, { externalActionId: row.id, effect: 'record_only', domainEventId }));
                     return { ids: [row.id] };
                 }
                 const completionId = identifier(v.completionId), completion = (await s.get('completionSnapshot', completionId));
@@ -90,8 +90,8 @@ export class CompletionService {
                 if (old)
                     return { ids: [old.id, next.id] };
                 const row = (await s.create('completionFollowup', { id: newId(), contextId, data: { taskId: task.id, completionId: completion.id, followupTaskId: next.id, reason: str(v.reason ?? '', 2000), linkedBy: p.user.id, linkedAt: this.clock() } }));
-                (await audit(s, p, this.clock, contextId, 'completion.followup_linked', task.id, {}, { completionId, followupTaskId: next.id }));
-                (await this.event(s, p, task, 'COMPLETION_FOLLOWUP_LINKED', row.id));
+                const domainEventId = (await this.event(s, p, task, 'COMPLETION_FOLLOWUP_LINKED', row.id));
+                (await audit(s, p, this.clock, contextId, 'completion.followup_linked', task.id, {}, { completionId, followupId: row.id, followupTaskId: next.id, domainEventId }));
                 return { ids: [row.id, next.id] };
             }, () => this.fault?.(command)));
         });

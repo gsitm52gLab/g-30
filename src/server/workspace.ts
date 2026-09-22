@@ -1,3 +1,4 @@
+import { searchTransaction } from '@/server/search/transaction';
 import { asyncFilter, asyncFlatMap, asyncMap } from "@/domain/async-collections";
 import { visibleProductRelations } from "@/server/products/access";
 import "server-only";
@@ -18,7 +19,7 @@ export function workspaceFailure(error: unknown): null {
 export async function readWorkspace(contextId?: string) {
     const service = await identity();
     const token = await currentToken();
-    return service.repo.transaction(async (s) => {
+    return searchTransaction(service.repo, async (s) => {
         const p = (await service.principal(s, token));
         const contexts = (await asyncFilter((await s.list("context")), async (c) => (await hasScope(s, p, c.id, service.clock)))).map(projectContext);
         if (contextId)

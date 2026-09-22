@@ -1,5 +1,6 @@
 import { jsonContentEqual } from '@/domain/json-content';
 import { asyncFilter, asyncFlatMap, asyncMap } from "@/domain/async-collections";
+import { appendAudit, auditOperation } from '@/server/audit/writer';
 import { campaignRequestSource } from './campaign-request';
 import { resolveProduct, visibleProductRelations } from "@/server/products/access";
 import { latestSubmission } from "@/server/submissions/read";
@@ -39,10 +40,10 @@ export class TaskService {
             fail("CONFLICT", 409, "다른 사용자가 변경했습니다. 최신 내용을 다시 불러와 입력을 재적용해 주세요.");
     }
     private async audit(s: UnitOfWork, p: Principal, contextId: string, action: string, targetId: string, before: Record<string, unknown>, after: Record<string, unknown>) {
-        (await s.create("audit", { id: id(), contextId, data: { actorId: p.user.id, action, targetId, before, after, at: this.clock() } }));
+        return (await appendAudit(s, p, this.clock, contextId, action, targetId, before, after));
     }
     private async event(s: UnitOfWork, p: Principal, contextId: string, eventType: string, targetId: string, sourceVersionId: string | null) {
-        (await s.create("domainEvent", { id: id(), contextId, data: { eventType, targetId, sourceVersionId, actorId: p.user.id, at: this.clock() } }));
+        return (await s.create("domainEvent", { id: id(), contextId, data: { eventType, targetId, sourceVersionId, actorId: p.user.id, at: this.clock() } })).id;
     }
     /** G05 may use the same UoW shape: fresh principal -> command -> snapshot/audit/event/receipt. */
     private async receipt(s: UnitOfWork, p: Principal, contextId: string, command: string, input: Record<string, unknown>, action: () => {
@@ -59,9 +60,10 @@ export class TaskService {
                 fail("CONFLICT", 409, "같은 재시도 키에 다른 내용을 사용할 수 없습니다.");
             return old.data.result;
         }
-        const result = (await action());
+        const receiptId = id();
+        const result = (await auditOperation(s, receiptId, action));
         this.fault?.(command);
-        (await s.create("commandReceipt", { id: id(), contextId, data: { key: compound, actorId: p.user.id, command, bodyHash, result } }));
+        (await s.create("commandReceipt", { id: receiptId, contextId, data: { key: compound, actorId: p.user.id, command, bodyHash, result } }));
         return result;
     }
     private async target(s: UnitOfWork, p: Principal, input: unknown): Promise<Target> {
@@ -222,8 +224,8 @@ export class TaskService {
         const previous = row.data.currentRequestId ? (await s.get("requestVersion", row.data.currentRequestId)) : null;
         const version = (await s.create("requestVersion", { id: id(), contextId: row.contextId, data: { taskId: row.id, sequence: (previous?.data.sequence ?? 0) + 1, previousId: previous?.id ?? null, templateVersionId, content: c, publishedBy: p.user.id, publishedAt: this.clock(), changedKeys: c.requirements.filter(q => !previous?.data.content.requirements.some(old => jsonContentEqual(old, q))).map(q => q.key) } }));
         (await s.update("task", row.id, row.revision, { ...row.data, visibility: "public", status: row.data.status === "draft" || row.data.submissionProgress && ["partial", "submitted", "in_progress"].includes(row.data.status) ? "requested" : row.data.status, resumeStatus: row.data.submissionProgress && ["on_hold", "cancelled"].includes(row.data.status) ? "requested" : row.data.resumeStatus, title: c.title, description: c.description, deadline: c.deadline.value, nextAction: c.nextAction, currentRequestId: version.id, draft: preservedDraft ?? c, templateVersionId }));
-        (await this.audit(s, p, row.contextId, "task.published", row.id, { requestVersionId: previous?.id ?? null }, { requestVersionId: version.id, sequence: version.data.sequence }));
-        (await this.event(s, p, row.contextId, previous ? "TASK_REQUEST_REVISED" : "TASK_PUBLISHED", row.id, version.id));
+        const domainEventId = (await this.event(s, p, row.contextId, previous ? "TASK_REQUEST_REVISED" : "TASK_PUBLISHED", row.id, version.id));
+        (await this.audit(s, p, row.contextId, "task.published", row.id, { requestVersionId: previous?.id ?? null }, { requestVersionId: version.id, sequence: version.data.sequence, domainEventId }));
         return version;
     }
     async command(token: string | undefined, taskId: string, input: Record<string, unknown>) {
@@ -241,7 +243,7 @@ export class TaskService {
                     const c = content(input.content);
                     (await this.validateContent(s, p, { contextId: row.contextId!, ownerId: row.data.ownerId, assigneeId: row.data.assigneeId, coAssigneeIds: row.data.coAssigneeIds ?? [], productIds: row.data.productIds }, c, row.id));
                     (await s.update("task", row.id, row.revision, { ...row.data, draft: c, ...(row.data.visibility === "draft" ? { title: c.title, description: c.description, nextAction: c.nextAction, deadline: c.deadline.value } : {}) }));
-                    (await this.audit(s, p, row.contextId!, "task.draft", row.id, { revision: row.revision }, { revision: row.revision + 1 }));
+                    (await this.audit(s, p, row.contextId!, "task.draft", row.id, { revision: row.revision, draftTitle: row.data.draft?.title, draftDescription: row.data.draft?.description, draftRequirementLabels: row.data.draft?.requirements.map(q => q.label), draftDeadline: row.data.draft?.deadline.value, draftDeadlineSource: row.data.draft?.deadline.source }, { revision: row.revision + 1, draftTitle: c.title, draftDescription: c.description, draftRequirementLabels: c.requirements.map(q => q.label), draftDeadline: c.deadline.value, draftDeadlineSource: c.deadline.source }));
                 }
                 else if (cmd === "save_publish")
                     await this.publish(s, p, row, content(input.content));
@@ -250,8 +252,8 @@ export class TaskService {
                 else if (cmd === "assign") {
                     const t = (await this.target(s, p, { ...object(input.assignment, ["ownerId", "assigneeId", "coAssigneeIds"]), contextId: row.contextId, productIds: row.data.productIds }));
                     (await s.update("task", row.id, row.revision, { ...row.data, ownerId: t.ownerId, assigneeId: t.assigneeId, coAssigneeIds: t.coAssigneeIds, assignmentNeedsAttention: false }));
-                    (await this.audit(s, p, row.contextId!, "task.reassigned", row.id, { assigneeId: row.data.assigneeId, ownerId: row.data.ownerId, coAssigneeIds: row.data.coAssigneeIds ?? [], authorId: row.data.authorId }, { assigneeId: t.assigneeId, ownerId: t.ownerId, coAssigneeIds: t.coAssigneeIds, authorId: row.data.authorId }));
-                    (await this.event(s, p, row.contextId!, "TASK_ASSIGNMENT_CHANGED", row.id, row.data.currentRequestId ?? null));
+                    const event = (await this.event(s, p, row.contextId!, "TASK_ASSIGNMENT_CHANGED", row.id, row.data.currentRequestId ?? null));
+                    (await this.audit(s, p, row.contextId!, "task.reassigned", row.id, { assigneeId: row.data.assigneeId, ownerId: row.data.ownerId, coAssigneeIds: row.data.coAssigneeIds ?? [], authorId: row.data.authorId }, { assigneeId: t.assigneeId, ownerId: t.ownerId, coAssigneeIds: t.coAssigneeIds, authorId: row.data.authorId, domainEventId: event }));
                 }
                 else if (["hold", "cancel", "resume"].includes(cmd)) {
                     const reason = str(input.reason, 2000, true);
@@ -265,8 +267,8 @@ export class TaskService {
                         return { ids: [row.id] };
                     const resumeStatus = cmd === "resume" ? null : paused ? (await this.resumeStatus(s, row)) : row.data.status as "requested" | "in_progress" | "partial" | "submitted";
                     (await s.update("task", row.id, row.revision, { ...row.data, status, resumeStatus }));
-                    (await this.audit(s, p, row.contextId!, "task.state", row.id, { status: row.data.status, resumeStatus: row.data.resumeStatus ?? null }, { status, resumeStatus, reason }));
-                    (await this.event(s, p, row.contextId!, `TASK_${cmd.toUpperCase()}`, row.id, row.data.currentRequestId ?? null));
+                    const event = (await this.event(s, p, row.contextId!, `TASK_${cmd.toUpperCase()}`, row.id, row.data.currentRequestId ?? null));
+                    (await this.audit(s, p, row.contextId!, "task.state", row.id, { status: row.data.status, resumeStatus: row.data.resumeStatus ?? null }, { status, resumeStatus, reason, domainEventId: event }));
                 }
                 else if (cmd === "duplicate") {
                     const cycle = object(input.cycle, ["label", "start", "end"]), start = dateValue(cycle.start), end = dateValue(cycle.end);
@@ -314,11 +316,8 @@ export class TaskService {
                     const activity = (await s.create("taskActivity", { id: id(), contextId: row.contextId, data: { taskId: row.id, requestId: row.data.currentRequestId, userId: p.user.id, kind: cmd === "schedule_decide" ? "schedule_resolved" : cmd as "read" | "accept" | "schedule", at: this.clock(), sequence, reason, proposedDeadline: proposed, respondsTo: cmd === "schedule_decide" ? str(input.activityId, 160, true) : null, decision, resultingRequestId } }));
                     if (cmd === "accept" && row.data.status === "requested")
                         (await s.update("task", row.id, row.revision, { ...row.data, status: "in_progress" }));
-                    (await this.audit(s, p, row.contextId!, `task.${cmd}`, row.id, {}, { requestVersionId: row.data.currentRequestId, decision, resultingRequestId }));
-                    if (cmd === "accept")
-                        (await this.event(s, p, row.contextId!, "TASK_ACCEPTED", row.id, row.data.currentRequestId));
-                    if (cmd === "schedule")
-                        (await this.event(s, p, row.contextId!, "TASK_SCHEDULE_CHANGE_REQUESTED", row.id, activity.id));
+                    const event = cmd === "accept" ? (await this.event(s, p, row.contextId!, "TASK_ACCEPTED", row.id, row.data.currentRequestId)) : cmd === "schedule" ? (await this.event(s, p, row.contextId!, "TASK_SCHEDULE_CHANGE_REQUESTED", row.id, activity.id)) : null;
+                    (await this.audit(s, p, row.contextId!, `task.${cmd}`, row.id, {}, { requestVersionId: row.data.currentRequestId, activityId: activity.id, decision, resultingRequestId, domainEventId: event }));
                 }
                 return { ids: [row.id] };
             }));

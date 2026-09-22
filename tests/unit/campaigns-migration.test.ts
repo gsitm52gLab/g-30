@@ -51,7 +51,7 @@ it('A20 D10 populated accepted seven migrations keep real G05/G06/G07/G08 histor
         await sub.draft(brand, tid, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: 0, content: { ...blankDraft(), answers: [{ requestId: w.request.id, requirementKey: 'answer', productId: null, type: 'long_text', input: { text: '이전 원문' } }], artifacts: [{ fileVersionId: upload.file.id, role: 'evidence', answer: null }] }, idempotencyKey: randomUUID() });
         const sw = await sub.workspace(brand, tid), input = { baseRequestId: sw.request.id, expectedDraftRevision: sw.draft!.revision, expectedTaskRevision: sw.taskRevision, mode: 'full', idempotencyKey: randomUUID() }, result = await sub.submit(brand, tid, input);
         const before = db.prepare('SELECT * FROM records ORDER BY kind,id').all(), oldLedger = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all(), submitted = await sub.snapshot(brand, result.ids[0]);
-        (await repo.close());
+        repo.close();
         const copies: Record<string, string> = {};
         for (const suffix of ['', '-wal', '-shm']) {
             try {
@@ -66,12 +66,12 @@ it('A20 D10 populated accepted seven migrations keep real G05/G06/G07/G08 histor
         }
         const next = openDatabase(database);
         repo = createSqliteRepository(next, () => NOW);
-        expect(migrate(next)).toEqual({ applied: 8, total: 15 });
+        expect(migrate(next)).toEqual({ applied: 10, total: 17 });
         expect(next.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
         expect((next.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as {
             name: string;
         }[]).filter(r => oldNames.includes(r.name))).toEqual(oldLedger);
-        expect(migrate(next)).toEqual({ applied: 0, total: 15 });
+        expect(migrate(next)).toEqual({ applied: 0, total: 17 });
         await seed(repo);
         expect(next.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
         const again = new IdentityService(repo, () => NOW);
@@ -84,10 +84,10 @@ it('A20 D10 populated accepted seven migrations keep real G05/G06/G07/G08 histor
             };
             expect(() => next.prepare('UPDATE records SET revision=revision+1 WHERE kind=? AND id=?').run(k, row.id)).toThrow();
         }
-        console.info('G12_MIGRATION_EVIDENCE ' + JSON.stringify({ oldNames, oldRows: before.length, oldRowsHash: hash(JSON.stringify(before)), historicalByteCopies: copies, oldFileHash: hash(png), oldLedgerHash: hash(JSON.stringify(oldLedger)), repeatApplied: 0, total: 15 }));
+        console.info('G12_MIGRATION_EVIDENCE ' + JSON.stringify({ oldNames, oldRows: before.length, oldRowsHash: hash(JSON.stringify(before)), historicalByteCopies: copies, oldFileHash: hash(png), oldLedgerHash: hash(JSON.stringify(oldLedger)), repeatApplied: 0, total: 17 }));
     }
     finally {
-        (await repo.close());
+        repo.close();
         await rm(dir, { recursive: true, force: true });
     }
 });

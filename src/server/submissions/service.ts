@@ -1,3 +1,4 @@
+import { searchTransaction } from '@/server/search/transaction';
 import { asyncFilter, asyncFlatMap, asyncMap } from "@/domain/async-collections";
 import { campaignRequestSource, materialProductIds } from '@/server/tasks/campaign-request';
 import { createHash } from 'node:crypto';
@@ -19,7 +20,7 @@ const hash = (v: unknown) => createHash('sha256').update(JSON.stringify(v)).dige
 export class SubmissionService {
     constructor(public identity: IdentityService, private fault?: (stage: string) => void) { }
     get clock() { return this.identity.clock; }
-    async workspace(token: string | undefined, taskId: string) { return this.identity.repo.transaction(async (s) => (await workspace(s, (await this.identity.principal(s, token)), taskId, this.clock))); }
+    async workspace(token: string | undefined, taskId: string) { return searchTransaction(this.identity.repo, async (s) => (await workspace(s, (await this.identity.principal(s, token)), taskId, this.clock))); }
     async snapshot(token: string | undefined, id: string) {
         return this.identity.repo.transaction(async (s) => {
             const p = (await this.identity.principal(s, token)), row = (await s.get('submission', id));
@@ -109,7 +110,7 @@ export class SubmissionService {
                 }
                 const carried = command === 'copy_submission' ? (await s.get('submission', input.sourceSubmissionId as string))!.data.answers : command === 'rebase_apply' ? old!.data.answers : undefined;
                 const row = (await this.saveRow(s, p, task, request.id, data, providedBy, old, baseSubmissionId, carried));
-                (await audit(s, p, this.clock, task.contextId!, 'submission.draft_saved', task.id, { draftRevision: old?.revision ?? 0 }, { draftId: row.id, requestId: request.id }));
+                (await audit(s, p, this.clock, task.contextId!, 'submission.draft_saved', task.id, { draftRevision: old?.revision ?? 0, draftNarrative: old?.data.narrative ?? null, draftAnswerKeys: old?.data.answers.map(a => a.requirementKey) ?? [] }, { draftRevision: row.revision, draftId: row.id, requestId: request.id, draftNarrative: row.data.narrative, draftAnswerKeys: row.data.answers.map(a => a.requirementKey) }));
                 this.fault?.('draft');
                 return { ids: [row.id] };
             }));
@@ -161,8 +162,8 @@ export class SubmissionService {
                 const exact = { ...content, answers, files: files.map(f => ({ fileVersionId: f.id, name: f.data.originalName, bytes: f.data.bytes, mime: f.data.mime, sha256: f.data.sha256, preview: f.data.preview, uploaderId: f.data.uploaderId, uploadedAt: f.createdAt })), productUseIds };
                 (await s.create('submission', { id: submissionId, contextId: task.contextId, data: { ...exact, taskId: task.id, requestId: request.id, baseSubmissionId: draft.data.baseSubmissionId, providedBy: draft.data.providedBy, sequence: (previous?.data.sequence ?? 0) + 1, previousId: previous?.id ?? null, draftId: draft.id, committedDraftRevision: draft.revision, mode, fileVersionIds: files.map(f => f.id), evaluation, recordedBy: p.user.id, submittedAt: this.clock(), contentHash: hash(exact) } }));
                 (await s.update('task', task.id, task.revision, { ...task.data, status: mode === 'full' ? 'submitted' : 'partial', submissionProgress: { latestSubmissionId: submissionId, requestId: request.id, mode } }));
-                (await audit(s, p, this.clock, task.contextId!, 'submission.created', task.id, { submissionId: previous?.id ?? null }, { submissionId, requestId: request.id, mode }));
-                (await s.create('domainEvent', { id: newId(), contextId: task.contextId, data: { eventType: 'TASK_SUBMITTED', targetId: task.id, sourceVersionId: submissionId, actorId: p.user.id, at: this.clock() } }));
+                const auditEvent = (await s.create('domainEvent', { id: newId(), contextId: task.contextId, data: { eventType: 'TASK_SUBMITTED', targetId: task.id, sourceVersionId: submissionId, actorId: p.user.id, at: this.clock() } }));
+                (await audit(s, p, this.clock, task.contextId!, 'submission.created', task.id, { submissionId: previous?.id ?? null }, { submissionId, requestId: request.id, mode, productUseIds, fileVersionIds: files.map(f => f.id) }, { references: [{ kind: 'domainEvent', id: auditEvent.id, role: 'source' }] }));
                 this.fault?.('submit');
                 return { ids: [submissionId] };
             }));

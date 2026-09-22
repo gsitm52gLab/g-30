@@ -30,7 +30,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
     await mkdir(priorSql);
     await mkdir(originalFiles);
     const source = path.resolve('src/server/db/migrations'), names = (await readdir(source)).filter(x => x.endsWith('.sql')).sort();
-    expect(names.map(n => Number(n.slice(0, 4)))).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+    expect(names.map(n => Number(n.slice(0, 4)))).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
     for (const name of names.filter(n => Number(n.slice(0, 4)) <= 8 && Number(n.slice(0, 4)) !== missing))
         await copyFile(path.join(source, name), path.join(priorSql, name));
     let db = openDatabase(originalDb, true);
@@ -71,7 +71,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
     try {
         const existing = await (missing === 8 ? produceEvidence() : produceInquiry());
         const before = db.prepare('SELECT * FROM records ORDER BY kind,id').all(), oldMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all();
-        (await repo.close());
+        repo.close();
         // Never open the prior database to copy it. Record/copy all SQLite sidecars using filesystem bytes first.
         const copies: {
             source: string;
@@ -98,7 +98,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
         repo = createSqliteRepository(db, () => NOW);
         identity = new IdentityService(repo, () => NOW);
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
-        expect(migrate(db)).toEqual({ applied: 8, total: 15 });
+        expect(migrate(db)).toEqual({ applied: 10, total: 17 });
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
         const allMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as {
             name: string;
@@ -107,7 +107,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
         expect(allMigrations.filter(x => Number(x.name.slice(0, 4)) <= 8 && Number(x.name.slice(0, 4)) !== missing)).toEqual(oldMigrations);
         for (const m of allMigrations)
             expect(m.sha256).toBe(hash(await readFile(path.join(source, m.name))));
-        expect(migrate(db)).toEqual({ applied: 0, total: 15 });
+        expect(migrate(db)).toEqual({ applied: 0, total: 17 });
         expect((await seed(repo)).inserted).toBe(0);
         expect(await existing.replay()).toEqual(existing.result);
         expect(await new NoticeService(identity).command(admin, noticeId, noticePublish)).toEqual(noticeReceipt);
@@ -127,7 +127,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
         console.info('G09_UNION_MIGRATION ' + JSON.stringify({ missing, priorCount: 7, finalCount: 9, preservedRows: before.length, rowsSha256: hash(JSON.stringify(before)), copiedBeforeOpening: copies, originalFilesUnchanged: priorFileHashes, repeatNoop: true, replayUnchanged: true, bothModuleProducersAndGuards: true }));
     }
     finally {
-        (await repo.close());
+        repo.close();
         await rm(directory, { recursive: true, force: true });
     }
 });

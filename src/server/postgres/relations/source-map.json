@@ -1,9 +1,9 @@
 [
   {
     "source": "src/domain/constraints.ts",
-    "sha256": "3e4074fa7efecb15d302555e3e233aca6eaaf518033c77766e0ae5964117129b",
+    "sha256": "56fd407a6fb4dd11407e03dbc8bb12b5c73177746dbe50126ac19719d7a7285a",
     "async": "index.ts",
-    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+    "change_note": "Storage S1 registration only; all existing relations retained."
   },
   {
     "source": "src/domain/ai-input/constraints.ts",
@@ -88,5 +88,17 @@
     "sha256": "2ebb9e934da832f23aabda955346a2c5a6dd2ccb6d0f9d1ec9bff02689876d7b",
     "async": "tasks.ts",
     "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/audit/constraints.ts",
+    "sha256": "93ac3445e8f54b5c59b3dc0d1f54a218d92f7c82dadc75e317192ff9257041a2",
+    "async": "audit.ts",
+    "change_note": "Exact fa2491b relation behavior; local SyncUnitOfWork alias only, PostgreSQL awaited get."
+  },
+  {
+    "source": "src/domain/storage/constraints.ts",
+    "sha256": "493b8c59755f72dad80abd1705fb99e0e0ac87832404c425802a890d468dd745",
+    "async": "storage.ts",
+    "change_note": "Same pure relation validation over awaited dependency rows."
   }
 ]

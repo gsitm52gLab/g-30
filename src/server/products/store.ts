@@ -1,3 +1,4 @@
+import { appendAudit, auditOperation } from '@/server/audit/writer';
 import { createHash, randomUUID } from "node:crypto";
 import type { Clock, StoredRecord, UnitOfWork } from "@/domain/records";
 import type { Principal } from "@/server/auth/service";
@@ -30,13 +31,14 @@ export async function receipt(s: UnitOfWork, p: Principal, contextId: string, co
             fail("CONFLICT", 409, "같은 재시도 키에 다른 내용을 사용할 수 없습니다.");
         return { ids: Array.isArray(old.data.result?.ids) ? old.data.result.ids.filter((value): value is string => typeof value === "string") : [] };
     }
-    const result = (await action());
+    const receiptId = newId();
+    const result = (await auditOperation(s, receiptId, action));
     fault?.();
-    (await s.create("commandReceipt", { id: newId(), contextId, data: { key, bodyHash, command, actorId: p.user.id, result } }));
+    (await s.create("commandReceipt", { id: receiptId, contextId, data: { key, bodyHash, command, actorId: p.user.id, result } }));
     return result;
 }
-export async function audit(s: UnitOfWork, p: Principal, clock: Clock, contextId: string, action: string, targetId: string, before: Record<string, unknown>, after: Record<string, unknown>) {
-    (await s.create("audit", { id: newId(), contextId, data: { actorId: p.user.id, at: clock(), action, targetId, before, after } }));
+export async function audit(s: UnitOfWork, p: Principal, clock: Clock, contextId: string, action: string, targetId: string, before: Record<string, unknown>, after: Record<string, unknown>, detail?: Parameters<typeof appendAudit>[8]) {
+    return (await appendAudit(s, p, clock, contextId, action, targetId, before, after, detail));
 }
 export async function commonVersion(s: UnitOfWork, p: Principal, clock: Clock, product: StoredRecord<"product">, common: ProductCommon, archived: boolean, source = "사용자 입력") {
     const old = product.data.currentVersionId ? (await s.get("productVersion", product.data.currentVersionId)) : null;
