@@ -1,0 +1,77 @@
+[
+  {
+    "source": "src/domain/constraints.ts",
+    "sha256": "31f5484ec6018ea6ffe24cfae579f51a1daa058f0199427e67d7a600cf7e0cf3",
+    "async": "index.ts"
+  },
+  {
+    "source": "src/domain/ai-input/constraints.ts",
+    "sha256": "6461a7af70c2165c515046033a5165467e462884c5da5d9ca39affe419ac06be",
+    "async": "ai-input.ts"
+  },
+  {
+    "source": "src/domain/ai-provider/constraints.ts",
+    "sha256": "7c6e64658ce067c57c13a97a983d3f8dc824dfcf0d8ed4cbf5c28acf50d642a4",
+    "async": "ai-provider.ts"
+  },
+  {
+    "source": "src/domain/ai-review/constraints.ts",
+    "sha256": "d50d94197f82a3ae851b4873ac29bcc08ad124f3cf71597dcb1a108d648fa17c",
+    "async": "ai-review.ts"
+  },
+  {
+    "source": "src/domain/campaigns/constraints.ts",
+    "sha256": "b992ee79b3f7562fd62a6bab87347b9391ca60c43afdb8559af9c1010b5099e9",
+    "async": "campaigns.ts"
+  },
+  {
+    "source": "src/domain/completion/constraints.ts",
+    "sha256": "7e338b4c61cba8272a78b836dd37a39c0ef7f94a43045162abb0790383d786a6",
+    "async": "completion.ts"
+  },
+  {
+    "source": "src/domain/corrections/constraints.ts",
+    "sha256": "c43ca00c022c74cce3b90429f2f16ed000f1f5db1bd250d8ba8eec6c21d61aaa",
+    "async": "corrections.ts"
+  },
+  {
+    "source": "src/domain/evidence/constraints.ts",
+    "sha256": "fffd5cccba8a195997a043c95d095731f6343d96c1dec40a53c9abb450078add",
+    "async": "evidence.ts"
+  },
+  {
+    "source": "src/domain/inquiries/constraints.ts",
+    "sha256": "494d8e073b06554fd37d385a345bb372f5c121586002c39057b5beac8460d7bb",
+    "async": "inquiries.ts"
+  },
+  {
+    "source": "src/domain/notices/constraints.ts",
+    "sha256": "464c8eef7f21508624fdcaab44dbb69beba29e09b9a32edf069970a819e8c44f",
+    "async": "notices.ts"
+  },
+  {
+    "source": "src/domain/notifications/constraints.ts",
+    "sha256": "e66f2772215e36434cde186993820c82202cddba9a31ca8601e89adb58286abf",
+    "async": "notifications.ts"
+  },
+  {
+    "source": "src/domain/products/constraints.ts",
+    "sha256": "90940eb07d1b307dc5c0424cb8d3f85c39ce8b896e529b9f3f41c78b478ec18c",
+    "async": "products.ts"
+  },
+  {
+    "source": "src/domain/scheduling/constraints.ts",
+    "sha256": "bac513cde11c80f600501ac6fb6103420fcce74e34a95e3d4cb1a902d582c2d3",
+    "async": "scheduling.ts"
+  },
+  {
+    "source": "src/domain/submissions/constraints.ts",
+    "sha256": "e4742f1b48e55919bde3d4531349067f3e343db14e085bac220797c6a60ba088",
+    "async": "submissions.ts"
+  },
+  {
+    "source": "src/domain/tasks/constraints.ts",
+    "sha256": "ac944900815d46bedb9d2b98b8dac911df1bd993af3c3d3ccad19d2b58f117a5",
+    "async": "tasks.ts"
+  }
+]
