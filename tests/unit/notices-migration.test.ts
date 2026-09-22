@@ -16,9 +16,9 @@ it('G08 migration adds constraints to populated accepted G05 DB without changing
         await seed(repo);
         await repo.transaction(async (s) => { const t = (await s.get('task', 'task-pop'))!; (await s.update('task', t.id, t.revision, { ...t.data, title: '기존 사용자가 수정한 실제 데이터' })); });
         const before = db.prepare('SELECT * FROM records ORDER BY kind,id').all();
-        expect(migrate(db)).toEqual({ applied: 11, total: 16 });
+        expect(migrate(db)).toEqual({ applied: 12, total: 17 });
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
-        expect(migrate(db)).toEqual({ applied: 0, total: 16 });
+        expect(migrate(db)).toEqual({ applied: 0, total: 17 });
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
     }
     finally {

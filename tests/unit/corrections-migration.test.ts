@@ -21,10 +21,10 @@ it('G10 populated accepted six migrations preserve all old business rows and act
         const identity = await policyFixture(repo), bytes = Buffer.from('kind,value\nG10,oldfile\n'), file = (await new FileService(identity, dir).upload(tokenFor('user-admin'), 'task-onboarding', [{ name: 'existing.csv', type: 'text/csv', bytes }], 'internal')).files[0];
         await repo.transaction(async (s) => { const t = (await s.get('task', 'task-onboarding'))!; (await s.update('task', t.id, t.revision, { ...t.data, title: 'Edited accepted row' })); });
         const before = db.prepare('SELECT * FROM records ORDER BY kind,id').all();
-        expect(migrate(db)).toEqual({ applied: 10, total: 16 });
+        expect(migrate(db)).toEqual({ applied: 11, total: 17 });
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
         expect(readFileSync(path.join(dir, file.id))).toEqual(bytes);
-        expect(migrate(db)).toEqual({ applied: 0, total: 16 });
+        expect(migrate(db)).toEqual({ applied: 0, total: 17 });
         expect((await seed(repo)).inserted).toBe(0);
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
     }

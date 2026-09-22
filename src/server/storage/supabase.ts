@@ -86,6 +86,16 @@ async function boundedBody(response: Response, limit: number): Promise<Buffer> {
     return Buffer.concat(parts, bytes);
   } finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
 }
+/** Supabase's authenticated object reads use this exact envelope with HTTP400 for absence.
+ * Only bounded structured codes are interpreted; remote messages never become diagnostics. */
+async function missingObjectEnvelope(response: Response): Promise<boolean> {
+  try {
+    const data: unknown = JSON.parse((await boundedBody(response, JSON_LIMIT)).toString('utf8'));
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+    const value = data as Record<string, unknown>;
+    return value.statusCode === '404' && value.error === 'not_found' && value.code === 'NoSuchKey';
+  } catch { return false; }
+}
 /** Transport only: callers must perform current app authorization before AND after each operation. */
 export class SupabasePrivateStorage {
   #url: string;
@@ -138,9 +148,11 @@ export class SupabasePrivateStorage {
             ...(body === undefined ? {} : { body: body as BodyInit }),
           });
           if (!response.ok) {
-            await response.body?.cancel();
             const status = response.status;
-            const code = status === 404 ? 'NOT_FOUND' : status === 409 || status === 412 ? 'CONFLICT' : status === 413 ? 'TOO_LARGE' : 'UNAVAILABLE';
+            const objectRead = method === 'GET' && (path.startsWith('/object/info/authenticated/') || path.startsWith('/object/authenticated/'));
+            const missingObject = status === 400 && objectRead && await missingObjectEnvelope(response);
+            if (!response.bodyUsed) await response.body?.cancel();
+            const code = status === 404 || missingObject ? 'NOT_FOUND' : status === 409 || status === 412 ? 'CONFLICT' : status === 413 ? 'TOO_LARGE' : 'UNAVAILABLE';
             if (read && attempt < this.#retries && (status === 429 || status >= 500)) continue;
             throw new StorageError(code, status, read || status < 500 ? 'unchanged' : 'unknown');
           }
