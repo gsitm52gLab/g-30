@@ -1,0 +1,25 @@
+.stack { display:grid; gap:24px; min-width:0; }
+.hero { padding:32px; border:1px solid #b7d4cd; border-radius:18px; background:linear-gradient(120deg,#f0f7f2,#e5f1ef); min-width:0; }
+.hero h1 { font-size:clamp(1.8rem,4vw,3rem); line-height:1.25; max-width:20ch; margin:12px 0; overflow-wrap:anywhere; }
+.panel,.card { padding:22px; background:#fff; border:1px solid #dce2de; border-radius:14px; min-width:0; overflow-wrap:anywhere; }
+.panel h2,.card h3 { margin-top:0; }
+.row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; min-width:0; }
+.filters { display:flex; flex-wrap:wrap; align-items:end; gap:16px; border-bottom:1px solid #dce2de; padding:8px 0 22px; min-width:0; }
+.filters label { display:grid; gap:7px; flex:1 1 220px; min-width:0; font-size:14px; }
+.filters select { width:100%; min-width:0; max-width:100%; padding:12px; background:white; color:#173a32; border:1px solid #bdcdc5; border-radius:8px; }
+.filters p { flex-basis:100%; margin:0; font-size:13px; color:#52665f; }
+.metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+.metric { display:flex; flex-direction:column; gap:10px; padding:20px; background:#fff; border:1px solid #c9d9d2; border-radius:12px; text-decoration:none; min-width:0; }
+.metric strong { font-size:32px; font-variant-numeric:tabular-nums; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr)); gap:16px; min-width:0; }
+.facts { display:grid; gap:10px; font-size:14px; }
+.facts div { display:grid; grid-template-columns:92px minmax(0,1fr); gap:8px; }
+.facts dt { color:#53675f; }.facts dd { margin:0; }
+.attention { color:#963e1c; font-weight:600; }
+.actionList { list-style:none; padding:0; margin:0; display:grid; gap:0; }
+.actionList li { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; padding:15px 0; border-bottom:1px solid #e1e7e3; }
+.actionList span { font-size:13px; color:#52665f; }
+.kanban { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),1fr)); gap:16px; min-width:0; align-items:start; }
+.lane { display:grid; align-content:start; gap:12px; min-width:0; padding:12px; background:#edf2ee; border-radius:14px; }.lane h3 { margin:0; }
+.muted { color:#52665f; font-size:13px; }
+@media(max-width:600px) { .hero,.panel,.card { padding:18px; } .filters button { width:100%; }.metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }.metric { padding:15px; } }
