@@ -1,3 +1,4 @@
+import { assertHomeProjection, homeText } from './projection';
 import { asyncFilter } from '@/domain/async-collections';
 import type { Clock, StoredRecord, UnitOfWork } from '@/domain/records';
 import { calendarPosition } from '@/domain/scheduling/calendar';
@@ -33,7 +34,7 @@ export function homeQuery(params: URLSearchParams): HomeQuery {
 }
 const active = (t: StoredRecord<'task'>) => !['draft', 'completed', 'cancelled', 'on_hold'].includes(t.data.status);
 const ownTask = (t: StoredRecord<'task'>, p: Principal) => p.user.data.role === 'gsg' ? t.data.ownerId === p.user.id : [t.data.assigneeId, ...(t.data.coAssigneeIds ?? [])].includes(p.user.id);
-const contextLabel = (c: StoredRecord<'context'>) => [c.data.country, c.data.retailer, c.data.brand].join(' · ');
+const contextLabel = (c: StoredRecord<'context'>) => [c.data.country, c.data.retailer, c.data.brand].map(homeText).join(' · ');
 const person = async (s: UnitOfWork, p: Principal, context: string, id: string): Promise<HomePerson> => ({ id, label: await userLabel(s, p, context, id) });
 
 /** Uses the notification domain's current-need predicate; this is a read, never delivery.
@@ -140,6 +141,7 @@ export class HomeService {
           result.campaigns.push({ id: c.id, taskId: task.id, title: canManage ? campaignDraft(c.data.draft).title : published!.title, taskTitle: task.data.title, contextId: ctx, url: `/tasks/${encodeURIComponent(task.id)}/campaigns?context=${encodeURIComponent(ctx)}&campaign=${encodeURIComponent(c.id)}` });
         }
       }
+      assertHomeProjection(result);
       result.tasks.sort((a, b) => (a.deadline?.value ?? 'z').localeCompare(b.deadline?.value ?? 'z') || a.id.localeCompare(b.id));
       result.dates.sort((a, b) => (a.deadline.value ?? 'z').localeCompare(b.deadline.value ?? 'z') || a.key.localeCompare(b.key));
       const pendingDates = result.dates.filter(d => d.pending);

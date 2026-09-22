@@ -3,6 +3,7 @@
 PRD-03 AC-03-01~05 / A03, A08, A10, A18, A24. 기준은 execution-v1 PRD와 G14 통합 92eba683이며, 새로운 스키마·인증·가격 규칙을 도입하지 않는다.
 
 - 기본 GSG 범위는 전체 허용 컨텍스트, 브랜드는 내 업무다. 내 업무는 전체 허용 범위에서 GSG owner 또는 브랜드 주/공동담당을 선택한다. 선택 컨텍스트와 전체 허용 범위는 공개된 비담당 업무도 포함하며 제출 권한을 부여하지 않는다. 전달한 context ID는 scope=all/mine일 때도 반드시 서버가 검증한다.
+- 알려진 저장 필드가 객체·배열 등 잘못된 타입이면 공개 DTO 경계에서 값/필드명을 노출하지 않는 STORAGE_UNAVAILABLE 503으로 실패한다. 문자열 강제 변환·레코드 누락·0건 성공으로 처리하지 않는다. ACL을 먼저 적용하므로 허용 밖 컨텍스트의 손상을 조회하지 않는다.
 - DTO 집계 전에 기존 context/task/inquiry/notice/campaign/product ACL을 적용한다. GET은 단일 SERIALIZABLE 읽기 UoW의 lazy raw-row memo만 사용한다. 요청간 캐시, ACL 캐시, whole-DB 복제, 쓰기 및 임의 레코드 제한이 없다. 읽기 오류는 전체 집계 실패이며 0건으로 바꾸지 않는다.
 - task/owner/assignees/product/current request는 기존 저장값, 목록·칸반·프로젝트 타임라인은 같은 HomeTask DTO다. 기존 /tasks 및 /projects UI도 같은 TaskService.projectTask를 유지하며 담당·공동담당·상품 표기만 보강한다. 숨은 task/project/campaign의 제목·개수는 생성하지 않는다.
 - 미답변은 현재 활성 문의에서 resolved가 아닌 질문 수다. 타 브랜드 사용자의 같은 컨텍스트 문의도 기존 initiator 규칙에 따라 제외된다. 정확한 질문 anchor로 이동해 키보드 초점을 둔다. 문의의 외부 확인 담당은 externalWait 담당, 그 외는 연결 업무 GSG owner, 독립 미배정 문의는 담당 확인 필요다. GSG 기본 전체 홈에는 미배정도 포함한다.
