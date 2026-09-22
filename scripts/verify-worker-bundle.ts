@@ -49,7 +49,14 @@ async function traceFiles(directory: string): Promise<string[]> {
 const traceArgument = process.argv.indexOf('--check-trace');
 const traceNames = traceArgument >= 0
   ? [path.resolve(process.argv[traceArgument + 1] ?? '')]
-  : [...await traceFiles(path.join(root, '.next/server')), path.join(root, '.next/next-server.js.nft.json')];
+  : [
+    ...await traceFiles(path.join(root, '.next/server')),
+    path.join(root, '.next/next-server.js.nft.json'),
+    // Webpack also emits next-minimal-server; audit every top-level server trace.
+    ...(await readdir(path.join(root, '.next'), { withFileTypes: true }))
+      .filter(entry => entry.isFile() && entry.name.endsWith('.nft.json') && entry.name !== 'next-server.js.nft.json')
+      .map(entry => path.join(root, '.next', entry.name)),
+  ];
 const audits: Awaited<ReturnType<typeof auditTrace>>[] = [];
 for (const trace of traceNames) audits.push(await auditTrace(trace));
 const preflight = {
