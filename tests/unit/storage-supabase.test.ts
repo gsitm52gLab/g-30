@@ -74,6 +74,41 @@ describe('Supabase private storage transport', () => {
   it('rejects stale and unbounded app deadlines', async () => { const s = new SupabasePrivateStorage(config, fixture().fetcher); for (const offset of [-1, 16 * 60_000]) await expect(s.issueUploadGrant({ key: key(), expectedBytes: 1, appExpiresAt: Date.now() + offset })).rejects.toMatchObject({ code: 'INVALID_INPUT' }); });
   it('rejects a provider upload token for a different object', async () => { const f = fixture(), other = new SupabasePrivateStorage(config, f.fetcher); const grant = await other.issueUploadGrant({ key: key(), expectedBytes: 1, appExpiresAt: Date.now() + 60_000 }); const fetcher = vi.fn(async () => json({ url: new URL(grant.signedUrl).pathname.replace('/storage/v1','') + new URL(grant.signedUrl).search })); const s = new SupabasePrivateStorage(config, fetcher); await expect(s.issueUploadGrant({ key: key(), expectedBytes: 1, appExpiresAt: Date.now() + 60_000 })).rejects.toMatchObject({ code: 'PROTOCOL' }); });
   it('rejects a remote redirect without forwarding the credential', async () => { const f = vi.fn(async () => { throw new Error(`Bearer ${config.secretKey}`); }); const s = new SupabasePrivateStorage({ ...config, readRetries: 0 }, f); await expect(s.inspect(key())).rejects.toMatchObject({ code: 'UNAVAILABLE', message: 'Storage operation failed (UNAVAILABLE).' }); expect(f.mock.calls).toHaveLength(1); });
+  it('classifies the exact provider missing-object envelope on an authenticated object read', async () => {
+    const fetcher = vi.fn(async () => json({ statusCode: '404', error: 'not_found', code: 'NoSuchKey', message: config.secretKey }, 400));
+    const storage = new SupabasePrivateStorage(config, fetcher);
+    await expect(storage.inspect(key('final'))).rejects.toMatchObject({ code: 'NOT_FOUND', status: 400, outcome: 'unchanged', message: 'Storage operation failed (NOT_FOUND).' });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+  it.each([
+    { statusCode: '404', error: 'not_found' },
+    { statusCode: 404, error: 'not_found', code: 'NoSuchKey' },
+    { statusCode: '403', error: 'not_found', code: 'NoSuchKey' },
+    { statusCode: '404', error: 'AccessDenied', code: 'NoSuchKey' },
+    { statusCode: '404', error: 'not_found', code: 'AccessDenied' },
+    { message: 'Object not found' },
+    [{ statusCode: '404', error: 'not_found', code: 'NoSuchKey' }],
+    null,
+  ])('does not infer a missing object from a different HTTP400 envelope %#', async body => {
+    const storage = new SupabasePrivateStorage(config, async () => json(body, 400));
+    await expect(storage.inspect(key())).rejects.toMatchObject({ code: 'UNAVAILABLE', status: 400, outcome: 'unchanged' });
+  });
+  it.each([403, 500])('does not reinterpret HTTP%s using a missing-object body', async status => {
+    const fetcher = vi.fn(async () => json({ statusCode: '404', error: 'not_found', code: 'NoSuchKey' }, status));
+    await expect(new SupabasePrivateStorage({ ...config, readRetries: 0 }, fetcher).inspect(key())).rejects.toMatchObject({ code: 'UNAVAILABLE', status });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+  it('does not extend the object-read exception to upload mutation errors', async () => {
+    const fetcher = vi.fn(async () => json({ statusCode: '404', error: 'not_found', code: 'NoSuchKey' }, 400));
+    await expect(new SupabasePrivateStorage(config, fetcher).issueUploadGrant({ key: key(), expectedBytes: 1, appExpiresAt: Date.now() + 60_000 })).rejects.toMatchObject({ code: 'UNAVAILABLE', status: 400, outcome: 'unchanged' });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+  it('bounds malformed and oversized missing-object error bodies without leaking their content', async () => {
+    for (const response of [new Response(config.secretKey, { status: 400 }), new Response(config.secretKey, { status: 400, headers: { 'content-length': '9999999' } }), new Response('x'.repeat(65537), { status: 400 })]) {
+      await expect(new SupabasePrivateStorage(config, async () => response).inspect(key())).rejects.toMatchObject({ code: 'UNAVAILABLE', status: 400, message: 'Storage operation failed (UNAVAILABLE).' });
+      expect(response.body?.locked).toBe(false);
+    }
+  });
   it('bounds GET retries and has no mutation retry', async () => { const f = vi.fn(async () => json({ secret: config.secretKey }, 503)); const s = new SupabasePrivateStorage(config, f); await expect(s.inspect(key())).rejects.toMatchObject({ code: 'UNAVAILABLE', outcome: 'unchanged' }); expect(f).toHaveBeenCalledTimes(2); f.mockClear(); await expect(s.issueUploadGrant({ key: key(), expectedBytes: 1, appExpiresAt: Date.now() + 60_000 })).rejects.toMatchObject({ outcome: 'unknown' }); expect(f).toHaveBeenCalledTimes(1); });
   it('times out a real pending fetch and redacts the transport error', async () => { const fetcher: typeof fetch = (_input, init) => new Promise((_resolve, reject) => { init?.signal?.addEventListener('abort', () => reject(new Error(config.secretKey))); }); const s = new SupabasePrivateStorage({ ...config, timeoutMs: 50, readRetries: 0 }, fetcher); await expect(s.inspect(key())).rejects.toMatchObject({ code: 'TIMEOUT' }); });
   it('bounds simultaneous requests without pretending to be a distributed lock', async () => { let resolve!: (r: Response) => void; const f: typeof fetch = () => new Promise(r => { resolve = r; }); const s = new SupabasePrivateStorage({ ...config, maxConcurrentRequests: 1, readRetries: 0 }, f); const pending = s.inspect(key()).catch(e => e); await expect(s.inspect(key())).rejects.toMatchObject({ code: 'BUSY' }); resolve(json({}, 404)); await pending; });
