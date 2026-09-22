@@ -168,3 +168,7 @@ Latest user request selects Supabase PostgreSQL/private Storage, preserving all 
 ### State 177 — 2026-09-22 credential preflight and fail-closed supplemental guard
 
 DATABASE_URL/Transaction pooler와 DIRECT_URL/Session pooler 모두 TLS 1.3·서버 인증서/hostname 검증을 포함한 READ ONLY SELECT 1 성공. Storage 인증 읽기 HTTP 200. public 테이블 0개, gs-hale-private 버킷 없음. 원격 데이터 변경 0회. 앱 통합/Vercel 환경변수 검증은 미실행. 첫 CA 오류 및 pooler backend SSL 지표의 진단 오류는 원본 결과에 보존했고 공식 CA와 실제 TLS 소켓을 확인하여 보완했다. 읽기 전용 연결은 SB 제품 수용 통과로 승격하지 않는다. 독립 검토에서 supplemental 설정 누락 우회를 발견해 고정 revision/경로/18 ID/필수 여부를 검사하도록 보완했다. 6개 guard 조건 검증 통과, 독립 후속 소스 검토 PASS.
+
+### State 178 — resumed Supabase implementation contracts
+
+실제 active Goal 재개를 확인해 paused 준비 상태를 해제한다. 원문 첨부의 이전 저장소/push 조건보다 후속 사용자 Supabase 전환·g-30·push 허용을 우선한다. DB 기반은 모든 get/list/create/update가 Promise인 AsyncUnitOfWork, 단일 pg 연결 SERIALIZABLE, async 관계검사를 사용하며 서비스 callsite 전환은 기반 독립검증 후 진행한다. Storage 허가는 staging에만, 실제 bytes 검증 후 서버 create-only finalized key로 보존한다. 인증/권한/최종 저장 연계는 별도 후속 수용이다. G14 packet의 존재하지 않는 AC-14-05는 원문 4개 AC에 맞춰 정정하고 원 packet을 보존했다.
