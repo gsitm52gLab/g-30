@@ -6,6 +6,7 @@ import datetime
 import hashlib
 import json
 import os
+import subprocess
 from pathlib import Path
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -26,6 +27,7 @@ state = read('.execution/run-plan.json')
 trace = read('.execution/traceability.json')
 scope = read('.execution/scope-checklist.json')
 deferred = read('.execution/deferred-checks.json')
+supabase = read('.execution/supabase-acceptance.json')
 rows, errors = [], []
 
 
@@ -46,7 +48,7 @@ def add(group, item, owners=()):
         refs.append({'path': str(target), 'sha256_at_preparation': digest})
     rows.append({
         'group': group, 'id': item['id'], 'owners': list(owners),
-        'requirement': item.get('expected', item.get('requirement', item.get('scenario', item['id']))),
+        'requirement': item.get('expected', item.get('requirement', item.get('acceptance', item.get('scenario', item['id'])))),
         'prior_tracking_status': item.get('status'), 'prior_evidence': refs,
         'prior_notes': {k: v for k, v in item.items() if k in ('remaining', 'scope_note', 'verification_idea', 'scenario') or k.startswith('current_')},
         'final_audit_status': 'NOT_EVALUATED', 'final_candidate': None,
@@ -71,11 +73,17 @@ for item in deferred['checks']:
 for item in trace['external_levels']:
     if item.get('required_for_goal'):
         add('mandatory external integration', item, ['G17', 'G18'])
+for item in supabase['checks']:
+    add('Supabase supplemental acceptance', item, item.get('goals', []))
+expected_supabase_ids = {f'SB-{n:02}' for n in range(1, 19)}
+if {item['id'] for item in supabase['checks']} != expected_supabase_ids:
+    errors.append({'reason': 'Supabase acceptance IDs must be exactly SB-01 through SB-18'})
 
 counts = collections.Counter(row['group'] for row in rows)
 expected = {'PRD acceptance': 91, 'original criterion': 26,
             'AI evaluation perspective': 13, 'source scope': 64,
-            'deferred integration': 10, 'mandatory external integration': 1}
+            'deferred integration': 10, 'mandatory external integration': 1,
+            'Supabase supplemental acceptance': 18}
 for group, count in expected.items():
     if counts[group] != count:
         errors.append({'group': group, 'expected': count, 'actual': counts[group]})
@@ -86,6 +94,9 @@ report = {
     'kind': 'audit_worksheet_not_execution_or_acceptance',
     'prepared_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
     'state_version': state['state_version'], 'accepted_product_at_preparation': state.get('accepted_commit'),
+    'integration_head_at_preparation': subprocess.check_output(
+        ['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip(),
+    'historical_acceptance_is_not_current_supabase_acceptance': True,
     'source_hashes': inputs, 'row_counts': dict(counts), 'integrity_errors': errors,
     'instructions': [
         'Regenerate from the final state before audit; this worksheet does not change the ledger.',
@@ -93,6 +104,7 @@ report = {
         'Reuse unchanged prior proof only with exact source binding, original verifier/session/command references and fresh count zero.',
         'A path or PASS string is not semantic evidence. Retain FAIL, SKIP and NOT_RUN explicitly.',
         'Mandatory actual configured OpenAI success is separate from synthetic/fault tests and cannot be deferred as an operational limitation.',
+        'Preserve all original audit rows and review SB-01 through SB-18 independently; historical mock/SQLite evidence alone is not current Supabase or Vercel acceptance.',
         'Final source must be the independently audited integration SHA; record product, API and operational levels separately.',
     ],
     'checkpoints': [{k: task.get(k) for k in ('id', 'state', 'candidate_commit', 'integration_commit', 'implementer_session_id', 'implementer_session_ids', 'verifier_session_id')} for task in state['tasks']],

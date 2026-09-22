@@ -4135,8 +4135,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "User-authorized Supabase shared-session/login fix; platform Goal remains paused",
-  "next_action": "Complete G14 async port exactcandidate independent verification; implement shared Storage grants/finalize/range/Excel/AI then role-based home and whole Supabase audit. Primitive integration accepted, fullscope unchanged.",
-  "state_version": 183,
+  "next_action": "Finish current independent G14 PostgreSQL/browser and service-race diagnosis; accept only verified finalcandidate and integrationregression. Workerbundle packaging proceeds independently. Then StorageS1 and G03; final225audit allNOT_EVALUATED.",
+  "state_version": 185,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4171,14 +4171,14 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T03:06:52.211507+00:00",
+  "updated_at": "2026-09-22T03:25:48.838748+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
     "status": "active",
     "observed_at": "2026-09-22T02:53:03.319778+00:00",
     "source": "get_goal tool after user continuation",
-    "previous_goal_turn_classification": "PROGRESS: exacteece auth42artifact review and state182 committed/pusheda036b9c; Storage repaired candidate independently38unit/7actual verified. Currentturn integrated3dd9078 and root38unit/typecheckPASS."
+    "previous_goal_turn_classification": "PROGRESS: Storage primitives independently verified then rootintegrated3dd9078 and affected38unit/typecheckPASS; state183committed/pushedfd96640. G14 independent783unit and priorSQLbytes checked; actual latency finding changes next action."
   },
   "session_log_submission_derivative": {
     "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/submission-log-derivatives/state122/manifest.json",
@@ -4340,17 +4340,47 @@
       {
         "id": "G14-ASYNC-PORT",
         "owner": "/root/sb_postgres_foundation",
-        "state": "AUTHOR_VERIFYING"
+        "state": "VERIFYING_ACTUAL_PG_AND_BROWSER",
+        "last_fullcheck_candidate": "5cc1c283e1f816eb8b7ebc68fc0d6428440dc23a",
+        "author_unit_pass": 783,
+        "baseline_actual_pg03_ms": 41870,
+        "baseline_pg02_ms": 94350,
+        "interrupted_probe_exit": 143,
+        "scope": "Single read-only UoW rawrowmemo, no requestcrossing cache; schemafrozen.",
+        "current_candidate": "97cf487f04297eabaa0bd9b255e905c2ab55cf0e",
+        "harness_failure_preserved": "Admin productquery correctly included internalprice extra hit; firstrole oracle wronglyexpected1. Newharness team query thenadminedit; productunchangedf524."
+      },
+      {
+        "id": "G14-INDEPENDENT",
+        "owner": "/root/supabase_scope_review",
+        "state": "VERIFYING_ACTUAL_PG_AND_BROWSER",
+        "candidate": "5cc1c283e1f816eb8b7ebc68fc0d6428440dc23a",
+        "unit_pass": 783,
+        "unit_fail": 0,
+        "app_browser": "WAITING_FINAL_PERFORMANCE_CANDIDATE",
+        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-async-independent/task.json",
+        "current_candidate": "97cf487f04297eabaa0bd9b255e905c2ab55cf0e",
+        "harness_failure_preserved": "Admin productquery correctly included internalprice extra hit; firstrole oracle wronglyexpected1. Newharness team query thenadminedit; productunchangedf524."
       },
       {
         "id": "STORAGE-APP-PLAN",
         "owner": "/root/prd",
-        "state": "READONLY_PLANNING"
+        "state": "PREPARATION_COMPLETE_NOT_IMPLEMENTATION",
+        "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-app-plan/result.json",
+        "next_prepared_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-app-core/prepared-task.json",
+        "owner_current_task": "SB13-WORKER-BUNDLE"
       },
       {
         "id": "SB01-06-REVALIDATION-PLAN",
         "owner": "/root/supabase_scope_review",
-        "state": "READONLY_PLANNING"
+        "state": "PREPARATION_COMPLETE",
+        "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/sb01-06-audit-plan/plan.json"
+      },
+      {
+        "id": "G03-HOME",
+        "owner": "UNASSIGNED",
+        "state": "PREPARED_NOT_ASSIGNED",
+        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-supabase-home/prepared-task.json"
       }
     ],
     "storage_primitive_acceptance": {
@@ -4385,7 +4415,40 @@
         "Full SB acceptance"
       ],
       "at": "2026-09-22T03:06:52.211507+00:00"
-    }
+    },
+    "g14_actual_schema_independent": {
+      "candidate": "5cc1c283e1f816eb8b7ebc68fc0d6428440dc23a",
+      "pass": 6,
+      "fail": 0,
+      "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-async-independent/independent-sql-report.json",
+      "scope": "Fresh17/repeat/checksum/auditSQL/TLS; notwholeSB02"
+    },
+    "worker_bundle": {
+      "state": "IMPLEMENTING_AFTER_REAL_BUNDLE_FAILURE",
+      "owner": "/root/prd",
+      "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/worker-bundle/task.json",
+      "observed_original": {
+        "pass": 3,
+        "fail": 4
+      },
+      "findings": [
+        "Excelchild/tsx absent from actual NFT",
+        "sharp detect-libc transitive dependency missing in isolated OCR execution"
+      ],
+      "scope": "Packaging only; actual Vercel test remains later"
+    },
+    "audit_worksheet_preparation": {
+      "rows": 225,
+      "original_rows": 207,
+      "supabase_rows": 18,
+      "original_rows_equal": true,
+      "integrity_errors": 0,
+      "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/final-audit-preparation-state184.json",
+      "tool_regression": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/audit-tool-verification/result.json",
+      "product_tests_executed": 0,
+      "acceptance_claims": 0
+    },
+    "g18_readiness_gaps": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g18-readiness-gaps-state184.json"
   },
   "bounded_auth_release": {
     "candidate": "fb9dd23e04e823034bcc7f213dd78f93325c6ce2",
