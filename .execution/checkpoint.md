@@ -1,3 +1,7 @@
+# Current checkpoint — state165
+
+2026-09-22T00:02:51.620633+00:00; Workflow G17independent9dd4259/60; prd G14typed server/common0016; goals G14UI future aftertypedhandoff. Accepted15/19f48e. No AIintegrationacceptance yet. G17root1d60 verifies1843artifacts/720refs/457sources/914priorpairs/40commands/47ZIP; repaird02b raw0P4F→32P,13P5F→18P; actual40browser/16defaultskip keptseparate. RootgenericcopiedBeforeOpen hashchecker failure correctedwithoutdatachanges, recordedinreview. Formalverifierpacket f4a2753ca63a63b5746e5a8d5789eb5ffe18cad93472b9f8e781931ff3c01e16. Actualauthor07c1call preserved; finalindependentcallrequired. G14goals UI onlyaftertypednotyetassigned.
+
 # Current checkpoint — state164
 
 2026-09-21T23:53:33.292470+00:00; prd G14server/common0016; goalsG17finalUI; workflowboundedG17readonlyrepairpreparation thenG14typedUI orG17independent asresourceallows. Root G03currentreadiness only. Accepted15/19f48e. G14UIprep460c/root339f5inputs21sources verified. ai_verify followup tool thread-limit failed beforework; exactfailure retained, existingworkflow readonlyrepair taske938 assigned(no runtime). G03sourceaddendum has18sourcebindings: existingkanban/coassignment/timeline retained; ProductCards placeholder currentlyunused, avoidfalsevisibledefect. Goal ACTIVE, userenv/v2 unchanged.
