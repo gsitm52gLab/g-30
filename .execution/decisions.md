@@ -151,3 +151,20 @@ G13 committed UI-I leaves response.json unawaited beyond page teardown. Original
 
 ## 2026-09-21T23:46:01.968310+00:00 — G13 accepted; G14 narrow server implementation
 G13 exactf48e independently verified and integrated regression reviewed. Original19P1F preserved and testonly0c97closed4cases, freshintegration16realcases (rootoriginal12assumptioncorrectedaddendum5011). G14 begins onlyafterallsevenrequireddependenciesACCEPTED. New0016audit appendonly nolegacybackfill; optional typedmetadata andlistedproducerseams only, currentG17ai-review/service/SDK/package notowned. Finalsearch/history/price existence filters must beindependentlytested.
+
+
+## 2026-09-22T00:12:50.582242+00:00 — SDK envelope boundary and typed search handoff
+Independent G17-V01 uses real object:response and exposes SDK addOutputText before application metadata preservation; earlier author fixture omitted discriminator. Preserve original failing evidence, fix author-owned transport only, then new candidate independent validation. Actual configured verification call waits for repaired final path. G14 server typed7cf19 author634/check/build evidence reviewed; lease released, runtime/UI/independent still pending.
+
+
+### 2026-09-22T00:41:57.725451+00:00 — G17 acceptance and G03 canonical preparation
+G17 actual response/usage and error paths passed independent and integration review; no additional API call was necessary because provider source bytes were unchanged. Final legal accuracy remains unverified. G03 adopts separate all-GSG urgency and self-only delivered unread counts; Brand mine material counts; exact-submission external-use review cue without send/approval inference. G03 implementation still waits for G14 acceptance.
+
+
+## 2026-09-22T01:40:45.740480+00:00 — Supabase deployment and authorized g-30 push
+
+Latest user request selects Supabase PostgreSQL/private Storage, preserving all existing product ACs. Explicit non-force branch push permission supersedes prior push prohibition; remote main and legacy histories/data remain protected. Goal stays paused until the user restarts. execution-v3 adds SB-01~18, secure direct uploads/finalize immutable objects, bounded authorized large-file reads and actual multi-instance/Vercel acceptance. New remote main85bcb is byte-identical to historical f3f868c tree; preparation merge retains current product bytes. SUPABASE_URL/SECRET_KEY read-only Storage list succeeds; SQL URI checks pending. No implementation/runtime pass is claimed.
+
+### State 177 — 2026-09-22 credential preflight and fail-closed supplemental guard
+
+DATABASE_URL/Transaction pooler와 DIRECT_URL/Session pooler 모두 TLS 1.3·서버 인증서/hostname 검증을 포함한 READ ONLY SELECT 1 성공. Storage 인증 읽기 HTTP 200. public 테이블 0개, gs-hale-private 버킷 없음. 원격 데이터 변경 0회. 앱 통합/Vercel 환경변수 검증은 미실행. 첫 CA 오류 및 pooler backend SSL 지표의 진단 오류는 원본 결과에 보존했고 공식 CA와 실제 TLS 소켓을 확인하여 보완했다. 읽기 전용 연결은 SB 제품 수용 통과로 승격하지 않는다. 독립 검토에서 supplemental 설정 누락 우회를 발견해 고정 revision/경로/18 ID/필수 여부를 검사하도록 보완했다. 6개 guard 조건 검증 통과, 독립 후속 소스 검토 PASS.

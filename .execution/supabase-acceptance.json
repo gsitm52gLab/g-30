@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "revision": "SUPABASE-20260922-01",
+  "status": "PLANNED_NOT_IMPLEMENTED",
+  "active_goal_created": false,
+  "baseline_source_revision": "DP-20260921-03",
+  "baseline_accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
+  "checks": [
+    {
+      "id": "SB-01",
+      "goals": [
+        "G00",
+        "G02"
+      ],
+      "title": "서버 환경과 명시 모드",
+      "acceptance": "Supabase 설정 누락/잘못된 URI/키에서 안전한 오류를 반환하고 mock으로 fallback하지 않는다. secret은 서버 전용이며 런타임 pooler·migration 전용 연결을 구분한다. DB TLS의 서버 인증서와 hostname을 검증하며 필요한 공식 CA의 출처/해시/유효기간을 기록하고 검증을 비활성화하지 않는다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-02",
+      "goals": [
+        "G00",
+        "G14"
+      ],
+      "title": "PostgreSQL migration 동등성",
+      "acceptance": "최종 SQLite migration 전체의 테이블/JSON/부분 고유 인덱스/불변 trigger/관계 제약을 PostgreSQL 대응표와 음성 사례로 검증한다. 빈 DB 성공·반복 적용 0·checksum 변경 거부를 확인한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-03",
+      "goals": [
+        "G00",
+        "G06",
+        "G18"
+      ],
+      "title": "기존 데이터와 seed 보존",
+      "acceptance": "seed 재실행이 기존 변경을 덮지 않고 중복 생성하지 않는다. 기존 SQLite/파일이 있으면 복사본을 대상으로 ID/버전/시간/hash를 보존하는 import를 검증하고 원본을 삭제하지 않는다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-04",
+      "goals": [
+        "G02",
+        "G04",
+        "G05",
+        "G14"
+      ],
+      "title": "원자성·CAS·멱등",
+      "acceptance": "서로 다른 서버/DB 연결의 동시 수정·중복 제출에서 revision 충돌·고유 제약을 적용하고 자료/감사/영수증이 전부 commit 또는 rollback한다. READ/WRITE/phantom 경쟁과 timeout/복구를 검사한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-05",
+      "goals": [
+        "G01",
+        "G02"
+      ],
+      "title": "공유 로그인 세션",
+      "acceptance": "두 독립 서버와 두 실제 브라우저에서 로그인·CSRF·초대·중지/authVersion·로그아웃·세션 만료를 검증한다. 요청이 다른 인스턴스로 이동해도 정상 세션이 유지되고 철회는 반영된다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-06",
+      "goals": [
+        "G02",
+        "G06",
+        "G14"
+      ],
+      "title": "서버 권한과 DB 직접 접근 차단",
+      "acceptance": "모든 컨텍스트·역할·가격 행렬을 재검증하고 비회원/publishable key로 앱 전용 테이블/세션/내부 가격에 직접 접근하지 못함을 검사한다. secret의 RLS 우회는 서버 검사로 보완한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-07",
+      "goals": [
+        "G04",
+        "G05",
+        "G06",
+        "G09",
+        "G15"
+      ],
+      "title": "대용량 private 업로드",
+      "acceptance": "25MiB/10개 및 각 기능 고유 한도에서 직접 업로드·재개·부분 실패·중복 허가·권한 철회를 검증한다. Vercel 함수 body 제한을 넘는 단일 중계를 사용하지 않는다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-08",
+      "goals": [
+        "G04",
+        "G05",
+        "G07",
+        "G15"
+      ],
+      "title": "finalize와 객체 무결성",
+      "acceptance": "서버가 실제 bytes/크기/MIME signature/hash/object 소유·현재 요청 버전을 검증한다. 임의 key 재사용/중복 finalize/업로드 후 DB 실패/고아 임시 object의 복구와 제한된 정리를 검사한다. 업로드 허가 재사용·늦은 재개 업로드·upsert가 finalized 불변 object를 바꾸지 못하고, 검증 도중 bytes 교체·최종 hash/크기 확인·finalize와 cleanup 경합·Range 응답의 동일 object 버전을 검증한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-09",
+      "goals": [
+        "G02",
+        "G04",
+        "G06",
+        "G09"
+      ],
+      "title": "원본·다운로드·미리보기 철회",
+      "acceptance": "private 파일의 원본/참조 양쪽 현재 권한을 검사한다. 큰 파일 전체 다운로드 및 PDF/이미지 미리보기, Range·청크 경계와 도중 철회를 확인하고 장기 signed URL로 접근 검사를 우회하지 않는다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-10",
+      "goals": [
+        "G07"
+      ],
+      "title": "공유 Excel staging",
+      "acceptance": "미리보기 staging을 만든 서버와 적용 서버가 달라도 actor/context/hash/가격 권한/만료가 일치하며 원자 적용·CAS·재시도 영수증을 유지한다. 실패·빈·잘못된 숫자·반복 적용을 확인한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-11",
+      "goals": [
+        "G09",
+        "G13"
+      ],
+      "title": "다중 인스턴스 문의·알림",
+      "acceptance": "문의 cursor/재연결/누락 복구·공개/내부 lane·실시간 권한 철회 및 알림 recipient/중복 방지를 공유 DB에서 검증한다. app-open 전달을 실제 외부 메일이나 cron으로 과장하지 않는다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-12",
+      "goals": [
+        "G15",
+        "G16",
+        "G17"
+      ],
+      "title": "AI 실행 기록과 복구",
+      "acceptance": "plan/claim/lease/attempt/outcome/schema/usage/원문·corpus 버전이 Supabase에 보존된다. 중단·동시 실행·RESPONSE_UNKNOWN·명시 재시도 동의·bounded retry를 검사하고 실제 허용 입력 OpenAI 최소 호출을 새 경로와 연결한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-13",
+      "goals": [
+        "G07",
+        "G15",
+        "G18"
+      ],
+      "title": "Vercel parser·OCR 실행",
+      "acceptance": "배포된 Node runtime에서 Excel worker, PDF/image 추출, native 모듈과 일본어 OCR 자산, timeout/메모리/종료 정리를 검증한다. 지원 범위를 제거해서 통과하지 않는다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-14",
+      "goals": [
+        "G00",
+        "G05",
+        "G06",
+        "G18"
+      ],
+      "title": "실제 Supabase 영속 흐름",
+      "acceptance": "실제 허용 테스트 schema/private prefix에서 신규 입점과 스팟, 상품, 부분/전체·재제출, 파일·보완·수동 완료를 실행하고 서버 재시작/재로그인/별도 인스턴스 뒤 동일 값·버전·파일 hash를 확인한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-15",
+      "goals": [
+        "G18"
+      ],
+      "title": "실제 Vercel 배포 검증",
+      "acceptance": "배포 SHA·환경/도메인·APP_ORIGIN을 연결하고 PC/390px·두 독립 브라우저에서 요청→응답→첨부→문의/상품 흐름과 오류 복구를 확인한다. 배포 보호 401을 DB 성공/실패로 해석하지 않으며 접근 불가면 NOT_RUN/BLOCKED다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-16",
+      "goals": [
+        "G00",
+        "G16",
+        "G18"
+      ],
+      "title": "새 Git 원격과 main 근거",
+      "acceptance": "origin g-30, non-force 명시 ref push, remote SHA 일치, 과거 이력/사용자 변경 보존, secret/세션 원문 제외를 확인한다. 새 origin/main의 약기법 source manifest와 AI corpus 버전 대응을 검증한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-17",
+      "goals": [
+        "G00",
+        "G18"
+      ],
+      "title": "문서와 설치 재현",
+      "acceptance": "깨끗한 환경에서 README대로 install/dev/build/test/migration/seed/Supabase 실행을 재현한다. mock·SQLite 과거 증거와 Supabase·Vercel 실제 증거를 구분하고 현재 migration 수와 env 설명을 일치시킨다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "SB-18",
+      "goals": [
+        "G18"
+      ],
+      "title": "독립 최종 감사",
+      "acceptance": "기존 PRD-00~18의 91 AC, A01~A26, 모든 G 완료 조건과 SB-01~18을 각각 후보/통합 SHA와 실제 증거로 연결한다. 원래 207행 감사표의 세부 항목을 보존하고 신규 18행을 추가하며 제품 구현자가 아닌 감사자가 누락·미실행·한계를 확인한다.",
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "revision": "SUPABASE-20260922-01",
+  "platform_goal_status": "paused",
+  "activation": "user_will_resume",
+  "project_root": "/Users/evan/workspace/gs-hale",
+  "branch": "run/supabase-transition",
+  "origin": "https://github.com/gsitm52gLab/g-30.git",
+  "legacy_remote": "legacy-gs-hale",
+  "accepted_product_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
+  "historical_accepted_count": 16,
+  "historical_total": 19,
+  "historical_pending": [
+    "G14",
+    "G03",
+    "G18"
+  ],
+  "existing_sources": {
+    "g14_ui_candidate": "25ae3614de4a558f2682f690f410fbc100ab34c2",
+    "g14_provider_consumer": "01f09c0f89520a6e403c01e81903af915e8c4cf6",
+    "g14_preliminary_combined": "4093417",
+    "source_notes": "new packets arrived after state175; main evidence review remains required"
+  },
+  "supabase_configuration": {
+    "url_present": true,
+    "secret_present": true,
+    "database_url_present": true,
+    "migration_url_present": true,
+    "storage_read_only_http_status": 200,
+    "private_bucket_exists": false,
+    "remote_mutations": 0,
+    "sql_connection": "PASS_READ_ONLY_SELECT_1_BOTH_POOLERS",
+    "tls": "TLSv1.3_CERTIFICATE_AND_HOSTNAME_VERIFIED_WITH_OFFICIAL_CA",
+    "storage_bucket_variable_present": false,
+    "public_table_count": 0,
+    "checked_at": "2026-09-22T01:48:22.109Z",
+    "evidence": ".execution/private/preparation/SUPABASE-20260922-01/connection-check-1790041704368.json"
+  },
+  "next_steps": [
+    "Read execution-v3 override and current runtime ledger; observe actual Goal status without creating a second goal.",
+    "Recheck credentials and remote main; allocate isolated worktree/schema/bucket-prefix and fix shared async transaction/Storage contracts.",
+    "Review arrived G14 packets and complete required candidate integration before dependent G03 work; retain all failed evidence.",
+    "Implement Supabase migration/repository and Storage/auth adaptation with explicit file ownership, then independent validation on exact candidate.",
+    "Run affected G00~18 plus SB-01~18 on real Supabase and actual Vercel; finish G03/G14/G18 and independent final audit.",
+    "Push reviewed commits to the authorized g-30 branch; compare remote SHA; integrate main only after required verification and current-remote review."
+  ],
+  "required_supabase_acceptance": "docs/execution-v3/02-supabase-acceptance.json",
+  "supabase_runtime_pass_count": 0,
+  "vercel_runtime_pass_count": 0
+}

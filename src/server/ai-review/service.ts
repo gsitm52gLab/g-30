@@ -1,3 +1,4 @@
+import { AiProviderService } from '@/server/ai-provider/service';
 import { createHash } from 'node:crypto';
 import type { IdentityService } from '@/server/auth/service';
 import type { ExtractionSnapshot } from '@/domain/ai-input/types';
@@ -32,6 +33,7 @@ export class AiReviewService {
     })) fail('SOURCE_CHANGED', 409, '읽은 원본이 변경되었습니다. 원본과 읽기 버전을 확인해 주세요.');
   }
   async start(token: string | undefined, inputIdValue: string, raw: Record<string, unknown>) {
+    if (raw.engine === 'provider') return new AiProviderService(this.identity, this.directory).start(token, inputIdValue, raw);
     const input = obj(raw, ['inputVersionId', 'extractionRunId', 'expectedRunId', 'corpusReleaseId', 'corpusManifestHash', 'engine', 'idempotencyKey']), inputId = id(inputIdValue), versionId = id(input.inputVersionId), extractionRunId = id(input.extractionRunId);
     const corpusReleaseId = id(input.corpusReleaseId), corpusManifestHash = str(input.corpusManifestHash, 64); str(input.idempotencyKey);
     if (input.expectedRunId !== null) id(input.expectedRunId);
@@ -45,7 +47,7 @@ export class AiReviewService {
         const previous = s.list('aiAnalysisRun', contextId).filter(r => r.data.inputVersionId === versionId).sort((a, b) => runData(b.data).attempt - runData(a.data).attempt)[0];
         if ((previous?.id ?? null) !== input.expectedRunId) fail('CONFLICT', 409, '현재 분석 실행을 다시 확인해 주세요.');
         if (previous) {
-          const summary = runSummary(previous, this.clock), d = runData(previous.data), sameBasis = d.extractionRunId === extractionRunId && d.corpusReleaseId === corpus.id;
+          const summary = runSummary(previous, this.clock), d = runData(previous.data), sameBasis = d.extractionRunId === extractionRunId && d.corpusReleaseId === corpus.id && d.engine === SYNTHETIC_ENGINE.engine && d.modelId === SYNTHETIC_ENGINE.modelId && d.promptVersion === SYNTHETIC_ENGINE.promptVersion;
           if (summary.state === 'queued') {
             if (sameBasis) return { ids: [previous.id] };
             // Explicitly replacing a stale queued basis must not strand all later work on this version.

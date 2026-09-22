@@ -86,6 +86,35 @@ for rows, ids, label in [
 for row in deferred:
     completion_rows(row.get('check_groups', []), 'deferred producer/consumer groups')
 completion_rows([r for r in trace['external_levels'] if r.get('required_for_goal')], 'required external integration')
+supplemental_contract = {
+    'revision': 'SUPABASE-20260922-01',
+    'baseline_path': 'docs/execution-v3/02-supabase-acceptance.json',
+    'runtime_path': '.execution/supabase-acceptance.json',
+    'expected_ids': [f'SB-{i:02}' for i in range(1, 19)],
+    'required_for_goal': True,
+}
+supplemental = state.get('supplemental_acceptance')
+if not isinstance(supplemental, dict):
+    errors.append({'group': 'supplemental contract', 'error': 'required Supabase contract missing'})
+else:
+    for field, expected in supplemental_contract.items():
+        if supplemental.get(field) != expected:
+            errors.append({'group': 'supplemental contract', 'error': f'required {field} changed'})
+# Read fixed paths even when the runtime ledger omits or changes its declaration.
+supplemental_baseline = read(supplemental_contract['baseline_path'])
+supplemental_runtime = read(supplemental_contract['runtime_path'])
+for label, document in [('supplemental baseline', supplemental_baseline), ('supplemental runtime', supplemental_runtime)]:
+    if document.get('revision') != supplemental_contract['revision']:
+        errors.append({'group': label, 'error': 'required revision changed'})
+originals = index(supplemental_baseline['checks'], supplemental_contract['expected_ids'], 'supplemental baseline')
+checks = index(supplemental_runtime['checks'], supplemental_contract['expected_ids'], 'supplemental runtime')
+supplemental_count = len(checks)
+for check_id, original in originals.items():
+    if check_id in checks:
+        for field in ['goals', 'acceptance']:
+            if checks[check_id].get(field) != original[field]:
+                errors.append({'id': check_id, 'error': f'supplemental {field} changed; explicit review required'})
+completion_rows(supplemental_runtime['checks'], 'required Supabase/Vercel integration')
 final = tasks.get('G18', {})
 if final.get('state') == 'ACCEPTED' and final.get('integration_commit') != state.get('accepted_commit'):
     errors.append({'id': 'G18', 'error': 'final audited integration SHA differs from accepted SHA'})
@@ -95,6 +124,7 @@ report = {
     'accepted_checkpoints': sum(t['state'] == 'ACCEPTED' for t in tasks.values()),
     'total_checkpoints': 19,
     'total_acceptance_criteria': sum(len(t['acceptance']) for t in tasks.values()),
+    'total_supplemental_acceptance_criteria': supplemental_count,
     'integrity_errors': errors,
     'pending': pending,
     'ready_for_final_semantic_audit': not errors and not pending,
