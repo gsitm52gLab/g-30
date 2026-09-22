@@ -1,3 +1,5 @@
+import { storageRelations } from './storage';
+import { auditRelations } from './audit';
 // Explicit asynchronous counterpart of src/domain/constraints.ts; source hash tracked in source-map.json.
 import type { AsyncUnitOfWork as UnitOfWork } from '../types';
 import { schedulingRelations } from "./scheduling";
@@ -17,6 +19,8 @@ import { productRelations } from "./products";
 import { taskRelations } from "./tasks";
 /** Same constraints for mock/SQLite; SQL adds cross-process uniqueness. */
 export async function checkRelations<K extends RecordKind>(store: UnitOfWork, kind: K, input: RecordInput<K>) {
+    await storageRelations(store, kind, input);
+    await auditRelations(store, kind, input);
     (await schedulingRelations(store, kind, input));
     (await notificationRelations(store, kind, input));
     (await providerRelations(store, kind, input));

@@ -3,8 +3,8 @@
   "product": "GS HALE",
   "project_root": "/Users/evan/workspace/gs-hale",
   "source_revision": "DP-20260921-03",
-  "plan_status": "EXECUTING_EXPLICIT_AUTH_FIX",
-  "active_goal_count": 0,
+  "plan_status": "EXECUTING_SUPABASE_GOAL",
+  "active_goal_count": 1,
   "intended_active_goal_count": 1,
   "runtime_state_path": ".execution/run-plan.json",
   "max_sessions_including_main": 4,
@@ -99,7 +99,8 @@
       "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/verification-result.json",
       "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g00-regression",
       "accepted_at": "2026-09-21T09:00:14.945901+00:00",
-      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/regression-result.json"
+      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G00/1/regression-result.json",
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G01",
@@ -183,7 +184,8 @@
       ],
       "regression_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g01-regression",
       "accepted_at": "2026-09-21T09:57:00.305686+00:00",
-      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/regression-result.json"
+      "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G01/2/regression-result.json",
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G02",
@@ -312,7 +314,8 @@
       "accepted_at": "2026-09-21T10:50:09.785645+00:00",
       "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/regression-result.json",
       "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G02/1/main-acceptance.json",
-      "open_defects": []
+      "open_defects": [],
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G03",
@@ -327,49 +330,64 @@
         "G13",
         "G14"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTED_BOUNDED_CORE_ACCEPTED_CROSSFEATURE_PENDING",
       "required_for_product_completion": true,
-      "candidate_commit": null,
-      "integration_commit": null,
-      "implementer_session_id": null,
-      "verifier_session_id": null,
+      "candidate_commit": "a6def5b280c21783400beaaef2a3329e85eb4b53",
+      "integration_commit": "4a7a2999caf69570778f9e74d8720ae09ef924eb",
+      "implementer_session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
+      "verifier_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "attempt": 0,
       "owned_paths": [],
-      "actual_worktree_cwd": null,
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g03-supabase-home",
       "evidence_root": ".execution/private/runs/<run-id>/G03/<attempt>/",
       "acceptance": [
         {
           "id": "AC-03-01",
           "expected": "신규 배정 업무가 해당 브랜드 홈과 GSG 홈에 같은 담당·기한으로 나타난다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_BOUNDED_G03_CORE_FINAL_INTEGRATION_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         },
         {
           "id": "AC-03-02",
           "expected": "모든 주요 메뉴에서 목록→상세→관련 업무/상품으로 실제 이동한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PARTIAL_CROSSFEATURE_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         },
         {
           "id": "AC-03-03",
           "expected": "상품정보가 독립 메뉴로 표시되고 등록/수정 동작에 연결된다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_BOUNDED_G03_CORE_FINAL_INTEGRATION_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         },
         {
           "id": "AC-03-04",
           "expected": "모바일·키보드로 요청 확인→답변→첨부→문의 흐름을 완료한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PARTIAL_CROSSFEATURE_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         },
         {
           "id": "AC-03-05",
           "expected": "로그인·홈·앱 헤더·메타데이터와 발표 표지/도입/대본에서 지정 문구의 철자·띄어쓰기·내용이 원문과 일치한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_BOUNDED_G03_CORE_FINAL_INTEGRATION_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
+      "next_action": "Complete integrated mobile keyboard attachment/inquiry and all main menu deep links; do not mark wholeG03accepted yet.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/task-draft.json",
         "sha256": "d18132b3295ed9f52592aa21b58ac0c5d5d2f433932afb45789755036a1356ab"
@@ -398,7 +416,9 @@
       "route_navigation_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/route-navigation-preparation-task.json",
         "sha256": "59f6527a752809e8a0de4f3afff048122e78ca83a5bb54f82cc65bcab4bc0c58"
-      }
+      },
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-home-independent/result.json",
+      "bounded_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
     },
     {
       "id": "G04",
@@ -818,7 +838,8 @@
       },
       "accepted_at": "2026-09-21T12:26:19.572306+00:00",
       "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G04/4/main-acceptance.json",
-      "regression_result_sha256": "d0c0a86edc40ac4cfb95522474a864de2effdfc641a22e0a0298cbcc9b40513b"
+      "regression_result_sha256": "d0c0a86edc40ac4cfb95522474a864de2effdfc641a22e0a0298cbcc9b40513b",
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G05",
@@ -1031,7 +1052,8 @@
           "closure_evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G05/1/main-acceptance.json"
         }
       ],
-      "open_findings": []
+      "open_findings": [],
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G06",
@@ -1317,7 +1339,8 @@
       "regression_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/regression-task.json",
       "accepted_at": "2026-09-21T14:03:46.600408+00:00",
       "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/regression-result.json",
-      "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json"
+      "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G06/1/main-acceptance.json",
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G07",
@@ -1579,7 +1602,8 @@
       "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-acceptance.json",
       "main_acceptance_sha256": "cf5e05785a2f1094b1490c834043d305fbd022838d4ab061cd7f4d4d01cac802",
       "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/regression-result.json",
-      "main_regression_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-regression-review.json"
+      "main_regression_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G07/3/main-regression-review.json",
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G08",
@@ -1740,7 +1764,8 @@
       "accepted_at": "2026-09-21T17:42:42.262885+00:00",
       "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-acceptance.json",
       "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/regression-result.json",
-      "main_regression_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-regression-review.json"
+      "main_regression_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G08/1/main-regression-review.json",
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G09",
@@ -1942,7 +1967,8 @@
       "main_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-acceptance.json",
       "main_acceptance_sha256": "2da8d439f6f3ca3dbc113202959cd53e2cc61d7cfbc4eaf546b4647c7520a771",
       "regression_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/regression-result.json",
-      "main_regression_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-regression-review.json"
+      "main_regression_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G09/1/main-regression-review.json",
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G10",
@@ -2144,7 +2170,8 @@
       "main_acceptance_ref": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G10/1/main-acceptance.json",
         "sha256": "1828dce60a1ba4dd50b2fd17482b6f19faf96135482d0a42f2ad073108c27595"
-      }
+      },
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G11",
@@ -2408,7 +2435,8 @@
       "regression_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G11/1/main-regression-review.json",
         "sha256": "f286dae5e4a9641211de5d2c222ef7d196df55e0eea772bba4252ab45fc025a3"
-      }
+      },
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G12",
@@ -2659,7 +2687,8 @@
       "regression_scope_addendum": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G12/1/regression-scope-addendum.json",
         "sha256": "129403a219b1513a1aba7383232c66a740c650f9bc0339bebd7d09c2b8a1d9ac"
-      }
+      },
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G13",
@@ -2908,7 +2937,8 @@
       "implementer_session_ids": [
         "01a0c307-c975-75b1-b96a-5a5c4e448aec",
         "01a0c307-9b54-7b83-b5eb-1b12b9a8553c"
-      ]
+      ],
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G14",
@@ -2923,7 +2953,7 @@
         "G12",
         "G13"
       ],
-      "state": "VERIFYING",
+      "state": "STALE",
       "required_for_product_completion": true,
       "candidate_commit": "fa2491b062777dbfc43ec9d078216975af86d116",
       "integration_commit": null,
@@ -2959,7 +2989,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Exact combined candidate independent verification running; no AC accepted until evidence review and integration regression.",
+      "next_action": "Independent exact fa2491b local mock/SQLite result PASS; requires async/Supabase adaptation then new independent/integrated regression before acceptance.",
       "readonly_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/preparation-task.json",
         "sha256": "8d2e5fb5bc7c7c59a0c1db0c615a3f8625ecd293b9d120d2402970426dd6bdab"
@@ -3452,7 +3482,8 @@
       "main_acceptance": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G15/1/main-acceptance.json",
         "sha256": "9a21d4c1a9d8925c55490e23656859d608562e58f11987eec020a4dcefd3a933"
-      }
+      },
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G16",
@@ -3701,7 +3732,8 @@
       "implementer_session_ids": [
         "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
         "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a"
-      ]
+      ],
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G17",
@@ -4001,7 +4033,8 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/regression/main-regression-review.json",
         "sha256": "8212f6c52d781235ee12af86f1ea9fc9b26ff5ff69c2079136471f3ea6661941"
       },
-      "open_defects": []
+      "open_defects": [],
+      "supabase_revalidation": "REQUIRED; historical mock/SQLite acceptance is not async/Supabase acceptance"
     },
     {
       "id": "G18",
@@ -4118,9 +4151,9 @@
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
-  "current_goal": "User-authorized Supabase shared-session/login fix; platform Goal remains paused",
-  "next_action": "Compose async core/consumer candidate under AUTH-DURABILITY-20260922-01; independent foundation then exact union validation; two-server session/CSRF and cross-instance revocation; integrate regression and non-force main push after current remote review. Preserve remaining Goal and Storage checkpoints.",
-  "state_version": 179,
+  "current_goal": "Active full GS HALE implementation and Supabase revalidation; bounded deployed auth accepted, complete Goal not achieved",
+  "next_action": "G03 bounded home core accepted4a7a299 (928check/build); finish FileLink929 browser contract verification to unblockS3, independent S2 candidate4345 andS4 product3818/helpera862 actual verification; full journeys/SB05/Vercel/API/finalaudit remain.",
+  "state_version": 194,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4155,13 +4188,14 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T02:15:41.860236+00:00",
+  "updated_at": "2026-09-22T05:32:45.129399+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
-    "status": "paused",
-    "observed_at": "2026-09-22T02:15:41.860236+00:00",
-    "interpretation": "New explicit user request authorizes bounded login fix; no create/update/resume Goal tool invoked."
+    "status": "active",
+    "observed_at": "2026-09-22T04:17:56.170871+00:00",
+    "source": "get_goal tool in current continuation",
+    "previous_goal_turn_classification": "PROGRESS: actual session-log validation changed selection next action; Worker cause isolated and author906 completed syntheticallNFT+7actual; S1contract6e6 frozen864check; user now cancels submission-log task only."
   },
   "session_log_submission_derivative": {
     "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/submission-log-derivatives/state122/manifest.json",
@@ -4228,18 +4262,18 @@
     "resume_prompt": "docs/execution-v3/05-goal-prompt.md",
     "resume_plan": "docs/execution-v3/04-resume-plan.json",
     "historical_acceptance_is_not_supabase_acceptance": true,
-    "runtime_status": "AUTH_DURABILITY_IMPLEMENTING",
-    "preflight": "Real SQL/TLS credential preflight passed. Foundation candidate built and remotely tested; private Storage bucket created and primitives candidate ready. Neither wired into deployed app yet.",
+    "runtime_status": "AUTH_MINIMUM_DEPLOYED_VERIFIED_FULL_REVALIDATION_REQUIRED",
+    "preflight": "Actual PostgreSQL shared auth deployed; bounded Storage primitives accepted. Worker packaging independentPASS integrated under regression. AppStorage not yet wired.",
     "origin": "https://github.com/gsitm52gLab/g-30.git",
     "previous_remote": "legacy-gs-hale",
     "source_review_session_id": "01a0c6bc-d9f3-73f1-ae63-d88781905c0a",
     "preflight_evidence": ".execution/private/preparation/SUPABASE-20260922-01/connection-check-1790041704368.json",
     "guard_review": "Independent read-only review found missing-contract bypass; fixed fail-closed contract and 6/6 targeted checks; independent follow-up source review PASS. Product runtime NOT_RUN.",
-    "previous_turn_classification": "PROGRESS: real credential/TLS preflight and v3 contract commit/push; no product completion",
+    "previous_turn_classification": "PROGRESS: actual session-log validation changed selection next action; Worker cause isolated and author906 completed syntheticallNFT+7actual; S1contract6e6 frozen864check; user now cancels submission-log task only.",
     "active_tasks": [
       {
         "id": "G14-FINAL-INDEPENDENT",
-        "state": "PASS_NOT_INTEGRATED",
+        "state": "HISTORICAL_LOCAL_PASS_ASYNC_PORT_REQUIRED",
         "session_id": "01a0c6d2-65c7-70e2-9e2f-0fb4f74dd58b",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g14-final-verification",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-final-verify-task.json",
@@ -4254,7 +4288,7 @@
       },
       {
         "id": "SB-DB-FOUNDATION",
-        "state": "INDEPENDENT_VERIFYING",
+        "state": "INTEGRATED_BOUNDED_RUNTIME_VERIFIED",
         "session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/sb-postgres-foundation",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/postgres-foundation-task.json",
@@ -4268,12 +4302,12 @@
           "package-lock.json"
         ],
         "evidence_dir": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/postgres-foundation",
-        "integration_acceptance": "NOT_RUN",
+        "integration_acceptance": "Foundation and auth checks only; full SB acceptance incomplete",
         "candidate_commit": "d6838bb6247fbb213187db624a411f51bb5fa429"
       },
       {
         "id": "SB-STORAGE-FOUNDATION",
-        "state": "CANDIDATE_NOT_INDEPENDENTLY_VERIFIED",
+        "state": "ACCEPTED_BOUNDED_PRIMITIVES",
         "session_id": "01a0c6d2-bbfc-7443-9085-2923497dc707",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/sb-storage-foundation",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation-task.json",
@@ -4285,9 +4319,11 @@
           "docs/storage/storage-*.md"
         ],
         "evidence_dir": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation",
-        "integration_acceptance": "NOT_RUN",
-        "candidate_commit": "2f5d0d11090a487bb3bad791b31f957a8332b12b",
-        "result": ".execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation/implementation-result.json"
+        "integration_acceptance": "38targeted unit and typecheck passed on3dd9078; no app/SB acceptance",
+        "candidate_commit": "880f15c27123383cf580fc2e58e4e7b41a32c401",
+        "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-integration/result.json",
+        "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-independent/result.json",
+        "integration_commit": "3dd9078dadb6a8cc4e0817aba526830f691963da"
       }
     ],
     "current_deployment": {
@@ -4296,10 +4332,10 @@
       "team": "plai-developer-league-2026",
       "project": "g-30",
       "source_branch": "main",
-      "source_commit": "fe2932ef422f4734b91c0ffcc113b70dd55c143b",
-      "deployment_id": "FKxzkRbdk2cY6PcVh2VksdBBzDM5",
-      "status": "Ready",
-      "observed_via": "Native Comet browser, user-authenticated Vercel project Overview; production auto-deploy on main push"
+      "source_commit": "eece434adf3793fd7a603f997eee15f729c4eef0",
+      "deployment_id": "H13c6Cc3vAmG7QwUcw6ZMMXNb4ug",
+      "status": "Exact deployment login/navigation browser verified",
+      "observed_via": "GitHub Vercel status plus actual production API and root IAB browser"
     },
     "auth_durability_contract": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/contract.json",
     "source_only_login_diagnosis": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/deployment-before.json",
@@ -4308,14 +4344,407 @@
         "id": "SB-AUTH-CORE",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/core-task.json",
         "session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
-        "state": "IMPLEMENTING"
+        "state": "INTEGRATED_BOUNDED_AUTH_VERIFIED"
       },
       {
         "id": "SB-AUTH-CONSUMERS",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/consumers-task.json",
         "session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
-        "state": "IMPLEMENTING"
+        "state": "INTEGRATED_BOUNDED_AUTH_VERIFIED"
       }
-    ]
+    ],
+    "current_parallel_tasks": [
+      {
+        "id": "S2-FILES-SUBMISSIONS-UI-WRAPPERS",
+        "owner": "/root/sb_postgres_foundation",
+        "state": "CANDIDATE_FROZEN_AUTHOR_ACTUAL_AND_S4_INDEPENDENT",
+        "base_commit": "d09c76efaa01e53aa1137f9c8e92c5a6d2557010",
+        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-files-submissions/task.json",
+        "shared_helper_candidate": "a38597ab535932a5755ea4689a75db161f6c9fd9",
+        "helper_state": "ACCEPTED_BOUNDED_SHARED_FILE_CONTRACT",
+        "helper_previous_failures": [
+          "63authpurge/reselection2red",
+          "822lateabort13P1F"
+        ],
+        "other_g03_candidate": "a6def5b280c21783400beaaef2a3329e85eb4b53",
+        "g03_state": "ACCEPTED_BOUNDED_HOME_CORE",
+        "g03_actual_product_latency": {
+          "before_ms": 58182,
+          "after_ms": 5975,
+          "before_reads": 418,
+          "after_reads": 41,
+          "writes": 0,
+          "dto_identical": true
+        },
+        "candidate": "4345d4a087a7d7f934fe574b7f5a64d10752bbf6",
+        "author_unit_pass": 915
+      },
+      {
+        "id": "S3-INQUIRY-AND-BOUNDED-VERIFICATION",
+        "owner": "/root/prd",
+        "state": "S3_EARLY_FROZEN_FILELINK_INDEPENDENT_THEN_S2_INDEPENDENT",
+        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-inquiries/task.json",
+        "helper_verification_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-contract-independent/task.json",
+        "g03_candidate_under_verification": "a6def5b280c21783400beaaef2a3329e85eb4b53",
+        "g03_pass": "OwnPGhome PC/mobile/restart, scalarfault503/recovery,55baseline+101affectedunit,2redclosed",
+        "g03_remaining": "Actual product create/edit/reload and saved AI navigation passed on ab241. Task reply form still timed out before POST; verify final workspace read delta. Attachments later S2/S3.",
+        "candidate": "d22477f",
+        "filelink_candidate": "929adfd9c3fdaad3b682d50e0ce5c1b026cc1f45",
+        "g03_state": "BOUNDED_INDEPENDENT_PASS_INTEGRATED"
+      },
+      {
+        "id": "S4-EXCEL-AI",
+        "owner": "/root/supabase_scope_review",
+        "state": "PRODUCT_FROZEN_AUTHOR_BROWSER_CONTINUATION",
+        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-excel-ai/task.json",
+        "candidate": "a86296b8a4b156e4c9a771ee1ae3f7e2dbce4290",
+        "author_units": 214,
+        "actual_pass": 11,
+        "actual_fail": 0,
+        "actual_scope_correction": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-excel-ai/actual-server-01-scope-correction.json",
+        "actual_export_bytes": 5315786,
+        "not_run": [
+          "TwoNextHTTP/browser",
+          "Genuine crosscontextexport negative",
+          "OldAIversionafternewversion",
+          "Grantrevokereplay"
+        ],
+        "delta": "AI-only WebPpreservation includingcommoncore/servertransportnarrowlease",
+        "exclusive_migrations": [
+          "SQLite0018",
+          "PostgreSQL0019"
+        ],
+        "runtime_resources": "baseline23856terminal0,6ownkeyscleaned,poolsclosed",
+        "shared_helper_dependency": "ACCEPTED ca17949",
+        "large_json_transfer": "Preserve full source/preview JSON with current ACL checked bounded ranges; no additional schema or value truncation",
+        "product_source_candidate": "3818dff8c5d53d8b4318d058138ab1bce568290f",
+        "author_webp_actual_pass": 5,
+        "author_browser_excel_pass": 2,
+        "author_browser_mobile": "Original selector timeout retained; role-selector continuation in progress"
+      }
+    ],
+    "storage_primitive_acceptance": {
+      "status": "ACCEPTED_BOUNDED_STORAGE_PRIMITIVES",
+      "candidate": "880f15c27123383cf580fc2e58e4e7b41a32c401",
+      "integration_commit": "3dd9078dadb6a8cc4e0817aba526830f691963da",
+      "root_cwd": "/Users/evan/workspace/gs-hale",
+      "independent_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-harness-repair/independent/result.json",
+      "independent_sha256": "5cdcff3c41495f48baf1323491b531736fe1d3e010597ac26427e07759b93d7a",
+      "root_review": {
+        "artifact_hashes_checked": 8,
+        "mismatches": 0,
+        "source_scope": "Five additive primitive/test/probe/doc files only; app flows not yet wired"
+      },
+      "independent_counts": {
+        "unit_pass": 38,
+        "unit_fail": 0,
+        "actual_adversarial_pass": 7,
+        "actual_adversarial_fail": 0
+      },
+      "integration_counts": {
+        "unit_pass": 38,
+        "unit_fail": 0,
+        "unit_skip": 0,
+        "typecheck_exit": 0
+      },
+      "commands": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-integration/commands.json",
+      "not_run": [
+        "App direct upload/finalize/shared grants",
+        "Browser10files/25MiB",
+        "Current app ACL/range revocation",
+        "Full SB acceptance"
+      ],
+      "at": "2026-09-22T03:06:52.211507+00:00"
+    },
+    "g14_actual_schema_independent": {
+      "candidate": "5cc1c283e1f816eb8b7ebc68fc0d6428440dc23a",
+      "pass": 6,
+      "fail": 0,
+      "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-async-independent/independent-sql-report.json",
+      "scope": "Fresh17/repeat/checksum/auditSQL/TLS; notwholeSB02"
+    },
+    "worker_bundle": {
+      "state": "ACCEPTED_BOUNDED_LOCAL_WORKER_PACKAGING",
+      "owner": "/root/supabase_scope_review",
+      "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/worker-bundle/task.json",
+      "observed_original": {
+        "pass": 3,
+        "fail": 4
+      },
+      "findings": [
+        "Excelchild/tsx absent from actual NFT",
+        "sharp detect-libc transitive dependency missing in isolated OCR execution"
+      ],
+      "scope": "Packaging only; actual Vercel test remains later",
+      "candidate": "906067c9514a15493092904f9b10582e28d2372f",
+      "integration_commit": "401e6eac89af5ca52d6179d76de73a1483f9694b",
+      "independent_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/worker-bundle-independent/verification-result.json",
+      "artifact_hashes_verified": 116,
+      "artifact_hash_errors": 0,
+      "independent_checks": {
+        "isolated": 7,
+        "dependency_walk": 5,
+        "semantic": 7
+      },
+      "root_process_session": null,
+      "deployed_execution": "NOT_RUN",
+      "integration_probe_exit": 143,
+      "root_finding": "Actual populatedroot NFT322466 entries included268746 lexicalworktree and50092 privateevidence; noenv0. Root stopped own probe before deployment. Leancheckout PASS retained; notaccepted.",
+      "fix_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/worker-bundle-root-leak-fix/task.json",
+      "latest_candidate": "906067c9514a15493092904f9b10582e28d2372f",
+      "current_root": "1c05441fba869fbe40a8b2d4c7f3895d8293e60d",
+      "root_regression": "FAIL retained, fresh unchanged build repeated guard rejection; cache-only hypothesis disproved,0copies",
+      "cause": "Turbopack include expansion appends nested files after exclusion; supported webpack tracing final exclusions tested",
+      "new_author_counts": {
+        "all_nft": 133,
+        "entries": 36718,
+        "denied": 0,
+        "isolated_pass": 7,
+        "isolated_fail": 0
+      },
+      "independent_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/worker-webpack-independent/task.json",
+      "acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/worker-webpack-root-integration/acceptance.json",
+      "root_result": {
+        "build_exit": 0,
+        "all_nft": 133,
+        "denied_entries": 0,
+        "worker_pass": 7,
+        "worker_fail": 0,
+        "g14_http_pass": 28,
+        "g14_http_fail": 0,
+        "g14_http_skip": 0
+      }
+    },
+    "audit_worksheet_preparation": {
+      "rows": 225,
+      "original_rows": 207,
+      "supabase_rows": 18,
+      "original_rows_equal": true,
+      "integrity_errors": 0,
+      "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/final-audit-preparation-state184.json",
+      "tool_regression": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/audit-tool-verification/result.json",
+      "product_tests_executed": 0,
+      "acceptance_claims": 0
+    },
+    "g18_readiness_gaps": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g18-readiness-gaps-state184.json",
+    "g14_author_evidence_review": {
+      "candidate": "15233cde67d462e0fd6791e76ddd25340f14ac96",
+      "artifacts": 918,
+      "mismatches": 0,
+      "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-async-port-root-manifest-review.json",
+      "acceptance": "PENDING_INDEPENDENT_ACTUAL_MOBILE_AND_INTEGRATION"
+    },
+    "estimate": {
+      "at": "2026-09-22T03:43:18.391653+00:00",
+      "hours": [
+        4,
+        8
+      ],
+      "certainty": "Provisional scope estimate, not deadline commitment",
+      "remaining": [
+        "Storageapplication flows",
+        "rolehome",
+        "fullSupabase workflows",
+        "deployedparser/OCR andAI",
+        "final225rowaudit"
+      ]
+    },
+    "g14_async_contract_acceptance": {
+      "status": "ACCEPTED_BOUNDED_ASYNC_SEARCH_AUDIT_SCHEMA_CONTRACT",
+      "candidate": "15233cde67d462e0fd6791e76ddd25340f14ac96",
+      "integration_commit": "92eba683afa6e68692b0c2761bc87a460ad9cea9",
+      "root_units": 824,
+      "root_fail": 0,
+      "root_skip": 0,
+      "lint": 0,
+      "typecheck": 0,
+      "unchanged_candidate_paths": 90,
+      "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-integration/acceptance.json",
+      "not_claimed": "WholeG14 allproducerSupabase/fullGoal/finaldeployment; rootbuild0 and HTTP28PASS but separate Worker packaging failed.",
+      "root_postmerge_http": {
+        "commit": "1c05441fba869fbe40a8b2d4c7f3895d8293e60d",
+        "pass": 28,
+        "fail": 0,
+        "skip": 0,
+        "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/worker-root-fixed-integration/g14-http-report.json"
+      }
+    },
+    "storage_s1_next": {
+      "state": "ACCEPTED_BOUNDED_STORAGE_S1_CORE",
+      "owner": "/root/prd",
+      "base_commit": "e5e653bc149690873dfa32c4daf4ca16eddbf954",
+      "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-app-core/task.json",
+      "packet_sha256": "b35c58e23c99c2207d86e4958cb11ad34b9f30b430d76e8211c849a16b0c22da",
+      "dependency": "G14async/schema boundedcontract accepted; Workerpackaging disjoint so no need consume unverifiedfix",
+      "candidate": "c5dc4990105cecb33f5c8895a14e0d34f7875a38",
+      "author_check_pass": 864,
+      "author_core_pass": 40,
+      "independent_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-core-independent/task.json",
+      "independent_unit_pass": 191,
+      "independent_new_invariant_pass": 12,
+      "integration_commit": "d09c76efaa01e53aa1137f9c8e92c5a6d2557010",
+      "acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-core-root-integration/acceptance.json",
+      "root_unit_pass": 877,
+      "independent_actual_pass": 16,
+      "final_absent_pass": 3,
+      "independent_artifacts": 75,
+      "tracked_nonblocking": [
+        "Ready staging duplicate retention roughly2x; no automatic final deletion"
+      ]
+    },
+    "public_key_configuration": {
+      "state": "PRESENT_ACTUAL_DIRECT_GATE_PASS",
+      "variable": "SUPABASE_PUBLISHABLE_KEY",
+      "required_for": "SB06 direct gateway and role/schema denials only",
+      "other_work_continues": true,
+      "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/sb06-direct-access-independent/root-review.json",
+      "counts": {
+        "pass": 11,
+        "fail": 0,
+        "not_run": 0
+      },
+      "limit": "Not full app role/channel matrix"
+    },
+    "shared_file_contract": {
+      "candidate": "a38597ab535932a5755ea4689a75db161f6c9fd9",
+      "state": "ACCEPTED_BOUNDED_SHARED_FILE_CONTRACT",
+      "root_source_review_822": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-files-submissions/root-contract-author-review.json",
+      "author_test_count": 22,
+      "feature_wiring_actual": "NOT_RUN",
+      "integration_commit": "ca17949d8716ffdf317709ec8c464ad4b9a57c7c",
+      "independent_pass": 38,
+      "independent_fail": 0,
+      "root_pass": 113,
+      "root_fail": 0,
+      "root_typecheck_exit": 0,
+      "root_lint_exit": 0,
+      "acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-contract-root-integration/acceptance.json"
+    },
+    "g03_bounded_acceptance": {
+      "status": "ACCEPTED_BOUNDED_G03_HOME_NAVIGATION_CORE",
+      "at": "2026-09-22T05:32:45.129399+00:00",
+      "candidate": "a6def5b280c21783400beaaef2a3329e85eb4b53",
+      "integration_commit": "4a7a2999caf69570778f9e74d8720ae09ef924eb",
+      "cwd": "/Users/evan/workspace/gs-hale",
+      "author_session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
+      "independent_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+      "independent_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-home-independent/result.json",
+      "independent_result_sha256": "5c5926e233d2c1017b50ee144c6edcba0b47e7a74f3f7cd2e0027a0973dae6cd",
+      "independent_artifacts_verified": 128,
+      "independent_traces_crc_verified": 9,
+      "root": {
+        "unit_pass": 928,
+        "unit_fail": 0,
+        "unit_skip": 0,
+        "lint_exit": 0,
+        "typecheck_exit": 0,
+        "build_exit": 0,
+        "candidate_source_paths_identical": 27
+      },
+      "actual_final_browser": {
+        "desktop_and_mobile_answer_save_reload_related_product_pass": 2,
+        "new_pid_relogin_preserved_answer_ai_pass": 1,
+        "source_bound_prior": "Own realPG home5 + homebrowser3, product create/edit/reload PC, exactcampaign/AI navigation; result packet separates original failures and repaired/source-bound cases"
+      },
+      "scope": "Canonical role home/counts/filter/list/kanban/project timeline, independent product nav and related links, strict scalar projection, readonly request-local memo in product/submission/workspace reads.",
+      "not_run": [
+        "AC03-04 fullattachment+inquiry journey waits accepted S2/S3",
+        "All mainmenus bothviewport CRUD final sweep",
+        "Actual final Vercel release"
+      ],
+      "full_g03_accepted": false,
+      "full_goal_accepted": false,
+      "source_binding": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/source-binding.json",
+      "commands": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/commands.json"
+    },
+    "main_source_continuity": {
+      "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/main-source-continuity/record.json",
+      "sha256": "fa99922b9d07bc8f9aecf29c424010742011e1ef4300776457e982461c840073",
+      "main": "eece434adf3793fd7a603f997eee15f729c4eef0",
+      "unchanged_source_paths": 30,
+      "corpus_same_as_historical_independent": true,
+      "fresh_legal_reading": 0,
+      "full_sb16_accepted": false
+    }
+  },
+  "bounded_auth_release": {
+    "candidate": "fb9dd23e04e823034bcc7f213dd78f93325c6ce2",
+    "first_main_integration": "c73b7a362a230e557fab37518ddd0780d20c990e",
+    "supabase_env_commit": "0e96a5c65ed2dae59a76380ae7d7c894fe1be912",
+    "unit": {
+      "pass": 91,
+      "fail": 0,
+      "skip": 0
+    },
+    "independent": {
+      "pass": 22,
+      "fail": 1,
+      "failed": "desktop populated /tasks navigation 30s timeout",
+      "not_run": [
+        "mobile",
+        "full role/context regression",
+        "full feature regression"
+      ]
+    },
+    "production_schema": {
+      "name": "gs_hale",
+      "migrations": 16,
+      "seedInserted": 49,
+      "productsMigrated": 3,
+      "corpusInserted": 2
+    },
+    "production_runtime": "Login fresh-document home, clicked tasks/products, reload session and logout redirect actual production desktop Chromium5PASS/pageerrors0.",
+    "deadline": "2026-09-22T11:40:00+09:00",
+    "deadline_met": false,
+    "scope_override": "User requested minimum login checks and immediate push, deferred full regression.",
+    "evidence": ".execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/",
+    "latest_production_commit": "eece434adf3793fd7a603f997eee15f729c4eef0",
+    "supabase_runtime_failure_resolved": "SUPABASE_URL unnecessary PostgreSQL dependency removed; DATABASE_URL canonical identity; Vercel region bom1",
+    "full_goal_accepted": false,
+    "status": "ACCEPTED_BOUNDED_AUTH_RELEASE",
+    "final_verification": {
+      "root_unit_pass": 737,
+      "root_unit_fail": 0,
+      "root_unit_skip": 0,
+      "independent_unit_pass": 20,
+      "author_production_browser_pass": 5,
+      "author_production_browser_fail": 0,
+      "full_goal_accepted": false
+    },
+    "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/navigation-fix/implementation-result.json",
+    "root_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/navigation-fix/root-evidence-review.json"
+  },
+  "submission_log_user_request": {
+    "state": "CANCELLED_BY_USER",
+    "at": "2026-09-22T04:17:56.170871+00:00",
+    "preserved_existing_files": true,
+    "no_conversion_or_upload": true,
+    "latest_instruction": "세션 로그 찾는거 중단하자 그냥 goal만 실행하는걸로"
+  },
+  "delivery_target": {
+    "user_requested_hours": 3,
+    "target_by_utc": "2026-09-22T07:24:41.442983+00:00",
+    "target_by_kst": "2026-09-22 16:25 approximate",
+    "not_guarantee": true,
+    "scope_and_required_verification_unchanged": true,
+    "parallel_sessions": 3,
+    "main_role": "serial integration/evidence review",
+    "codex_default_reasoning": "medium",
+    "current_session_effort_change": "NOT_VERIFIED"
+  },
+  "readme_consolidation": {
+    "commit": "6338649",
+    "archive": "docs/history/README-before-supabase-consolidation-20260922.md",
+    "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/readme-consolidation/static-check.json",
+    "links_checked": 13,
+    "broken": 0,
+    "claim": "Currenttransitioninstructions only; finalreproductionpending"
+  },
+  "final_journey_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/final-journey/prepared-task.json",
+  "demo_script": {
+    "path": "docs/demo/demo-script.md",
+    "source_commit": "9132581",
+    "rehearsal": "NOT_RUN final source pending",
+    "identity_exact_phrases": 5
   }
 }

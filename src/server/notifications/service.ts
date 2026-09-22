@@ -11,25 +11,27 @@ import { sourceReminderDecision } from './eligibility';
 import { notificationEventSource } from './sources';
 import { deliveryId, deliveryKey, canonicalEvent, projectedSource, resolvedDelivery, readCommand } from './delivery';
 import { newId, receipt, fresh } from '@/server/products/store';
+export async function notificationSource(s: UnitOfWork, p: Principal, row: StoredRecord<'notification'>, clock: import('@/domain/records').Clock) {
+    if (!row.contextId)
+        unavailable();
+    (await authorize(s, p, 'notification.read', { id: row.id, kind: 'notification', contextId: row.contextId, visibility: 'public', recipientUserId: row.data.recipientId }, clock));
+    const current = (await resolvedDelivery(s, p, row.contextId, row.data.source, clock, false));
+    if (!current || current.key !== row.data.key || row.data.email !== 'not_connected' || row.data.actionUrl !== current.actionUrl || row.data.certainty !== null && !['confirmed', 'requested', 'expected', 'needs_confirmation'].includes(row.data.certainty))
+        unavailable();
+    return current;
+}
+export async function notificationDTO(s: UnitOfWork, p: Principal, row: StoredRecord<'notification'>, clock: import('@/domain/records').Clock) {
+    (await notificationSource(s, p, row, clock));
+    return { id: row.id, revision: row.revision, source: projectedSource(row.data.source), title: sourceText(row.data.title, 200), message: sourceText(row.data.message, 2000), actionUrl: sourceText(row.data.actionUrl, 4000), occurredAt: sourceText(row.data.occurredAt), deliveredAt: sourceText(row.data.deliveredAt), readAt: row.data.readAt === null ? null : sourceText(row.data.readAt), certainty: row.data.certainty, inApp: 'delivered' as const, email: 'not_connected' as const };
+}
 export class NotificationService {
     constructor(public identity: IdentityService, private hooks: {
         fault?: (stage: string) => void;
         beforeDelivery?: () => Promise<void>;
     } = {}) { }
     get clock() { return this.identity.clock; }
-    private async own(s: UnitOfWork, p: Principal, row: StoredRecord<'notification'>) {
-        if (!row.contextId)
-            unavailable();
-        (await authorize(s, p, 'notification.read', { id: row.id, kind: 'notification', contextId: row.contextId, visibility: 'public', recipientUserId: row.data.recipientId }, this.clock));
-        const current = (await resolvedDelivery(s, p, row.contextId, row.data.source, this.clock, false));
-        if (!current || current.key !== row.data.key || row.data.email !== 'not_connected' || row.data.actionUrl !== current.actionUrl || row.data.certainty !== null && !['confirmed', 'requested', 'expected', 'needs_confirmation'].includes(row.data.certainty))
-            unavailable();
-        return current;
-    }
-    private async dto(s: UnitOfWork, p: Principal, row: StoredRecord<'notification'>) {
-        (await this.own(s, p, row));
-        return { id: row.id, revision: row.revision, source: projectedSource(row.data.source), title: sourceText(row.data.title, 200), message: sourceText(row.data.message, 2000), actionUrl: sourceText(row.data.actionUrl, 4000), occurredAt: sourceText(row.data.occurredAt), deliveredAt: sourceText(row.data.deliveredAt), readAt: row.data.readAt === null ? null : sourceText(row.data.readAt), certainty: row.data.certainty, inApp: 'delivered' as const, email: 'not_connected' as const };
-    }
+    private async own(s: UnitOfWork, p: Principal, row: StoredRecord<'notification'>) { return (await notificationSource(s, p, row, this.clock)); }
+    private async dto(s: UnitOfWork, p: Principal, row: StoredRecord<'notification'>) { return (await notificationDTO(s, p, row, this.clock)); }
     async list(token: string | undefined, contextId: string) {
         return this.identity.repo.transaction(async (s) => {
             const p = (await currentActor(s, (await this.identity.principal(s, token)), contextId, this.clock));

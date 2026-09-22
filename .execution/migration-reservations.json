@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "rule": "Root allocates new migration filename; immutable accepted SQL bytes stay unchanged. File count is actual checkout migrations, never inferred from highest reserved number. Reservation does not grant schema lease or mark implementation complete.",
-  "at": "2026-09-22T00:41:57.725451+00:00",
+  "at": "2026-09-22T04:54:20.516558+00:00",
   "reservations": [
     {
       "id": "0001",
@@ -97,7 +97,22 @@
       "id": "0016",
       "file": "0016-audit.sql",
       "goal": "G14",
-      "state": "EXCLUSIVE_PRD_IMPLEMENTING_BASE_0015_ABSENT"
+      "state": "ACCEPTED_G14_ASYNC_CONTRACT",
+      "postgres_equivalent": "0017-audit.sql"
+    },
+    {
+      "id": "0017",
+      "file": "0017-storage.sql",
+      "goal": "SB-STORAGE-S1",
+      "state": "ACCEPTED_BOUNDED_CORE",
+      "postgres_equivalent": "0018-storage.sql"
+    },
+    {
+      "id": "0018",
+      "file": "0018-import-export.sql",
+      "goal": "SB-STORAGE-S4",
+      "state": "EXCLUSIVE_LEASE_SUPABASE_SCOPE_REVIEW",
+      "postgres_equivalent": "0019-import-export.sql"
     }
   ]
 }

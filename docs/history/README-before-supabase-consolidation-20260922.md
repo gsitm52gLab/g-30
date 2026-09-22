@@ -1,0 +1,401 @@
+# GS HALE
+
+## G09 문의 합본 후보
+
+이 내부 후보는 수용된 G07 자료·Excel과 G08 공지에 G09 서버·UI를 합칩니다. 합본 자체 검사와 독립 검증·전체 모듈 수용은 구분합니다. `src/server/inquiries/contracts.ts`는 client type-only 진입점이고 `readInquirySummary(store, principal, contextId, clock, taskId?)`는 같은 UoW에서 홈/업무가 사용할 현재 권한 집계입니다.
+
+브랜드는 `POST /api/inquiries`의 `{contextId,taskId:null|id,idempotencyKey}`로 비공개 초안을 만듭니다. 초안은 현재 작성자만 읽으며 GSG/admin도 볼 수 없습니다. `POST /api/inquiries/:id/files?visibility=public`에 multipart `files`와 같은 순서의 `clientItemIds`를 1~10개 전송합니다. 파일별 ready/failed 응답과 같은 키 재시도는 기존 파일을 보존합니다. 업로드만으로 질문을 공개하지 않습니다. 실제 파일 선택 후 `POST /api/inquiries/:id`의 `publish_first`를 명시 전송하며 제목, 첫 내용, 양수 초안 revision을 사용합니다.
+
+`GET /api/inquiries?context=...`는 공개된 참여 문의만 집계합니다. 같은 브랜드/컨텍스트의 다른 브랜드 사용자는 참여자가 아닙니다. `GET /api/inquiries/:id`는 팝업과 상세가 함께 쓸 원본입니다. 공개 후 GSG는 명시 answer/state/internal_note/link_task를, 브랜드는 question/supplement를 사용합니다. comment/acknowledgement/read는 질문을 해결하지 않습니다. 답변과 업무·제출·완료는 별개입니다.
+
+`GET /api/inquiries/:id/events?after=...` 및 `/stream?after=...`는 저장된 이벤트와 actor/conversation/view에 묶인 opaque cursor를 사용합니다. 상세의 cursor 이후를 연결하고, cursor가 유효하지 않으면 상세를 다시 읽습니다. SSE `inquiry` 사건의 JSON과 `unavailable` 오류를 구별합니다. 공개/내부 위치는 분리되어 내부 메모가 공개 cursor·revision·정렬 시각을 바꾸지 않습니다. 모든 전달과 파일 읽기는 현재 권한을 다시 검사합니다.
+
+파일은 정확한 `conversationId`와 `messageId` 참조로 읽습니다. 미전송 ready 파일은 현재 업로더만 읽으며 공개 메시지에 포함된 선택 파일만 상대에게 보입니다. 내부 파일의 공개 메시지 재사용이나 다른 업무/상품으로의 문의 파일 재사용은 제공하지 않습니다. 401/403/404는 보호 데이터·복구 입력을 제거하고, 409/503에서는 허용된 입력과 성공 파일·이미 만들어진 업무 ID를 보존합니다. 같은 intent를 재시도하고 새 질문/업무를 자동 생성하지 않습니다.
+
+현재 migration은 `0001`~`0009` 총 9개입니다. 수용된 G09 통합 체인(`0001`~`0008`)에는 `0009`만, 이전 G10 분기(`0001`~`0005`, `0007`, `0009`)에는 빠진 `0006`과 `0008`을 추가합니다. 기존 SQL/데이터를 수정하지 않으며 반복 migration은 추가 적용 0개입니다. 일반 실행의 명시 `db:setup`, DATA_SOURCE/DB/FILE_STORAGE_DIR 설정과 실제 로그인은 기존 방식입니다. 문의 타입·단위 검사는 `npx vitest run tests/unit/inquiries*.test.ts`로 실행합니다. 실제 SSE·HTTP·재시작, UI·모바일·독립 검증 결과는 별도 증거로 기록합니다.
+
+```sh
+npm run build
+INQUIRIES_MODE=mock E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inquiries-http.ts
+INQUIRIES_MODE=sqlite E2E_PORT=4205 E2E_AUX_PORT=4206 npx tsx scripts/verify-inquiries-http.ts
+```
+
+검사 포트는 자신이 소유한 빈 두 포트로 바꿉니다. `INQUIRIES_HTTP_ROOT`는 매 실행 새 DB/파일 폴더를 만들 부모 경로(기본 `.local/g09-http`), `INQUIRIES_HTTP_REPORT`는 새 보고서 경로입니다. 응답 원문·해시·실제 SSE 프레임·PID 종료를 private 증거로 보존하므로 과거 보고서와 같은 경로를 덮어쓰지 마세요. mock 검사는 private IPC 저장소 관찰을 위해 별도 자식 부팅을 사용하고, SQLite는 일반 `next start` 두 프로세스와 새 PID/실제 재로그인을 검사합니다. 제품의 테스트 전용 endpoint는 없습니다. 브라우저 문의 화면·홈·팝업의 검증과 독립 수용은 이 서버 검사와 별개입니다.
+
+**Healthcare & Aesthetic Launch Enablement** · **해외 헬스케어 진출의 모든 일**
+
+현재 후보는 G00 실행·저장, G01 컨텍스트·사용자, G02 서버 권한 기반에 **G04 업무 요청·프로젝트·참고자료**를 연결합니다. 합성 자료로 로그인, 컨텍스트 관리, 초대 수락·재발급, 계정/멤버십 중지·재배정, 신규 입점/스팟 요청 작성·공개·버전 변경과 파일 업로드를 제공합니다. 현재 화면과 API는 중앙 서버 정책과 명시적 필드 투영을 사용합니다.
+
+G04의 실제 업무·참고파일 API/HTML/RSC와 후행 채널의 정책 harness는 구분합니다. G06 독립 상품과 정확한 사용본, G05 실제 답변 UI/API, G07 증빙·Excel, G08 공지를 보존하며 G09 문의 UI/API를 합칩니다. 이 후보는 후행 검토·완료·AI나 G09 독립 수용의 완료를 뜻하지 않습니다. 기존 prior-submission fixture는 계약 예시로 보존하고 새 실제 제출과 구별합니다. 외부기관 계정, 실제 이메일 발송, 실제 AI API 호출은 없습니다.
+
+## 설치·실행
+
+Node **24.x**, npm **11.x**를 사용합니다. 명령은 해당 worktree 루트에서 실행하며 다른 프로젝트의 node_modules·DB·환경파일을 연결하지 않습니다. API 키와 실제 `.env` 없이 실행할 수 있습니다.
+
+```bash
+npm ci
+npm run dev:mock
+```
+
+`http://127.0.0.1:3000/login`에서 로그인합니다. 합성 관리자 이메일은 `admin@example.test`, 비밀번호는 `Demo-Hale-2026!`입니다. 같은 공개 합성 비밀번호를 사용하는 `luna@example.test`는 두 컨텍스트 브랜드 멤버, `operator@example.test`는 관리자 권한 없는 GSG 운영자, `selected@example.test`는 하나의 컨텍스트만 관리하는 관리자입니다. `co@example.test`와 `price@example.test`는 브랜드/GSG 재배정 대상입니다. 이 공개 fixture는 시연 전용이며 실제 서비스 계정으로 쓰지 않습니다.
+
+`npm run build` 후 `npm start`로 production 빌드를 확인합니다. 일반 `npm run dev`/`npm start`의 기본 포트는 3000입니다. 별도 포트를 쓰면 `APP_ORIGIN=http://127.0.0.1:<port>`와 고유 `SESSION_COOKIE_NAME`을 함께 지정하세요. 허용 Origin은 서버 설정과 정확히 같아야 하며 브라우저의 임의 Host/role 값을 인증 근거로 쓰지 않습니다. HTTPS Origin에서는 Secure 쿠키를 사용합니다.
+
+mock은 메모리 저장으로 재시작 시 fixture로 초기화됩니다. 영속 시연에는 SQLite를 사용하세요.
+
+## SQLite와 기존 G00 자료
+
+```bash
+DATABASE_FILE=.local/data/gs-hale.db npm run db:migrate
+DATABASE_FILE=.local/data/gs-hale.db npm run db:seed
+DATABASE_FILE=.local/data/gs-hale.db npm run dev:db
+```
+
+`db:setup`은 migration과 seed를 순서대로 실행합니다. 적용된 SQL의 SHA-256을 기록하고 변경을 거부합니다. G00의 `0001`은 그대로 보존하고 `0002-identity.sql`이 종류별 고유 인덱스와 관계 검사를 추가합니다. 시작 시 DB migration/seed를 자동 수행하지 않으며 DB가 없거나 실패하면 503/저장 오류를 표시하고 mock으로 전환하지 않습니다.
+
+seed는 누락된 합성 fixture ID만 추가하고, **명시적으로 알려진 G00 fixture**의 누락된 인증·컨텍스트·작성자 필드만 보강합니다. 사용자가 바꾼 상태·담당자·추가 레코드·기존 credential을 덮어쓰지 않습니다. 알 수 없는 기존 사용자를 자동으로 active/admin으로 승격하지 않습니다. DB 초기화 명령은 없습니다.
+
+## 인증·상태·저장 계약
+
+- 신원은 정규화된 이메일(앞뒤 공백 제거·소문자) 하나이며, 점/플러스 주소를 추측해 병합하지 않습니다. 멤버십은 `(contextId,userId)` 하나입니다. `gsg/brand` 행위자와 관리자 grant는 별도이며, 관리자는 `all/selected contextIds`와 명시적 가격 접근 값을 가집니다.
+- 비밀번호는 서버의 scrypt-v1 해시/랜덤 salt로 저장합니다. 세션/초대 원문 토큰은 저장하지 않고 SHA-256만 저장합니다. 세션은 HttpOnly·SameSite=Lax 쿠키이며 절대 8시간, preauth는 15분, 초대는 48시간입니다. CSRF 토큰과 Origin 검사를 모든 현재 변경 API에 적용하고 로그인/수락 시도를 제한합니다. 본문은 허용 키와 최대 길이를 검사합니다.
+- 새 계정은 초대 수락 때 비밀번호를 설정합니다. 기존 계정은 **초대받은 동일 계정으로 로그인**해야 다른 컨텍스트 초대를 수락하며 기존 비밀번호/전역권한은 바뀌지 않습니다. 링크는 fragment로 전달하고 수락 화면 진입 후 주소에서 제거합니다. 실제 메일은 보내지 않고 복사 가능한 링크를 제공합니다.
+- 같은 pending 초대의 반복 요청은 `ALREADY_INVITED`로 거부하여 성공한 첫 링크를 유지합니다. 명시적 재발급만 이전 링크를 철회합니다. 만료·철회·소비된 링크는 수락할 수 없으며, 이미 철회한 초대를 다시 재발급할 수 없습니다. 초대 대기 멤버십의 직접 중지/활성화는 거부하고 수락을 통해 활성화합니다.
+- 전역 중지는 기존 세션을 즉시 철회하고 authVersion을 올립니다. 복구 후에도 옛 쿠키는 살아나지 않습니다. 멤버십 중지는 해당 컨텍스트만 차단하고 다른 활성 컨텍스트는 유지합니다. 관리자 grant는 멤버십과 별도이므로 관리자 계정 전체 중지는 all-scope 관리자가 수행합니다.
+- 중지는 진행 업무의 브랜드 담당자와 GSG 책임자를 모두 확인하여 재배정 필요를 표시합니다. 자동 배정은 하지 않습니다. 동일 컨텍스트의 활성 사용자/멤버십을 역할에 맞게 명시 선택하며 현재 assignee/owner만 바꾸고 author/contributor 이력을 보존합니다. 변경 전후·시각·기록자를 감사에 남깁니다.
+- `RecordRepository`의 Promise 조회와 동기 `UnitOfWork` 계약을 유지합니다. 하나의 transaction에서 최신 권한·상태·revision을 확인하고 신원/멤버십/초대/세션철회/배정/감사를 원자 저장합니다. 해시 등 비동기 작업은 transaction 전에 수행하고 저장 직전에 다시 확인합니다. async callback/escaped UoW는 거부합니다. stale revision/고유 충돌은 409이며 실패는 전체 rollback입니다.
+- 공개 경로는 `/login`, `/invitations`, 인증 부트스트랩 API와 데이터 없는 `/api/health`입니다. 일반 응답/감사에는 credential, session, 초대 토큰 해시를 포함하지 않습니다. 초대 생성/재발급 응답만 생성된 원문 링크를 한 번 제공합니다.
+
+## 검증
+
+```bash
+npm run check
+npm run build
+npm run db:restart
+npm run identity:races
+npm run identity:restart
+npm run test:install
+npm run test:e2e
+npm run test:e2e:db
+```
+
+`npm run verify`는 브라우저 설치를 제외한 위 검사를 순서대로 수행합니다. `check`는 lint·typecheck·단위 테스트이며 mock/SQLite의 정상·반례·시간 경계·권한·원자 rollback을 포함합니다. `identity:races`는 서로 다른 네 자식 프로세스로 SQLite 중복 이메일 초대와 동일 초대 수락을 경합시킵니다. `identity:restart`는 production 서버 A를 실제 종료한 뒤 같은 DB의 서버 B에서 새 로그인·멤버십·대기/소비 초대·철회 쿠키·재배정/작성자/감사 보존을 HTTP로 확인합니다. `db:restart`는 별도의 G00 최소 adapter 검사입니다.
+
+`test:e2e`와 `test:e2e:db`는 `scripts/run-e2e.ts`를 통해 desktop → mobile 순서로 실행합니다. 설치된 Playwright CLI의 `--list`로 실제 선택된 테스트를 먼저 확인한 뒤, 각 프로젝트의 테스트 파일(spec)마다 새 production 서버·DB/메모리 fixture·파일 저장 경로·쿠키 이름을 사용합니다. 서로 다른 파일의 정상 로그인 횟수가 한 서버의 인증 제한에 누적되지 않으며 제품의 인증 제한과 테스트 assertion은 그대로입니다. 기존 파일/줄 번호·grep·grep-invert 선택을 유지한 채 설정의 정확한 파일 조건을 교집합으로 적용하고, 실행 결과의 test ID를 최초 선택과 대조하여 누락·중복·추가 선택이면 실패합니다. `verify`도 이 격리 명령을 사용합니다. `npm run build`와 Chromium 설치를 먼저 완료하세요.
+
+기본 `E2E_PORT=4111`을 각 프로젝트가 순서대로 사용하고, `E2E_AUX_PORT`를 지정하면 mobile은 그 포트를 사용합니다. 지정하지 않으면 `E2E_PORT`와 같습니다. 사용 중인 서버를 재사용하거나 종료하지 않습니다. 테스트마다 다른 사용자의 작업 서버와 충돌하지 않는 예약 포트를 지정하세요. 각 서버의 `APP_ORIGIN`과 고유 쿠키 이름은 실행기가 포트/프로젝트로 설정하며 제품 기본 포트 3000은 유지됩니다. DB는 `.local/e2e-<mode>-<run-id>/<project>/<순번-spec>/fixture.db`, 파일은 같은 디렉터리의 `files/`에 보존됩니다(mock의 DB 경로는 예약만 하고 DB 파일을 만들지 않음).
+
+CLI는 `--project=desktop`, `--project mobile`을 지원하며 반복 옵션으로 둘을 선택할 수 있습니다. 프로젝트를 생략하면 둘 다 실행합니다. 테스트 파일/행, `--grep`/`--grep-invert`, `--list`, `--headed` 등 나머지 인자는 shell 조합 없이 Playwright에 전달합니다. 잘못된 프로젝트·옵션·무일치 필터와 테스트 실패는 nonzero exit입니다. 격리를 우회하는 `--config/-c`, `--reporter`, `--output`과 상주 `--ui`는 명시 거부합니다. 보고서/산출물은 환경변수로 지정하세요. 직접 `npx playwright test` 대신 아래 wrapper 명령을 사용합니다.
+
+```bash
+# 기본 전체 실행: desktop과 mobile의 모든 시나리오
+E2E_PORT=4149 E2E_AUX_PORT=4150 npm run test:e2e
+E2E_PORT=4149 E2E_AUX_PORT=4150 npm run test:e2e:db
+# 요청한 프로젝트/파일/테스트만 실행; 인자는 -- 뒤에 지정
+E2E_PORT=4149 E2E_AUX_PORT=4150 npm run test:e2e -- --project=mobile tests/e2e/foundation.spec.ts --grep 'brand and home'
+# 테스트 목록만 조회하며 서버/DB는 만들지 않음
+npm run test:e2e -- --project desktop --list
+# 실행별 보고서/trace 위치 지정
+E2E_PORT=4149 E2E_AUX_PORT=4150 E2E_REPORT=.local/review/e2e.json E2E_ARTIFACTS=.local/review/artifacts npm run test:e2e
+```
+
+`run-id`는 UTC 시각+무작위 접미사입니다. `E2E_REPORT=/path/e2e.json`이면 `/path/e2e.<run-id>.summary.json`에 명령·cwd·exit·건수·서버 PID/종료·DB/파일/쿠키 경로를 기록하고, 프로젝트 집계 JSON은 `e2e.<run-id>.desktop.json`과 `e2e.<run-id>.mobile.json`입니다. 원본 CLI 선택은 `.<project>.discovery.json`, 파일별 원본 결과는 `.<project>.<순번-spec>.json`에 보존합니다. summary의 `projects[].files[]`에는 파일별 명령·선택 ID·PID·종료·실행 건수와 selection 검증을 기록하며, 실행 전 실패로 보고되지 않은 선택 항목은 `not_run_test_count`로 남깁니다. 기본 prefix는 `.local/e2e-results.json`입니다. 콘솔이 정확한 summary 절대경로를 출력합니다. `E2E_ARTIFACTS=/path/artifacts`이면 `/path/artifacts/<run-id>/<project>/<순번-spec>/test-results/`에 trace/화면을, 그 상위에 `runner.log`·`server.log`를 남깁니다(기본 root `test-results`). 프로젝트·파일·재실행 사이에 원본을 덮어쓰지 않습니다. summary의 test 건수는 command 건수와 별개이며 `--list`는 실제 CLI 선택만 기록하고 서버를 시작하지 않으며 실행 통과로 세지 않습니다. CLI 선택이 실행 중 달라지거나 파일 실행이 실패하면 전체 명령도 실패합니다.
+
+기본 trace/자동 screenshot 설정은 꺼져 있습니다. G04 여정은 로그인 후 명시 trace·화면과 실패 DOM을 private 산출물로 남깁니다. 보고서는 환경 덤프/인증 헤더/DB 원문을 출력하지 않습니다. 증거는 합성 자료여도 비공개 보관하며 실패 로그를 삭제하거나 성공으로 재명명하지 않습니다. `RESTART_REPORT`, `IDENTITY_RESTART_REPORT`, `IDENTITY_RACES_REPORT`는 해당 검사기의 선택 출력입니다. 구현자 자기검증과 독립 검증/통합 회귀는 별개입니다.
+
+```bash
+EVIDENCE_ROOT=.local/g01-evidence python3 scripts/record-command.py check -- npm run check
+```
+
+기록기는 실제 cwd·argv·시작/종료·exit·stdout/stderr·SHA-256을 매 실행 새 파일로 남깁니다. 환경변수 덤프는 하지 않습니다. `scripts/verify-dev.ts`는 잘못된 선택 AI 설정에서도 실제 로그인 후 기본 업무가 열리는지를, `verify-unavailable.ts`는 DB 실패를, `verify-client-bundle.ts`와 `verify-server-boundary.ts`는 기존 서버 경계를 검사합니다.
+
+## 환경·후속 확장
+
+Next/CLI는 현재 프로젝트의 환경 로딩 규칙을 사용합니다. `.env.example`만 형식 참고에 사용하고 실제 `.env`는 추적 제외입니다. 저장 설정과 선택 AI 설정을 분리하여 AI 키/설정이 기본 업무를 막지 않습니다. 서버 환경 값은 브라우저 props/health/로그로 반환하지 않습니다. 지정 alias `gpt-6 astra`만 `gpt-6-astra`로 정규화하며 다른 모델 값은 보존합니다. 실제 허용 입력으로 OpenAI를 호출해 schema/근거/usage를 확인하는 검증은 G17의 필수 작업입니다.
+
+G01에서는 설치된 Next **16.3.5**의 authentication·cookies·route-handlers 가이드를 읽고 DB 세션과 서버 DAL을 구성했습니다. 버전은 accepted package/lockfile 그대로이며 신규 의존성은 없습니다. G00 때 참조한 `/Users/evan/workspace/hackathon`의 앱/fixture/DB를 복사하거나 원본을 변경하지 않았습니다. 공개 패키지 license·scaffold 검토는 G00 증거에 남아 있습니다.
+
+다음 모듈은 `src/server/auth/service.ts`의 principal과 `src/server/policy/`의 action/resource 정책을 소비하고 새 mutation마다 동일 UoW 내부 최신 상태 검사를 추가해야 합니다. G04는 실제 업무·파일·요청 버전 연결을 제공하며 G05는 실제 제출 작성자 연결, G18은 존재하는 전 채널 및 전체 영속성 회귀를 소유합니다. G02 당시의 harness 결과만으로 후행 경로를 검증했다고 계산하지 않습니다.
+
+## G02 정책과 검증 경계
+
+`policy.ts`는 세션/계정·현재 멤버십·관리/가격 grant를 같은 동기 transaction에서 다시 읽습니다. 클라이언트 역할이나 이전 요청의 capability를 권한으로 사용하지 않습니다. 알 수 없는 action/kind/공개 범위는 거부하며, 타 범위/없는 자료는 동일한 404 응답입니다. 내부 원문 접근과 가격 접근은 별개입니다. 회원 관리의 peer identity에는 다른 사용자의 adminGrant를 포함하지 않고, 본인의 세션 DTO에만 명시 grant를 제공합니다.
+
+`projection.ts`는 현재 업무·상품·컨텍스트·회원·감사 DTO를 허용 필드로 구성합니다. 내부 공급가/공급률은 브랜드와 가격 권한 없는 GSG에게 필드 자체가 없습니다. 현재 합성 업무의 `notes`는 공개 안내입니다. 기존 `contributorIds`는 이력이며 공동담당 권한으로 해석하지 않습니다. G04는 실제 공개/초안 및 현재 주/공동담당 메타데이터를 생산합니다. 기존 G00/G01 adapter의 공개 합성 미리보기와 실제 내부 초안의 권한은 구분합니다.
+
+현재 연결: 인증/컨텍스트 관리와 G04 업무·프로젝트·템플릿·참고파일 API, 홈·업무·상품 조회 HTML/RSC. 부트스트랩 로그인/초대 수락/CSRF와 데이터 없는 health는 인증 전 예외입니다. 일반 응답은 no-store이며 body는 읽는 중 16KiB에서 제한하고 입력 키를 검사합니다. 429는 Retry-After를 제공합니다.
+
+G04 참고파일 original/preview/download와 원본·참조 범위는 실제 endpoint로 연결했습니다. 후행 계약만 있는 경로는 실제 제출 lead/co/team, 상품 가격·통합 검색/정렬/페이지/count·Excel/export, 알림 수신자, AI 입력/결과입니다. 정책은 원본과 모든 참조의 현재 권한을 확인하고 projection 이후 검색/집계를 수행합니다. `projectChannel`은 최소 harness 계약이며 후행 모듈은 실제 DTO allowlist와 HTTP/파일 검사를 추가해야 합니다. D02~D05의 후행 소비와 G18 회귀 의무는 남습니다. GSG 완료 정책은 잔여 질문/외부 대기/AI 실패를 승인 게이트로 삼지 않습니다.
+
+```bash
+npm run check
+npm run build
+E2E_PORT=4121 APP_ORIGIN=http://127.0.0.1:4121 npm run test:e2e
+E2E_PORT=4121 APP_ORIGIN=http://127.0.0.1:4121 npm run test:e2e:db
+E2E_PORT=4121 node --import tsx scripts/verify-policy-http.ts
+E2E_PORT=4121 node --import tsx scripts/verify-policy-browser.ts
+E2E_PORT=4121 E2E_AUX_PORT=4124 node --import tsx scripts/verify-policy-isolation.ts
+```
+
+권한 HTTP 검사기는 합성 전용 DB와 `E2E_PORT` 서버(기본 4121)를 직접 생성해 중첩 비공개 marker·실제 cookie/CSRF·HTML/RSC·권한 철회·재시작·DB 오류를 검사합니다. isolation 검사는 `E2E_PORT`(기본 4121)와 `E2E_AUX_PORT`(기본 4124)에 독립 DB/쿠키를 생성합니다. 다른 슬롯을 배정받았다면 위 명령의 두 환경변수 값만 바꾸세요. 검사기 소스를 수정할 필요가 없습니다. APP_ORIGIN, Client 요청, 쿠키 이름(`gs_hale_g02_<주 포트>` / `gs_hale_g02_aux_<보조 포트>`), 검사와 결과 보고가 지정한 두 포트를 따릅니다. 서로 다른 1~65535 정수만 허용하며 사용 중인 포트에서는 실행하지 마세요. 기본 제품 APP_ORIGIN은 3000으로 유지하며 검증 포트를 제품 기본값으로 바꾸지 않습니다. 아직 없는 후행 API는 harness 검사로만 기록하고, 구현된 G04 파일/API와 구분합니다.
+
+HTTP 검사의 직접 `_rsc` 요청은 프로토콜 probe입니다. 별도 browser 검사는 비공개 합성 marker를 저장한 SQLite에서 PC/모바일의 실제 Link 이동·prefetch가 만든 RSC 응답과 화면을 확인합니다. 로그인 요청/인증 헤더는 수집하지 않고 응답의 안전한 본문·경로·hash·비공개 필드 부재를 기록합니다. 각 서버 검사는 같은 포트를 사용하므로 순서대로 실행하세요.
+
+`EVIDENCE_ROOT`로 보고서 위치를 지정할 수 있으며 각 실행은 timestamp가 다른 보고서를 남깁니다. `scripts/verify-policy-command.py --requirements AC-02-01,A19 --level HTTP label -- <command>`는 실제 명령/cwd/exit/시각/요구 ID/로그 hash를 남깁니다. 기록기에는 `EVIDENCE_ROOT`가 필요합니다. command 수와 unit test/HTTP assertion/UI scenario 수를 합쳐 부풀리지 않으며 실패·재시도는 별도 이력으로 보존합니다.
+
+## 데모/발표 도입
+
+**글로벌 헬스케어의 새로운 물결**
+
+GS HALE은 해외 헬스케어 진출에 필요한 모든 일을 하나의 흐름으로 연결해, 글로벌 헬스케어 시장에 새로운 물결을 만드는 플랫폼입니다
+
+현재 시연은 로그인 → 컨텍스트 생성/전환 → 초대 수락 → 담당자 중지/재배정과 이력 → 업무/상품 탐색 순서입니다. 실제 메일 발송·현업 자료·AI 연동을 시연했다고 설명하지 않습니다.
+
+## G04 업무 요청과 참고자료
+
+업무 메뉴에서 신규 입점 프로젝트를 만들고 필요한 기본 유형을 선택하거나, 프로젝트에 연결되지 않은 스팟 업무를 작성합니다. GSG 책임자·브랜드 주담당·공동담당은 같은 컨텍스트의 활성 회원을 선택합니다. 프로젝트의 병렬 업무와 선행 관계, 추가 제품의 별도 요청, 회차·대상 기간 복제는 기존 업무 진행을 초기화하지 않습니다.
+
+기본 7종 템플릿과 직접 작성에서 8종 요청 항목, 필수/선택·조건·제품 범위, 규격 출처/버전과 자동/사람 확인 구분을 저장합니다. 내부 초안은 브랜드에 보이지 않으며 서버의 공개 미리보기를 확인한 후 공개합니다. 날짜만 정해진 기한과 시각이 정해진 기한을 구분하고, 외부 신청/검토/인쇄·납품/게시·사용 일정·확인 상대는 브랜드 마감과 별도로 보존합니다. 원문의 요일·날짜 충돌은 원문으로 남깁니다. 외부 상대 계정이나 실제 발송 기능은 만들지 않습니다.
+
+다중 컨텍스트 생성에서는 기한·외부 일정 확인 담당을 각 대상 GSG 책임자로, 제품별 요건을 각 대상의 선택 Product IDs로 복제합니다. 개별 초안을 검토한 뒤 따로 공개합니다. 공개 이후 수정은 새 요청 버전이며 템플릿 변경은 선택한 업무에만 적용합니다. 빈 확인 담당을 가진 기본 템플릿 적용은 해당 업무 GSG 책임자로 채웁니다. 일정 조정은 제안만으로 마감을 바꾸지 않습니다. GSG가 반영하면 현재 공개본의 기한만 새 버전으로 공개하며, 별도 미공개 초안은 보존합니다. 초안과 공개본이 달라진 경우 다음 공개 전에 초안 기한도 검토해야 합니다.
+
+참고자료는 인증된 `POST /api/files?taskId=...`에서 업로드하며 `GET /api/files/:id?taskId=...&mode=download|original|preview`에서 원본과 참조 업무의 최신 권한을 모두 검사합니다. private 파일 저장소는 기본 `.data/files`, 선택 환경변수 `FILE_STORAGE_DIR`입니다. 웹 public 폴더가 아닙니다. 1개 25MiB·1회 10개 제한과 이름/확장자/MIME/기본 signature 검사를 적용하고, PDF/PNG/JPEG만 브라우저 미리보기를 제공합니다. 다른 허용 형식은 원본 다운로드로 확인합니다. 악성코드 백신/파일 내용의 전문가 검토를 수행했다고 주장하지 않습니다. 과거 공개 요청의 정확한 FileVersion은 새 버전 이후에도 현재 권한이 있는 사용자가 조회할 수 있습니다.
+
+G04의 읽음·수락·일정 협의는 제출·검토·업무 완료와 별개입니다. 상품 스냅샷(G06)과 실제 답변 UI·서버(G05)는 선행 단계에서 통합·검증되었습니다. GSG 수동 완료(G11), 앱 알림 소비(G13)는 후행 기능입니다. 기존 G04 과거 답변 검사의 합성 prior-submission과 실제 G05 제출을 구별합니다. 요청 변경 이력과 durable outbox는 실제 저장되지만 알림 발송/수신 완료로 표시하지 않습니다. 참고자료 업로드만으로 결과물이 제출된 것으로 계산하지 않습니다. 실제 환경의 파일 백업·재해 복구는 별도 운영 검증입니다.
+
+```bash
+npm run check
+npm run build
+# 이미 비어 있는 검증 슬롯을 사용; 기본 제품 포트는 3000 유지
+TASKS_MODE=sqlite E2E_PORT=4144 npm run tasks:http
+TASKS_MODE=mock E2E_PORT=4144 npm run tasks:http
+E2E_PORT=4141 APP_ORIGIN=http://127.0.0.1:4141 npm run test:e2e
+E2E_PORT=4141 APP_ORIGIN=http://127.0.0.1:4141 npm run test:e2e:db
+```
+
+HTTP 검사기는 새 `.data/g04-http-*` DB/파일과 별도 쿠키 이름을 사용하며 자신의 서버만 종료합니다. SQLite 모드는 실제 서버 종료·재기동 후 재로그인하여 요청 버전·활동 순서·원본 byte hash를 비교합니다. mock은 메모리 모드이므로 프로세스 종료 후 업무 영속성을 주장하지 않습니다. `TASKS_HTTP_REPORT`와 브라우저 `E2E_REPORT`/`E2E_ARTIFACTS`는 선택 보고서 경로입니다. 실제 `.env`·외부 API·메일은 필요하지 않습니다.
+
+## G06 상품 UI·API 계약
+
+브랜드 공통 상품은 기존 Product ID를 유지하고, 컨텍스트별 SKU·JAN·등록/판매/출시 정보·프로젝트·파일 연결과 소비자가/내부 공급가를 별도 버전으로 저장합니다. `npm run db:setup`은 migration 0004와 모든 기존 상품의 원본 보존 이행을 실행합니다. 이미 이행한 상품은 다시 덮어쓰지 않으며 모호한 기존 용량 문자열은 원문으로 남깁니다.
+
+인증된 `/api/products`의 목록·생성, `/api/products/:id?context=...`의 상세·명령, `/api/products/:id/impact`의 공통 변경 미리보기를 제공합니다. 상품 파일은 `POST /api/files?productId=...&contextId=...`와 같은 소유 범위를 사용하는 GET으로 처리하며 기존 `taskId` 파일 경로도 유지합니다. 업로드 한도와 private 저장소는 G04와 같습니다. 브랜드의 같은 컨텍스트 비담당자도 공개 상품을 편집할 수 있고, 내부 가격 필드·이력은 최신 명시 권한이 있는 GSG에게만 전달합니다.
+
+공통 정보 변경은 공유된 현재 정보를 갱신합니다. 미리보기에는 읽을 수 있는 적용 컨텍스트만 표시하고 숨겨진 대상의 이름·수·가격·파일은 반환하지 않습니다. 저장 명령은 각 common/context/price의 revision과 idempotencyKey를 사용합니다. `captureProductUse`는 후속 제출 트랜잭션에서 쓸 정확한 common/context/file 버전과 명시적으로 선택한 소비자가 버전을 저장합니다. 최신 가격을 당일 적용 가격으로 자동 간주하지 않습니다.
+
+G06의 상품 UI/API는 통합·브라우저 검사·독립 검증과 메인 수용을 마친 단계입니다. 초기 prior-use 레코드는 계약 검증용이며 실제 제출이 아닙니다. G05는 실제 제출 트랜잭션에서 상품 사용본을 만들며 선행 단계에서 수용되었습니다. 현재 G07 서버 후보는 증빙 집계/Excel을 연결하며, G10 검토·G11 완료는 후속 의무입니다. G07 자료 집계는 연결된 상태의 실제 요청·미제출·미확인 수를 반환하며 신규 상품의 0과 조회 실패를 구별합니다.
+
+상품 서버 검사기는 새 전용 DB/파일·쿠키와 자신의 프로세스를 사용합니다. SQLite 모드는 두 포트에서 실제 동시 수정/중복 등록을 확인하고 종료·재시작·재로그인 후 정확한 상품/가격/파일/스냅샷을 비교합니다. mock 모드의 fixture 준비는 검사 전용 IPC이며 제품 API에 준비용 경로를 추가하지 않습니다. 과거 사용 스냅샷은 명시적 fixture이며 실제 G05 제출 완료로 계산하지 않습니다.
+
+```bash
+npm run build
+PRODUCTS_MODE=mock E2E_PORT=4161 E2E_AUX_PORT=4164 npm run products:http
+PRODUCTS_MODE=sqlite E2E_PORT=4161 E2E_AUX_PORT=4164 npm run products:http
+npm run products:migration-check
+```
+
+`PRODUCTS_HTTP_REPORT`는 보고서 경로를 지정하며 실제 요청/상태/응답 hash와 프로세스 종료를 남깁니다. `E2E_PORT`/`E2E_AUX_PORT`는 비어 있는 자신 소유 슬롯으로 함께 바꿀 수 있습니다. 기존 원장에 이행할 수 없는 상품이 있으면 전체 데이터 이행을 원복하고 CLI에 G06 모듈·상품 ID·원본 컨텍스트 ID·허용된 사유만 표시합니다. 원문 값·비공개 가격·stack을 진단에 넣지 않으며 API의 일반 오류 응답도 그대로 유지합니다.
+
+## G05 답변 서버 계약
+
+`src/server/submissions/contracts.ts`가 입력/출력 타입 진입점입니다. 현재 공개 요청에 대해 브랜드 주·공동 담당자 또는 허용 GSG가 공유 초안을 저장합니다. 팀 비담당자는 공개 제출만 읽으며 미제출 초안/임시파일은 받지 않습니다. GSG 대리는 실제 자료 제공자와 로그인 기록자를 구분합니다.
+
+- `GET /api/tasks/:id/submissions`: 신선한 권한으로 초안, 실제 제출/이력, 후보 파일/상품을 조회합니다. `draftEvaluation`은 편집 초안, `submittedEvaluation`은 실제 최신 제출을 현재 요청에 대조한 진행입니다.
+- `POST /api/tasks/:id/submission-evaluation`: `{baseRequestId,content}`를 쓰기 없이 검사합니다. 8종 입력·조건 계층·필수 누락을 계산합니다. 자유문자 규격의 `check:auto`도 실행 가능한 규칙이 아니므로 사람 확인 대기이며 자동 검증 완료가 아닙니다.
+- `POST /api/tasks/:id/submission-draft`: `save`, `rebase_apply`, `copy_submission` 명령. 요청 ID와 공유 초안 revision을 검사합니다. 숫자 `-` 등 입력 중 값은 보존하고 제출 시 유효성을 검사합니다. `GET`은 요청 변경 후 명시적 이어받기 미리보기입니다.
+- `POST /api/tasks/:id/submissions`: 저장한 초안의 부분/전체 제출. 같은 초안 revision은 한 번만 소비합니다. 요청·상품·파일의 정확한 버전, 감사, 이벤트, 멱등 응답, 업무 진행을 한 transaction으로 기록합니다. 전체 제출은 구조적 충족이며 검토 승인/실물 수령/업무 완료가 아닙니다.
+- `GET /api/submissions/:id`: 불변 과거 제출과 당시 상품 사용본. 현재 권한과 원본/참조 권한은 다시 확인합니다.
+- `POST /api/tasks/:id/submission-files?requestId=...`: multipart `files`와 같은 순서의 `clientItemIds` 각 1~10개. `{items:[{clientItemId,state:'ready',file}|{clientItemId,state:'failed',error}]}`로 성공을 유지하고 실패 파일만 재시도합니다. 파일당 25MiB와 기존 MIME·시그니처 검사를 적용하며 전역 `/api/files` 응답은 변경하지 않습니다.
+
+모든 변경 요청은 기존 Origin/CSRF/세션 정책을 사용합니다. `REQUEST_CHANGED`, `DRAFT_CHANGED`, `CONFLICT` 409에서 입력과 준비된 파일 ID를 유지하고 최신 조회/명시적 비교·재선택을 사용합니다. 업로드/초안 저장은 제출 상태를 바꾸지 않습니다. 임시 참조 제외는 물리 삭제가 아니며, 공개 요청 또는 실제 불변 제출에 포함되어야 다른 업무/상품이 재사용할 수 있습니다. 외부 링크는 서버가 수집하지 않고 내용 미고정으로 보존합니다. 보류/취소 중 초안 저장은 가능하고 새 제출은 재개 후 가능합니다.
+
+합성 단위 검사는 `npx vitest run tests/unit/submissions.test.ts`이며 mock/SQLite 양쪽에서 실제 생성·부분/전체·v2·CAS·멱등·권한·업로드·요청변경·상품 캡처·rollback을 검사합니다. `0005-submissions.sql`은 업무당 공유 초안, 순번/초안 소비/파일 재시도 키의 고유성과 제출 불변성을 추가합니다. 실패저장 복구는 승인된 사용자/컨텍스트/업무/요청별 bounded sessionStorage 계약을 후속 UI가 구현하며 원시 File bytes/쿠키는 저장하지 않습니다.
+
+G05 실제 HTTP 검사는 production build 후 아래처럼 자신이 소유한 비어 있는 두 포트를 사용합니다. 검사기는 실제 API로 합성 답변을 만들고 mock/SQLite를 각각 확인합니다. SQLite에서는 두 서버의 CAS/중복 제출과 실제 종료·새 PID 재기동·재로그인을 검사합니다. 환경/쿠키/기밀 API는 필요하지 않습니다.
+
+```bash
+SUBMISSIONS_MODE=mock E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
+SUBMISSIONS_MODE=sqlite E2E_PORT=4151 E2E_AUX_PORT=4154 npm run submissions:http
+```
+
+`SUBMISSIONS_HTTP_ROOT`는 새 고유 DB/파일 런타임 디렉터리의 부모(기본 `.local/g05-http`), `SUBMISSIONS_HTTP_REPORT`는 요청 상태·응답 hash·assertion 결과·프로세스 종료 보고서 경로입니다. 과거 보고서를 덮어쓰지 않게 새 경로를 사용하세요. SQLite 검사의 private fixture는 실제 생성된 레코드의 읽기·해시 대조만 하며, mock은 같은 읽기 전용 관찰을 IPC로 수행합니다. 실제 UI·브라우저·복구 및 독립 검증은 별도 실행 증거로 구분합니다.
+
+저장된 공개 요청의 항목 구조가 손상된 경우 `REQUEST_INVALID`409로 답변 쓰기를 거부합니다. 읽기 평가는 `needs_reconfirmation`, `canSubmitFull:false`, 요청 구조 확인 필요를 표시합니다. 비정상 상품 범위를 공통 항목으로 바꿔 제출을 허용하지 않습니다. GSG가 실제 요청 편집에서 규칙을 확인·정정한 뒤 다시 공개하고, 작성자는 유지한 답변을 명시적으로 비교·재적용합니다. 정상 값의 알 수 없는 추가 키는 공개 출력에서 제외하지만 합법적인 제출은 유지합니다. 이 답변 구조 검사는 후행 GSG 수동 완료의 강제 승인 게이트가 아닙니다.
+
+## G07 증빙·표준 Excel 통합 후보
+
+G07 자료·Excel UI/API와 V01~V03 수정이 포함된 통합 후보입니다. 수용된 G08과의 합본 자체·독립 검증 및 G07 수용은 아직 완료되지 않았습니다. 현업 원본 Excel 검증은 원본 미확보로 `NOT_RUN`이며, 합성 표준 `.xlsx`의 실제 검증과 구분합니다.
+
+증빙은 공개 요청/실제 제출/상품 자료의 정확한 파일 버전을 참조합니다. 파일을 복제하지 않고 상품별 적용 상태와 이력을 분리합니다. 적용 확인은 인증 승인·유효성 판단이 아닙니다. 업로드/증빙 등록만으로 제출하지 않으며, 증빙의 해당 없음은 공개 요청의 필수 항목을 면제하지 않습니다. 상품 자료 수는 현재 공개 요청과 실제 제출을 같은 표 projector로 집계합니다.
+
+Excel은 `GET /api/imports?context=ID`의 허용 열/한도를 받아 표준 양식을 사용합니다. `GET /api/imports/workbook?context=ID&kind=template|export`로 새 workbook을 생성합니다. `POST /api/imports/source?context=ID`에 multipart `file` 하나 → `POST /api/imports/preview`의 시트/헤더/열/행 선택 → `POST /api/imports/apply`의 명시적 반영 순서입니다. 한 배치는 선택한 컨텍스트 하나이며 모든 행의 `contextKey`가 일치해야 합니다. 숫자로 저장한 제품 코드·SKU·JAN·ITF의 손실된 0은 복구하지 않습니다. 업데이트의 빈 셀은 기존 값을 유지하고 `clearFields`로만 명시적으로 비웁니다.
+
+미리보기는 업무 DB를 변경하지 않고 권한을 확인한 비공개 임시 분석본만 저장합니다. `IMPORT_STORAGE_DIR`(기본 `.data/imports`)는 사용자별 최대 50개, 24시간 정리 대상이며 미리보기 적용 유효 시간은 30분입니다. 성공 배치·출처·버전·재시도 영수증은 DB에 영속됩니다. 동기 단일 트랜잭션에서 전체 CAS와 오류를 확인한 뒤 전부 반영합니다. 인증/가격 권한은 재시도 때도 현재 상태로 확인합니다.
+
+분석은 `exceljs@4.4.0`, `yauzl@3.4.0`와 설치된 `tsx`를 별도 Node 프로세스에서 사용합니다. ExcelJS 하위 `uuid`만 `11.1.1`로 고정해 버퍼 경계 advisory의 수정 버전을 사용하며, CJS/조건부 서식 workbook 호환성을 검사합니다. 10MiB 원본, ZIP 512개 항목/항목 32MiB/총 64MiB, 20시트/300,000 실제 셀, 선택 자료 5,000행·100열, 셀 32,767문자, 10초 제한과 256MiB V8 old-space 한도를 적용합니다. V8 한도는 프로세스 총 RSS 한도가 아닙니다. 암호화·매크로·수식 계산·외부 workbook/OLE 연결은 지원하지 않으며 링크를 실행하거나 가져오지 않습니다. `.xls` 보관은 기존 첨부 기능으로 가능하지만 Excel 가져오기는 `.xlsx`만 지원합니다.
+
+계약 검사는 작업 worktree 루트에서 다음과 같이 실행합니다. 실제 실행 결과와 실패 원본은 별도의 비공개 실행 증거에 남깁니다.
+
+```sh
+npm ci
+npm run check
+npm run build
+npx vitest run tests/unit/evidence.test.ts tests/unit/imports.test.ts tests/unit/imports-parser.test.ts tests/unit/products.test.ts tests/unit/repositories.test.ts
+# production build 이후, 비어 있는 자신 소유의 포트 사용
+IMPORTS_MODE=mock E2E_PORT=4171 npx tsx scripts/verify-imports-http.ts
+IMPORTS_MODE=sqlite E2E_PORT=4172 npx tsx scripts/verify-imports-http.ts
+```
+
+`IMPORTS_HTTP_REPORT`로 과거 결과를 덮어쓰지 않는 보고서 경로를 지정합니다. 검사기는 `.local/g07-http` 아래 새 전용 DB·파일·분석본과 포트별 쿠키를 사용하며 모든 실제 HTTP 응답·해시·자신의 서버 종료를 남깁니다. SQLite에서는 종료 후 새 PID·재로그인과 불변 원장 해시를 확인합니다. 동시 재시도는 실제 HTTP 요청을 겹쳐 보내 한 배치 응답을 확인하며, 별도 프로세스 간 동시 Excel 반영은 이 검사기에 포함하지 않습니다.
+
+저장된 배치 결과의 알려진 필드 구조가 손상되면 `STORAGE_UNAVAILABLE`503으로 안전하게 실패합니다. 원본 배치 기록을 다시 쓰지 않고 관리자 확인을 요청합니다. 정상 데이터의 알 수 없는 추가 키는 공개 DTO에서 제외합니다. 일반 링크 표시값에 매크로 관련 단어가 있다는 이유만으로 거부하지 않으며 실제 OOXML content type·요소·관계와 파일 구조를 검사합니다.
+
+
+G07 XLSX 입력은 SpreadsheetML의 실제 namespace URI와 local name으로 해석합니다. 표준 URI에 연결된 `x:` 등 접두사나 기본 namespace는 같은 의미로 처리하며, 구조 이름의 잘못된 URI·DTD·매크로·외부 통합문서 연결은 거부합니다. 원본 ZIP의 크기·CRC·경로 검사를 먼저 수행하고 제한된 메모리에서 ExcelJS용 XML/ZIP을 재직렬화합니다. 원본 업로드 bytes 기준 SHA와 셀의 정확한 숫자 문자열·앞자리 0·수식 거부 정책은 유지합니다. 이것이 모든 XLSX 확장 기능 또는 미확보 현업 양식의 호환성 보장은 아닙니다. `saxes@5.0.1`과 `jszip@3.10.2`는 기존 설치 버전을 direct exact dependency로 명시했습니다(ISC, JSZip의 MIT 라이선스 선택).
+
+접두사가 있는 합성 원본 세 종류의 실제 업로드→미리보기→반영/거부 회귀는 다음처럼 실행합니다. 서버/DB/파일은 매번 별도로 생성합니다.
+
+```bash
+IMPORTS_NAMESPACE_ONLY=1 IMPORTS_MODE=mock E2E_PORT=4191 npx tsx scripts/verify-imports-http.ts
+IMPORTS_NAMESPACE_ONLY=1 IMPORTS_MODE=sqlite E2E_PORT=4192 npx tsx scripts/verify-imports-http.ts
+```
+
+기본 E2E 실행기는 실행 회차·프로젝트·spec마다 DB, 일반 첨부 저장소와 `IMPORT_STORAGE_DIR`를 모두 별도로 생성합니다. 외부에서 물려받은 import 경로도 해당 spec의 `import_staging`으로 덮고 실행 summary에 경로를 남깁니다. 이전 staging은 삭제하지 않으며 실제 50개 보관 제한도 유지합니다.
+
+## G08 공지·가이드
+
+G08 공지 UI·브랜드 홈·PC/모바일·서버는 독립 검증과 루트 통합 회귀를 거쳐 수용된 상태입니다. 이 G07 합본에서의 공존 회귀는 별도 검증합니다. 공지 1건은 명시적인 컨텍스트 1개를 소유합니다. GSG는 공지·FAQ·업무 가이드·양식을 초안으로 저장하고 브랜드 보기의 공개 내용 투영을 확인한 뒤 새 불변 버전으로 공개합니다. 개정은 과거 본문·첨부·읽음을 덮어쓰지 않습니다.
+
+전체 대상은 해당 컨텍스트의 활성 브랜드 사용자라는 규칙이며 나중에 합류한 활성 사용자도 읽을 수 있습니다. 선택 대상의 빈 목록은 대상 없음입니다. 공개 당시 알림용 사용자 목록은 저장하지만 읽기 권한으로 고정하지 않습니다. 과거 버전과 파일도 현재 대상 권한 및 해당 과거 버전의 대상 권한을 함께 확인합니다. 읽음은 서버의 사용자·버전·시각 기록이며 업무 수락·제출·완료를 변경하지 않습니다. GSG만 대상/확인 명단을 받고 브랜드는 본인의 확인 사실을 받습니다.
+
+`GET/POST /api/notices`, `GET/POST /api/notices/:id`가 목록·생성·조회·명령이며 `?version=...`은 정확한 과거 공개본, `?preview=1`은 GSG의 저장된 초안 미리보기입니다. 같은 컨텍스트의 별도 업무 ID는 초안 `content.taskIds`에 연결하고 공개합니다. 생성·기한·배정·답변은 기존 업무 API의 책임입니다. 공지 공개본의 업무 표시는 원본의 읽음/수락/제출/완료 사실을 구분하며 비공개 업무는 브랜드 공개 투영에 포함하지 않습니다.
+
+파일 API는 기존 경로에 `?noticeId=...`와 선택 `versionId=...` 참조를 추가합니다. 기존 25MiB/10개와 private 저장소 규칙을 유지합니다. 업로드된 초안 파일은 공개 버전에 포함되기 전 브랜드가 읽거나 다른 자료에 재사용할 수 없습니다. 과거 버전에서 제거된 파일은 허용된 과거 공지 주소에서 정확한 바이트로 조회하며, 비동기 읽기 전후 권한을 다시 검사합니다. 공지 전용 파일 owner 추가는 기존 task/product 파일 원장을 다시 쓰지 않습니다.
+
+`0007-notices.sql`과 G07의 `0006-evidence-imports.sql`을 모두 유지합니다. 현재 통합본의 migration은 `0001`~`0009` 총 9개이며, 기존 DB에는 아직 적용하지 않은 파일만 추가합니다. 적용된 파일의 내용과 checksum은 바꾸지 않습니다. 공개 버전·읽음은 불변이고 공개 pointer/event/audit/receipt는 하나의 transaction입니다. `NOTICE_PUBLISHED`/`NOTICE_REVISED` 사건은 G13 알림 소비 계약이며 실제 전달 완료를 뜻하지 않습니다.
+
+```sh
+npm ci
+npm run check
+npm run build
+npx vitest run tests/unit/notices.test.ts
+```
+
+G08 서버 실제 API 검사기는 다음 명령으로 실행합니다. 두 포트는 비어 있는 자신 소유 슬롯을 지정하며, 실행마다 새 합성 DB/파일/쿠키를 만듭니다. SQLite는 두 프로세스의 CAS·멱등 공개, 실제 종료·새 PID 재시작·재로그인을 포함합니다.
+
+```sh
+NOTICES_MODE=mock E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notices-http.ts
+NOTICES_MODE=sqlite E2E_PORT=4183 E2E_AUX_PORT=4184 npx tsx scripts/verify-notices-http.ts
+```
+
+`NOTICES_HTTP_ROOT`는 런타임 부모(기본 `.local/g08-http`), `NOTICES_HTTP_REPORT`는 새 결과 경로입니다. 보고서는 실제 요청·응답 본문 파일/hash, assertion 단위 결과, PID/종료와 저장소 경로를 기록합니다. 원 보고서를 보존하려면 새 경로를 쓰세요. HTTP로 실제 업무와 제출을 만든 뒤 공지 읽음 전후 업무·요청·활동·제출·상품 캡처·파일 원장을 비교합니다. 공지 파일의 상품/다른 공지 재사용과 원본·참조 양측 권한도 검사합니다. 신규 멤버/알 수 없는 저장 확장 키 준비는 제품 endpoint가 없는 private IPC/저장소 fixture이며 읽기 권한은 실제 HTTP로 검사합니다. late fault와 비동기 파일 읽기 중 철회는 양 adapter 단위 검사, 기존 데이터 migration은 별도 `notices-migration.test.ts`가 확인합니다. UI·HTML/RSC·독립 검증은 별도 증거가 필요합니다.
+
+### 문의 UI — G09 내부 구현 후보
+
+현재 컨텍스트의 **문의**에서 브랜드가 비공개 초안을 만든 뒤 제목·메시지·파일을 준비하고 **첫 질문 보내기**로 전송합니다. 업무 담당이 아니어도 새 문의를 시작할 수 있습니다. 질문의 답변·보완·확인 회신·외부 확인 대기를 명시적으로 구분하며, GSG 홈에서 질문별 남은 수와 다음 확인일을 확인합니다. 팝업과 전체 상세는 같은 서버 대화·파일·읽음 기록을 사용합니다. 대화는 업무 수락·자료 제출·완료와 별개이고, 알림 배달은 G13 후행입니다.
+
+파일은 최대 10개/개당 25 MiB입니다. 성공한 업로드를 유지하며 실패 항목만 같은 파일로 재시도하거나 명시적으로 제외합니다. 메시지 응답 유실은 같은 의도로 재시도하고, 전송 성공 후 조회만 실패하면 **저장 결과 다시 읽기**를 사용합니다. 업무 생성 후 문의 연결이 실패하면 실제 생성된 업무 ID를 보존하고 **이미 만든 업무 연결만 다시 시도**합니다. 재생성하지 않습니다.
+
+미전송 입력과 업로드된 파일 참조는 계정·컨텍스트·문의별로 sessionStorage에 최대 24시간/8건/건당 180,000자 보관합니다. 파일 바이트는 저장하지 않아 실패 파일은 새로고침 후 다시 선택해야 합니다. 복구 전에 실제 현재 권한을 확인하며 401/403/404에서는 문의 화면·목록·커서·보관 입력을 지웁니다. 이 로컬 보관 기간은 서버 초안 삭제 정책이 아닙니다.
+
+UI 자체 검사(원본 결과·실패 및 합본 독립 검증은 별도): `npm run check`, `npm run build`, 이후 `E2E_PORT=4213 E2E_AUX_PORT=4214 npm run test:e2e -- inquiries` 및 동일 포트의 `npm run test:e2e:db -- inquiries`. 기본 runner가 모드/프로젝트/스펙마다 별도 DB·서버를 만듭니다. 실제 실행 기록은 할당된 비공개 evidence에 보존하며 이 설명 자체가 G09 수용 판정은 아닙니다.
+
+# G10 corrections server
+
+The corrections server uses current task permissions and actual immutable G05 submissions. GET `/api/corrections?taskId=...` returns public batches and exact source choices; only GSG receives the separate staff opinion/draft/review section. POST `/api/corrections` supports `save_opinion`, `save_draft`, `publish`, `reflect`, `resolve`, and `record_review`. Client types are exported from `src/server/corrections/contracts.ts`.
+
+Internal opinions append versions. Published batches and their source draft are immutable; late opinions require an explicit follow-up batch. Brand assignees record reflection against a later actual submission, then GSG records individual resolution. Uploading or submitting does not resolve corrections. Previous reviews are references only. G16 human-reviewed AI candidates can be deliberately connected to a server-verified exact submitted target; this creates an internal opinion, without automatic brand publication or a live provider claim.
+
+Public preview: GET `/api/corrections/drafts/:id/preview` (GSG only). Exact batch: GET `/api/corrections/:id`. Target-file links use `/api/corrections/files/:id` and recheck the current batch/item plus original file authority before and after file IO. Internal opinion files use existing internal task uploads; no draft or upload releases them to brands.
+
+Run the existing `npm ci`, `npm run db:setup`, `npm run check`, and `npm run build` setup/check commands. Migration `0009-corrections.sql` adds constraints without changing previous SQL. The accepted G10 integration contained 0001 through 0009 (nine). This G12 union adds 0010 and contains ten migrations. The accepted G10 chain gains only 0010; the isolated G12 chain (0001–0007 plus0010) gains 0008 and0009. Historical source membership is preserved independently of numeric order. Existing applied SQL bytes and records remain unchanged. The actual corrections UI is available at `/tasks/:id/corrections?context=...`; downstream notification delivery and independent acceptance remain separate stages.
+
+### PR 행사 서버 계약 (G12)
+
+`/api/campaigns`의 목록·명령, `/:id`의 공개 버전·이력, `/:id/preview`, `/catalogs`, `/summary?taskId=…`와 인증된 `/files/:id` 경로를 제공합니다. GSG가 공개한 메뉴 정의를 브랜드가 선택하면 같은 업무의 새 요청 버전에 선택 범위와 실제 기록자·승인 원본 출처를 고정합니다. 일반 요청 항목과 미공개 초안, 과거 제출본은 유지하며 기존 답변은 명시적으로 새 요청에 전환합니다. 미선택·불참의 현재 자료 요구는 제외하고, 이미 신청한 불참의 외부 사실은 취소 협의 보류로 별도 보존합니다. 캠페인·업무 요청·조건 의존성 충돌은 기존 기록을 유지하고 409로 재확인을 요청합니다. 송장·파일만으로 실물 수령이나 업무 완료를 처리하지 않습니다.
+
+행사 UI는 이 합본에 연결되어 있으며 독립 수용은 별도 검증 단계입니다. 실제 알림 발송은 G13 후행입니다. 자체 검사에는 합성 데이터만 사용합니다.
+
+```sh
+npm run check
+npm run build
+CAMPAIGNS_MODE=mock E2E_PORT=4219 E2E_AUX_PORT=4220 npx tsx scripts/verify-campaigns-http.ts
+CAMPAIGNS_MODE=sqlite E2E_PORT=4219 E2E_AUX_PORT=4220 npx tsx scripts/verify-campaigns-http.ts
+```
+
+검사마다 고유 DB·파일 디렉터리를 만들며 `CAMPAIGNS_HTTP_ROOT`, `CAMPAIGNS_HTTP_REPORT`로 별도 증거 위치를 지정할 수 있습니다. SQLite 검사는 일반 `next start` 및 실제 두 프로세스 경합·재시작을 사용합니다. mock 검사는 프로세스 내 저장소 관찰을 위해 테스트 자식 서버를 사용하며 운영 경로에 테스트 API를 추가하지 않습니다. 보고서의 실제 검사 수·계층을 확인하세요.
+
+### G12 PR·행사 UI 후보
+
+업무 상세의 **PR·행사 참여와 실물**에서 같은 업무에 연결된 행사를 봅니다. GSG는 카탈로그 원문·번역을 내부에 저장하고, 실제 공개 요청의 준비물과 상품 버전을 메뉴별로 선택한 후 서버 미리보기를 거쳐 공개합니다. 브랜드 담당자는 참여할 메뉴를 선택합니다. 선택 결과로 요청 버전이 달라져도 기존 답변 초안은 보존되며 답변 화면에서 명시적으로 전환합니다.
+
+외부 신청·선정·진행은 별도 사실입니다. 신청 후 불참은 취소 협의로 남습니다. 촬영·배포 목적지별 송장·발송·수령도 각각 기록하고, 후속 산출물은 실제 제출한 답변·파일·상품 사용본을 참조합니다. 이 UI 후보는 아직 G12 독립 수용 전이며 외부 신청·운송 실행·알림 발송을 수행하지 않습니다.
+
+허용된 합성 환경에서 `npm run build` 후 `E2E_PORT=4229 npm run test:e2e -- campaigns` 또는 `E2E_PORT=4229 npm run test:e2e:db -- campaigns`로 캠페인 UI 여정을 실행합니다. 표준 실행기는 project×spec마다 서버·DB·파일을 격리합니다. 포트와 보고서 경로는 실행 환경에서 지정하며 실제 `.env` 값은 필요 없습니다.
+
+## AI 입력·텍스트 읽기 (G15)
+
+주 메뉴의 **AI 입력·읽기**에서 컨텍스트별 텍스트·PDF·이미지를 저장합니다. 실제 업무 제출과 상품 버전을 선택할 수 있으며, 업무 상세의 **이 업무의 AI 입력 작성**은 그 업무의 제출 선택으로 이어집니다. 새 제출이 생겨도 선택한 이전 제출을 자동으로 바꾸지 않습니다.
+
+일반 화장품의 일본어 POP·리플렛만 지원합니다. 텍스트 10,000자, PDF 10 MiB/선택 최대 10페이지, 이미지 최대 4개/합계 10 MiB입니다. 분류 미확인·약용·패키지·SDS·Illustrator 파일은 지원 대상으로 추정하지 않습니다. 저장한 입력을 읽으면 선택·읽음·일부 읽음·읽지 못함·제외 구간과 원본을 함께 확인할 수 있습니다. 이미지 인식은 사람의 원문 대조가 필요합니다.
+
+**원문 읽기와 근거 분석은 별도 실행입니다.** GSG는 이 입력 버전의 분석 화면에서 G16 합성 데모와 사람 검토로 이어갈 수 있습니다. 실제 외부 모델 호출은 G17 대상이며 읽기 성공은 법적 적합성이나 사람 검토 완료가 아닙니다. 전송 대상 확인은 현재 권한과 서버에 등록된 정확한 합성 자료 해시만 확인하고 실제 호출은 하지 않습니다. 실제 기밀 입력을 공개 체크박스로 전송 허용하는 기능은 없습니다.
+
+입력은 계정·컨텍스트별 sessionStorage에 최대 24시간 복구용으로 보관하며 파일 바이트는 보관하지 않습니다. 실패 파일은 다시 선택해 같은 의도로 재시도합니다. 저장 성공 후 조회 실패는 **저장 결과 다시 읽기**, 대기는 **대기 작업 이어 읽기**로 이어갑니다. 401/403/404에서는 보호 자료와 로컬 복구값을 지웁니다. 새 버전 저장 충돌은 작성값을 유지한 채 현재 버전을 명시적으로 비교합니다.
+
+자체 UI 검사 명령: `npm run check`, `npm run build`, `E2E_PORT=4233 E2E_AUX_PORT=4234 npm run test:e2e -- ai-input`, 같은 포트의 `npm run test:e2e:db -- ai-input`. 기본 runner는 모드·프로젝트·스펙별로 서버/DB를 격리합니다. 이 설명은 전체 G15 수용 판정이 아닙니다.
+
+G11/G15 합본 시점의 SQL은 `0001`–`0012`, 총 12개였습니다. G16은 원 바이트를 유지하며 `0013-ai-review.sql`을 추가합니다. 기존 G12 구성에는 `0011-completion.sql`과 `0012-ai-input.sql`을 추가하며, G11 또는 G15 격리 구성에는 없는 번호만 추가합니다. 원 SQL 바이트·적용 이력·파일은 보존하며 검사 시 원본 DB와 sidecar·파일부터 별도 위치로 복사합니다. 위 모듈별 과거 격리 구성 설명의 개수는 해당 시점의 구성입니다.
+
+## 외부 진행·수동 완료 화면 (G11)
+
+업무 상세의 **외부 진행·업무 완료**에서 현재 요청과 제출 당시 기준, 문의·수정·행사 잔여 상태를 확인합니다. GSG는 빈 메모로도 완료할 수 있으며, 완료 당시 기록은 재개 뒤에도 보존됩니다. 외부 전달 기록은 기존 요청·제출·상품 사용본·파일의 정확한 버전을 선택하며 실제 발송·승인·납품을 실행하지 않습니다. 새 후속 업무를 만든 뒤 연결에 실패하면 이미 생성한 업무를 보존하고 연결만 재시도합니다. 브랜드는 현재 권한으로 공개 기록을 확인합니다. 현재 GSG AI 잔여 상태는 정확한 분석 실행·실패·미검토 후보에서 계산하며 수동 완료를 차단하지 않습니다. 과거 미연결 기록은 그대로 보존하고 브랜드에는 일정한 비공개·접근 불가 표현을 사용합니다.
+
+UI 검사: `npm run test:e2e -- completion` / `npm run test:e2e:db -- completion` (각 spec·프로젝트별 독립 저장소와 쿠키).
+
+### G13 일정·앱 알림 (author UI 후보)
+
+`일정`은 현재 컨텍스트의 업무·행사·외부 확인 일정과 직접 기록한 일정을 함께 보여 줍니다. 원 업무에서 파생된 일정은 해당 원본 화면에서 수정합니다. 직접 기록하는 일정은 날짜만/명시 오프셋 시각, IANA 시간대, 확정 수준, 원문별 출처와 충돌·해소 근거를 저장합니다. 기한 확인 주체와 실제 행동 담당자는 별도입니다. 일정 종료·취소·재개는 업무 완료가 아닙니다.
+
+컨텍스트 바가 있는 일반 업무 화면을 열거나 다시 포커스하면 현재 본인의 앱 알림을 POST 동기화합니다. 보이는 동안 30초 간격으로 확인하며 서버의 100건 chunk와 `hasMore`를 따릅니다. 알림 읽음·안 읽음은 공지 확인, 수락, 문의 읽음, 제출, 업무 완료를 바꾸지 않습니다. 이메일·앱을 닫은 동안의 cron은 미연동입니다. 권한 변경 시 화면의 보호된 내용과 복구 요청을 비우며, 일시적인 실패에서는 같은 명령 키/본문과 작성값을 유지합니다.
+
+UI 자체 검사: `E2E_PORT=4229 E2E_AUX_PORT=4230 npm run test:e2e -- 'scheduling-.*|notifications-.*'` 및 같은 환경의 `npm run test:e2e:db -- 'scheduling-.*|notifications-.*'`. 각 spec·viewport는 새 서버/DB/파일 경로를 사용합니다. 이 문구는 실행 성공 또는 독립 수용을 주장하지 않으며 정확한 결과는 private evidence의 candidate-bound 보고서에 기록합니다.
+
+## AI 근거·사람 검토 (G16)
+
+GSG는 **AI 입력·읽기 → 근거 분석·사람 검토**에서 정확한 입력 버전의 읽기 결과를 선택하고 **합성 데모 분석 실행**을 명시적으로 수행합니다. `/ai-review`는 목록, `/ai-review/inputs/[id]?context=…&versionId=…`는 버전별 실행, `/ai-review/runs/[id]?context=…`는 정확한 결과, `/ai-review/corpus?context=…&releaseId=…`는 배포 소유의 읽기 전용 근거 자료입니다. 현재 엔진은 합성 데모이며 실제 외부 모델 호출·법률 정확도 평가가 아닙니다. 실제 provider는 G17 검증 대상입니다.
+
+원문 위치와 실제 읽은 범위, 위험 수준과 확신도, 공식 법적 근거와 업계 보조 지침을 구분합니다. 일본어 발췌와 사전 정렬된 비공식 한국어 번역에는 버전·검수 상태가 표시됩니다. 미확인 인용·분리된 후보·과거 corpus를 숨기지 않으며 후보 0개를 적법 확인으로 표시하지 않습니다. 사람의 수락·수정·기각은 사유와 불변 이력을 남기고 원문 또는 공개 상태를 자동 변경하지 않습니다.
+
+실제 제출의 정확한 문안·파일에 해당하는 수락/수정 후보만 사용자가 명시적으로 G10 내부 의견으로 저장할 수 있습니다. 서버가 제공하지 않은 답변 대상을 추정하지 않습니다. 브랜드 공개는 G10의 별도 초안·미리보기·공개 행동입니다. AI 분석·corpus·raw·검토 기록은 GSG 내부이며 현재 권한이 없으면 보호 내용과 브라우저 복구 입력을 비웁니다. 일시 저장 실패는 같은 요청 ID를 유지하고 409 충돌은 최신 기록 확인과 명시 재적용으로 처리합니다.
+
+화면 검사: `E2E_PORT=4237 E2E_AUX_PORT=4238 npm run test:e2e -- ai-review`, `E2E_PORT=4237 E2E_AUX_PORT=4238 npm run test:e2e:db -- ai-review`. 모드·PC/390px·스펙별 실제 결과를 별도 보존합니다. 자체 검사와 독립 검증·통합 회귀·전체 G16 수용은 구분합니다.
+
+## OpenAI 연결·실행 이력 (G17)
+
+이 절은 앞선 G15/G16 단계의 외부 연결 예정 설명을 갱신합니다. GSG의 입력별 분석 화면에서 **합성 데모**와 **OpenAI**를 명시적으로 선택합니다. 외부 AI 설정은 컨텍스트별이며, 사용 중지·연결 설정·키 존재 여부·모델을 보여 줍니다. 키 내용은 브라우저로 보내지 않습니다. 일반 앱은 서버의 `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL`을 사용합니다. 기존 `gpt-6 astra` 표기는 `gpt-6-astra`로만 정규화하며 다른 모델로 자동 대체하지 않습니다.
+
+정확한 서버 등록 해시와 현재 원본·참조 권한을 다시 확인한 읽기 구간만 전송합니다. 실행·외부 시도·응답·구조/근거 검증·사람 판단은 별개입니다. SDK 자동 재시도는 없으며 429/서버 오류는 같은 실행에서 최대 3회 명시적으로 시도합니다. 시간 초과·중단은 외부 결과 불확실성을 보존하고 중복 처리 가능성을 확인한 뒤 재시도합니다. 키·인증·권한을 수정했다면 **서버 설정 확인 후 같은 실행 재시도**를 사용합니다. 모델·주소·컨텍스트 설정 변경은 새 실행 기준입니다.
+
+제공된 입력/캐시 읽기/캐시 쓰기/출력/추론 사용량과 공식 요율 기준일을 기록합니다. 추론은 출력에 포함됩니다. 누락되거나 일치하지 않는 사용량·모델·처리 방식은 비용을 산정 불가로 표시하며 0으로 만들지 않습니다. 금액 상한은 없습니다. 기술 제한은 화면에 표시합니다. AI 장애 중에도 상품·제출·문의·사람 검토·GSG 수동 완료를 사용할 수 있고 실패는 잔여 상태로 보존합니다.
+
+합성 오류 검사는 실제 OpenAI에 접속하지 않습니다. 프로덕션 Next 경로를 사용하고 검사 자식 프로세스의 SDK fetch만 가로챕니다. 각각 고유 DB·파일·쿠키를 사용합니다. 기본 E2E runner에서는 이 전용 오류 스펙이 명시적으로 제외되며 아래 runner로 실행합니다. `.env`나 API 키 없이 재현할 수 있습니다.
+
+```sh
+npm ci
+npm run check
+npm run build
+AI_PROVIDER_MODE=mock E2E_PORT=4247 E2E_AUX_PORT=4248 node --conditions=react-server --import tsx scripts/verify-ai-provider-http.ts
+AI_PROVIDER_MODE=sqlite E2E_PORT=4247 E2E_AUX_PORT=4248 node --conditions=react-server --import tsx scripts/verify-ai-provider-http.ts
+AI_PROVIDER_MODE=mock E2E_PORT=4247 node --conditions=react-server --import tsx scripts/verify-ai-provider-ui.ts
+AI_PROVIDER_MODE=sqlite E2E_PORT=4247 node --conditions=react-server --import tsx scripts/verify-ai-provider-ui.ts
+node --conditions=react-server --import tsx scripts/verify-ai-provider-history.ts
+```
+
+`AI_PROVIDER_ROOT`/`AI_PROVIDER_REPORT`는 HTTP·UI 증거 위치, `AI_PROVIDER_HISTORY_ROOT`/`AI_PROVIDER_HISTORY_REPORT`는 과거 DB 복사 검사 위치입니다. G17 격리 기준은 기존 `0001`–`0013` 13개와 새 `0015-ai-provider.sql`이며, 후속 합본의 `0014`와 구분합니다. 원 SQL·DB·파일은 변경하지 않고 복사본에만 이행합니다.
+
+실제 제공자 검증은 별도 명시 명령입니다. 배포 소유의 승인된 합성 문안만 정상 앱 경로로 보내며 유료 요청이 발생할 수 있습니다. `AI_PROVIDER_ENV_FILE`로 기존 설정 파일을 지정하고 키를 명령행 값으로 쓰거나 복사하지 않습니다. 일반 오류/UI 검사를 실호출 성공으로 세지 않습니다. 실제 응답 성공 역시 전문가 법률 정확도 검증과 별개입니다.
+
+```sh
+AI_PROVIDER_ENV_FILE=/absolute/path/to/existing/.env E2E_PORT=4247 node --conditions=react-server --import tsx scripts/verify-ai-provider-live.ts
+```

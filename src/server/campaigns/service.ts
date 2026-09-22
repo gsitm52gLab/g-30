@@ -20,7 +20,7 @@ export const campaignCommandKeys = ['command', 'contextId', 'taskId', 'campaignI
 export class CampaignService {
     constructor(public identity: IdentityService, private fault?: (stage: string) => void) { }
     get clock() { return this.identity.clock; }
-    private async event(s: UnitOfWork, p: Principal, row: StoredRecord<'campaign'>, kind: string, versionId: string) { (await s.create('domainEvent', { id: newId(), contextId: row.contextId, data: { eventType: kind, targetId: row.id, sourceVersionId: versionId, actorId: p.user.id, at: this.clock() } })); }
+    private async event(s: UnitOfWork, p: Principal, row: StoredRecord<'campaign'>, kind: string, versionId: string) { return (await s.create('domainEvent', { id: newId(), contextId: row.contextId, data: { eventType: kind, targetId: row.id, sourceVersionId: versionId, actorId: p.user.id, at: this.clock() } })); }
     private stamp(s: UnitOfWork, p: Principal, row: StoredRecord<'campaign'>, previousId: string | null): ServerVersion { return { sequence: safe.integer(row.data.sequence) + 1, previousId, recordedBy: p.user.id, recordedAt: this.clock() }; }
     private async bump(s: UnitOfWork, row: StoredRecord<'campaign'>, extra: Partial<StoredRecord<'campaign'>['data']> = {}) { (await s.update('campaign', row.id, row.revision, { ...row.data, sequence: safe.integer(row.data.sequence) + 1, publicRevision: safe.integer(row.data.publicRevision) + 1, ...extra })); }
     async list(token: string | undefined, contextId: string, taskId?: string) { return this.identity.repo.transaction(async (s) => { const p = (await this.identity.principal(s, token)); (await authorize(s, p, 'context.read', contextResource(contextId), this.clock)); if (taskId) {
@@ -60,7 +60,7 @@ export class CampaignService {
             const x = parse.parseSaveCampaign(body);
             return this.identity.repo.transaction(async (s) => { const p = (await this.identity.principal(s, token)), task = (await campaignTask(s, p, x.taskId, this.clock, 'manage')); if (task.contextId !== x.contextId)
                 unavailable(); (await validateDraft(s, p, task, x.draft, this.clock)); const old = x.campaignId ? (await s.get('campaign', x.campaignId)) : null; if (x.campaignId && (!old || old.contextId !== x.contextId || old.data.taskId !== task.id))
-                unavailable(); return (await receipt(s, p, x.contextId, `campaign.save:${task.id}`, x as unknown as Record<string, unknown>, async () => { fresh(old, x.expectedRevision); const row = old ? (await s.update('campaign', old.id, old.revision, { ...old.data, draft: x.draft, draftRequestId: task.data.currentRequestId ?? null })) : (await s.create('campaign', { id: newId(), contextId: x.contextId, data: { taskId: task.id, draft: x.draft, draftRequestId: task.data.currentRequestId ?? null, currentVersionId: null, publicRevision: 0, sequence: 0, createdBy: p.user.id } })); (await audit(s, p, this.clock, x.contextId, 'campaign.draft_saved', row.id, { revision: old?.revision ?? 0 }, { revision: row.revision })); return { ids: [row.id] }; }, () => this.fault?.('save'))); });
+                unavailable(); return (await receipt(s, p, x.contextId, `campaign.save:${task.id}`, x as unknown as Record<string, unknown>, async () => { fresh(old, x.expectedRevision); const row = old ? (await s.update('campaign', old.id, old.revision, { ...old.data, draft: x.draft, draftRequestId: task.data.currentRequestId ?? null })) : (await s.create('campaign', { id: newId(), contextId: x.contextId, data: { taskId: task.id, draft: x.draft, draftRequestId: task.data.currentRequestId ?? null, currentVersionId: null, publicRevision: 0, sequence: 0, createdBy: p.user.id } })); (await audit(s, p, this.clock, x.contextId, 'campaign.draft_saved', row.id, { revision: old?.revision ?? 0, draftTitle: old?.data.draft.title ?? null }, { revision: row.revision, draftTitle: x.draft.title })); return { ids: [row.id] }; }, () => this.fault?.('save'))); });
         }
         const x = command === 'publish' ? { command: 'publish' as const, ...parse.parsePublishCampaign(body) } : command === 'participate' ? { command: 'participate' as const, ...parse.parseParticipation(body) } : command === 'external' ? { command: 'external' as const, ...parse.parseRecordExternalFact(body) } : command === 'physical' ? { command: 'physical' as const, ...parse.parseRecordPhysicalFact(body) } : { command: 'followup' as const, ...parse.parseRecordFollowup(body) };
         return this.identity.repo.transaction(async (s) => {
@@ -111,8 +111,8 @@ export class CampaignService {
                     const content = publicContent(draft), version = (await s.create('campaignVersion', { id: newId(), contextId: row.contextId, data: { ...content, campaignId: row.id, contextId: x.contextId, taskId: task.id, requestId: basis.id, privateDraft: draft, ...this.stamp(s, p, row, row.data.currentVersionId), contentHash: createHash('sha256').update(JSON.stringify(content)).digest('hex') } }));
                     (await this.bump(s, row, { currentVersionId: version.id }));
                     const requestId = (await applyCampaignRequest(s, p, version, this.clock, 'publish', null));
-                    (await audit(s, p, this.clock, x.contextId, 'campaign.published', row.id, { versionId: row.data.currentVersionId }, { versionId: version.id }));
-                    (await this.event(s, p, row, 'CAMPAIGN_PUBLISHED', version.id));
+                    const event = (await this.event(s, p, row, 'CAMPAIGN_PUBLISHED', version.id));
+                    (await audit(s, p, this.clock, x.contextId, 'campaign.published', row.id, { versionId: row.data.currentVersionId }, { versionId: version.id, domainEventId: event.id }));
                     return { ids: [row.id, version.id, requestId] };
                 }
                 let id: string;
@@ -142,8 +142,8 @@ export class CampaignService {
                         fail('CAMPAIGN_CHANGED', 409, '현재 공개 행사 버전에서 요청 범위를 다시 확인해 주세요.');
                     (await applyCampaignRequest(s, p, published!, this.clock, x.command, x.command === 'external' ? id : null));
                 }
-                (await audit(s, p, this.clock, x.contextId, `campaign.${command}`, row.id, {}, { factId: id }));
-                (await this.event(s, p, row, x.command === 'participate' ? 'CAMPAIGN_SELECTION_RECORDED' : 'CAMPAIGN_FACT_RECORDED', id));
+                const event = (await this.event(s, p, row, x.command === 'participate' ? 'CAMPAIGN_SELECTION_RECORDED' : 'CAMPAIGN_FACT_RECORDED', id));
+                (await audit(s, p, this.clock, x.contextId, `campaign.${command}`, row.id, {}, { factId: id, domainEventId: event.id }));
                 return { ids: [row.id, id] };
             }, () => this.fault?.(command)));
         });

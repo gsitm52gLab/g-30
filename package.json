@@ -11,7 +11,7 @@
     "dev": "next dev --hostname 127.0.0.1",
     "dev:mock": "cross-env DATA_SOURCE=mock next dev --hostname 127.0.0.1",
     "dev:db": "cross-env DATA_SOURCE=sqlite next dev --hostname 127.0.0.1",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint src scripts tests next.config.ts playwright.config.ts vitest.config.ts *.mjs --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit",

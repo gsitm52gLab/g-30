@@ -64,10 +64,10 @@ describe('Supabase strict configuration and redaction', () => {
 });
 describe('explicit 0001–0015 migration and relation parity inventory', () => {
   it('maps every immutable SQLite source checksum, index and trigger with no silent source drift', () => {
-    const migrations = readMigrations(); expect(migrations).toHaveLength(16);
+    const migrations = readMigrations(); expect(migrations).toHaveLength(18);
     for (const source of mappings.migrations) {
       const original = readFileSync(path.join('src/server/db/migrations', source.name), 'utf8');
-      const target = migrations.find(m => m.name === source.name)!;
+      const target = migrations.find(m => m.name === (source.postgres_name ?? source.name))!;
       expect(createHash('sha256').update(original).digest('hex')).toBe(source.sqlite_sha256);
       expect(target.sha256).toBe(source.postgres_sha256);
       for (const index of source.indexes) expect(target.sql).toContain(`INDEX${target.sql.includes(`INDEX IF NOT EXISTS ${index}`) ? ' IF NOT EXISTS' : ''} ${index} `);

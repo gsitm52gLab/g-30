@@ -1,3 +1,5 @@
+import { storageRelations } from './storage/constraints';
+import { auditRelations } from './audit/constraints';
 import { schedulingRelations } from './scheduling/constraints';
 import { notificationRelations } from './notifications/constraints';
 import { providerRelations } from './ai-provider/constraints';
@@ -15,6 +17,8 @@ import { productRelations } from "./products/constraints";
 import { taskRelations } from "./tasks/constraints";
 /** Same constraints for mock/SQLite; SQL adds cross-process uniqueness. */
 export function checkRelations<K extends RecordKind>(store: UnitOfWork, kind: K, input: RecordInput<K>) {
+    storageRelations(store, kind, input);
+    auditRelations(store, kind, input);
     schedulingRelations(store, kind, input);
     notificationRelations(store, kind, input);
     providerRelations(store, kind, input);

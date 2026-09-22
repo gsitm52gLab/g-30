@@ -20,15 +20,15 @@ it('G09 migration preserves populated accepted G08 notice and all old rows; repe
         const id = (await notice.create(admin, { contextId: 'ctx-jp-a-luna', content: { ...blankNotice(), title: 'Existing published notice', body: 'Keep original' }, idempotencyKey: 'g09-migration-notice' })).ids[0];
         await notice.command(admin, id, { command: 'publish', expectedRevision: 1, idempotencyKey: 'g09-migration-publication' });
         const before = db.prepare('SELECT * FROM records ORDER BY kind,id').all();
-        expect(migrate(db)).toEqual({ applied: 8, total: 15 });
+        expect(migrate(db)).toEqual({ applied: 10, total: 17 });
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
-        expect(migrate(db)).toEqual({ applied: 0, total: 15 });
+        expect(migrate(db)).toEqual({ applied: 0, total: 17 });
         expect((await seed(repo)).inserted).toBe(0);
         expect(db.prepare('SELECT * FROM records ORDER BY kind,id').all()).toEqual(before);
     }
     finally {
         if (repo)
-            (await repo.close());
+            repo.close();
         else
             db.close();
         rmSync(dir, { recursive: true, force: true });

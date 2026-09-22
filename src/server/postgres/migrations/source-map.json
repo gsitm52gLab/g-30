@@ -1,5 +1,5 @@
 {
-  "sqlite_through": "0015",
+  "sqlite_through": "0016",
   "migrations": [
     {
       "name": "0001-foundation.sql",
@@ -219,6 +219,34 @@
       "triggers": [
         "immutable_ai_provider_update",
         "immutable_ai_provider_delete"
+      ]
+    },
+    {
+      "name": "0016-audit.sql",
+      "postgres_name": "0017-audit.sql",
+      "sqlite_sha256": "5f7d113e92f44ae9242588d423d45b9e8fdfa84dc2840ff6420bb3d47c71fd39",
+      "postgres_sha256": "437f79eb19a84784bbb9d6731d78fa159bc354d16e09a9fee4abee11d0d97c16",
+      "indexes": [],
+      "triggers": [
+        "audit_no_update",
+        "audit_no_delete"
+      ]
+    },
+    {
+      "name": "0017-storage.sql",
+      "postgres_name": "0018-storage.sql",
+      "sqlite_sha256": "0e90b224641bf31e7eab530c25ce61aee6141e246e1f528a2b01349f9c9b0a8e",
+      "postgres_sha256": "fe44f611c706e99ba66c1c1ca38141ce21f2d99bfc95f7595e828f509a7af770",
+      "indexes": [
+        "storage_grant_identity",
+        "storage_object_grant",
+        "storage_stage_actor"
+      ],
+      "triggers": [
+        "storage_no_delete",
+        "storage_object_no_update",
+        "storage_grant_guard",
+        "storage_stage_guard"
       ]
     }
   ],

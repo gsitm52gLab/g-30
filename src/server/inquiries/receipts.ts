@@ -17,6 +17,6 @@ export async function replay(s: UnitOfWork, key: string, bodyHash: string, actor
         safe.corrupt();
     return ids.slice();
 }
-export async function receipt(s: UnitOfWork, contextId: string, key: string, bodyHash: string, actorId: string, command: string, ids: string[]) {
-    (await s.create('commandReceipt', { id: randomUUID(), contextId, data: { key, bodyHash, actorId, command, result: { ids } } }));
+export async function receipt(s: UnitOfWork, contextId: string, key: string, bodyHash: string, actorId: string, command: string, ids: string[], id = randomUUID()) {
+    (await s.create('commandReceipt', { id, contextId, data: { key, bodyHash, actorId, command, result: { ids } } }));
 }
