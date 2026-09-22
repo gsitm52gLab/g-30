@@ -4152,8 +4152,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "Active full GS HALE implementation and Supabase revalidation; bounded deployed auth accepted, complete Goal not achieved",
-  "next_action": "Fix newly observed production home unsent-inquiry 409; independently verify and release, then finish direct-save production smoke. UX forms and AI latency implementation parallel; remaining Goal required.",
-  "state_version": 197,
+  "next_action": "Prioritize concrete task forms and plain user language from two source-grounded workflows; finish frozen S2/S3 validations and S4 price projection repair/reverification. Full Supabase/Vercel/OpenAI/final audit remains mandatory.",
+  "state_version": 195,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4176,8 +4176,7 @@
     "2026-09-22: User again explicitly requested continuing existing active Goal to full completion; no scope or acceptance relaxation.",
     "2026-09-22: User selected Supabase PostgreSQL/private Storage for the full Vercel deployment; browser-only mock alternative not selected. Existing required product scope remains.",
     "2026-09-22: User instructed origin https://github.com/gsitm52gLab/g-30.git and authorized commit-by-commit non-force push. Previous remote retained as legacy-gs-hale.",
-    "2026-09-22: Prepare revised Goal first; user will explicitly restart. execution-v3 overrides old SQLite-only deployment and push-prohibited provisions.",
-    "2026-09-22: Remove task-registration draft-save/separate-publication workflow. Saving a task should immediately make it visible to brand. User requests faster turnaround: smallest complete fix and relevant verification first. Existing drafts are not bulk-published; other submission/AI/inquiry drafting remains scoped separately."
+    "2026-09-22: Prepare revised Goal first; user will explicitly restart. execution-v3 overrides old SQLite-only deployment and push-prohibited provisions."
   ],
   "integration_branch": "run/supabase-transition",
   "integration_worktree": "/Users/evan/workspace/gs-hale",
@@ -4189,7 +4188,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T06:33:16.107283+00:00",
+  "updated_at": "2026-09-22T05:57:42.693106+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -4707,18 +4706,10 @@
       "production_and_full_goal_accepted": false
     },
     "remaining_observed_defects": {
-      "s4_price_projection": "Fixed a81; independent bounded pass, root integration pending.",
-      "s2_mobile": "Author c0b actual/browser PASS with prior failures preserved; independent required.",
+      "s4_price_projection": "Independent2FAIL on corrupted persisted stage; author repair active; full acceptance held",
+      "s2_mobile": "8success/2failed preserved; unexpected first-item conflict under investigation, failed-only retry/restart/revoke remain NOT_RUN",
       "s2_latency": "actual finalize75.6s and notification sync133.2s in same root implementation; workspace50.1s is older source lacking accepted G03 memo, not current-root measurement",
-      "sb03": "historical SQLite/files Supabase import still required gap; design deferred during UX review",
-      "s4_actual_openai": "Actual one call completed with usage, app lease expired due 74.6s preflight +37.1s call: ENGINE_ERROR INTERRUPTED; narrow repeated-read fix authoring, new independent required."
-    },
-    "current_deployment_observed_20260922": {
-      "main": "e096b8ec1b29f946ccd74d824d7f1a8fb34469c9",
-      "github_vercel_status": "success",
-      "deployment": "5CKRnJNYbqr6A2i2au2EPQmmATPF",
-      "status_updated_at": "2026-09-22T05:41:17Z",
-      "note": "User-merged PR3; preserve. Earlier eece-only production assumption superseded."
+      "sb03": "historical SQLite/files Supabase import still required gap; design deferred during UX review"
     }
   },
   "bounded_auth_release": {
@@ -4802,7 +4793,7 @@
     "identity_exact_phrases": 5
   },
   "usability_review": {
-    "status": "UX_FORMS_IMPLEMENTATION_AND_PRODUCTION_HOME_HOTFIX",
+    "status": "SOURCE_GROUNDED_DESIGN_AND_PREPARED_IMPLEMENTATION",
     "user_confirmed": [
       "complex screens and navigation",
       "unfamiliar nonbusiness terminology",
@@ -4821,27 +4812,6 @@
     "no_prior_documents_overwritten": true,
     "no_existing_data_deleted": true,
     "full_rewrite_not_authorized": true,
-    "implementation_done": false,
-    "priority": "Direct task save hotfix before 2new forms/overall UI simplification",
-    "direct_save_hotfix": {
-      "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/task-direct-save-hotfix/task.json",
-      "base": "e096b8ec1b29f946ccd74d824d7f1a8fb34469c9",
-      "author": "/root/supabase_scope_review",
-      "verifier": "/root/sb_postgres_foundation",
-      "state": "SOURCE_ACCEPTED_PUSHED_DEPLOYED_PRODUCTION_PARTIAL_FAILURE",
-      "original_user_tasks_unchanged": true,
-      "deployed_findings": "2draft tasks excluded from brand catalog; exact user task unconfirmed",
-      "candidate": "d25fdb2c354a6742c9bd13c72214e0da4396cd5f",
-      "release_commit": "38e76c2523036ddbbcadf9e3380d0a7c2a2cd329",
-      "vercel_status": "success",
-      "vercel_deployment": "wu7Ei9xZ8hFUw89f4msqvneXMBRS",
-      "production_create_pass": true,
-      "production_brand_list_detail_api_status": 200,
-      "production_home_status": 409,
-      "production_defect": "Existing unsent inquiry triggers CONFLICT in home schedule aggregation; no original rows changed.",
-      "evidence": ".execution/private/runs/RUN-20260921-01/SUPABASE/task-direct-save-hotfix/production-02/result.json"
-    },
-    "forms_owner": "/root/prd",
-    "home_fix_owner": "/root/supabase_scope_review"
+    "implementation_done": false
   }
 }

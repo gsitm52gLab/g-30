@@ -122,3 +122,13 @@ Main-source fetchedactualorigin/main eece434;30AI sourcepaths byteidentical curr
 ## State195 authoritative override
 
 User confirms complex navigation/unfamiliar terminology/weak concrete task input definition. Goal remains active/full scope; no rewrite or deletion authorized. New source-grounded two-case contract at docs/product-review/2026-09-22-workflow-examples.md, UXR task packet under SUPABASE/usability-task-forms. Original v1 templates mostly one generic response; next implementation adds explicit versioned forms and simpler entry controls while preserving histories. Current frozen S2/S3 actual validation continues; S4 corrupted persisted-price projection is open and author repair active. SB03 import preservation gap remains design-deferred. Shared FileLink96c74fb accepted bounded. SB05 actual two-instance lifecycle accepted bounded after root31artifacts/706source hashes and assertion review; historical selector failure retained, final union binding still required. Current root96c74fb equals pushed transition; productioneece434 unchanged. Full Supabase/Vercel/OpenAI/final journeys/audit not complete.
+
+
+## State196 authoritative override
+
+User explicitly removes task draft-save/separate-publication UI and requests speed. Primary hotfix: save→atomic publish→brand visible, including project-created tasks and duplicates; old histories preserved, no bulk publication, no other draft behavior changes. Author scope in hotfix-task-direct-save, base latestmain e096 (user merged PR3, Vercel success05:41:17UTC deployment5CKRnJNYbqr6A2i2au2EPQmmATPF), verifierSBpostgres next. Root actual read-only deployed API sees2draft tasks absent from brand catalog; exact user task title unconfirmed. New form/terminology work follows hotfix. S4 a81 bounded independent review done; provider realcall0/NOT_RUN. S2 c0b browser finishing, S3 590 candidate cursor-aware read memo finishing. Full Goal remains active.
+
+
+## State197 — direct save released, production home defect found
+
+Main `38e76c2` pushed; Vercel wu7Ei9xZ8hFUw89f4msqvneXMBRS success. Actual production registration/pass and brand task list/detail API200. Home409 CONFLICT from unsent inquiry, newly observed on production fixtures; root delegated minimal fix to scope before broader S3 verification. Two original production failures retained; own synthetic tasks cancelled only. UX forms assigned prd from accepted38. S4 actual one OpenAI completion usage returned but app lease expired; SB authoring narrow repeated-read fix, not accepted and no automatic second API call. Whole Goal ACTIVE/incomplete.
