@@ -33,3 +33,12 @@ export function privateJsonResponse(request: Request, value: unknown, id: string
   if (bytes.length > STORAGE_LIMITS.chunkBytes) fail('RANGE_REQUIRED', 422, '범위 다운로드로 전체 미리보기를 확인해 주세요.');
   return json(value);
 }
+
+/** Re-authorize after serialization: no protected bytes escape a changed context/price grant. */
+export async function authorizedPrivateJsonResponse(request: Request, load: () => Promise<unknown>, id: string, downloadUrl: string) {
+  const value = await load(), before = digest(Buffer.from(JSON.stringify(value)));
+  const response = privateJsonResponse(request, value, id, downloadUrl);
+  const current = await load();
+  if (digest(Buffer.from(JSON.stringify(current))) !== before) fail('CONFLICT', 412, '표시 자료를 다시 확인해 주세요.');
+  return response;
+}

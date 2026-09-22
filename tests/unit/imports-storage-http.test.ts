@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { privateJsonResponse } from '@/server/imports/storage-http';
+import { authorizedPrivateJsonResponse, privateJsonResponse } from '@/server/imports/storage-http';
 import { digest } from '@/domain/storage/validate';
 import { STORAGE_LIMITS } from '@/domain/storage/types';
 describe('private import DTO bounded JSON transport',()=>{
@@ -16,4 +16,14 @@ describe('private import DTO bounded JSON transport',()=>{
   expect(()=>privateJsonResponse(new Request(url,{headers:{range:'bytes=0-1','if-match':'"stale"'}}),value,'a','/api/imports/preview/a?page=1')).toThrow();
   for(const range of ['bytes=0-99999999','bytes=0-1,3-4','bytes=-1','bytes=3-1']) expect(()=>privateJsonResponse(new Request(url,{headers:{range,'if-match':m.etag}}),value,'a','/api/imports/preview/a?page=1')).toThrow();
  });
+});
+
+it('rechecks current authorization and identical DTO after serialization before returning metadata or bytes', async () => {
+  let calls = 0;
+  await expect(authorizedPrivateJsonResponse(new Request('https://app.invalid/api/imports/source/x?transfer=1'), async () => {
+    if (++calls === 2) throw Object.assign(new Error('revoked'), { status: 404 });
+    return { value: 'protected' };
+  }, 'x', '/api/imports/source/x')).rejects.toMatchObject({ status: 404 });
+  calls = 0;
+  await expect(authorizedPrivateJsonResponse(new Request('https://app.invalid/api/imports/source/x?transfer=1'), async () => ({ revision: ++calls }), 'x', '/api/imports/source/x')).rejects.toMatchObject({ status: 412 });
 });
