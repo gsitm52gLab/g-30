@@ -23,7 +23,14 @@ export function emptyTransport(issue:ProviderIssue,unknown=false):TransportResul
 export const openaiTransport:Transport=async(config,request,beforeDispatch,onDispatch)=>{
  try {
   const client=new OpenAI({apiKey:config.apiKey,baseURL:config.baseURL,maxRetries:0,timeout:PROVIDER_LIMITS.timeoutMs,logLevel:'off',fetch:async(input,init)=>{await beforeDispatch();const pending=fetch(input,init);void pending.catch(()=>{});await onDispatch();return pending;}});
-  const {data,response}=await client.responses.create(request).withResponse();
+  // asResponse keeps SDK HTTP/error/timeout handling, without its eager addOutputText
+  // transform throwing before our safe metadata projection on malformed envelopes.
+  const response=await client.responses.create(request).asResponse();
+  const parseFailure=()=>{const r=emptyTransport('PARSE_ERROR');r.requestId=identifier(response.headers.get('x-request-id'));r.responseHash=sha256(JSON.stringify(r));return r;};
+  const mediaType=response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase();
+  if(!mediaType?.includes('application/json')&&!mediaType?.endsWith('+json'))return parseFailure();
+  let value:unknown;try{value=await response.json();}catch(e){if(e instanceof SyntaxError)return parseFailure();throw e;}
+  const data=value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{};
   const result:TransportResult={issue:null,responseId:identifier(data?.id),requestId:identifier(response.headers.get('x-request-id')),responseModel:label(data?.model),serviceTier:label(data?.service_tier),providerStatus:label(data?.status),rawCandidate:null,responseHash:null,usage:providerUsage(data?.usage),remoteOutcomeUnknown:false};
   const finish=()=>{result.responseHash=sha256(JSON.stringify(result));return result;};
   if(!Array.isArray(data?.output)){result.issue='PARSE_ERROR';return finish();}

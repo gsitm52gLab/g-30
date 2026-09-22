@@ -21,3 +21,5 @@ Pricing snapshot2026-09-22, USD/1M gpt-6-astra standard input10/cached1/cache-wr
 Official sources: https://developers.openai.com/api/docs/models/gpt-6-astra ; https://developers.openai.com/api/docs/guides/structured-outputs ; https://developers.openai.com/api/docs/guides/prompt-caching ; https://developers.openai.com/api/docs/pricing . Exact implementation-day downloaded sources and SDK revision are in the private G17 documentation-preflight evidence.
 
 Malformed parsed provider output preserves safe actual response/request IDs, model/status/tier and provided usage even when content cannot be parsed. It cannot become an empty successful result.
+
+Received responses use the SDK's public `asResponse()` boundary so SDK `addOutputText` cannot discard safe metadata before application validation. Parsed JSON remains unknown until explicit projection; malformed `object:response` output/content yields PARSE_ERROR with provided identity/usage/cost, no candidate and received-outcome uncertainty false. Arbitrary provider bodies are never persisted. Non-JSON/lexically invalid bodies do not invent usage; unreceived SDK timeouts remain uncertain.
