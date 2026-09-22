@@ -94,9 +94,9 @@ describe("migration and persistence setup", () => {
     it("migrates an empty DB twice without losing writes", () => {
         const db = openDatabase(":memory:", true);
         try {
-            expect(migrate(db)).toEqual({ applied: 15, total: 15 });
+            expect(migrate(db)).toEqual({ applied: 16, total: 16 });
             db.prepare("INSERT INTO records VALUES ('checkpoint','preserved',NULL,'{}',1,'now','now')").run();
-            expect(migrate(db)).toEqual({ applied: 0, total: 15 });
+            expect(migrate(db)).toEqual({ applied: 0, total: 16 });
             expect(db.prepare("SELECT id FROM records").all()).toEqual([{ id: "preserved" }]);
         }
         finally {

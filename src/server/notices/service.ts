@@ -98,15 +98,15 @@ export class NoticeService {
                     const content = noticeInput(v.content);
                     (await validateReferences(s, p, n, content, this.clock));
                     (await s.update('notice', id, n.revision, { ...n.data, draft: content }));
-                    (await audit(s, p, this.clock, n.contextId!, 'notice.draft_saved', id, { revision: n.revision }, { revision: n.revision + 1 }));
+                    (await audit(s, p, this.clock, n.contextId!, 'notice.draft_saved', id, { revision: n.revision, draftTitle: n.data.draft.title, draftBody: n.data.draft.body }, { revision: n.revision + 1, draftTitle: content.title, draftBody: content.body }));
                     return { ids: [id] };
                 }
                 const content = noticeInput(n.data.draft, true);
                 (await validateReferences(s, p, n, content, this.clock, true));
                 const previous = r.current, version = (await s.create('noticeVersion', { id: newId(), contextId: n.contextId, data: { noticeId: id, sequence: (previous ? noticeSequence(previous) : 0) + 1, previousId: previous?.id ?? null, content, publishedBy: p.user.id, publishedAt: this.clock(), publishedRecipientUserIds: (await activeBrands(s, n.contextId!)).filter(u => content.audience.mode === 'all' || content.audience.userIds.includes(u.id)).map(u => u.id) } }));
                 (await s.update('notice', id, n.revision, { ...n.data, currentVersionId: version.id }));
-                (await s.create('domainEvent', { id: newId(), contextId: n.contextId, data: { eventType: previous ? 'NOTICE_REVISED' : 'NOTICE_PUBLISHED', targetId: id, sourceVersionId: version.id, actorId: p.user.id, at: this.clock() } }));
-                (await audit(s, p, this.clock, n.contextId!, 'notice.published', id, { versionId: previous?.id ?? null }, { versionId: version.id }));
+                const event = (await s.create('domainEvent', { id: newId(), contextId: n.contextId, data: { eventType: previous ? 'NOTICE_REVISED' : 'NOTICE_PUBLISHED', targetId: id, sourceVersionId: version.id, actorId: p.user.id, at: this.clock() } }));
+                (await audit(s, p, this.clock, n.contextId!, 'notice.published', id, { versionId: previous?.id ?? null }, { versionId: version.id, domainEventId: event.id }));
                 return { ids: [id, version.id] };
             }, this.fault));
         });

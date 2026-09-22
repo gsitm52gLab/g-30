@@ -57,8 +57,8 @@ export class ProductService {
                 unavailable();
             return (await receipt(s, p, contextId, "product.create", v, async () => {
                 const result = (await createProduct(s, p, this.clock, contextId, brandId, common, fields)), product = (await s.get("product", result.productId))!, cpId = result.contextProductId;
-                (await audit(s, p, this.clock, contextId, "product.created", product.id, {}, { name: common.name, code: common.code }));
-                (await s.create("domainEvent", { id: newId(), contextId, data: { eventType: "PRODUCT_CREATED", targetId: product.id, sourceVersionId: (await s.get("product", product.id))!.data.currentVersionId!, actorId: p.user.id, at: this.clock() } }));
+                const auditEvent = (await s.create("domainEvent", { id: newId(), contextId, data: { eventType: "PRODUCT_CREATED", targetId: product.id, sourceVersionId: (await s.get("product", product.id))!.data.currentVersionId!, actorId: p.user.id, at: this.clock() } }));
+                (await audit(s, p, this.clock, contextId, "product.created", product.id, {}, { name: common.name, code: common.code, commonVersionId: product.data.currentVersionId, contextVersionId: (await s.get("contextProduct", cpId))!.data.currentVersionId }, { references: [{ kind: 'domainEvent', id: auditEvent.id, role: 'source' }] }));
                 return { ids: [product.id, cpId] };
             }, () => this.fault?.("create")));
         });
@@ -107,6 +107,7 @@ export class ProductService {
                 (await authorize(s, p, "product.edit", productContextScope(str(v.targetContextId, 160, true), productId), this.clock));
             return (await receipt(s, p, contextId, `product.${productId}.${command}`, v, async () => {
                 let versionId: string | null = null;
+                const previousVersionId = ["save_common", "archive", "restore"].includes(command) ? r.common.id : ["save_context", "save_files"].includes(command) ? r.local.id : command === "save_retail" || command === "save_internal" ? (await s.list(command === "save_retail" ? "retailPrice" : "internalPrice", contextId)).find(x => x.data.contextProductId === r.relation.id)?.data.currentVersionId ?? null : null;
                 if (command === "save_common" || command === "archive" || command === "restore") {
                     fresh(r.product, v.expectedCommonRevision);
                     const common = command === "save_common" ? commonInput(v.common) : commonDTO(r.common.data.common);
@@ -148,8 +149,8 @@ export class ProductService {
                         (await s.update("task", task.id, task.revision, { ...task.data, productIds: [...task.data.productIds, productId] }));
                     versionId = task.id;
                 }
-                (await audit(s, p, this.clock, contextId, `product.${command}`, productId, {}, { versionId }));
-                (await s.create("domainEvent", { id: newId(), contextId, data: { eventType: `PRODUCT_${command.toUpperCase()}`, targetId: productId, sourceVersionId: versionId, actorId: p.user.id, at: this.clock() } }));
+                const auditEvent = (await s.create("domainEvent", { id: newId(), contextId, data: { eventType: `PRODUCT_${command.toUpperCase()}`, targetId: productId, sourceVersionId: versionId, actorId: p.user.id, at: this.clock() } }));
+                (await audit(s, p, this.clock, contextId, `product.${command}`, productId, { versionId: previousVersionId }, { versionId }, { references: [{ kind: 'domainEvent', id: auditEvent.id, role: 'source' }] }));
                 return { ids: [productId, ...versionId ? [versionId] : []] };
             }, () => this.fault?.(command)));
         });

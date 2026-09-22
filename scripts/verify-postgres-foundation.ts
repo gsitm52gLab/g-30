@@ -60,9 +60,9 @@ try {
       await client.query('COMMIT');
     } finally { client.release(); }
   });
-  await check('explicit migrations apply baseline 0001–0015 plus PG-only 0016 atomically', async () => {
-    const migration = await migratePostgres(config); assert.equal(migration.total, 16);
-    assert.equal(migration.applied, 16 - Number(result.inventory.applied_migration_count));
+  await check('explicit migrations apply baseline plus revision-width0016 and audit0017 atomically', async () => {
+    const migration = await migratePostgres(config); assert.equal(migration.total, 17);
+    assert.equal(migration.applied, 17 - Number(result.inventory.applied_migration_count));
   });
   if (result.counts.fail) throw new Error('Migrations unavailable');
   await check('additive migration preserves every pre-existing record byte representation', async () => {
@@ -192,7 +192,7 @@ try {
       assert.equal(preserved?.revision, Number.MAX_SAFE_INTEGER); assert.equal(preserved?.data.value, 'last exact value');
     });
     for (const map of mappings.migrations) {
-      const sql = readFileSync(`src/server/postgres/migrations/${map.name}`, 'utf8');
+      const sql = readFileSync(`src/server/postgres/migrations/${map.postgres_name ?? map.name}`, 'utf8');
       for (const index of map.indexes.filter(n => n !== 'records_kind_context')) {
         await check(`SQL unique index rejects duplicate: ${index}`, async () => {
           const line = sql.split('\n').find(l => l.includes(` ${index} `))!;

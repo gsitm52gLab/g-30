@@ -74,6 +74,7 @@ export interface InvitationData {
     createdBy: string;
 }
 export interface AuditData {
+    detail?: import("./audit/types").AuditDetail;
     actorId: string;
     action: string;
     targetId: string;

@@ -24,7 +24,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
     const sqlSource = path.resolve('src/server/db/migrations'), sqlDirectory = path.join(directory, 'prior');
     await mkdir(sqlDirectory);
     const names = (await readdir(sqlSource)).filter(n => /^\d+.*\.sql$/.test(n)).sort();
-    expect(names).toEqual(['0001-foundation.sql', '0002-identity.sql', '0003-tasks.sql', '0004-products.sql', '0005-submissions.sql', '0006-evidence-imports.sql', '0007-notices.sql', '0008-inquiries.sql', '0009-corrections.sql', '0010-campaigns.sql', '0011-completion.sql', '0012-ai-input.sql', '0013-ai-review.sql', '0014-scheduling-notifications.sql', '0015-ai-provider.sql']);
+    expect(names).toEqual(['0001-foundation.sql', '0002-identity.sql', '0003-tasks.sql', '0004-products.sql', '0005-submissions.sql', '0006-evidence-imports.sql', '0007-notices.sql', '0008-inquiries.sql', '0009-corrections.sql', '0010-campaigns.sql', '0011-completion.sql', '0012-ai-input.sql', '0013-ai-review.sql', '0014-scheduling-notifications.sql', '0015-ai-provider.sql', '0016-audit.sql']);
     for (const name of names.filter(n => Number(n.slice(0, 4)) <= 5 || Number(n.slice(0, 4)) === firstModule))
         await copyFile(path.join(sqlSource, name), path.join(sqlDirectory, name));
     const db = openDatabase(path.join(directory, 'populated.sqlite'), true);
@@ -75,7 +75,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
         const fileHash = hash((await files.download(brand, file.id, reference, 'original')).bytes);
         expect(fileHash).toBe(hash(png));
         expect((await repo.list('commandReceipt')).length).toBeGreaterThan(4);
-        expect(migrate(db)).toEqual({ applied: 9, total: 15 });
+        expect(migrate(db)).toEqual({ applied: 10, total: 16 });
         expect(rows()).toEqual(before);
         const allMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as {
             name: string;
@@ -85,7 +85,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
         expect(allMigrations.filter(m => Number(m.name.slice(0, 4)) <= 5 || Number(m.name.slice(0, 4)) === firstModule)).toEqual(oldMigrations);
         for (const m of allMigrations)
             expect(m.sha256).toBe(hash(await readFile(path.join(sqlSource, m.name))));
-        expect(migrate(db)).toEqual({ applied: 0, total: 15 });
+        expect(migrate(db)).toEqual({ applied: 0, total: 16 });
         expect(rows()).toEqual(before);
         expect(await original.replay()).toEqual(original.result);
         expect(rows()).toEqual(before);
@@ -102,7 +102,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
     }
     finally {
         if (repo)
-            (await repo.close());
+            repo.close();
         else
             db.close();
         await rm(directory, { recursive: true, force: true });

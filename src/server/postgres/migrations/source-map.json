@@ -1,5 +1,5 @@
 {
-  "sqlite_through": "0015",
+  "sqlite_through": "0016",
   "migrations": [
     {
       "name": "0001-foundation.sql",
@@ -219,6 +219,17 @@
       "triggers": [
         "immutable_ai_provider_update",
         "immutable_ai_provider_delete"
+      ]
+    },
+    {
+      "name": "0016-audit.sql",
+      "postgres_name": "0017-audit.sql",
+      "sqlite_sha256": "5f7d113e92f44ae9242588d423d45b9e8fdfa84dc2840ff6420bb3d47c71fd39",
+      "postgres_sha256": "437f79eb19a84784bbb9d6731d78fa159bc354d16e09a9fee4abee11d0d97c16",
+      "indexes": [],
+      "triggers": [
+        "audit_no_update",
+        "audit_no_delete"
       ]
     }
   ],
