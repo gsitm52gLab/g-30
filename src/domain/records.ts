@@ -183,19 +183,26 @@ export class StoreError extends Error {
         this.name = "StoreError";
     }
 }
-/** Transaction callbacks are synchronous; perform network/crypto work before entering. */
-export interface UnitOfWork {
+/** Internal local-adapter contract only. Never expose this interface to remote consumers. */
+export interface SyncUnitOfWork {
     get<K extends RecordKind>(kind: K, id: string): StoredRecord<K> | null;
     list<K extends RecordKind>(kind: K, contextId?: string): StoredRecord<K>[];
     create<K extends RecordKind>(kind: K, input: RecordInput<K>): StoredRecord<K>;
     update<K extends RecordKind>(kind: K, id: string, expectedRevision: number, data: RecordDataMap[K], migration?: { legacyProductContextId: string }): StoredRecord<K>;
 }
-export interface RecordRepository {
-    readonly mode: "mock" | "sqlite";
+/** Public storage contract: every operation is asynchronous in every mode. */
+export interface UnitOfWork {
     get<K extends RecordKind>(kind: K, id: string): Promise<StoredRecord<K> | null>;
     list<K extends RecordKind>(kind: K, contextId?: string): Promise<StoredRecord<K>[]>;
-    transaction<T>(operation: (store: UnitOfWork) => T): Promise<T>;
-    close(): void;
+    create<K extends RecordKind>(kind: K, input: RecordInput<K>): Promise<StoredRecord<K>>;
+    update<K extends RecordKind>(kind: K, id: string, expectedRevision: number, data: RecordDataMap[K], migration?: { legacyProductContextId: string }): Promise<StoredRecord<K>>;
+}
+export interface RecordRepository {
+    readonly mode: "mock" | "sqlite" | "supabase";
+    get<K extends RecordKind>(kind: K, id: string): Promise<StoredRecord<K> | null>;
+    list<K extends RecordKind>(kind: K, contextId?: string): Promise<StoredRecord<K>[]>;
+    transaction<T>(operation: (store: UnitOfWork) => T | Promise<T>): Promise<T>;
+    close(): void | Promise<void>;
 }
 export function jsonCopy<T>(value: T): T {
     try {
