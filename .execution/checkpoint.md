@@ -108,3 +108,12 @@ Shared file contract a385 independently38PASS then integrated ca17949 with113tar
 G03 final a6def freezes readWorkspace readonly memo import/wrapper after ab241 product memo. Independent actual product create/edit/reload and savedAI→task navigation passed on ab241, but task reply form timeout before POST retained; prd now final narrow remaining actual. No full G03 acceptance yet. S4 server baseline11actualPASS remains bounded with recorded scope corrections; AI-only WebP, large JSON bounded read and UI implementation continue. No new shared schema beyond sole S4SQLite18/PG19.
 
 Root+3 sessions; production remains eece434, full Goal active. Required final journeys/SB05/deployed worker+OpenAI/final225 audit unchanged, target16:25KST. Submission-log task remains cancelled.
+
+
+## State194 authoritative override
+
+G03a6 independently boundedPASS: finalPC390 answer/save/reload/product2PASS +newPID/relogin1PASS, ownPG/home priorproof sourcebound. 128artifacts+9traceCRC verified0errors. Integrated root4a7a299,27candidatepaths identical,928unitPASS/lint/type/build0. Boundedhome/navigation coreACCEPTED; wholeG03 notaccepted until attachment+inquiry/allmenujourney. Productread58s→7s actual, workspace timeout closure keptoriginalfailures.
+
+S2 candidate4345 frozen915checkPASS; authoractual ownPG/Storage andfinalbuild active. Shared FileLink929 singlefile independent prd browsergate active, S3d22477 early36unit/build0 waitsreadviewcontract. S4 product3818 fullcandidatea862 helper-onlydelta137unit/build0, actualserver11+WebP5PASS, browserExcel/source crossNext2PASS; originalmobile selector timeout preserved, continuation ongoing. Root+3only, nextverificationrotationS2→prd,S4→SBpostgres,S3→scope.
+
+Main-source fetchedactualorigin/main eece434;30AI sourcepaths byteidentical currentroot, curated corpus identical historicalG16candidate. Sourcecontinuity only, nofreshlegalreading/providercall. Demo script9132581 adds completeplannedscenario/originalbranding; finalrehearsalNOT_RUN. FullSB05/finaljourney/deployedworkers+OpenAI/225audit mandatory; target16:25KST unchanged.

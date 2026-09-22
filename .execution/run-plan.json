@@ -330,49 +330,64 @@
         "G13",
         "G14"
       ],
-      "state": "PLANNED",
+      "state": "IMPLEMENTED_BOUNDED_CORE_ACCEPTED_CROSSFEATURE_PENDING",
       "required_for_product_completion": true,
-      "candidate_commit": null,
-      "integration_commit": null,
-      "implementer_session_id": null,
-      "verifier_session_id": null,
+      "candidate_commit": "a6def5b280c21783400beaaef2a3329e85eb4b53",
+      "integration_commit": "4a7a2999caf69570778f9e74d8720ae09ef924eb",
+      "implementer_session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
+      "verifier_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
       "attempt": 0,
       "owned_paths": [],
-      "actual_worktree_cwd": null,
+      "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g03-supabase-home",
       "evidence_root": ".execution/private/runs/<run-id>/G03/<attempt>/",
       "acceptance": [
         {
           "id": "AC-03-01",
           "expected": "신규 배정 업무가 해당 브랜드 홈과 GSG 홈에 같은 담당·기한으로 나타난다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_BOUNDED_G03_CORE_FINAL_INTEGRATION_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         },
         {
           "id": "AC-03-02",
           "expected": "모든 주요 메뉴에서 목록→상세→관련 업무/상품으로 실제 이동한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PARTIAL_CROSSFEATURE_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         },
         {
           "id": "AC-03-03",
           "expected": "상품정보가 독립 메뉴로 표시되고 등록/수정 동작에 연결된다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_BOUNDED_G03_CORE_FINAL_INTEGRATION_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         },
         {
           "id": "AC-03-04",
           "expected": "모바일·키보드로 요청 확인→답변→첨부→문의 흐름을 완료한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PARTIAL_CROSSFEATURE_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         },
         {
           "id": "AC-03-05",
           "expected": "로그인·홈·앱 헤더·메타데이터와 발표 표지/도입/대본에서 지정 문구의 철자·띄어쓰기·내용이 원문과 일치한다.",
-          "status": "NOT_RUN",
-          "evidence": []
+          "status": "PASS_BOUNDED_G03_CORE_FINAL_INTEGRATION_PENDING",
+          "evidence": [
+            "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
+          ],
+          "current_supabase_scope": "Boundedhome/core verified; fullAC closure at finalcrossfeature journey"
         }
       ],
-      "next_action": "DoR와 실제 선행 ACCEPTED 증거 확인 후 구현 패킷 발행",
+      "next_action": "Complete integrated mobile keyboard attachment/inquiry and all main menu deep links; do not mark wholeG03accepted yet.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/task-draft.json",
         "sha256": "d18132b3295ed9f52592aa21b58ac0c5d5d2f433932afb45789755036a1356ab"
@@ -401,7 +416,9 @@
       "route_navigation_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/route-navigation-preparation-task.json",
         "sha256": "59f6527a752809e8a0de4f3afff048122e78ca83a5bb54f82cc65bcab4bc0c58"
-      }
+      },
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-home-independent/result.json",
+      "bounded_acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/acceptance.json"
     },
     {
       "id": "G04",
@@ -4135,8 +4152,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "Active full GS HALE implementation and Supabase revalidation; bounded deployed auth accepted, complete Goal not achieved",
-  "next_action": "G03 a6def remaining task-answer actual verification then integration; shared file helper ca179 ACCEPTED, S2/S3/S4 consumer implementations parallel. Final Supabase journeys/SB05/deployed workers and configured OpenAI/final225 audit remain.",
-  "state_version": 193,
+  "next_action": "G03 bounded home core accepted4a7a299 (928check/build); finish FileLink929 browser contract verification to unblockS3, independent S2 candidate4345 andS4 product3818/helpera862 actual verification; full journeys/SB05/Vercel/API/finalaudit remain.",
+  "state_version": 194,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4171,7 +4188,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T05:16:17.410226+00:00",
+  "updated_at": "2026-09-22T05:32:45.129399+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -4340,7 +4357,7 @@
       {
         "id": "S2-FILES-SUBMISSIONS-UI-WRAPPERS",
         "owner": "/root/sb_postgres_foundation",
-        "state": "IMPLEMENTING",
+        "state": "CANDIDATE_FROZEN_AUTHOR_ACTUAL_AND_S4_INDEPENDENT",
         "base_commit": "d09c76efaa01e53aa1137f9c8e92c5a6d2557010",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-files-submissions/task.json",
         "shared_helper_candidate": "a38597ab535932a5755ea4689a75db161f6c9fd9",
@@ -4350,7 +4367,7 @@
           "822lateabort13P1F"
         ],
         "other_g03_candidate": "a6def5b280c21783400beaaef2a3329e85eb4b53",
-        "g03_state": "INDEPENDENT_REMAINING_TASK_ANSWER_AFTER_READONLY_WORKSPACE_DELTA",
+        "g03_state": "ACCEPTED_BOUNDED_HOME_CORE",
         "g03_actual_product_latency": {
           "before_ms": 58182,
           "after_ms": 5975,
@@ -4358,24 +4375,29 @@
           "after_reads": 41,
           "writes": 0,
           "dto_identical": true
-        }
+        },
+        "candidate": "4345d4a087a7d7f934fe574b7f5a64d10752bbf6",
+        "author_unit_pass": 915
       },
       {
         "id": "S3-INQUIRY-AND-BOUNDED-VERIFICATION",
         "owner": "/root/prd",
-        "state": "IMPLEMENTING_S3_PARALLEL_G03_REMAINING_ACTUAL",
+        "state": "S3_EARLY_FROZEN_FILELINK_INDEPENDENT_THEN_S2_INDEPENDENT",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-inquiries/task.json",
         "helper_verification_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-contract-independent/task.json",
         "g03_candidate_under_verification": "a6def5b280c21783400beaaef2a3329e85eb4b53",
         "g03_pass": "OwnPGhome PC/mobile/restart, scalarfault503/recovery,55baseline+101affectedunit,2redclosed",
-        "g03_remaining": "Actual product create/edit/reload and saved AI navigation passed on ab241. Task reply form still timed out before POST; verify final workspace read delta. Attachments later S2/S3."
+        "g03_remaining": "Actual product create/edit/reload and saved AI navigation passed on ab241. Task reply form still timed out before POST; verify final workspace read delta. Attachments later S2/S3.",
+        "candidate": "d22477f",
+        "filelink_candidate": "929adfd9c3fdaad3b682d50e0ce5c1b026cc1f45",
+        "g03_state": "BOUNDED_INDEPENDENT_PASS_INTEGRATED"
       },
       {
         "id": "S4-EXCEL-AI",
         "owner": "/root/supabase_scope_review",
-        "state": "IMPLEMENTING_UI_WEBP_AND_BOUNDED_LARGE_JSON_TRANSFER",
+        "state": "PRODUCT_FROZEN_AUTHOR_BROWSER_CONTINUATION",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-excel-ai/task.json",
-        "candidate": "e02161e3bbe1625c1fd0e907abcf388844a4c248",
+        "candidate": "a86296b8a4b156e4c9a771ee1ae3f7e2dbce4290",
         "author_units": 214,
         "actual_pass": 11,
         "actual_fail": 0,
@@ -4394,7 +4416,11 @@
         ],
         "runtime_resources": "baseline23856terminal0,6ownkeyscleaned,poolsclosed",
         "shared_helper_dependency": "ACCEPTED ca17949",
-        "large_json_transfer": "Preserve full source/preview JSON with current ACL checked bounded ranges; no additional schema or value truncation"
+        "large_json_transfer": "Preserve full source/preview JSON with current ACL checked bounded ranges; no additional schema or value truncation",
+        "product_source_candidate": "3818dff8c5d53d8b4318d058138ab1bce568290f",
+        "author_webp_actual_pass": 5,
+        "author_browser_excel_pass": 2,
+        "author_browser_mobile": "Original selector timeout retained; role-selector continuation in progress"
       }
     ],
     "storage_primitive_acceptance": {
@@ -4593,6 +4619,52 @@
       "root_typecheck_exit": 0,
       "root_lint_exit": 0,
       "acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-contract-root-integration/acceptance.json"
+    },
+    "g03_bounded_acceptance": {
+      "status": "ACCEPTED_BOUNDED_G03_HOME_NAVIGATION_CORE",
+      "at": "2026-09-22T05:32:45.129399+00:00",
+      "candidate": "a6def5b280c21783400beaaef2a3329e85eb4b53",
+      "integration_commit": "4a7a2999caf69570778f9e74d8720ae09ef924eb",
+      "cwd": "/Users/evan/workspace/gs-hale",
+      "author_session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
+      "independent_session_id": "01a0c307-9b54-7b83-b5eb-1b12b9a8553c",
+      "independent_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-home-independent/result.json",
+      "independent_result_sha256": "5c5926e233d2c1017b50ee144c6edcba0b47e7a74f3f7cd2e0027a0973dae6cd",
+      "independent_artifacts_verified": 128,
+      "independent_traces_crc_verified": 9,
+      "root": {
+        "unit_pass": 928,
+        "unit_fail": 0,
+        "unit_skip": 0,
+        "lint_exit": 0,
+        "typecheck_exit": 0,
+        "build_exit": 0,
+        "candidate_source_paths_identical": 27
+      },
+      "actual_final_browser": {
+        "desktop_and_mobile_answer_save_reload_related_product_pass": 2,
+        "new_pid_relogin_preserved_answer_ai_pass": 1,
+        "source_bound_prior": "Own realPG home5 + homebrowser3, product create/edit/reload PC, exactcampaign/AI navigation; result packet separates original failures and repaired/source-bound cases"
+      },
+      "scope": "Canonical role home/counts/filter/list/kanban/project timeline, independent product nav and related links, strict scalar projection, readonly request-local memo in product/submission/workspace reads.",
+      "not_run": [
+        "AC03-04 fullattachment+inquiry journey waits accepted S2/S3",
+        "All mainmenus bothviewport CRUD final sweep",
+        "Actual final Vercel release"
+      ],
+      "full_g03_accepted": false,
+      "full_goal_accepted": false,
+      "source_binding": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/source-binding.json",
+      "commands": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-root-integration/commands.json"
+    },
+    "main_source_continuity": {
+      "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/main-source-continuity/record.json",
+      "sha256": "fa99922b9d07bc8f9aecf29c424010742011e1ef4300776457e982461c840073",
+      "main": "eece434adf3793fd7a603f997eee15f729c4eef0",
+      "unchanged_source_paths": 30,
+      "corpus_same_as_historical_independent": true,
+      "fresh_legal_reading": 0,
+      "full_sb16_accepted": false
     }
   },
   "bounded_auth_release": {
@@ -4668,5 +4740,11 @@
     "broken": 0,
     "claim": "Currenttransitioninstructions only; finalreproductionpending"
   },
-  "final_journey_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/final-journey/prepared-task.json"
+  "final_journey_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/final-journey/prepared-task.json",
+  "demo_script": {
+    "path": "docs/demo/demo-script.md",
+    "source_commit": "9132581",
+    "rehearsal": "NOT_RUN final source pending",
+    "identity_exact_phrases": 5
+  }
 }
