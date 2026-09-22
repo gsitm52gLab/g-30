@@ -61,8 +61,8 @@ try {
     } finally { client.release(); }
   });
   await check('explicit migrations apply baseline plus revision-width0016 and audit0017 atomically', async () => {
-    const migration = await migratePostgres(config); assert.equal(migration.total, 17);
-    assert.equal(migration.applied, 17 - Number(result.inventory.applied_migration_count));
+    const migration = await migratePostgres(config); assert.equal(migration.total, 18);
+    assert.equal(migration.applied, 18 - Number(result.inventory.applied_migration_count));
   });
   if (result.counts.fail) throw new Error('Migrations unavailable');
   await check('additive migration preserves every pre-existing record byte representation', async () => {

@@ -231,6 +231,23 @@
         "audit_no_update",
         "audit_no_delete"
       ]
+    },
+    {
+      "name": "0017-storage.sql",
+      "postgres_name": "0018-storage.sql",
+      "sqlite_sha256": "0e90b224641bf31e7eab530c25ce61aee6141e246e1f528a2b01349f9c9b0a8e",
+      "postgres_sha256": "fe44f611c706e99ba66c1c1ca38141ce21f2d99bfc95f7595e828f509a7af770",
+      "indexes": [
+        "storage_grant_identity",
+        "storage_object_grant",
+        "storage_stage_actor"
+      ],
+      "triggers": [
+        "storage_no_delete",
+        "storage_object_no_update",
+        "storage_grant_guard",
+        "storage_stage_guard"
+      ]
     }
   ],
   "postgres_only": [

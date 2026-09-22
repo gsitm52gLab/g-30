@@ -64,7 +64,7 @@ describe('Supabase strict configuration and redaction', () => {
 });
 describe('explicit 0001–0015 migration and relation parity inventory', () => {
   it('maps every immutable SQLite source checksum, index and trigger with no silent source drift', () => {
-    const migrations = readMigrations(); expect(migrations).toHaveLength(17);
+    const migrations = readMigrations(); expect(migrations).toHaveLength(18);
     for (const source of mappings.migrations) {
       const original = readFileSync(path.join('src/server/db/migrations', source.name), 'utf8');
       const target = migrations.find(m => m.name === (source.postgres_name ?? source.name))!;

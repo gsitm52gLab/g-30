@@ -10,11 +10,15 @@ const mimeByExtension: Record<string, string[]> = {
     ai: ["application/postscript", "application/pdf", "application/illustrator"], zip: ["application/zip", "application/x-zip-compressed"],
     mp4: ["video/mp4"], mov: ["video/quicktime"],
 };
-export function validateFile(name: string, declared: string, bytes: Buffer) {
+export function validateFileMetadata(name: string, declared: string, bytes: number) {
     if (!name || name.length > 240 || /[\x00-\x1f\x7f/\\]/.test(name) || name === "." || name === "..") fail("VALIDATION", 422, "파일 이름을 확인해 주세요.");
     const extension = name.split(".").pop()?.toLowerCase() ?? "", allowed = mimeByExtension[extension];
-    if (!allowed || bytes.length === 0 || bytes.length > MAX_FILE_BYTES) fail("VALIDATION", 422, "허용 형식과 파일당 25MiB 한도를 확인해 주세요.");
+    if (!allowed || !Number.isSafeInteger(bytes) || bytes <= 0 || bytes > MAX_FILE_BYTES) fail("VALIDATION", 422, "허용 형식과 파일당 25MiB 한도를 확인해 주세요.");
     if (declared && declared !== "application/octet-stream" && !allowed.includes(declared.toLowerCase())) fail("VALIDATION", 422, "파일 확장자와 전송 형식이 일치하지 않습니다.");
+    return { extension, mime: allowed[0] };
+}
+export function validateFile(name: string, declared: string, bytes: Buffer) {
+    const { extension, mime } = validateFileMetadata(name, declared, bytes.length);
     const pdf = bytes.subarray(0, 5).toString() === "%PDF-";
     const zip = bytes.subarray(0, 4).equals(Buffer.from([0x50,0x4b,3,4])) || bytes.subarray(0,4).equals(Buffer.from([0x50,0x4b,5,6]));
     const ole = bytes.subarray(0,8).equals(Buffer.from([0xd0,0xcf,0x11,0xe0,0xa1,0xb1,0x1a,0xe1]));
@@ -29,5 +33,5 @@ export function validateFile(name: string, declared: string, bytes: Buffer) {
     if (extension === "mp4" || extension === "mov") valid = bytes.length >= 12 && (bytes.subarray(4,8).toString() === "ftyp" || extension === "mov" && ["moov","mdat","wide"].includes(bytes.subarray(4,8).toString()));
     if (extension === "csv") { try { new TextDecoder("utf-8",{fatal:true}).decode(bytes); valid=!bytes.includes(0); } catch { valid=false; } }
     if (!valid) fail("VALIDATION", 422, "파일 내용과 확장자가 일치하지 않습니다.");
-    return { name, mime: allowed[0], preview: ["pdf","png","jpg","jpeg"].includes(extension) };
+    return { name, mime, preview: ["pdf","png","jpg","jpeg"].includes(extension) };
 }

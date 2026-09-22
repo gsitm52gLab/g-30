@@ -1,9 +1,9 @@
 [
   {
     "source": "src/domain/constraints.ts",
-    "sha256": "226c2eae4168f42ee564bb223e79ece7b671a7b39a5223f0aac059869b2845fd",
+    "sha256": "56fd407a6fb4dd11407e03dbc8bb12b5c73177746dbe50126ac19719d7a7285a",
     "async": "index.ts",
-    "change_note": "G14 async port: add auditRelations registration; all existing relation behavior preserved."
+    "change_note": "Storage S1 registration only; all existing relations retained."
   },
   {
     "source": "src/domain/ai-input/constraints.ts",
@@ -94,5 +94,11 @@
     "sha256": "93ac3445e8f54b5c59b3dc0d1f54a218d92f7c82dadc75e317192ff9257041a2",
     "async": "audit.ts",
     "change_note": "Exact fa2491b relation behavior; local SyncUnitOfWork alias only, PostgreSQL awaited get."
+  },
+  {
+    "source": "src/domain/storage/constraints.ts",
+    "sha256": "493b8c59755f72dad80abd1705fb99e0e0ac87832404c425802a890d468dd745",
+    "async": "storage.ts",
+    "change_note": "Same pure relation validation over awaited dependency rows."
   }
 ]
