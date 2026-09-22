@@ -139,7 +139,7 @@ try {
         await page.goto(`${origin}/audit?${params({ product: productId, status: 'product.save_common' })}`);
         await expect(page.locator('[data-g14-view]')).toContainText(name);
         await page.screenshot({ path: path.join(dir, 'audit.png'), fullPage: true });
-      } finally { await context.tracing.stop({ path: path.join(dir, 'trace.zip') }); await context.close(); }
+      } catch (e) { await page.screenshot({ path: path.join(dir, 'failed.png'), fullPage: true }).catch(() => {}); writeFileSync(path.join(dir, 'failed.html'), await page.content().catch(() => '')); throw e; } finally { await context.tracing.stop({ path: path.join(dir, 'trace.zip') }); await context.close(); }
     });
     await check('PG09 restarted server relogin retains exact search and audit', async () => {
       const context = await browser.newContext();
@@ -164,7 +164,7 @@ finally {
   for (const port of [...servers.keys()]) await stop(port);
   await repo.close(); await second.close();
   const envUnchanged = hash(readFileSync(envFile)) === envBefore; if (!envUnchanged) process.exitCode = 1;
-  const report = { candidate, dirty, cwd, schema, id, startedAt, finishedAt: new Date().toISOString(), checks, failure, processes, counts: { pass: checks.filter(x => x.status === 'PASS').length, fail: checks.filter(x => x.status === 'FAIL').length }, envUnchanged, fixtureIds: { productId, originalVersion, auditId }, dataDeleted: 0, externalLlmCalls: 0, limitations: ['Author validation only; separate independent verification required.', 'Synthetic PostgreSQL records retained. Local file mode; Storage application integration not tested.'] };
+  const report = { candidate, dirty, cwd, schema, id, startedAt, finishedAt: new Date().toISOString(), checks, failure, processes, counts: { planned: 11, pass: checks.filter(x => x.status === 'PASS').length, fail: checks.filter(x => x.status === 'FAIL').length, skip: 0, not_run: 11 - checks.length }, envUnchanged, fixtureIds: { productId, originalVersion, auditId }, dataDeleted: 0, externalLlmCalls: 0, limitations: ['Author validation only; separate independent verification required.', 'Synthetic PostgreSQL records retained. Local file mode; Storage application integration not tested.'] };
   writeFileSync(path.join(root, 'report.json'), JSON.stringify(report, null, 2), { mode: 0o600 });
   console.log(JSON.stringify({ report: path.join(root, 'report.json'), counts: report.counts, failure, envUnchanged }));
 }
