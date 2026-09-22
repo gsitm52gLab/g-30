@@ -6,6 +6,8 @@ The Excel parser and AI extraction run in child processes. Importing the parent 
 
 The original route traces omitted the Excel child/tsx and sharp's `detect-libc` dependency. The repair changes packaging only: parser rules, exact decimals/leading zeros, formula rejection, XML/ZIP resource guards, selected-page processing, coverage warnings, byte/time/heap/RSS limits and child termination remain unchanged. `tsx` is a build dependency whose runtime files must remain in the resulting trace.
 
+The first isolated-checkout proof did not cover a populated working root. Integration exposed Next's conservative tracing of unrelated configuration/JSON paths, including worktrees and private evidence. The resulting bundle was not deployed. Global trace exclusions now restrict top-level output to `node_modules`, `.next`, `src`, `public` and four explicit configuration manifests, and reject private/worktree/Git/env/log paths even inside those roots. No parser rule was relaxed.
+
 ## Reproduce the isolated bundle check
 
 Use Node 24 and the locked installation:
@@ -17,6 +19,10 @@ WORKER_BUNDLE_EVIDENCE=/absolute/private/evidence/path npx tsx scripts/verify-wo
 ```
 
 Use a new evidence path per run. The script copies only each built route NFT's declared files to separate temporary directories outside the repository. It preserves per-file hashes, total bytes, largest assets, invocation inputs/output, exit status and elapsed time. No dependency symlinks are copied, and it checks that there is no ancestor `node_modules`. Child environment variables are explicitly limited; no `.env`, database, Storage or provider connection is used.
+
+Before creating either bundle, the script audits **all** built server NFT files. It checks normalized lexical paths and resolved symlink targets against the same runtime boundary before reading any referenced contents. One denied or unresolved entry stops the run with zero copied files; the preflight report contains counts/reasons, not private paths or contents. `--audit-only` runs just this gate; `--check-trace /absolute/test.nft.json` supports isolated negative fixtures. Treat this preflight as a required release check, including in populated repositories. A successful build alone does not prove safe trace contents.
+
+The populated-root regression uses only newly created synthetic worktree/private/local/data/log/session/env canaries, including a runtime-looking symlink to private synthetic data. Original failed integration evidence remains separate. Do not copy real private files into a test bundle or weaken the preflight to make it pass.
 
 The probe runs an exact-value workbook, a cached-formula rejection, corrupt XLSX, selected-page text PDF, actual Japanese image OCR and corrupt PDF. A negative probe verifies that Node denies reading the original repository. Node permission mode allows reads only under the copied directory (including its case-swapped alias used by TSX's filesystem probe) and writes only under an isolated temporary cache. Native addons/worker threads/child processes are needed by these libraries; this diagnostic permission setup is not a production security sandbox claim.
 
