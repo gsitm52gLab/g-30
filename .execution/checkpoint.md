@@ -137,3 +137,8 @@ Main `38e76c2` pushed; Vercel wu7Ei9xZ8hFUw89f4msqvneXMBRS success. Actual produ
 ## State198 — direct save and home production acceptance
 
 Main `b72cef844650b091703c4100004a52453841ef47`, Vercel deployment7LkcQumuBD2x8jVETPkNBDREEqr2 success. Actual1280 GSG UI register→public request;390 brand list/detail/reload/home and cross-context404:4PASS/0FAIL/0NOT_RUN. Existing unsent inquiry caused home409, fixed by authorized valid-draft schedule omission;75 independent units/type0,33 integrated tests. Original production attempts01/02 failures preserved. Only three own synthetic tasks cancelled; existing drafts/user rows unchanged. Acceptance `.execution/private/runs/RUN-20260921-01/SUPABASE/task-direct-save-hotfix/production-acceptance.json`. Whole Goal ACTIVE; next UX2forms, S2 independent, S3 independent UI, S4 AI latency+independent and full remaining audit.
+
+
+## State199 — S4 bounded Storage consumer integration
+
+Integrated a81 into `1cd56fd`;49candidate paths byte-identical. Root330PASS+2stale migration inventoryFAIL, corrected expected new0018 and2closurePASS; build0. Original failures preserved.37/38 original artifacts match; prepared unexecuted OpenAI helper was revised without old snapshot, documented amendment; actual scripts separately frozen. Bounded Excel/AI-source Storage acceptance only. Configured actual provider original lease failed; b2 memo improves reads but37/45s delayed-provider safety followup authoring before another live call. UX68b64a6 author browser running, S3 independent browser running; S2 independent and SB03 still needed. Whole Goal ACTIVE.

@@ -4152,8 +4152,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "Active full GS HALE implementation and Supabase revalidation; bounded deployed auth accepted, complete Goal not achieved",
-  "next_action": "Continue task-form UX simplification and independent S2/S3/S4 completion. Immediate task-save and home production hotfix accepted b72cef8; do not rerun unchanged hotfix broadly.",
-  "state_version": 198,
+  "next_action": "Freeze and independently validate UX forms; finish S3 and S2 independent gates; AI pre-dispatch lease bounded repair then independent actual provider. SB03 importer remains mandatory; final integrated journeys/audit pending.",
+  "state_version": 199,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4189,7 +4189,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T06:41:19.713945+00:00",
+  "updated_at": "2026-09-22T06:46:50.249163+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -4719,6 +4719,38 @@
       "deployment": "7LkcQumuBD2x8jVETPkNBDREEqr2",
       "status_updated_at": "2026-09-22T06:39:58Z",
       "note": "Bounded direct save and home fix; full feature transition still pending."
+    },
+    "storage_s4_acceptance": {
+      "status": "ACCEPTED_BOUNDED_S4_STORAGE_CONSUMERS",
+      "at": "2026-09-22T06:46:50.249163+00:00",
+      "candidate": "a81d50e17067fa819a797a7c8b9420ebea3e1cab",
+      "integration_commit": "1cd56fdf92f22d1c5928dfaad12f0459681bc536",
+      "cwd": "/Users/evan/workspace/gs-hale",
+      "candidate_source_paths_identical": 49,
+      "root_initial": {
+        "pass": 330,
+        "fail": 2,
+        "skip": 0,
+        "cause": "outdated explicit migration inventory expected17 after approved new0018"
+      },
+      "root_closure": {
+        "pass": 2,
+        "fail": 0,
+        "changed": "test expected new immutable-export migration only; product unchanged"
+      },
+      "build_exit": 0,
+      "independent_result": "../storage-excel-ai-independent/result-bounded-a81.json",
+      "artifacts": {
+        "matched": 37,
+        "original_prepared_unexecuted_script_not_retained": 1,
+        "amendment": "../storage-excel-ai-independent/prepared-openai-provenance-amendment.json"
+      },
+      "bounds": [
+        "Excel source/preview/export private Storage and AI original/extraction source consumers",
+        "Configured actual OpenAI pipeline still fails original lease; separate author fix and independent required",
+        "Actual final Vercel Storage/worker flow not yet run"
+      ],
+      "whole_goal_complete": false
     }
   },
   "bounded_auth_release": {
