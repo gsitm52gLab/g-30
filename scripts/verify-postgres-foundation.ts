@@ -17,17 +17,22 @@ if (!envFile || !evidenceFile) throw new Error('Usage: verify-postgres-foundatio
 const envBytes = readFileSync(envFile), beforeHash = createHash('sha256').update(envBytes).digest('hex');
 const config = parsePostgresConfig({ ...parseEnv(envBytes.toString()), SUPABASE_DB_SCHEMA: 'gs_hale_sb_foundation_20260922' });
 const schema = quoteSchema(config.schema), id = `foundation-${randomUUID()}`;
+const plannedCheckCount = 18 + mappings.migrations.reduce((count, migration) => count
+  + migration.indexes.filter(name => name !== 'records_kind_context').length
+  + migration.triggers.filter(name => !name.endsWith('reference_insert')).length, 0);
 const result = {
   started_at: new Date().toISOString(), actual_cwd: process.cwd(), candidate: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   schema: config.schema, fixture_prefix: id, real_supabase: true, strict_tls_required: true, existing_data_deleted: false,
   checks: [] as { name: string; status: 'PASS' | 'FAIL'; error?: string }[],
-  inventory: {} as Record<string, unknown>, counts: { pass: 0, fail: 0, skip: 0, not_run: 0 }, env_unchanged: false,
+  inventory: {} as Record<string, unknown>, planned_check_count: plannedCheckCount, infrastructure_errors: [] as string[],
+  counts: { pass: 0, fail: 0, skip: 0, not_run: plannedCheckCount }, env_unchanged: false,
 };
 writeFileSync(evidenceFile, JSON.stringify(result, null, 2), { flag: 'wx', mode: 0o600 });
 function save() { writeFileSync(evidenceFile, JSON.stringify(result, null, 2) + '\n', { mode: 0o600 }); }
 async function check(name: string, fn: () => Promise<void>) {
   try { await fn(); result.checks.push({ name, status: 'PASS' }); result.counts.pass++; }
   catch (error) { result.checks.push({ name, status: 'FAIL', error: safePostgresError(error).message }); result.counts.fail++; process.exitCode = 1; }
+  result.counts.not_run = plannedCheckCount - result.checks.length;
   save();
 }
 const pool = createPostgresPool(config, 'migration'), repository = createPostgresRepository(config), other = createPostgresRepository(config);
@@ -206,10 +211,11 @@ try {
     try { assert.equal((await reopened.get('checkpoint', `${id}-seed`))?.data.value, 'user edit'); }
     finally { await reopened.close(); }
   });
-} catch (error) { result.checks.push({ name: 'remaining proof prerequisites', status: 'FAIL', error: safePostgresError(error).message }); result.counts.fail++; result.counts.not_run++; process.exitCode = 1; }
+} catch (error) { result.infrastructure_errors.push(safePostgresError(error).message); process.exitCode = 1; }
 finally {
   await Promise.allSettled([repository.close(), other.close(), pool.end()]);
   result.env_unchanged = createHash('sha256').update(readFileSync(envFile)).digest('hex') === beforeHash;
-  if (!result.env_unchanged) { result.counts.fail++; process.exitCode = 1; }
-  save(); console.log(JSON.stringify({ status: result.counts.fail ? 'failed' : 'ok', counts: result.counts, env_unchanged: result.env_unchanged, evidence: evidenceFile }));
+  if (!result.env_unchanged) { result.infrastructure_errors.push('ENV_CHANGED'); process.exitCode = 1; }
+  if (result.counts.not_run) process.exitCode = 1;
+  save(); console.log(JSON.stringify({ status: result.counts.fail || result.counts.not_run || result.infrastructure_errors.length ? 'failed' : 'ok', counts: result.counts, env_unchanged: result.env_unchanged, evidence: evidenceFile }));
 }
