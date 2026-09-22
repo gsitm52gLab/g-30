@@ -32,7 +32,7 @@ The callback must create the feature's immutable version/reference, its existing
 
 After remote success but failed/ambiguous DB commit, the core never deletes a possible committed final object. A new instance recovers by inspecting the same final key and matching the persisted verified hash/size. A missing/mismatched final after an unknown promotion remains `recovery_required`; it is not permission to allocate or promote another key. A stale worker cannot commit after claim replacement. Ready replays reauthorize and return the same exact record; they do not create another receipt/audit.
 
-`cleanup(credentials,id)` claims only expired staging after the conservative safe deadline. This blocks finalize, inspects the current staging descriptor, reauthorizes, and deletes only that exact version. A late replacement or active claim fails closed. This is cleanup of unused/rejected/recovery staging, not final-object garbage collection. Ready grants and final objects are retained. Missing staging can finish cleanup; an unknown deletion outcome is retried by inspection at the same key. Production orphan review must retain the durable grant/object record instead of guessing that a final object is unreferenced.
+`cleanup(credentials,id)` claims only expired staging after the conservative safe deadline. This blocks finalize, inspects the current staging descriptor, reauthorizes, and deletes only that exact version. A late replacement or active claim fails closed. This is cleanup of unused/rejected/recovery staging, not final-object garbage collection. Ready grants and final objects are retained. Successful uploads currently retain both staging and final bytes (approximately twice the file storage); automatic ready-staging collection is an explicitly deferred P2 operational improvement, not implemented by S1. Missing staging can finish cleanup; an unknown deletion outcome is retried by inspection at the same key. Production orphan review must retain the durable grant/object record instead of guessing that a final object is unreferenced.
 
 ## Authorized internal reads
 
@@ -51,3 +51,11 @@ Each payload is capped at 64MiB; at most fifty active stages per actor are allow
 SQLite adds `0017-storage.sql`; PostgreSQL adds `0018-storage.sql` after its separate revision-width migration. Previous SQL bytes are untouched. The new records are private `storageUploadGrant`, immutable `storageObject`, and `importStage`. Local and PostgreSQL adapters use the same pure relationship/state validation; PostgreSQL awaits dependency reads before invoking it. Unique grant identity/object-grant indexes and SQL immutability guards preserve cross-instance correctness.
 
 The early contract checkpoint has local mock/SQLite and existing-file regression checks. Actual PostgreSQL, direct Storage, two-repository/process recovery and downstream app/browser integration are separately reported; typecheck/build or local mocks do not establish these results.
+
+Author actual probe (fresh synthetic schema/private UUID keys only):
+
+```
+node --conditions=react-server --import tsx scripts/verify-storage-app.ts /absolute/latest.env /absolute/new-evidence.json
+```
+
+Default schema is `gs_hale_storage_core_20260922`; an independent reviewer may set `STORAGE_APP_SCHEMA=gs_hale_storage_ind_20260922`. The helper accepts only dedicated `gs_hale_storage_core_*`/`gs_hale_storage_ind_*` test schemas, inherits that setting in the fresh-process recovery child, preserves all database rows and removes only the remote UUID objects allocated by its own run. It does not provision routes or test the browser adapter. The simulated 24-hour cleanup clock tests the deadline predicate, not elapsed production retention.

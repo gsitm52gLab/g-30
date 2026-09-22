@@ -19,7 +19,9 @@ import type { RecordRepository } from '@/domain/records';
 const [envFile, outputFile, mode = 'main', childRunId, childGrantId] = process.argv.slice(2);
 if (!envFile?.startsWith('/') || !outputFile?.startsWith('/')) throw Error('Absolute env and new output paths required');
 const envBytes = readFileSync(envFile), envHash = digest(envBytes), env = parseEnv(envBytes.toString());
-const config = parsePostgresConfig({ ...env, SUPABASE_DB_SCHEMA: 'gs_hale_storage_core_20260922' }, 'migration');
+const targetSchema = process.env.STORAGE_APP_SCHEMA || 'gs_hale_storage_core_20260922';
+if (!/^gs_hale_storage_(?:core|ind)_[a-z0-9_]{1,35}$/.test(targetSchema)) throw Error('Dedicated Storage test schema required');
+const config = parsePostgresConfig({ ...env, SUPABASE_DB_SCHEMA: targetSchema }, 'migration');
 const runId = mode === 'recover' ? childRunId : randomUUID(), f = fixtureIds(runId);
 const namespace = `storage_core_${runId.replaceAll('-', '')}`;
 const storageConfig = { projectUrl: new URL(env.SUPABASE_URL || '').origin, secretKey: env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY || '', bucket: env.SUPABASE_STORAGE_BUCKET || 'gs-hale-private', namespace, timeoutMs: 120_000 };
@@ -45,7 +47,7 @@ if (mode === 'recover') {
 } else {
   const planned = 16;
   const checks: { name: string; status: 'PASS' | 'FAIL'; code?: string; details?: Record<string, unknown> }[] = [];
-  const report = { candidate_commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), cwd: process.cwd(), pid: process.pid, runId, schema: config.schema, started_at: clock(), checks, counts: { pass: 0, fail: 0, skip: 0, not_run: planned }, env_unchanged: false, actual_provider_calls: 0, browser_app_integration: 'NOT_RUN', private_paths_or_tokens_logged: false };
+  const report = { candidate_commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), cwd: process.cwd(), pid: process.pid, runId, schema: config.schema, started_at: clock(), checks, counts: { pass: 0, fail: 0, skip: 0, not_run: planned }, env_unchanged: false, actual_storage_http: 'EXECUTED; individual HTTP count not instrumented', ai_provider_calls: 0, browser_app_integration: 'NOT_RUN', private_paths_or_tokens_logged: false };
   writeFileSync(outputFile, JSON.stringify(report, null, 2), { flag: 'wx', mode: 0o600 });
   function save() { report.counts.not_run = Math.max(0, planned - checks.filter(c => c.name !== 'execution prerequisite').length); report.counts.pass = checks.filter(c => c.status === 'PASS').length; report.counts.fail = checks.filter(c => c.status === 'FAIL').length; writeFileSync(outputFile, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 }); }
   async function check(name: string, operation: () => Promise<Record<string, unknown> | void>) {
