@@ -7,5 +7,6 @@ export async function storageRelations(s: UnitOfWork, kind: RecordKind, input: R
   const rows: StoredRecord[] = [];
   for (const ref of refs) { const row = await s.get(ref.kind, ref.id); if (row) rows.push(row); }
   const stages = kind === 'importStage' ? await s.list('importStage') : [];
-  validate(relationView(rows, stages), kind, input);
+  const exports = kind === 'importExport' ? await s.list('importExport') : [];
+  validate(relationView(rows, stages, exports), kind, input);
 }

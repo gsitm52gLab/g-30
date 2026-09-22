@@ -7,6 +7,7 @@ export async function POST(request: Request) {
     return route(request, async (identity, token) => {
         const contextId = new URL(request.url).searchParams.get('context') ?? '', service = new ImportService(identity);
         await service.configuration(token, contextId);
+        if (identity.repo.mode === 'supabase') fail('DIRECT_UPLOAD_REQUIRED',422,'직접 업로드 경로를 사용해 주세요.');
         const mime = request.headers.get('content-type');
         if (!mime?.startsWith('multipart/form-data;'))
             fail('VALIDATION', 422, 'Excel 파일을 선택해 주세요.');

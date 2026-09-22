@@ -1,4 +1,5 @@
 import { assessmentStatuses } from '@/domain/evidence/types';
+import { exportShape } from '@/domain/storage/validate';
 import { resolveEvidenceVersion, resolveLink } from '@/server/evidence/access';
 import type { SearchDocument } from '@/domain/search/types';
 import { versionDTO } from '@/server/evidence/projection';
@@ -35,6 +36,11 @@ export async function materialDocuments(a: SearchAccess): Promise<SearchDocument
             continue;
         const d = batchDTO(r);
         docs.push((await document(a, 'import', r, r.id, d.sourceName, [field('파일명', d.sourceName), field('형식', d.schema)], url('/products/import', contextId), { current: true, precision: 'exact_version', at: d.appliedAt, actor: r.data.actorId, status: 'applied', statusPrecision: 'historical', productIds: d.rows.flatMap(r => r.productId ? [r.productId] : []) })));
+    }
+    for (const r of (await s.list('importExport', contextId))) {
+        if (r.data.actorId !== p.user.id || !(await decide(s, p, 'product.read', productContextScope(contextId, 'import'), clock)).allowed || r.data.includeInternal && !(await decide(s, p, 'price.read', { ...productContextScope(contextId, 'import'), requiresInternalPrice: true }, clock)).allowed) continue;
+        exportShape(r.data);
+        docs.push(await document(a, 'import', r, r.id, r.data.filename, [field('파일명', r.data.filename)], url('/products/import', contextId), { current: false, precision: 'exact_version', at: new Date(r.data.createdAt).toISOString(), actor: r.data.actorId, status: 'exported', statusPrecision: 'historical' }));
     }
     return docs;
 }

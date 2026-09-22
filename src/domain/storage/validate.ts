@@ -79,3 +79,13 @@ export function stageShape(v: ImportStageData) {
     try { const parsed = JSON.parse(v.payload); if (!parsed || typeof parsed !== 'object') throw Error(); } catch { throw new StoreError('INVALID_RECORD'); }
   }
 }
+export function exportShape(v: import('./types').ImportExportData) {
+  if (!v || !id(v.actorId) || typeof v.includeInternal !== 'boolean' || !millis(v.createdAt) || !sha(v.sha256) || !Number.isSafeInteger(v.totalBytes) || v.totalBytes < 1 || v.mime !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || typeof v.filename !== 'string' || !/^[A-Za-z0-9_-]+\.xlsx$/.test(v.filename) || v.filename.length > 240 || !Array.isArray(v.parts) || !v.parts.length) throw new StoreError('INVALID_RECORD');
+  const keys = new Set<string>(), ids = new Set<string>(); let offset = 0;
+  for (const part of v.parts) {
+    const d = descriptor(part.descriptor, 'final');
+    if (part.start !== offset || d.bytes > STORAGE_LIMITS.chunkBytes || keys.has(d.key) || ids.has(d.id) || d.mime !== v.mime || d.originalName !== v.filename || d.preview) throw new StoreError('INVALID_RECORD');
+    offset += d.bytes; if (!Number.isSafeInteger(offset)) throw new StoreError('INVALID_RECORD'); keys.add(d.key); ids.add(d.id);
+  }
+  if (offset !== v.totalBytes) throw new StoreError('INVALID_RECORD');
+}

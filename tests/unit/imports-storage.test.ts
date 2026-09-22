@@ -1,0 +1,70 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import ExcelJS from 'exceljs';
+import { createHash, randomUUID } from 'node:crypto';
+import { createMockRepository } from '@/server/repositories/mock';
+import { createSqliteRepository } from '@/server/repositories/sqlite';
+import { openDatabase, migrate } from '@/server/db/database';
+import type { RecordRepository } from '@/domain/records';
+import { IdentityService } from '@/server/auth/service';
+import { policyFixture, tokenFor, NOW } from '../fixtures/policy';
+import type { StorageTransport } from '@/server/storage/contracts';
+import { StorageError } from '@/server/storage/supabase';
+import { STORAGE_LIMITS, type StorageDescriptor } from '@/domain/storage/types';
+import { digest, exportShape } from '@/domain/storage/validate';
+import { validateFile } from '@/domain/files/validate';
+import { ImportStorage } from '@/server/imports/storage';
+import { ImportService } from '@/server/imports/service';
+import { ImportExports } from '@/server/imports/storage-export';
+import { AiAssetStorage } from '@/server/ai-input/storage';
+import { VersionSourceStorage } from '@/server/ai-input/storage-source';
+import { AiInputService } from '@/server/ai-input/service';
+const ctx='ctx-jp-a-luna', brand=tokenFor('user-luna'), price=tokenFor('user-price');
+class FakeStorage implements StorageTransport {
+  objects = new Map<string, { object: StorageDescriptor; bytes: Buffer }>();
+  issued = 0; promotions = 0; deleted = 0; ranges = 0;
+  afterPromote: (() => Promise<void>) | null = null;
+  afterRange: (() => Promise<void>) | null = null;
+  unknownPromotion = false;
+  beforeCleanup: (() => Promise<void>) | null = null;
+  allocateStagingKey() { return `core_test/staging/${randomUUID()}`; }
+  allocateFinalKey() { return `core_test/final/${randomUUID()}`; }
+  put(key: string, bytes: Buffer) { this.objects.set(key, { bytes: Buffer.from(bytes), object: { key, id: randomUUID(), version: randomUUID(), bytes: bytes.length, etag: `"${createHash('md5').update(bytes).digest('hex')}"`, contentType: 'text/csv' } }); }
+  async issueUploadGrant(i: { key: string; expectedBytes: number; appExpiresAt: number; now?: number }) {
+    this.issued++; const now = i.now!;
+    return { key: i.key, bucket: 'private', signedUrl: 'https://synthetic.supabase.co/capability', token: 'synthetic-token', method: 'PUT' as const, resumableEndpoint: 'https://synthetic.storage.supabase.co/resumable', tusChunkBytes: 6 * 1024 * 1024, appExpiresAt: i.appExpiresAt, storageExpiresAt: now + 2 * 3600_000, safeCleanupAfter: now + STORAGE_LIMITS.cleanupMs, expectedBytes: i.expectedBytes, bucketMaxBytes: STORAGE_LIMITS.generalBytes };
+  }
+  async inspect(key: string) { const r = this.objects.get(key); if (!r) throw new StorageError('NOT_FOUND'); return { ...r.object }; }
+  async readSnapshot(key: string) { const object = await this.inspect(key), bytes = Buffer.from(this.objects.get(key)!.bytes); return { object, bytes, sha256: digest(bytes) }; }
+  async promoteVerified(i: { stagingKey: string; finalKey: string; originalName: string; declaredMime: string; expectedBytes: number }) {
+    this.promotions++; if (this.objects.has(i.finalKey)) throw new StorageError('CONFLICT');
+    const source = await this.readSnapshot(i.stagingKey); this.put(i.finalKey, source.bytes);
+    await this.afterPromote?.();
+    if (this.unknownPromotion) throw new StorageError('TIMEOUT', undefined, 'unknown');
+    return { ...await this.inspect(i.finalKey), sha256: source.sha256, originalName: i.originalName, ...validateFile(i.originalName, i.declaredMime, source.bytes) };
+  }
+  async readRange(expected: StorageDescriptor, start: number, end: number) {
+    this.ranges++; const current = await this.inspect(expected.key);
+    if (current.version !== expected.version) throw new StorageError('INTEGRITY');
+    const result = this.objects.get(expected.key)!.bytes.subarray(start, end + 1); await this.afterRange?.(); return Buffer.from(result);
+  }
+  async createGeneratedPart(i: {key:string;bytes:Buffer;filename:string;sha256:string}) { if(this.objects.has(i.key)) throw new StorageError('CONFLICT'); this.put(i.key,i.bytes); return {...await this.inspect(i.key), sha256:digest(i.bytes), originalName:i.filename, mime:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', preview:false}; }
+  async cleanupExpiredStaging(expected: StorageDescriptor, safe: number, now = Date.now()) {
+    await this.beforeCleanup?.();
+    if (now <= safe) throw new StorageError('NOT_EXPIRED');
+    if ((await this.inspect(expected.key)).version !== expected.version) throw new StorageError('INTEGRITY');
+    this.deleted++; this.objects.delete(expected.key);
+  }
+}
+
+for(const mode of ['mock','sqlite'] as const) describe(`${mode} S4 storage consumers`,()=>{
+ let repo:RecordRepository, identity:IdentityService, remote:FakeStorage;
+ async function setup(){ repo=mode==='mock'?createMockRepository(()=>NOW):(()=>{const db=openDatabase(':memory:',true);migrate(db);return createSqliteRepository(db,()=>NOW);})(); identity=await policyFixture(repo); remote=new FakeStorage(); }
+ afterEach(async()=>{await repo?.close();});
+ const service=()=>new ImportService(new IdentityService({...repo,mode:'supabase'},identity.clock),undefined,undefined,()=>remote);
+ async function source(code='000-REMOTE',headers=['contextKey','common.code','common.name','local.jan'],token=brand){const book=new ExcelJS.Workbook();const sheet=book.addWorksheet('商品');sheet.addRows([headers,[ctx,code,'日本語商品','00012']]);const bytes=Buffer.from(await book.xlsx.writeBuffer());const storage=new ImportStorage(identity,()=>remote), issued=await storage.issue(token,{contextId:ctx,owner:{purpose:'import_source'},visibility:'internal',clientItemId:randomUUID(),originalName:'source.xlsx',declaredMime:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',expectedBytes:bytes.length,expectedSha256:digest(bytes)});remote.put(issued.capability!.key,bytes); const ready=await storage.finalize(token,issued.status.id); return ready.result!.id; }
+ it('source A → preview B → apply/replay A with atomic shared consume and original strings',async()=>{await setup();const id=await source(), a=service(), b=service(), inspection=await b.source(brand,id);const preview=await b.preview(brand,{sourceId:id,sheetId:inspection.sheets[0].id,headerRow:1,mapping:['contextKey','common.code','common.name','local.jan'].map((field,i)=>({column:i+1,field})),choices:[]});expect(preview.canApply).toBe(true); const command={previewId:preview.id,idempotencyKey:randomUUID()}, result=await a.apply(brand,command);expect(await b.apply(brand,command)).toEqual(result);expect((await repo.get('importStage',preview.id))!.data.state).toBe('consumed'); const batch=await a.batch(brand,result.ids[0]);expect(batch.rows).toHaveLength(1);expect((await repo.list('productVersion')).some(v=>v.data.common.code==='000-REMOTE')).toBe(true);expect((await repo.list('contextProductVersion')).some(v=>v.data.fields.jan==='00012')).toBe(true);expect((await repo.list('audit')).some(v=>v.data.detail?.references.some(r=>r.kind==='importStage'&&r.id===id))).toBe(true);});
+ it('forced apply failure rolls back shared consume and business rows',async()=>{await setup();const id=await source(), a=service(), inspection=await a.source(brand,id), p=await a.preview(brand,{sourceId:id,sheetId:inspection.sheets[0].id,headerRow:1,mapping:['contextKey','common.code','common.name'].map((field,i)=>({column:i+1,field})),choices:[]});const before=await repo.list('productVersion'); const faulty=new ImportService(a.identity,undefined,()=>{throw Error('ROW_ROLLBACK');},()=>remote);await expect(faulty.apply(brand,{previewId:p.id,idempotencyKey:randomUUID()})).rejects.toThrow('ROW_ROLLBACK');expect((await repo.get('importStage',p.id))!.data.state).toBe('active');expect(await repo.list('productVersion')).toEqual(before);expect(await repo.list('importBatch')).toHaveLength(0);});
+ it('source actor/expiry and direct multipart bypass fail closed',async()=>{await setup();const id=await source(); await expect(service().source(tokenFor('user-team'),id)).rejects.toMatchObject({status:404});await expect(service().inspect(brand,ctx,'a.xlsx',Buffer.alloc(0))).rejects.toMatchObject({code:'DIRECT_UPLOAD_REQUIRED'}); identity.clock=()=>new Date(Date.parse(NOW)+25*3600000).toISOString(); await expect(new ImportStorage(identity,()=>remote).source(brand,id)).rejects.toBeDefined();});
+ it('immutable export crosses part boundary, verifies current actor and price ACL each chunk',async()=>{await setup();const svc=new ImportExports(identity,()=>remote), bytes=Buffer.alloc(STORAGE_LIMITS.chunkBytes+100,7), meta=await svc.publish(price,ctx,true,bytes); const r=await svc.chunk(price,meta.id,STORAGE_LIMITS.chunkBytes-5,STORAGE_LIMITS.chunkBytes+4);expect(r.bytes).toEqual(bytes.subarray(STORAGE_LIMITS.chunkBytes-5,STORAGE_LIMITS.chunkBytes+5));expect(r.bytes.length).toBe(10);expect(JSON.stringify(meta)).not.toContain('core_test');await expect(svc.metadata(brand,meta.id)).rejects.toMatchObject({status:404});const row=(await repo.get('importExport',meta.id))!;await expect(repo.transaction(s=>s.update('importExport',row.id,row.revision,row.data))).rejects.toMatchObject({code:'INVALID_RECORD'});for(const data of [{...row.data,totalBytes:1},{...row.data,parts:[...row.data.parts].reverse()},{...row.data,parts:[row.data.parts[0],{...row.data.parts[0],start:STORAGE_LIMITS.chunkBytes}]}])expect(()=>exportShape(data)).toThrow(); await repo.transaction(async s=>{const m=(await s.list('membership',ctx)).find(x=>x.data.userId==='user-price')!;await s.update('membership',m.id,m.revision,{...m.data,internalPriceAccess:false});});await expect(svc.chunk(price,meta.id,0,3)).rejects.toMatchObject({status:404});});
+ it('AI direct asset remains separate, exact parent source read rejects wrong version and mid-read revoke',async()=>{await setup(); const bytes=Buffer.from('%PDF-1.4\n1 0 obj <</Type /Page>> endobj\n%%EOF'), storage=new AiAssetStorage(identity,()=>remote), issue=await storage.issue(brand,{contextId:ctx,owner:{purpose:'ai_asset',inputKind:'pdf'},visibility:'public',clientItemId:randomUUID(),originalName:'source.pdf',declaredMime:'application/pdf',expectedBytes:bytes.length,expectedSha256:digest(bytes)});remote.put(issue.capability!.key,bytes);const ready=await storage.finalize(brand,issue.status.id), id=ready.result!.id;expect(await repo.list('aiInput')).toHaveLength(0);expect((await storage.snapshot(brand,id)).bytes).toEqual(bytes);const input=await new AiInputService(identity).create(brand,{contextId:ctx,visibility:'context',idempotencyKey:randomUUID(),content:{title:'合成',scope:{classification:'general_cosmetic',language:'ja',media:'pop',use:'店頭'},kind:'pdf',text:null,sources:[{kind:'upload',assetId:id}],selectedPages:[1],submission:null,products:[]}});const reader=new VersionSourceStorage(identity,()=>remote);expect((await reader.snapshot(brand,input.id,input.version.id,0)).bytes).toEqual(bytes);await expect(reader.metadata(brand,input.id,randomUUID(),0)).rejects.toMatchObject({status:404});remote.afterRange=async()=>{await repo.transaction(async s=>{const m=(await s.list('membership',ctx)).find(x=>x.data.userId==='user-luna')!;await s.update('membership',m.id,m.revision,{...m.data,status:'suspended'});});};await expect(reader.chunk(brand,input.id,input.version.id,0,0,3)).rejects.toMatchObject({status:404});});
+});

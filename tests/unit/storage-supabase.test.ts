@@ -156,4 +156,18 @@ describe('Supabase private storage transport', () => {
     expect(spy.mock.calls.filter(c => c[1]?.method === 'DELETE')).toHaveLength(1); expect(f.objects.has(k)).toBe(true);
   });
 
+  it('generated workbook part is conditional, verified and not a public upload grant', async () => {
+    const f=fixture(), storage=new SupabasePrivateStorage(config,f.fetcher), bytes=Buffer.from('synthetic workbook segment'), k=storage.allocateFinalKey();
+    const input={key:k,bytes,filename:'export.xlsx',sha256:createHash('sha256').update(bytes).digest('hex')};
+    const result=await storage.createGeneratedPart(input); expect(result.bytes).toBe(bytes.length);expect(result.sha256).toBe(input.sha256);expect(result.key).toBe(k);
+    await expect(storage.createGeneratedPart(input)).rejects.toMatchObject({code:'CONFLICT'});
+    expect(f.calls.some(c=>c.url.includes('/upload/sign/'))).toBe(false);expect(new Headers(f.calls.find(c=>c.method==='POST')!.init.headers).get('x-upsert')).toBe('false');
+  });
+  it('generated part rejects wrong hash, staging lane, over4MiB and substituted final', async()=>{
+    const f=fixture(), storage=new SupabasePrivateStorage(config,f.fetcher), bytes=Buffer.from('abc'), input={key:storage.allocateFinalKey(),bytes,filename:'export.xlsx',sha256:createHash('sha256').update(bytes).digest('hex')};
+    for(const delta of [{key:storage.allocateStagingKey()},{sha256:'0'.repeat(64)},{bytes:Buffer.alloc(STORAGE_CHUNK_BYTES+1)},{filename:'../export.xlsx'}]) await expect(storage.createGeneratedPart({...input,...delta})).rejects.toMatchObject({code:'INVALID_INPUT'});
+    expect(f.calls).toHaveLength(0);
+    const changed=new SupabasePrivateStorage(config,async(url,init)=>{const r=await f.fetcher(url,init);if(init?.method==='POST')f.add(input.key,Buffer.from('bad'));return r;});await expect(changed.createGeneratedPart(input)).rejects.toMatchObject({code:'INTEGRITY'});
+  });
+
 });

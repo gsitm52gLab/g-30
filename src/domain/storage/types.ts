@@ -48,7 +48,13 @@ export interface ImportStageData {
   state: 'active' | 'consumed' | 'expired';
 }
 export interface StorageRecords {
-  storageUploadGrant: StorageGrantData; storageObject: StorageObjectData; importStage: ImportStageData;
+  storageUploadGrant: StorageGrantData; storageObject: StorageObjectData; importStage: ImportStageData; importExport: ImportExportData;
+}
+/** Private ordered parts of one generated workbook; never projected into a page or audit DTO. */
+export interface ImportExportData {
+  actorId: string; includeInternal: boolean; filename: string; mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  createdAt: number; totalBytes: number; sha256: string;
+  parts: { start: number; descriptor: VerifiedDescriptor }[];
 }
 /** Safe generic status. Feature DTO production still belongs to the current-authorized caller. */
 export interface GrantStatus {

@@ -61,7 +61,7 @@ try {
     } finally { client.release(); }
   });
   await check('explicit migrations apply baseline plus revision-width0016 and audit0017 atomically', async () => {
-    const migration = await migratePostgres(config); assert.equal(migration.total, 18);
+    const migration = await migratePostgres(config); assert.equal(migration.total, 19);
     assert.equal(migration.applied, 18 - Number(result.inventory.applied_migration_count));
   });
   if (result.counts.fail) throw new Error('Migrations unavailable');
