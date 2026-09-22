@@ -61,7 +61,7 @@ try {
     } finally { client.release(); }
   });
   await check('explicit migrations apply baseline 0001–0015 plus PG-only 0016 atomically', async () => {
-    const migration = await migratePostgres(config); assert.equal(migration.total, 16);
+    const migration = await migratePostgres(config); assert.equal(migration.total, 17);
     assert.equal(migration.applied, 16 - Number(result.inventory.applied_migration_count));
   });
   if (result.counts.fail) throw new Error('Migrations unavailable');
