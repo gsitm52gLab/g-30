@@ -1,3 +1,5 @@
+import { providerHistory, settingsView } from '@/server/ai-provider/projection';
+import { providerEngine, providerConfig } from '@/server/ai-provider/config';
 import type { Clock, StoredRecord, UnitOfWork } from '@/domain/records';
 import type { Principal } from '@/server/auth/service';
 import { AuthError, unavailable } from '@/server/auth/errors';
@@ -45,7 +47,7 @@ export function analysisDetail(s: UnitOfWork, p: Principal, runId: string, clock
   const resolved = resolveAnalysis(s, p, runId, clock), summary = runSummary(resolved.row, clock);
   const currentCorpus = loadCorpus(s);
   const base = { ...summary, contextId: resolved.row.contextId!, inputTitle: resolved.content.title, inputSequence: resolved.version.data.sequence, inputIsCurrent: resolved.input.data.currentVersionId === resolved.version.id, inputUrl: `/ai-input/${resolved.input.id}?context=${resolved.row.contextId}&version=${resolved.version.id}`, snapshot: resolved.snapshot,
-    corpusIsCurrent: currentCorpus.id === summary.corpusReleaseId, capabilities: { review: summary.state === 'finished', rerun: mayRestart(s, resolved.row, clock, currentCorpus.id), resumeQueued: summary.state === 'queued', readRaw: summary.state === 'finished' }, engineLabel: summary.engine === 'synthetic_demo' ? SYNTHETIC_ENGINE.label : '실제 provider 실행', legalApproval: false as const };
+    provider: providerHistory(s,runId,clock), corpusIsCurrent: currentCorpus.id === summary.corpusReleaseId, capabilities: { review: summary.state === 'finished', rerun: mayRestart(s, resolved.row, clock, currentCorpus.id), resumeQueued: summary.state === 'queued', readRaw: summary.state === 'finished' }, engineLabel: summary.engine === 'synthetic_demo' ? SYNTHETIC_ENGINE.label : '실제 provider 실행', legalApproval: false as const };
   if (!resolved.data.resultId) return { ...base, result: null };
   const r = resolvedResult(s, p, runId, clock);
   return { ...base, result: { id: r.resultRow.id, createdAt: r.resultRow.createdAt, resultHash: r.resultRow.data.resultHash, rawUrl: `/api/ai-review/runs/${runId}/raw`, ...r.result, staleExcerptIds: r.staleExcerptIds,
@@ -57,12 +59,12 @@ export function analysisWorkspace(s: UnitOfWork, p: Principal, inputId: string, 
   const source = resolveVersion(s, p, inputId, selected, clock), corpus = loadCorpus(s);
   const runs = s.list('aiAnalysisRun', input.contextId!).filter(r => r.data.inputVersionId === selected).flatMap(r => visibleRun(s, p, r, clock)).sort((a, b) => b.attempt - a.attempt);
   const extractionOptions = s.list('aiRun', input.contextId!).filter(r => r.data.versionId === selected && r.data.state === 'finished' && r.data.snapshotId !== null).map(r => { const exact = extractionSource(s, p, inputId, selected, r.id, clock); return { id: exact.extraction.id, snapshotId: exact.snapshotRow.id, attempt: safely(() => integer(r.data.attempt, 1)) }; });
-  return { inputId, contextId: input.contextId!, title: source.content.title, inputVersionId: selected, inputSequence: source.version.data.sequence, inputIsCurrent: input.data.currentVersionId === selected, extractionOptions, runs, corpus: { id: corpus.id, manifestHash: corpus.manifestHash, asOf: corpus.asOf, sourceCount: corpus.sources.length, excerptCount: corpus.excerpts.length, translationReview: 'mixed_or_unreviewed' as const, url: `/api/ai-review/corpus?contextId=${input.contextId}&releaseId=${corpus.id}` }, availableEngines: [SYNTHETIC_ENGINE], defaultEngine: SYNTHETIC_ENGINE.engine, capabilities: { start: extractionOptions.length > 0, review: true, editCorpus: false }, limits: analysisLimits, requiresHumanReview: true, legalApproval: false };
+  return { inputId, contextId: input.contextId!, title: source.content.title, inputVersionId: selected, inputSequence: source.version.data.sequence, inputIsCurrent: input.data.currentVersionId === selected, extractionOptions, runs, corpus: { id: corpus.id, manifestHash: corpus.manifestHash, asOf: corpus.asOf, sourceCount: corpus.sources.length, excerptCount: corpus.excerpts.length, translationReview: 'mixed_or_unreviewed' as const, url: `/api/ai-review/corpus?contextId=${input.contextId}&releaseId=${corpus.id}` }, availableEngines: [SYNTHETIC_ENGINE, providerEngine(providerConfig().config?.model)], defaultEngine: SYNTHETIC_ENGINE.engine, providerSettings: settingsView(s,input.contextId!), capabilities: { start: extractionOptions.length > 0, review: true, editCorpus: false }, limits: analysisLimits, requiresHumanReview: true, legalApproval: false };
 }
 export function analysisList(s: UnitOfWork, p: Principal, contextId: string, clock: Clock) {
   reviewAccess(s, p, contextId, clock);
   const items = s.list('aiInput', contextId).flatMap(input => { try { const r = resolveVersion(s, p, input.id, input.data.currentVersionId!, clock); const runs = s.list('aiAnalysisRun', contextId).filter(run => run.data.inputId === input.id).flatMap(run => visibleRun(s, p, run, clock)).sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.attempt - a.attempt); return [{ inputId: input.id, inputVersionId: r.version.id, title: r.content.title, sequence: r.version.data.sequence, latestRun: runs[0] ?? null }]; } catch (e) { if (e instanceof AuthError && [403, 404].includes(e.status)) return []; throw e; } });
-  return { contextId, items, total: items.length, availableEngines: [SYNTHETIC_ENGINE], visibility: 'gsg_internal' as const };
+  return { contextId, items, total: items.length, availableEngines: [SYNTHETIC_ENGINE, providerEngine(providerConfig().config?.model)], visibility: 'gsg_internal' as const };
 }
 export function rawResult(s: UnitOfWork, p: Principal, runId: string, clock: Clock) {
   const r = resolvedResult(s, p, runId, clock);

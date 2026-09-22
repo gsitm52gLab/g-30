@@ -1,3 +1,4 @@
+import { AiProviderService } from '@/server/ai-provider/service';
 import { afterEach, describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -46,8 +47,10 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} actual G16 ser
     await setup(); const f = await readyInput(identity, directory), r = await service.start(staff, f.input.id, f.body);
     expect((await service.start(staff, f.input.id, f.body)).runId).toBe(r.runId); expect(await repo.list('aiAnalysisRun')).toHaveLength(1); expect(await repo.list('aiAnalysisResult')).toHaveLength(1);
     await expect(service.start(staff, f.input.id, { ...f.body, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
-    await expect(service.start(staff, f.input.id, { ...f.body, engine: 'provider', idempotencyKey: randomUUID() })).rejects.toMatchObject({ code: 'ENGINE_UNAVAILABLE' });
     const second = await service.start(staff, f.input.id, { ...f.body, expectedRunId: r.runId, idempotencyKey: randomUUID() }); expect(second.detail.attempt).toBe(2); expect((await service.detail(staff, r.runId)).result).toEqual(r.detail.result);
+    let outbound = 0; const provider = new AiProviderService(identity, directory, { config: () => ({config: null, issue: 'KEY_MISSING'}), transport: async () => { outbound++; throw Error('must not dispatch'); } });
+    const missing = await provider.start(staff, f.input.id, { ...f.body, expectedRunId: second.runId, engine: 'provider', idempotencyKey: randomUUID() });
+    expect(missing.detail).toMatchObject({state: 'failed', providerCalled: false, provider: {attempts: [{issue: 'KEY_MISSING'}]}}); expect(outbound).toBe(0);
   });
   it('one actual claim while engine awaits; current source/role checked again before dispatch and after result', async () => {
     await setup(); const f = await readyInput(identity, directory); let enter!: () => void, release!: () => void, calls = 0;

@@ -1,0 +1,9 @@
+import { fail } from '@/server/auth/errors';
+import type { ProviderIssue } from '@/domain/ai-provider/types';
+export const issueMessages: Record<ProviderIssue, string> = {
+ KEY_MISSING:'서버 API 키가 설정되지 않았습니다.', CONFIGURATION:'서버 모델 또는 API 주소 설정을 확인해 주세요.', DISABLED:'이 컨텍스트의 외부 AI가 비활성화되어 있습니다.', PROVIDER_AUTH:'API 인증에 실패했습니다. 서버 키를 확인해 주세요.', PROVIDER_PERMISSION:'설정된 모델 또는 API 사용 권한이 없습니다.', RATE_LIMIT:'요청 제한에 도달했습니다. 잠시 후 명시적으로 재시도할 수 있습니다.', SERVER_ERROR:'AI 제공자 서버 오류입니다. 명시적으로 재시도할 수 있습니다.', TIMEOUT:'응답 대기 시간이 지났습니다. 제공자가 처리했는지는 확인되지 않았습니다.', NETWORK:'연결 결과를 확인할 수 없습니다. 외부 처리 여부가 불확실합니다.', REFUSAL:'모델이 이 요청의 결과 제공을 거절했습니다.', INCOMPLETE:'모델 응답이 끝나지 않았습니다. 결과를 판단하지 않았습니다.', PARSE_ERROR:'응답 형식 또는 원문 위치를 검증하지 못했습니다.', EXTERNAL_USE_DENIED:'현재 원본의 외부 전송 근거가 없습니다. 로컬 읽기와 사람 검토는 계속할 수 있습니다.', INPUT_LIMIT:'읽은 입력 또는 요청이 기술적 크기 제한을 넘었습니다.', SOURCE_CHANGED:'원본 또는 읽기 버전이 변경되었습니다.', CORPUS_CHANGED:'검토 근거 버전이 변경되었습니다.', ACCESS_CHANGED:'현재 접근 권한이 변경되었습니다.', SETTINGS_CHANGED:'실행 중 AI 설정이 변경되었습니다. 현재 설정을 확인해 주세요.', INTERRUPTED:'실행이 중단되었습니다. 외부 처리 여부를 확인할 수 없습니다.', RESPONSE_UNKNOWN:'외부 처리 여부가 불확실하여 자동 재전송하지 않습니다.', ENGINE_ERROR:'AI 분석 처리에 실패했습니다. 실패 기록을 확인해 주세요.' };
+export class ProviderFailure extends Error { constructor(readonly issue: ProviderIssue) { super(issue); } }
+export const transient = (issue: ProviderIssue | null) => issue !== null && ['RATE_LIMIT','SERVER_ERROR','TIMEOUT'].includes(issue);
+export function providerFail(issue: ProviderIssue): never { return fail(issue, issue === 'DISABLED' || issue.endsWith('CHANGED') || issue === 'RESPONSE_UNKNOWN' ? 409 : issue === 'EXTERNAL_USE_DENIED' || issue === 'INPUT_LIMIT' ? 422 : 503, issueMessages[issue]); }
+
+export const configurationIssue=(issue:ProviderIssue|null)=>issue!==null&&['KEY_MISSING','CONFIGURATION','PROVIDER_AUTH','PROVIDER_PERMISSION'].includes(issue);
