@@ -1,3 +1,4 @@
+import { searchTransaction } from '@/server/search/transaction';
 import { asyncFilter, asyncMap } from "@/domain/async-collections";
 import type { UnitOfWork } from "@/domain/records";
 import type { ProductFileBinding } from "@/domain/products/types";
@@ -64,7 +65,7 @@ export class ProductService {
         });
     }
     async list(token: string | undefined, query: ProductListQuery = {}) {
-        return this.identity.repo.transaction(async (s) => {
+        return searchTransaction(this.identity.repo, async (s) => {
             const p = (await this.identity.principal(s, token));
             if (query.context)
                 (await authorize(s, p, "product.read", productContextScope(query.context, "products"), this.clock));
@@ -78,10 +79,10 @@ export class ProductService {
             return { mode: this.identity.repo.mode, contexts, items: rows.slice((page - 1) * pageSize, page * pageSize), total: rows.length, page, pageSize, materialCounts: { connected: true as const, requested: rows.reduce((n, r) => n + r.materialCounts.requested, 0), missing: rows.reduce((n, r) => n + r.materialCounts.missing, 0), unconfirmed: rows.reduce((n, r) => n + r.materialCounts.unconfirmed, 0) } };
         });
     }
-    async detail(token: string | undefined, productId: string, contextId: string) { return this.identity.repo.transaction(async (s) => (await productDetail(s, (await this.identity.principal(s, token)), (await resolveProduct(s, (await this.identity.principal(s, token)), contextId, productId, this.clock)), this.clock))); }
+    async detail(token: string | undefined, productId: string, contextId: string) { return searchTransaction(this.identity.repo, async (s) => (await productDetail(s, (await this.identity.principal(s, token)), (await resolveProduct(s, (await this.identity.principal(s, token)), contextId, productId, this.clock)), this.clock))); }
     async impact(token: string | undefined, productId: string, input: Record<string, unknown>) {
         const v = object(input, ["contextId", "common", "expectedCommonRevision"]), contextId = str(v.contextId, 160, true), next = commonInput(v.common);
-        return this.identity.repo.transaction(async (s) => {
+        return searchTransaction(this.identity.repo, async (s) => {
             const p = (await this.identity.principal(s, token)), r = (await resolveProduct(s, p, contextId, productId, this.clock, true));
             fresh(r.product, v.expectedCommonRevision);
             return { productId, commonRevision: r.product.revision, sharedCommonNotice, visibleContexts: (await visibleContexts(s, p, r, this.clock)), changes: commonDiff(r.common.data.common, next) };
