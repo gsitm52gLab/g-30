@@ -32,12 +32,18 @@ export async function directUpload<T>(file: File, options: {
 }): Promise<T> {
   const { callbacks, signal } = options, state = options.state ?? {}, fetcher=options.fetcher ?? fetch;
   const send = (url: string, init: RequestInit) => fetcher(url, { ...init, credentials: 'omit', redirect: 'error', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(120000)]) : AbortSignal.timeout(120000) });
+  const resolveReady = async (status: import('@/domain/storage/types').GrantStatus) => {
+    signal?.throwIfAborted();
+    const result = await callbacks.resolve(status, signal);
+    signal?.throwIfAborted();
+    return result;
+  };
   const finalize = async (id: string) => {
     let status;
     try { status = await callbacks.finalize(id, signal); }
     catch (error) { if (accessStatus(error)) throw new FileTransferError('ACCESS_CHANGED', accessStatus(error)); signal?.throwIfAborted(); status = await callbacks.status(id, signal); }
     if (status.id !== id || status.state !== 'ready' || !status.result) throw new FileTransferError('NOT_READY');
-    return await callbacks.resolve(status, signal);
+    return await resolveReady(status);
   };
   try {
     signal?.throwIfAborted();
@@ -50,13 +56,13 @@ export async function directUpload<T>(file: File, options: {
     if (state.grantId) {
       const status = await callbacks.status(state.grantId, signal);
       if (status.id !== state.grantId) invalid();
-      if (status.state === 'ready') { if (!status.result) invalid(); return await callbacks.resolve(status, signal); }
+      if (status.state === 'ready') { if (!status.result) invalid(); return await resolveReady(status); }
       if (state.uploaded || status.state === 'recovery_required' || status.state === 'finalizing') return await finalize(status.id);
       if (!['issued','issuing'].includes(status.state)) throw new FileTransferError('NOT_READY');
     }
     const issued = await callbacks.issue({ clientItemId: options.clientItemId, originalName:file.name, declaredMime:file.type, expectedBytes:file.size, expectedSha256:sha256 }, signal);
     if (state.grantId && issued.status.id !== state.grantId) invalid(); state.grantId=issued.status.id;
-    if (issued.status.state === 'ready') { if (!issued.status.result) invalid(); return await callbacks.resolve(issued.status, signal); }
+    if (issued.status.state === 'ready') { if (!issued.status.result) invalid(); return await resolveReady(issued.status); }
     if (issued.status.state !== 'issued' || !issued.capability) throw new FileTransferError('NOT_READY');
     const cap = capability(issued.capability, file.size);
     if (file.size <= TUS_CHUNK) {
