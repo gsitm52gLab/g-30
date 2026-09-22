@@ -21,15 +21,14 @@ const identifier=(v:unknown)=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,180}$/.test
 const label=(v:unknown,max=160)=>typeof v==='string'&&v.length<=max&&/^[a-zA-Z0-9_.:/-]+$/.test(v)?v:null;
 export function emptyTransport(issue:ProviderIssue,unknown=false):TransportResult{return {issue,responseId:null,requestId:null,responseModel:null,serviceTier:null,providerStatus:null,rawCandidate:null,responseHash:null,usage:providerUsage(null),remoteOutcomeUnknown:unknown};}
 export const openaiTransport:Transport=async(config,request,beforeDispatch,onDispatch)=>{
+ let receivedRequestId:string|null=null;
  try {
   const client=new OpenAI({apiKey:config.apiKey,baseURL:config.baseURL,maxRetries:0,timeout:PROVIDER_LIMITS.timeoutMs,logLevel:'off',fetch:async(input,init)=>{await beforeDispatch();const pending=fetch(input,init);void pending.catch(()=>{});await onDispatch();return pending;}});
-  // asResponse keeps SDK HTTP/error/timeout handling, without its eager addOutputText
-  // transform throwing before our safe metadata projection on malformed envelopes.
-  const response=await client.responses.create(request).asResponse();
-  const parseFailure=()=>{const r=emptyTransport('PARSE_ERROR');r.requestId=identifier(response.headers.get('x-request-id'));r.responseHash=sha256(JSON.stringify(r));return r;};
-  const mediaType=response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase();
-  if(!mediaType?.includes('application/json')&&!mediaType?.endsWith('+json'))return parseFailure();
-  let value:unknown;try{value=await response.json();}catch(e){if(e instanceof SyntaxError)return parseFailure();throw e;}
+  // Match Responses.create's public SDK request/security options, omitting only
+  // addOutputText. withResponse retains SDK parsing and the original body deadline.
+  const pending=client.post<unknown>('/responses',{body:request,stream:request.stream??false,__security:{bearerAuth:true}});
+  const response=await pending.asResponse();receivedRequestId=identifier(response.headers.get('x-request-id'));
+  const {data:value}=await pending.withResponse();
   const data=value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{};
   const result:TransportResult={issue:null,responseId:identifier(data?.id),requestId:identifier(response.headers.get('x-request-id')),responseModel:label(data?.model),serviceTier:label(data?.service_tier),providerStatus:label(data?.status),rawCandidate:null,responseHash:null,usage:providerUsage(data?.usage),remoteOutcomeUnknown:false};
   const finish=()=>{result.responseHash=sha256(JSON.stringify(result));return result;};
@@ -44,9 +43,9 @@ export const openaiTransport:Transport=async(config,request,beforeDispatch,onDis
   const rawCandidate=texts.join('');result.issue=refusal?'REFUSAL':data.status==='incomplete'?'INCOMPLETE':data.status!=='completed'?'SERVER_ERROR':!rawCandidate||Buffer.byteLength(rawCandidate)>262144?'PARSE_ERROR':null;
   result.rawCandidate=rawCandidate&&Buffer.byteLength(rawCandidate)<=262144?rawCandidate:null;return finish();
  }catch(e){
-  if(e instanceof SyntaxError)return emptyTransport('PARSE_ERROR');
+  if(e instanceof SyntaxError)return {...emptyTransport('PARSE_ERROR'),requestId:receivedRequestId};
   if(e instanceof ProviderFailure)return emptyTransport(e.issue);
-  if(e instanceof OpenAI.APIConnectionTimeoutError)return emptyTransport('TIMEOUT',true);
+  if(e instanceof OpenAI.APIConnectionTimeoutError)return {...emptyTransport('TIMEOUT',true),requestId:receivedRequestId};
   if(e instanceof OpenAI.APIConnectionError)return emptyTransport('NETWORK',true);
   if(e instanceof OpenAI.APIError){const issue:ProviderIssue=e.status===401?'PROVIDER_AUTH':e.status===403?'PROVIDER_PERMISSION':e.status===429?'RATE_LIMIT':e.status&&e.status>=500?'SERVER_ERROR':'CONFIGURATION';return {...emptyTransport(issue),requestId:identifier(e.requestID)};}
   // Never return/log an exception message, HTTP body, input or credential.
