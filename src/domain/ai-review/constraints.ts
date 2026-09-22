@@ -1,4 +1,4 @@
-import { StoreError, type RecordInput, type RecordKind, type UnitOfWork } from '../records';
+import { StoreError, type RecordInput, type RecordKind, type SyncUnitOfWork as UnitOfWork } from '../records';
 import { readCorpusRelease } from './corpus';
 const kinds = ['aiCorpusRelease', 'aiCorpusHead', 'aiAnalysisRun', 'aiAnalysisResult', 'aiFindingReview', 'aiFindingReviewAction'] as const;
 const immutable: readonly string[] = ['aiCorpusRelease', 'aiAnalysisResult', 'aiFindingReviewAction'];

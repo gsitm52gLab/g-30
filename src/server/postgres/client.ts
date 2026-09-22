@@ -1,9 +1,11 @@
 import { Pool, type PoolClient, type QueryResultRow } from 'pg';
-import { safePostgresError } from './errors';
+import { PostgresConfigurationError, safePostgresError } from './errors';
 import type { PostgresConfig } from './config';
 
 export function createPostgresPool(config: PostgresConfig, purpose: 'runtime' | 'migration' = 'runtime'): Pool {
-  const pool = new Pool(config[purpose]);
+  const options = config[purpose];
+  if (!options) throw new PostgresConfigurationError('DIRECT_URL');
+  const pool = new Pool(options);
   // Idle network failures must not crash Node or leak raw driver diagnostics.
   pool.on('error', () => undefined);
   return pool;

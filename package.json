@@ -33,7 +33,10 @@
     "products:migration-check": "tsx scripts/verify-products-migration-cli.ts",
     "db:postgres:migrate": "tsx scripts/verify-postgres-db.ts migrate",
     "db:postgres:seed": "tsx scripts/verify-postgres-db.ts seed",
-    "db:postgres:verify": "tsx scripts/verify-postgres-foundation.ts"
+    "db:postgres:verify": "tsx scripts/verify-postgres-foundation.ts",
+    "dev:supabase": "cross-env DATA_SOURCE=supabase next dev --hostname 127.0.0.1",
+    "db:supabase:migrate": "cross-env DATA_SOURCE=supabase tsx scripts/db.ts migrate",
+    "db:supabase:seed": "cross-env DATA_SOURCE=supabase tsx scripts/db.ts seed"
   },
   "dependencies": {
     "@napi-rs/canvas": "1.0.9",

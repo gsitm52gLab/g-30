@@ -11,7 +11,7 @@ import { checkRelations } from '@/domain/constraints';
 import { createMockRepository } from '@/server/repositories/mock';
 import { fixtures } from '@/data/fixtures';
 import type { AsyncUnitOfWork } from '@/server/postgres/types';
-import type { RecordInput, RecordKind } from '@/domain/records';
+import type { RecordInput, RecordKind, StoredRecord, SyncUnitOfWork } from '@/domain/records';
 import mappings from '@/server/postgres/migrations/source-map.json';
 import relationSources from '@/server/postgres/relations/source-map.json';
 
@@ -23,11 +23,11 @@ const env = {
 describe('Supabase strict configuration and redaction', () => {
   it('loads pinned valid public CA and keeps verify-full with URI sslmode=require', () => {
     expect(createHash('sha256').update(loadSupabaseCa()).digest('hex')).toBe(CA_SHA256);
-    const config = parsePostgresConfig(env);
+    const config = parsePostgresConfig(env, 'migration');
     expect(config.runtime.ssl).toMatchObject({ rejectUnauthorized: true, minVersion: 'TLSv1.2' });
     expect(config.runtime).not.toHaveProperty('connectionString');
     expect(config.runtime.password).toBe('synthetic@password');
-    expect(config.runtime.port).toBe(6543); expect(config.migration.port).toBe(5432);
+    expect(config.runtime.port).toBe(6543); expect(config.migration?.port).toBe(5432);
   });
   it.each(['', '/rest/v1', '/rest/v1/', '/storage/v1', '/storage/v1/'])('normalizes known API path %s', suffix => {
     expect(parsePostgresConfig({ ...env, SUPABASE_URL: env.SUPABASE_URL + suffix }).schema).toBe('gs_hale');
@@ -46,7 +46,12 @@ describe('Supabase strict configuration and redaction', () => {
     ['SUPABASE_DB_SCHEMA', 'public'], ['SUPABASE_DB_SCHEMA', 'gs_hale; DROP SCHEMA public'],
     ['SUPABASE_POOL_MAX', '0'], ['SUPABASE_POOL_MAX', '21'],
   ])('rejects unsafe/missing %s without echoing it', (field, value) => {
-    expect(() => parsePostgresConfig({ ...env, [field!]: value })).toThrow(`Invalid PostgreSQL configuration: ${field}`);
+    expect(() => parsePostgresConfig({ ...env, [field!]: value }, 'migration')).toThrow(`Invalid PostgreSQL configuration: ${field}`);
+  });
+  it('runtime has no DIRECT_URL dependency while migrations require it', () => {
+    expect(parsePostgresConfig({ ...env, DIRECT_URL: undefined }).migration).toBeNull();
+    expect(parsePostgresConfig({ ...env, DIRECT_URL: 'unusable' }).migration).toBeNull();
+    expect(() => parsePostgresConfig({ ...env, DIRECT_URL: undefined }, 'migration')).toThrow('DIRECT_URL');
   });
   it('rejects schema outside the app namespace', () => { expect(() => quoteSchema('auth')).toThrow(); });
   it.each([['23505', 'CONFLICT'], ['40001', 'CONFLICT'], ['40P01', 'CONFLICT'], ['23514', 'INVALID_RECORD'], ['08006', 'STORAGE_UNAVAILABLE']])('redacts driver %s', (code, expected) => {
@@ -72,24 +77,30 @@ describe('explicit 0001–0015 migration and relation parity inventory', () => {
   });
   it('matches sync relation decisions on valid fixture inserts, duplicates and missing parents', async () => {
     const repository = createMockRepository();
-    // This is a test-only adapter to compare constraints; production never adapts a sync store.
-    // The repository guards escaped handles, so capture a fresh synchronous view for each test.
+    // Independent test-only reference state for synchronous constraint comparison.
+    const reference = new Map<string, StoredRecord>();
+    const sync: SyncUnitOfWork = {
+      get: <K extends RecordKind>(kind: K, id: string) => (reference.get(`${kind}:${id}`) as StoredRecord<K> | undefined) ?? null,
+      list: <K extends RecordKind>(kind: K, contextId?: string) => [...reference.values()].filter(r => r.kind === kind && (contextId === undefined || r.contextId === contextId)) as StoredRecord<K>[],
+      create: () => { throw new Error('test read view'); }, update: () => { throw new Error('test read view'); },
+    };
     for (const fixture of fixtures) {
       let syncResult: unknown;
-      await repository.transaction(s => { try { checkRelations(s, fixture.kind, fixture.input); syncResult = 'ok'; } catch (e) { syncResult = (e as Error).message; } });
+      try { checkRelations(sync, fixture.kind, fixture.input); syncResult = 'ok'; } catch (e) { syncResult = (e as Error).message; }
       const view: AsyncUnitOfWork = {
         get: (kind, id) => repository.get(kind, id), list: (kind, context) => repository.list(kind, context),
         create: async () => { throw new Error('test read view'); }, update: async () => { throw new Error('test read view'); },
       };
       let asyncResult: unknown = 'ok'; try { await asyncRelations(view, fixture.kind, fixture.input); } catch (e) { asyncResult = (e as Error).message; }
       expect(asyncResult).toBe(syncResult);
-      await repository.transaction(s => s.create(fixture.kind, fixture.input));
+      const saved = await repository.transaction(s => s.create(fixture.kind, fixture.input));
+      reference.set(`${saved.kind}:${saved.id}`, saved);
       const missing: RecordInput<RecordKind> = { ...fixture.input, id: 'missing-reference-probe', contextId: 'missing-context', data: { ...fixture.input.data, userId: 'missing-user', taskId: 'missing-task', productId: 'missing-product' } as RecordInput<RecordKind>['data'] };
-      await repository.transaction(s => { try { checkRelations(s, fixture.kind, missing); syncResult = 'ok'; } catch (e) { syncResult = (e as Error).message; } });
+      try { checkRelations(sync, fixture.kind, missing); syncResult = 'ok'; } catch (e) { syncResult = (e as Error).message; }
       asyncResult = 'ok'; try { await asyncRelations(view, fixture.kind, missing); } catch (e) { asyncResult = (e as Error).message; }
       expect(asyncResult).toBe(syncResult);
     }
-    repository.close();
+    await repository.close();
   });
 });
 

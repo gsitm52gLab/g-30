@@ -1,11 +1,12 @@
 // Pure parser: only explicitly supplied configuration is read here. No process.env access.
-export interface ServerConfig { dataSource: "mock" | "sqlite"; databaseFile: string; openai: { apiKey?: string; model?: string; baseURL: string } }
+export interface ServerConfig { dataSource: "mock" | "sqlite" | "supabase"; databaseFile: string; openai: { apiKey?: string; model?: string; baseURL: string } }
 export class ConfigurationError extends Error {
   constructor(public readonly field: string) { super(`환경 설정을 확인하세요: ${field}`); this.name = "ConfigurationError"; }
 }
 export function parseStorageConfig(source: Record<string, string | undefined>): Pick<ServerConfig, "dataSource" | "databaseFile"> {
+  if (source.VERCEL === '1' && !source.DATA_SOURCE?.trim()) throw new ConfigurationError('DATA_SOURCE');
   const dataSource = source.DATA_SOURCE?.trim() || "mock";
-  if (dataSource !== "mock" && dataSource !== "sqlite") throw new ConfigurationError("DATA_SOURCE");
+  if (dataSource !== "mock" && dataSource !== "sqlite" && dataSource !== "supabase") throw new ConfigurationError("DATA_SOURCE");
   const databaseFile = source.DATABASE_FILE?.trim() || ".local/data/gs-hale.db";
   if (databaseFile.includes("\0")) throw new ConfigurationError("DATABASE_FILE");
   return { dataSource, databaseFile };

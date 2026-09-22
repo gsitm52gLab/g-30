@@ -9,7 +9,7 @@ export const CA_SHA256 = '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7
 export interface PostgresConfig {
   schema: string;
   runtime: PoolConfig;
-  migration: PoolConfig;
+  migration: PoolConfig | null;
   statementTimeoutMs: number;
   lockTimeoutMs: number;
   idleTransactionTimeoutMs: number;
@@ -55,7 +55,7 @@ function connection(value: string | undefined, field: string, project: string, c
     };
   } catch { throw new PostgresConfigurationError(field); }
 }
-export function parsePostgresConfig(env: Record<string, string | undefined>): PostgresConfig {
+export function parsePostgresConfig(env: Record<string, string | undefined>, purpose: 'runtime' | 'migration' = 'runtime'): PostgresConfig {
   const ca = loadSupabaseCa();
   let project: string;
   try {
@@ -67,7 +67,7 @@ export function parsePostgresConfig(env: Record<string, string | undefined>): Po
   const max = integer(env.SUPABASE_POOL_MAX, 4, 20, 'SUPABASE_POOL_MAX');
   return {
     schema, runtime: connection(env.DATABASE_URL, 'DATABASE_URL', project, ca, max),
-    migration: connection(env.DIRECT_URL, 'DIRECT_URL', project, ca, 1),
+    migration: purpose === 'migration' ? connection(env.DIRECT_URL, 'DIRECT_URL', project, ca, 1) : null,
     statementTimeoutMs: integer(env.SUPABASE_STATEMENT_TIMEOUT_MS, 15_000, 120_000, 'SUPABASE_STATEMENT_TIMEOUT_MS'),
     lockTimeoutMs: integer(env.SUPABASE_LOCK_TIMEOUT_MS, 5_000, 30_000, 'SUPABASE_LOCK_TIMEOUT_MS'),
     idleTransactionTimeoutMs: integer(env.SUPABASE_IDLE_TRANSACTION_TIMEOUT_MS, 15_000, 120_000, 'SUPABASE_IDLE_TRANSACTION_TIMEOUT_MS'),

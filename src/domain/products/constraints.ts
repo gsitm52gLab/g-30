@@ -1,4 +1,4 @@
-import { StoreError, type RecordKind, type RecordInput, type UnitOfWork } from "../records";
+import { StoreError, type RecordKind, type RecordInput, type SyncUnitOfWork as UnitOfWork } from "../records";
 export function productRelations<K extends RecordKind>(s: UnitOfWork, kind: K, input: RecordInput<K>) {
     const immutable: RecordKind[] = ["productVersion", "contextProductVersion", "retailPriceVersion", "internalPriceVersion", "productUseSnapshot", "productMigration"];
     if (immutable.includes(kind) && s.get(kind, input.id))

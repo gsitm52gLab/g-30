@@ -1,4 +1,4 @@
-import { StoreError, type RecordKind, type RecordInput, type UnitOfWork } from '@/domain/records';
+import { StoreError, type RecordKind, type RecordInput, type SyncUnitOfWork as UnitOfWork } from '@/domain/records';
 export function schedulingRelations<K extends RecordKind>(s: UnitOfWork, kind: K, input: RecordInput<K>) {
     if (kind !== 'schedule' && kind !== 'scheduleVersion') return;
     const bad = () => { throw new StoreError('INVALID_RECORD'); };

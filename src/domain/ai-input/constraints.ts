@@ -1,4 +1,4 @@
-import { StoreError, type RecordKind, type RecordInput, type UnitOfWork } from '../records';
+import { StoreError, type RecordKind, type RecordInput, type SyncUnitOfWork as UnitOfWork } from '../records';
 const immutable: RecordKind[]=['aiAsset','aiVersion','aiSnapshot'];
 export function aiRelations<K extends RecordKind>(s:UnitOfWork,kind:K,input:RecordInput<K>){
  if(!['aiInput','aiRun',...immutable].includes(kind))return;

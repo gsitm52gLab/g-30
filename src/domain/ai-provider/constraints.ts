@@ -1,4 +1,4 @@
-import { StoreError, type UnitOfWork, type RecordKind, type RecordInput } from '../records';
+import { StoreError, type SyncUnitOfWork as UnitOfWork, type RecordKind, type RecordInput } from '../records';
 import { attemptData, outcomeData, planData, settingData } from './parse';
 export function providerRelations<K extends RecordKind>(s:UnitOfWork,kind:K,input:RecordInput<K>) {
  if(kind==='aiAnalysisRun'){const old=s.get('aiAnalysisRun',input.id);if(old?.data.engine==='provider'){const next=input.data as unknown as Record<string,unknown>;for(const key of ['inputId','inputVersionId','extractionRunId','extractionSnapshotId','snapshotHash','corpusReleaseId','corpusManifestHash','engine','modelId','promptVersion','taskId','createdBy','attempt','previousRunId'] as const)if(old.data[key]!==next[key])throw new StoreError('INVALID_RECORD');if(old.data.providerCalled&&!next.providerCalled)throw new StoreError('INVALID_RECORD');}return;}

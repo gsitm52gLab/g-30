@@ -15,7 +15,7 @@ import mappings from '@/server/postgres/migrations/source-map.json';
 const envFile = process.argv[2], evidenceFile = process.argv[3];
 if (!envFile || !evidenceFile) throw new Error('Usage: verify-postgres-foundation.ts ENV_FILE NEW_EVIDENCE_FILE');
 const envBytes = readFileSync(envFile), beforeHash = createHash('sha256').update(envBytes).digest('hex');
-const config = parsePostgresConfig({ ...parseEnv(envBytes.toString()), SUPABASE_DB_SCHEMA: 'gs_hale_sb_foundation_20260922' });
+const config = parsePostgresConfig({ ...parseEnv(envBytes.toString()), SUPABASE_DB_SCHEMA: 'gs_hale_sb_foundation_20260922' }, 'migration');
 const schema = quoteSchema(config.schema), id = `foundation-${randomUUID()}`;
 const plannedCheckCount = 21 + mappings.migrations.reduce((count, migration) => count
   + migration.indexes.filter(name => name !== 'records_kind_context').length

@@ -28,7 +28,7 @@ export function createPostgresRepository(config: PostgresConfig, clock: Clock = 
   const pool = suppliedPool || createPostgresPool(config);
   const table = `${quoteSchema(config.schema)}.records`;
   let closed = false;
-  async function run<T>(operation: (store: AsyncUnitOfWork) => Promise<T>, readOnly = false): Promise<T> {
+  async function run<T>(operation: (store: AsyncUnitOfWork) => T | Promise<T>, readOnly = false): Promise<T> {
     if (closed) throw new StoreError('STORAGE_UNAVAILABLE');
     const client = await connect(pool);
     let active = true, poisoned: unknown = null;
