@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { RequestError } from '@/features/tasks/client';
 import { createHash } from 'node:crypto';
 import { directUpload, boundedDownload, type DirectUploadCallbacks, type UploadResumeState } from '@/features/files/transfer';
 import { downloadMetadata } from '@/features/files/download';
@@ -48,7 +49,7 @@ describe('shared bounded file transport',()=>{
  });
  it('ready retry does not upload bytes or create a second grant',async()=>{
   const file=new File(['a'],'a.csv'),cb=callbacks(1);cb.status=vi.fn(async()=>ready);const fetcher=vi.fn() as typeof fetch;
-  expect(await directUpload(file,{clientItemId:'file-item-a',callbacks:cb,state:{grantId:'grant-a'},fetcher})).toBe('file-a');expect(fetcher).not.toHaveBeenCalled();expect(cb.issue).not.toHaveBeenCalled();
+  expect(await directUpload(file,{clientItemId:'file-item-a',callbacks:cb,state:{grantId:'grant-a',fileFingerprint:JSON.stringify([file.name,file.type,file.size,hash(new Uint8Array(await file.arrayBuffer()))])},fetcher})).toBe('file-a');expect(fetcher).not.toHaveBeenCalled();expect(cb.issue).not.toHaveBeenCalled();
  });
  it('resumes the same TUS resource after an interrupted chunk using authoritative HEAD',async()=>{
   const file=new File([new Uint8Array(TUS+5)],'a.csv',{type:'text/csv'}),cb=callbacks(file.size),state:UploadResumeState={};let creates=0,offset=0,failed=false;
@@ -71,7 +72,16 @@ describe('shared bounded file transport',()=>{
  });
  it('sanitizes a rejected ready DTO callback rather than exposing an underlying message',async()=>{
   const file=new File(['a'],'a.csv'),cb=callbacks(1);cb.status=vi.fn(async()=>ready);cb.resolve=vi.fn(async()=>{throw Error('synthetic_private_capability');});
-  await expect(directUpload(file,{clientItemId:'file-item-a',callbacks:cb,state:{grantId:'grant-a'}})).rejects.toMatchObject({name:'FileTransferError',code:'TRANSFER_FAILED'});
+  await expect(directUpload(file,{clientItemId:'file-item-a',callbacks:cb,state:{grantId:'grant-a',fileFingerprint:JSON.stringify([file.name,file.type,file.size,hash(new Uint8Array(await file.arrayBuffer()))])}})).rejects.toMatchObject({name:'FileTransferError',code:'TRANSFER_FAILED'});
+ });
+ it('rejects changed bytes even when ready retry uses the same name, size and MIME',async()=>{
+  const old=new File(['a'],'same.csv',{type:'text/csv'}),changed=new File(['b'],'same.csv',{type:'text/csv'}),cb=callbacks(1),state:UploadResumeState={};
+  await directUpload(old,{clientItemId:'file-item-a',callbacks:cb,state,fetcher:fetchAs(async()=>new Response(null,{status:200}))});cb.status=vi.fn(async()=>ready);vi.mocked(cb.resolve).mockClear();
+  await expect(directUpload(changed,{clientItemId:'file-item-a',callbacks:cb,state})).rejects.toMatchObject({code:'INVALID_INPUT'});expect(cb.status).not.toHaveBeenCalled();expect(cb.resolve).not.toHaveBeenCalled();
+ });
+ it.each([401,403,404])('retains safe RequestError %s semantics so feature UI purges denied data',async(status)=>{
+  const cb=callbacks(1);cb.issue=vi.fn(async()=>{throw new RequestError('synthetic_private_message',status,'SOURCE_DENIED');});
+  try{await directUpload(new File(['a'],'a.csv'),{clientItemId:'file-item-a',callbacks:cb});throw Error('unexpected success');}catch(error){expect(error).toBeInstanceOf(RequestError);expect(error).toMatchObject({status,code:'ACCESS_CHANGED'});expect((error as Error).message).not.toContain('synthetic_private_message');}
  });
  it('constructs Storage lazily and never falls back after invalid config',()=>{
   const environment=vi.fn(()=>({SUPABASE_URL:'https://sample.supabase.co/rest/v1',SUPABASE_SECRET_KEY:'sb_secret_synthetic_key_123456789'}));const factory=createPrivateStorageFactory(environment);expect(environment).not.toHaveBeenCalled();expect(factory().allocateStagingKey()).toMatch(/^gs-hale\/staging\//);expect(factory()).toBe(factory());expect(environment).toHaveBeenCalledTimes(1);

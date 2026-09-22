@@ -25,7 +25,7 @@ async function body(response: Response, maximum: number): Promise<Uint8Array<Arr
   const bytes = new Uint8Array(size); let at = 0; for (const part of parts) { bytes.set(part, at); at += part.length; } return bytes;
 }
 async function success(response: Response, expected: number) {
-  if (response.status !== expected) { await response.body?.cancel(); throw new FileTransferError([401,403,404,409,412].includes(response.status) ? 'ACCESS_CHANGED' : 'TRANSFER_FAILED'); }
+  if (response.status !== expected) { await response.body?.cancel(); throw new FileTransferError([401,403,404,409,412].includes(response.status) ? 'ACCESS_CHANGED' : 'TRANSFER_FAILED', response.status); }
 }
 export async function boundedDownload(metadataURL: string, options: { signal?: AbortSignal; maximumBytes?: number; fetcher?: typeof fetch } = {}): Promise<{ blob: Blob; metadata: DownloadMetadata }> {
   const fetcher = options.fetcher ?? fetch;
