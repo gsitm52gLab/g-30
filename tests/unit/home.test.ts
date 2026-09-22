@@ -59,6 +59,14 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G03 home`, () 
     expect(detail.id).toBe(item.id); expect(detail.taskId).toBe(fixture.taskId);
     expect((await home.read(actors.admin, {scope:'context',context:A})).campaigns).toHaveLength(2);
   });
+  it('distinguishes two independent events of the same country and brand without changing retail labels', async () => {
+    const { home } = await setup(), first = (await repo.get('context', 'ctx-event-luna'))!;
+    await repo.transaction(s => s.create('context', { id: 'home-second-event', contextId: null, data: { ...first.data, eventName: '합성 두 번째 행사', combinationKey: 'event:JP:brand-luna:합성 두 번째 행사' } }));
+    const result = await home.read(actors.admin, { scope: 'all' });
+    expect(result.contexts.find(c => c.id === first.id)?.label).toBe('일본 · 리테일러 미지정 · 루나랩 · 합성 독립 행사');
+    expect(result.contexts.find(c => c.id === 'home-second-event')?.label).toBe('일본 · 리테일러 미지정 · 루나랩 · 합성 두 번째 행사');
+    expect(result.contexts.find(c => c.id === A)?.label).toBe('일본 · 리테일러 A · 루나랩');
+  });
   it('storage failures propagate instead of false empty successful responses and clean retries work', async () => {
     const { identity, home } = await setup(); const normal = await home.read(actors.gsg, { scope: 'context', context: A });
     const broken = new HomeService(new IdentityService({ ...repo, transaction: async () => { throw new StoreError('STORAGE_UNAVAILABLE'); } }, identity.clock));

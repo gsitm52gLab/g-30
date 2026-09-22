@@ -34,7 +34,7 @@ export function homeQuery(params: URLSearchParams): HomeQuery {
 }
 const active = (t: StoredRecord<'task'>) => !['draft', 'completed', 'cancelled', 'on_hold'].includes(t.data.status);
 const ownTask = (t: StoredRecord<'task'>, p: Principal) => p.user.data.role === 'gsg' ? t.data.ownerId === p.user.id : [t.data.assigneeId, ...(t.data.coAssigneeIds ?? [])].includes(p.user.id);
-const contextLabel = (c: StoredRecord<'context'>) => [c.data.country, c.data.retailer, c.data.brand].map(homeText).join(' · ');
+const contextLabel = (c: StoredRecord<'context'>) => [c.data.country, c.data.retailer, c.data.brand, ...(c.data.type === 'event' ? [c.data.eventName] : [])].map(homeText).join(' · ');
 const person = async (s: UnitOfWork, p: Principal, context: string, id: string): Promise<HomePerson> => ({ id, label: await userLabel(s, p, context, id) });
 
 /** Uses the notification domain's current-need predicate; this is a read, never delivery.
