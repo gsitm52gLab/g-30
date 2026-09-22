@@ -64,9 +64,8 @@ export class SchedulingService {
                 const state = command === 'save' ? old?.state ?? 'open' : command === 'cancel' ? 'cancelled' : command === 'done' ? 'done' : 'open';
                 const v = (await s.create('scheduleVersion', { id: newId(), contextId, data: { scheduleId: root.id, sequence: (old?.version.data.sequence ?? 0) + 1, previousId: old?.version.id ?? null, content: c, state, changedBy: p.user.id, changedAt: this.clock(), reason } }));
                 (await s.update('schedule', root.id, root.revision, { ...root.data, currentVersionId: v.id }));
-                (await audit(s, p, this.clock, contextId, `schedule.${command}`, root.id, { versionId: old?.version.id ?? null }, { versionId: v.id, state }));
-                if (c.visibility === 'public')
-                    (await s.create('domainEvent', { id: newId(), contextId, data: { eventType: 'SCHEDULE_CHANGED', targetId: root.id, sourceVersionId: v.id, actorId: p.user.id, at: this.clock() } }));
+                const event = c.visibility === 'public' ? (await s.create('domainEvent', { id: newId(), contextId, data: { eventType: 'SCHEDULE_CHANGED', targetId: root.id, sourceVersionId: v.id, actorId: p.user.id, at: this.clock() } })) : null;
+                (await audit(s, p, this.clock, contextId, `schedule.${command}`, root.id, { versionId: old?.version.id ?? null }, { versionId: v.id, state, domainEventId: event?.id ?? null }));
                 return { ids: [root.id, v.id] };
             }));
         });

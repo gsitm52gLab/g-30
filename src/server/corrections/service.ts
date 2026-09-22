@@ -43,7 +43,7 @@ export class CorrectionService {
                 fail('TARGET_MISMATCH', 422, '의견과 수정항목의 정확한 제출 버전이 달라졌습니다.');
         }
     }
-    private async event(s: UnitOfWork, p: Principal, task: StoredRecord<'task'>, kind: string, id: string) { (await s.create('domainEvent', { id: newId(), contextId: task.contextId, data: { eventType: kind, targetId: task.id, sourceVersionId: id, actorId: p.user.id, at: this.clock() } })); }
+    private async event(s: UnitOfWork, p: Principal, task: StoredRecord<'task'>, kind: string, id: string) { return (await s.create('domainEvent', { id: newId(), contextId: task.contextId, data: { eventType: kind, targetId: task.id, sourceVersionId: id, actorId: p.user.id, at: this.clock() } })); }
     async workspace(token: string | undefined, taskId: string) { return this.identity.repo.transaction(async (s) => (await correctionWorkspace(s, (await this.identity.principal(s, token)), taskId, this.clock))); }
     async detail(token: string | undefined, batchId: string) { return this.identity.repo.transaction(async (s) => { const p = (await this.identity.principal(s, token)), b = (await s.get('correctionBatch', batchId)); if (!b)
         unavailable(); (await correctionTask(s, p, b.data.taskId, this.clock)); return (await batchDTO(s, p, b, this.clock)); }); }
@@ -93,7 +93,7 @@ export class CorrectionService {
                 (await this.checkDraft(s, p, task.id, content));
                 return (await receipt(s, p, task.contextId!, `correction.publish:${task.id}`, x as unknown as Record<string, unknown>, async () => { fresh(d, x.expectedRevision); if (d.data.publishedVersionId)
                     fail('PUBLISHED_IMMUTABLE', 409, '이미 공개된 묶음입니다. 후속 묶음으로 추가해 주세요.'); parse.assertPublishableDraft(content); const previous = (await s.list('correctionBatch', task.contextId!)).filter(b => b.data.taskId === task.id); if (previous.length && !content.previousBatchVersionId)
-                    fail('FOLLOWUP_REQUIRED', 422, '이전 공개 묶음을 선택해 후속 의견으로 연결해 주세요.'); const pub = publicContent(content), row = (await s.create('correctionBatch', { id: newId(), contextId: task.contextId, data: { taskId: task.id, draftId: d.id, draftRevision: d.revision, sequence: Math.max(0, ...previous.map(b => safe.integer(b.data.sequence, 1))) + 1, ...pub, publishedBy: p.user.id, publishedAt: this.clock(), contentHash: createHash('sha256').update(JSON.stringify(pub)).digest('hex') } })); (await s.update('correctionDraft', d.id, d.revision, { ...d.data, publishedVersionId: row.id })); (await audit(s, p, this.clock, task.contextId!, 'correction.published', row.id, {}, {})); (await this.event(s, p, task, 'CORRECTION_BATCH_PUBLISHED', row.id)); return { ids: [row.id] }; }, () => this.fault?.('publish')));
+                    fail('FOLLOWUP_REQUIRED', 422, '이전 공개 묶음을 선택해 후속 의견으로 연결해 주세요.'); const pub = publicContent(content), row = (await s.create('correctionBatch', { id: newId(), contextId: task.contextId, data: { taskId: task.id, draftId: d.id, draftRevision: d.revision, sequence: Math.max(0, ...previous.map(b => safe.integer(b.data.sequence, 1))) + 1, ...pub, publishedBy: p.user.id, publishedAt: this.clock(), contentHash: createHash('sha256').update(JSON.stringify(pub)).digest('hex') } })); (await s.update('correctionDraft', d.id, d.revision, { ...d.data, publishedVersionId: row.id })); const event = (await this.event(s, p, task, 'CORRECTION_BATCH_PUBLISHED', row.id)); (await audit(s, p, this.clock, task.contextId!, 'correction.published', row.id, {}, { correctionBatchId: row.id, domainEventId: event.id })); return { ids: [row.id] }; }, () => this.fault?.('publish')));
             }
             if (command === 'reflect' || command === 'resolve') {
                 const x = command === 'reflect' ? parse.parseReflectItems(body) : parse.parseResolveItems(body), b = (await this.batch(s, p, x.batchVersionId, task.id));
@@ -142,7 +142,7 @@ export class CorrectionService {
                     unavailable();
                 (await reviewDTO(s, p, old, this.clock));
             }
-            return (await receipt(s, p, task.contextId!, `correction.review:${task.id}`, x as unknown as Record<string, unknown>, async () => { const { idempotencyKey: _key, ...data } = x; void _key; const r = (await s.create('correctionReview', { id: newId(), contextId: task.contextId, data: { ...data, recordedBy: p.user.id, recordedAt: this.clock(), previousReviewIsReferenceOnly: true } })); (await audit(s, p, this.clock, task.contextId!, 'correction.review_recorded', r.id, {}, {})); return { ids: [r.id] }; }, () => this.fault?.('review')));
+            return (await receipt(s, p, task.contextId!, `correction.review:${task.id}`, x as unknown as Record<string, unknown>, async () => { const { idempotencyKey: _key, ...data } = x; void _key; const r = (await s.create('correctionReview', { id: newId(), contextId: task.contextId, data: { ...data, recordedBy: p.user.id, recordedAt: this.clock(), previousReviewIsReferenceOnly: true } })); (await audit(s, p, this.clock, task.contextId!, 'correction.review_recorded', r.id, {}, { reviewId: r.id })); return { ids: [r.id] }; }, () => this.fault?.('review')));
         });
     }
 }

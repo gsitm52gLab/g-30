@@ -1,4 +1,3 @@
-import { jsonContentEqual } from '@/domain/json-content';
 import { asyncMap, asyncSome } from "@/domain/async-collections";
 import type { Clock, UnitOfWork, StoredRecord } from '@/domain/records';
 import type { CampaignRequestSource, RequestContent, Requirement } from '@/domain/tasks/types';
@@ -13,7 +12,7 @@ import { menuIdentityKey } from '@/domain/campaigns/types';
 import { storedMenuState } from '@/server/campaigns/state';
 import * as safe from '@/server/campaigns/stored';
 function conflict(): never { return fail('CAMPAIGN_REQUEST_CONFLICT', 409, '업무 요청 또는 메뉴 조건이 변경되었습니다. 기존 요청·답변을 유지하고 GSG가 메뉴와 요청 범위를 다시 확인해 주세요.'); }
-const same = jsonContentEqual;
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 /** Positive projection plus exact immutable relations, including the actual recorder. */
 export async function campaignRequestSource(s: UnitOfWork, r: StoredRecord<'requestVersion'>): Promise<CampaignRequestSource | null> {
     const x = r.data.source;
@@ -108,7 +107,7 @@ export async function applyCampaignRequest(s: UnitOfWork, p: Principal, version:
     const oldKeys = current.data.content.requirements.map(q => q.key), changedKeys = [...new Set([...oldKeys, ...requirements.map(q => q.key)])].filter(key => !same(current.data.content.requirements.find(q => q.key === key), requirements.find(q => q.key === key)));
     const r = (await s.create('requestVersion', { id: newId(), contextId: task.contextId, data: { taskId: task.id, sequence: current.data.sequence + 1, previousId: current.id, templateVersionId: current.data.templateVersionId, content, publishedBy: p.user.id, publishedAt: clock(), changedKeys, source } }));
     (await s.update('task', task.id, task.revision, { ...task.data, currentRequestId: r.id, status: ['in_progress', 'partial', 'submitted'].includes(task.data.status) ? 'requested' : task.data.status, ...['on_hold', 'cancelled'].includes(task.data.status) ? { resumeStatus: 'requested' as const } : {} }));
-    (await audit(s, p, clock, task.contextId!, 'task.campaign_request', task.id, { requestId: current.id }, { requestId: r.id, campaignVersionId: version.id, selectionVersionId: selection?.id ?? null }));
-    (await s.create('domainEvent', { id: newId(), contextId: task.contextId, data: { eventType: 'TASK_REQUEST_REVISED', targetId: task.id, sourceVersionId: r.id, actorId: p.user.id, at: clock() } }));
+    const event = (await s.create('domainEvent', { id: newId(), contextId: task.contextId, data: { eventType: 'TASK_REQUEST_REVISED', targetId: task.id, sourceVersionId: r.id, actorId: p.user.id, at: clock() } }));
+    (await audit(s, p, clock, task.contextId!, 'task.campaign_request', task.id, { requestId: current.id }, { requestId: r.id, campaignVersionId: version.id, selectionVersionId: selection?.id ?? null, domainEventId: event.id }));
     return r.id;
 }

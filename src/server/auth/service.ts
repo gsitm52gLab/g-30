@@ -1,4 +1,5 @@
 import { asyncFilter, asyncMap, asyncSome } from "@/domain/async-collections";
+import { appendAudit } from '@/server/audit/writer';
 import { randomUUID } from "node:crypto";
 import { catalog } from "@/domain/catalog";
 import { type RecordRepository, type UnitOfWork, type StoredRecord, type Clock, systemClock, type ContextData } from "@/domain/records";
@@ -63,7 +64,7 @@ export class IdentityService {
             fail("UNAUTHENTICATED", 401, "로그인이 필요합니다.");
         return { user, session };
     }
-    private async audit(s: UnitOfWork, p: Principal, action: string, targetId: string, contextId: string | null, before: Record<string, unknown>, after: Record<string, unknown>) { (await s.create("audit", { id: id(), contextId, data: { actorId: p.user.id, action, targetId, before, after, at: this.clock() } })); }
+    private async audit(s: UnitOfWork, p: Principal, action: string, targetId: string, contextId: string | null, before: Record<string, unknown>, after: Record<string, unknown>) { (await appendAudit(s, p, this.clock, contextId, action, targetId, before, after)); }
     private async issue(s: UnitOfWork, user: StoredRecord<"user"> | null) { const token = randomToken(); const row = (await s.create("session", { id: id(), contextId: null, data: { userId: user?.id ?? null, tokenHash: digestToken(token), csrfToken: randomToken(), authVersion: user?.data.authVersion ?? 0, expiresAt: this.expiry(user ? 8 * 3600000 : 15 * 60000), revokedAt: null } })); return { token, csrfToken: row.data.csrfToken, expiresAt: row.data.expiresAt }; }
     async csrf(token?: string) {
         return this.repo.transaction(async (s) => {
@@ -251,7 +252,7 @@ export class IdentityService {
             }
             (await s.update("membership", member.id, member.revision, { ...member.data, status: "active", activatedAt: this.clock() }));
             (await s.update("invitation", inv.id, inv.revision, { ...inv.data, consumedAt: this.clock() }));
-            (await s.create("audit", { id: id(), contextId: inv.contextId, data: { actorId: user.id, action: "invitation.accepted", targetId: inv.id, before: { status: "invited" }, after: { status: "active", membershipId: member.id }, at: this.clock() } }));
+            (await appendAudit(s, { user }, this.clock, inv.contextId, "invitation.accepted", inv.id, { status: "invited" }, { status: "active", membershipId: member.id }));
             this.fault?.("accept");
             return { accepted: true, contextId: inv.contextId, loginRequired: true };
         });
