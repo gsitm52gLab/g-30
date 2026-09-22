@@ -50,7 +50,10 @@ export class InquiryService {
     async events(token: string | undefined, id: string, params: URLSearchParams, deliver?: (page: InquiryEventPage<StaffInquiryEvent>) => void) {
         inquiryId(id);
         const q = parseInquiryEventsQuery(params);
-        return this.identity.repo.transaction(async (s) => { const p = (await this.identity.principal(s, token)), { row } = (await activeInquiry(s, p, id, this.identity.clock)), page = (await eventPage(s, p, row, this.identity.clock, q.after, q.limit)); deliver?.(page); return page; });
+        const page = await this.identity.repo.transaction(async (s) => { const p = (await this.identity.principal(s, token)), { row } = (await activeInquiry(s, p, id, this.identity.clock)); return await eventPage(s, p, row, this.identity.clock, q.after, q.limit); });
+        // A cursor is deliverable only after its transaction has committed.
+        deliver?.(page);
+        return page;
     }
     private async files(s: UnitOfWork, p: Principal, c: StoredRecord<'conversation'>, content: MessageInput, internal: boolean) {
         for (const id of content.fileVersionIds) {
