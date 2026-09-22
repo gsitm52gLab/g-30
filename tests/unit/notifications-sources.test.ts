@@ -41,7 +41,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             taskId = (await tasks.create(admin, { category: 'spot', content: c, targets: [{ contextId, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: ['user-co'], productIds: ['product-serum'] }], idempotencyKey: randomUUID() })).ids[0];
             await tasks.command(admin, taskId, { command: 'publish', expectedRevision: 1, idempotencyKey: randomUUID() });
         }
-        async function read<T>(token: string, fn: (s: UnitOfWork, p: ReturnType<IdentityService['principal']>) => T | Promise<T>) { return repo.transaction(async (s) => (await fn(s, (await identity.principal(s, token))))); }
+        async function read<T>(token: string, fn: (s: UnitOfWork, p: Awaited<ReturnType<IdentityService['principal']>>) => T | Promise<T>) { return repo.transaction(async (s) => (await fn(s, (await identity.principal(s, token))))); }
         async function events(type: string, target = taskId) { return (await repo.list('domainEvent')).filter(e => e.data.eventType === type && e.data.targetId === target); }
         async function event(token: string, type: string, target = taskId) { const rows = await events(type, target); expect(rows.length).toBeGreaterThan(0); return read(token, async (s, p) => (await notificationEventSource(s, p, rows.at(-1)!.id, () => NOW))); }
         async function schedules(token = brand, id = taskId) { return read(token, async (s, p) => (await taskSchedules(s, p, id, () => NOW))); }
