@@ -4135,8 +4135,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "Active full GS HALE implementation and Supabase revalidation; bounded deployed auth accepted, complete Goal not achieved",
-  "next_action": "Accepta385 sharedhelper afterprd14caseclosure+rootfocusedregression to unblock S3/S4UI; G03ab241 finalproductreadactual; S2general/submissionUI/wrappers, S3Inquiry, S4ExcelAI/WebP real11baselinepass allparallel. FinalSupabasejourney/SB05/VercelAIworkers/225audit remain.",
-  "state_version": 192,
+  "next_action": "S1accepted d09: implementS2 files/submission/UI/wrappers andS4ExcelAI parallel; G03author finisheslatency+storedprojectionrepair andprdindependent, thenprdInquiry. RemainingSB05/fullflows/VercelAIworkers/final225audit required.",
+  "state_version": 191,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4171,7 +4171,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T05:09:04.986120+00:00",
+  "updated_at": "2026-09-22T04:47:51.798594+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -4338,61 +4338,36 @@
     ],
     "current_parallel_tasks": [
       {
-        "id": "S2-FILES-SUBMISSIONS-UI-WRAPPERS",
+        "id": "G03-HOME",
         "owner": "/root/sb_postgres_foundation",
-        "state": "IMPLEMENTING",
-        "base_commit": "d09c76efaa01e53aa1137f9c8e92c5a6d2557010",
-        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-files-submissions/task.json",
-        "shared_helper_candidate": "a38597ab535932a5755ea4689a75db161f6c9fd9",
-        "helper_state": "WAIT_INDEPENDENT_ABORT_CLOSURE",
-        "helper_previous_failures": [
-          "63authpurge/reselection2red",
-          "822lateabort13P1F"
-        ],
-        "other_g03_candidate": "ab241cd4fd411fd458a1baa5cfd869e7c0c17c65",
-        "g03_state": "AUTHOR_ACTUAL_3METHOD_REVOKE_AND_INDEPENDENT_JOURNEY",
-        "g03_actual_product_latency": {
-          "before_ms": 58182,
-          "after_ms": 5975,
-          "before_reads": 418,
-          "after_reads": 41,
-          "writes": 0,
-          "dto_identical": true
-        }
+        "state": "LATENCY_ACTUAL_AND_PROJECTION_REPAIR",
+        "candidate": "879d1d9bdc3e2e1722450f0560acbc04423e2ad1",
+        "actual_latency": {
+          "before_ms": 85025,
+          "after_ms": 6754,
+          "before_reads": 440,
+          "after_reads": 40,
+          "dto_hash_identical": true
+        },
+        "open_finding": "Storedtitle object may leak nested value; not demonstrated user-input path; author narrowruntimeprojectionrepair pending",
+        "next": "S2verticalfiles"
       },
       {
-        "id": "S3-INQUIRY-AND-BOUNDED-VERIFICATION",
+        "id": "G03-INDEPENDENT",
         "owner": "/root/prd",
-        "state": "HELPER_CLOSURE_THEN_S3_SERVER_PARALLEL_G03_BROWSER",
-        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-inquiries/task.json",
-        "helper_verification_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-contract-independent/task.json",
-        "g03_candidate_under_verification": "712e0fb20fa3b9ec28d4019a7eabf181280ef489",
-        "g03_pass": "OwnPGhome PC/mobile/restart, scalarfault503/recovery,55baseline+101affectedunit,2redclosed",
-        "g03_remaining": "Product60sfailure pendingab241 actualclosure; othermenus/taskansweractualrunning; attachmentsfutureS2S3"
+        "state": "OWN_PG_UI_RUNNING_WAIT_FINAL_REPAIR_SHA",
+        "candidate": "d26e155109a9eb8104779ba20934ede9ac7a0699",
+        "focused_pass": 55,
+        "new_projection_fail": 2,
+        "actual_pg_parity": true,
+        "next": "S3Inquiry"
       },
       {
         "id": "S4-EXCEL-AI",
         "owner": "/root/supabase_scope_review",
-        "state": "SERVER_ACTUAL_BASELINE_PASS_WEBP_DELTA_AND_UI_PENDING",
-        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-excel-ai/task.json",
-        "candidate": "e02161e3bbe1625c1fd0e907abcf388844a4c248",
-        "author_units": 214,
-        "actual_pass": 11,
-        "actual_fail": 0,
-        "actual_scope_correction": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-excel-ai/actual-server-01-scope-correction.json",
-        "actual_export_bytes": 5315786,
-        "not_run": [
-          "TwoNextHTTP/browser",
-          "Genuine crosscontextexport negative",
-          "OldAIversionafternewversion",
-          "Grantrevokereplay"
-        ],
-        "delta": "AI-only WebPpreservation includingcommoncore/servertransportnarrowlease",
-        "exclusive_migrations": [
-          "SQLite0018",
-          "PostgreSQL0019"
-        ],
-        "runtime_resources": "baseline23856terminal0,6ownkeyscleaned,poolsclosed"
+        "state": "PREPARATION_S1_JUST_ACCEPTED",
+        "base_commit": "d09c76efaa01e53aa1137f9c8e92c5a6d2557010",
+        "scope": "Ownimports/AI assetserver/UI consumers; commonexportextension decisionpending"
       }
     ],
     "storage_primitive_acceptance": {
@@ -4576,13 +4551,6 @@
         "not_run": 0
       },
       "limit": "Not full app role/channel matrix"
-    },
-    "shared_file_contract": {
-      "candidate": "a38597ab535932a5755ea4689a75db161f6c9fd9",
-      "state": "WAIT_INDEPENDENT_AND_ROOT",
-      "root_source_review_822": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-files-submissions/root-contract-author-review.json",
-      "author_test_count": 22,
-      "feature_wiring_actual": "NOT_RUN"
     }
   },
   "bounded_auth_release": {
@@ -4649,14 +4617,5 @@
     "main_role": "serial integration/evidence review",
     "codex_default_reasoning": "medium",
     "current_session_effort_change": "NOT_VERIFIED"
-  },
-  "readme_consolidation": {
-    "commit": "6338649",
-    "archive": "docs/history/README-before-supabase-consolidation-20260922.md",
-    "evidence": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/readme-consolidation/static-check.json",
-    "links_checked": 13,
-    "broken": 0,
-    "claim": "Currenttransitioninstructions only; finalreproductionpending"
-  },
-  "final_journey_preparation": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/final-journey/prepared-task.json"
+  }
 }

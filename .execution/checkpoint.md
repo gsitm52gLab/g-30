@@ -1,4 +1,4 @@
-# GS HALE checkpoint — state191 / Goal active
+# GS HALE checkpoint — state192 / Goal active
 
 Actual Goal re-observed active through get_goal on 2026-09-22 after the user continuation. No second Goal created. Latest user wanted background work; no return to synchronous broad questioning. Previous turn is PROGRESS: code integrated/pushed and real deployed auth + populated screens observed.
 
@@ -88,3 +88,14 @@ S1 c5dc499 accepted boundedcore at rootd09c76efaa01e53aa1137f9c8e92c5a6d2557010.
 G03 current879 latency memo drops actualSubmission.workspace85.0s/440reads to6.75s/40reads identicalDTO, actual UIcontinuation running. Independentprd ownPG330validrows+4actorparity/restart/revoke; storedtasktitle object projection2FAIL remainsopenauthorlease, not demonstrated userinputinjection. FinalSHAwillchange.
 
 Parallel root+3: sbpostgres G03repair thenS2verticalfiles/submissions/UI/wrappers; prdG03independent thenInquiry; scopeS1done nowS4ExcelAI. S1accepted d09base available.3htarget16:25KST remainsaspirational; fullrequiredvalidation unchanged. Submission-logrequestcancelled; do notresume.
+
+
+## State192 authoritative override
+
+Root6338649 transitionpushed, productioneece434 unchanged. S1d09accepted877check/build. README consolidated156lines andoriginal401linearchivepreserved; static13links/scriptsvalid, nofreshreproductionclaim.
+
+S2authorSBpostgres currenthelpera385 (base d09)22unit/lint/type0; prior63auth/reselection2red and822lateabort13P1F preserved; prdnon-author final14caseclosurepending thenrootcontractregression enablesS3/S4UI. S2server/UI/wrappers implementationactive. S4scope e021 server214unit/actual11PASS,5315786byte2partexport, PDFworker/exactsource, sharedExcelrollback/replay; 3mislabelledoracles explicitlycorrectedretained original, followupcrosscontext/oldAIversion/grantrevoke stillNOT_RUN. WebPexistingAIformatpreservation authorizednarrowcore/transportdelta; soleSQLite18/PG19ownerS4.
+
+G03authorab241 includesknownscalarrepair712/eventcontextlabel24eb/Productlist-detail-impact readonlymemo. IndependentactualProductlist58.182s418reads→5.975s41reads sameDTO/no writes; sourceleasegranted. Original60sproductmenufailure retained; finalactualclosurepending. PRDownPGhome PC/mobile/restart/pass/scalar503closure complete; othermenusexactjourney remainsinflight andmayrunbackground whileS3serverhooksbegin ownacceptedbase.
+
+Root+3 active only. Formal S2storage-files-submissions/task.json,S3storage-inquiries/task.json,S4storage-excel-ai/task.json. Finaljourney packetprepared, SB05full2browserlifecycle/Vercelworkers+configuredOpenAI/final225audit stillmandatory.16:25KSTtarget unchanged; Goalactive andsubmissionlogrequestcancelled.
