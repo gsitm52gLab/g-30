@@ -3,8 +3,8 @@
   "product": "GS HALE",
   "project_root": "/Users/evan/workspace/gs-hale",
   "source_revision": "DP-20260921-03",
-  "plan_status": "EXECUTING_EXPLICIT_AUTH_FIX",
-  "active_goal_count": 0,
+  "plan_status": "ACTIVE",
+  "active_goal_count": 1,
   "intended_active_goal_count": 1,
   "runtime_state_path": ".execution/run-plan.json",
   "max_sessions_including_main": 4,
@@ -4118,9 +4118,9 @@
   "run_id": "RUN-20260921-01",
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
-  "current_goal": "User-authorized Supabase shared-session/login fix; platform Goal remains paused",
-  "next_action": "Compose async core/consumer candidate under AUTH-DURABILITY-20260922-01; independent foundation then exact union validation; two-server session/CSRF and cross-instance revocation; integrate regression and non-force main push after current remote review. Preserve remaining Goal and Storage checkpoints.",
-  "state_version": 179,
+  "current_goal": "G14 + Supabase foundations",
+  "next_action": "Review G14 exact fa2491b independent result, integrate and run affected regression if PASS. Review PostgreSQL and Storage foundation candidates independently before porting service callers and wiring app mode. Preserve all G00~18 plus SB01~18 and actual Vercel/OpenAI gates.",
+  "state_version": 178,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4155,13 +4155,15 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T02:15:41.860236+00:00",
+  "updated_at": "2026-09-22T01:57:40.046615+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
-    "status": "paused",
-    "observed_at": "2026-09-22T02:15:41.860236+00:00",
-    "interpretation": "New explicit user request authorizes bounded login fix; no create/update/resume Goal tool invoked."
+    "status": "active",
+    "thread_id": "01a0c281-e335-7a81-a808-36dd5305557e",
+    "observed_at": "2026-09-22T01:57:40.046615+00:00",
+    "user_resume_instruction_received": true,
+    "objective_attachment_read": "/Users/evan/.codex/attachments/92660f2b-c827-486c-8372-a53d8450c415/pasted-text-1.txt"
   },
   "session_log_submission_derivative": {
     "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/submission-log-derivatives/state122/manifest.json",
@@ -4228,8 +4230,8 @@
     "resume_prompt": "docs/execution-v3/05-goal-prompt.md",
     "resume_plan": "docs/execution-v3/04-resume-plan.json",
     "historical_acceptance_is_not_supabase_acceptance": true,
-    "runtime_status": "AUTH_DURABILITY_IMPLEMENTING",
-    "preflight": "Real SQL/TLS credential preflight passed. Foundation candidate built and remotely tested; private Storage bucket created and primitives candidate ready. Neither wired into deployed app yet.",
+    "runtime_status": "IMPLEMENTING_FOUNDATIONS_NOT_INTEGRATED",
+    "preflight": "DATABASE_URL/Transaction pooler와 DIRECT_URL/Session pooler 모두 TLS 1.3·서버 인증서/hostname 검증을 포함한 READ ONLY SELECT 1 성공. Storage 인증 읽기 HTTP 200. public 테이블 0개, gs-hale-private 버킷 없음. 원격 데이터 변경 0회. 앱 통합/Vercel 환경변수 검증은 미실행.",
     "origin": "https://github.com/gsitm52gLab/g-30.git",
     "previous_remote": "legacy-gs-hale",
     "source_review_session_id": "01a0c6bc-d9f3-73f1-ae63-d88781905c0a",
@@ -4239,7 +4241,7 @@
     "active_tasks": [
       {
         "id": "G14-FINAL-INDEPENDENT",
-        "state": "PASS_NOT_INTEGRATED",
+        "state": "VERIFYING",
         "session_id": "01a0c6d2-65c7-70e2-9e2f-0fb4f74dd58b",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/g14-final-verification",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-final-verify-task.json",
@@ -4248,13 +4250,11 @@
           "private evidence and helpers only; candidate product MUST NOT change"
         ],
         "evidence_dir": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/G14-final-verification",
-        "integration_acceptance": "NOT_RUN",
-        "candidate_commit": "fa2491b062777dbfc43ec9d078216975af86d116",
-        "result": ".execution/private/runs/RUN-20260921-01/SUPABASE/G14-final-verification/verification-result.json"
+        "integration_acceptance": "NOT_RUN"
       },
       {
         "id": "SB-DB-FOUNDATION",
-        "state": "INDEPENDENT_VERIFYING",
+        "state": "IMPLEMENTING",
         "session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/sb-postgres-foundation",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/postgres-foundation-task.json",
@@ -4268,12 +4268,11 @@
           "package-lock.json"
         ],
         "evidence_dir": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/postgres-foundation",
-        "integration_acceptance": "NOT_RUN",
-        "candidate_commit": "d6838bb6247fbb213187db624a411f51bb5fa429"
+        "integration_acceptance": "NOT_RUN"
       },
       {
         "id": "SB-STORAGE-FOUNDATION",
-        "state": "CANDIDATE_NOT_INDEPENDENTLY_VERIFIED",
+        "state": "IMPLEMENTING",
         "session_id": "01a0c6d2-bbfc-7443-9085-2923497dc707",
         "worktree": "/Users/evan/workspace/gs-hale/.worktrees/sb-storage-foundation",
         "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation-task.json",
@@ -4285,36 +4284,7 @@
           "docs/storage/storage-*.md"
         ],
         "evidence_dir": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation",
-        "integration_acceptance": "NOT_RUN",
-        "candidate_commit": "2f5d0d11090a487bb3bad791b31f957a8332b12b",
-        "result": ".execution/private/runs/RUN-20260921-01/SUPABASE/storage-foundation/implementation-result.json"
-      }
-    ],
-    "current_deployment": {
-      "domain": "https://g-30-pi.vercel.app",
-      "provider": "Vercel",
-      "team": "plai-developer-league-2026",
-      "project": "g-30",
-      "source_branch": "main",
-      "source_commit": "fe2932ef422f4734b91c0ffcc113b70dd55c143b",
-      "deployment_id": "FKxzkRbdk2cY6PcVh2VksdBBzDM5",
-      "status": "Ready",
-      "observed_via": "Native Comet browser, user-authenticated Vercel project Overview; production auto-deploy on main push"
-    },
-    "auth_durability_contract": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/contract.json",
-    "source_only_login_diagnosis": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/deployment-before.json",
-    "auth_durability_tasks": [
-      {
-        "id": "SB-AUTH-CORE",
-        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/core-task.json",
-        "session_id": "01a0c6d2-9533-7e73-9c43-20958cbd1f83",
-        "state": "IMPLEMENTING"
-      },
-      {
-        "id": "SB-AUTH-CONSUMERS",
-        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/auth-durability/consumers-task.json",
-        "session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
-        "state": "IMPLEMENTING"
+        "integration_acceptance": "NOT_RUN"
       }
     ]
   }

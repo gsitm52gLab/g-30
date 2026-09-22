@@ -1,3 +1,7 @@
+## State 178 — Goal active / G14 독립 검증 + Supabase 기반 병렬 구현
+
+실제 Goal active를 확인하고 첨부 목표 원문을 읽었다. 최신 사용자 Supabase·g-30·push 지시는 v3를 통해 계속 우선 적용한다. G14 합본 후보 fa2491b, 별도 PostgreSQL async/TLS/SQL 기반과 private Storage transport 구현을 격리 worktree에 배정했다. 메인+서브세션 3개, package/lock은 DB 기반 구현자 단독 소유. G03은 G14 수용 전 착수하지 않는다. 기존 16/19 accepted는 과거 환경이며 새 Supabase 수용 0/18.
+
 ## State 177 — Supabase 자격증명 읽기 전용 확인 / Goal paused
 
 DATABASE_URL/Transaction pooler와 DIRECT_URL/Session pooler 모두 TLS 1.3·서버 인증서/hostname 검증을 포함한 READ ONLY SELECT 1 성공. Storage 인증 읽기 HTTP 200. public 테이블 0개, gs-hale-private 버킷 없음. 원격 데이터 변경 0회. 앱 통합/Vercel 환경변수 검증은 미실행. Goal 재개 전까지 제품 구현은 시작하지 않는다. 기존 16/19 수용 기록은 유지하고 신규 SB-01~18은 모두 NOT_RUN이다. v3 계약과 다음 실행 프롬프트를 따른다.
