@@ -16,7 +16,7 @@ export const person = { kind: 'user' as const, userId: 'user-luna' };
 export async function completionCampaign(identity: IdentityService, general = false) {
     const repo = identity.repo, campaigns = new CampaignService(identity), tasks = new TaskService(identity), products = new ProductService(identity);
     const p1 = await products.detail(admin, 'product-serum', contextId);
-    const p2id = (await products.create(admin, { contextId, brandId: p1.context.data.brandId, common: { ...blankCommon(), name: '미선택 상품', code: 'C11-'+randomUUID() }, fields: blankContext(), idempotencyKey: randomUUID() })).ids[0];
+    const p2id = (await products.create(admin, { contextId, brandId: p1.context.data.brandId, common: { ...blankCommon(), name: '미선택 상품', code: 'C11-' + randomUUID() }, fields: blankContext(), idempotencyKey: randomUUID() })).ids[0];
     const p2 = await products.detail(admin, p2id, contextId);
     const content = { ...blankContent(), title: '실제 캠페인 완료', description: '자료 범위와 실물 사실 분리', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('proof', 'file'), label: '사진' }, { ...blankRequirement('url', 'link'), label: 'URL' }, { ...blankRequirement('other', 'number'), label: '다른 메뉴 수량' }, ...(general ? [{ ...blankRequirement('general'), label: '일반 요청' }] : [])] };
     const taskId = (await tasks.create(admin, { category: 'spot', content, targets: [{ contextId, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: ['user-co'], productIds: [p1.productId, p2.productId] }], idempotencyKey: randomUUID() })).ids[0];
@@ -34,11 +34,14 @@ export async function completionCampaign(identity: IdentityService, general = fa
     async function applied() { return command('external', { campaignVersionId: versionId, menu: draft.menus[0].identity, fact: { axis: 'application', value: 'applied', requester: person, performedBy: person, occurredAt: null, source: source(), note: campaignMarker } }); }
     async function physical(kind: 'tracking' | 'dispatch' | 'receipt', dispatchFactIds: string[] = [], evidence: SubmittedReference[] = []) { return command('physical', { campaignVersionId: versionId, menu: draft.menus[0].identity, physicalKey: 'shoot', fact: { kind, performedBy: person, occurredAt: null, evidence, note: campaignMarker, ...(kind === 'tracking' ? { carrier: '합성택배', trackingNumber: '0001', trackingUrl: null } : kind === 'dispatch' ? { quantity: '1', unit: '개', carrier: '합성택배', trackingNumber: '0001' } : { quantity: '0', unit: '개', dispatchFactIds }) } }, brand); }
     async function submitted(directory: string) {
-        const sub = new SubmissionService(identity); let w = await sub.workspace(brand, taskId);
+        const sub = new SubmissionService(identity);
+        let w = await sub.workspace(brand, taskId);
         const upload = (await new SubmissionFiles(identity, directory).upload(brand, taskId, w.request.id, [{ clientItemId: randomUUID(), name: 'proof.png', type: 'image/png', bytes: png }])).items[0];
-        if (upload.state !== 'ready') throw Error('fixture upload');
+        if (upload.state !== 'ready')
+            throw Error('fixture upload');
         await sub.draft(brand, taskId, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: w.draft?.revision ?? 0, content: { ...blankDraft(), answers: [{ requestId: w.request.id, requirementKey: 'proof', productId: null, type: 'file', input: { fileVersionIds: [upload.file.id] } }], artifacts: [{ fileVersionId: upload.file.id, role: 'evidence', answer: { requirementKey: 'proof', productId: null } }], productSelections: [{ productId: p1.productId, expectedCommonRevision: p1.commonRevision, expectedContextRevision: p1.contextRevision, bindingIds: [], retailPriceVersionId: null, asOfDate: '2026-09-21' }] }, idempotencyKey: randomUUID() });
-        w = await sub.workspace(brand, taskId); const id = (await sub.submit(brand, taskId, { baseRequestId: w.request.id, expectedDraftRevision: w.draft!.revision, expectedTaskRevision: w.taskRevision, mode: 'partial', idempotencyKey: randomUUID() })).ids[0];
+        w = await sub.workspace(brand, taskId);
+        const id = (await sub.submit(brand, taskId, { baseRequestId: w.request.id, expectedDraftRevision: w.draft!.revision, expectedTaskRevision: w.taskRevision, mode: 'partial', idempotencyKey: randomUUID() })).ids[0];
         const row = (await repo.get('submission', id))!;
         return { taskId, requestId: row.data.requestId, submissionId: row.id, contentHash: row.data.contentHash, answer: { requirementKey: 'proof', productId: null }, fileVersionIds: [upload.file.id], productUseIds: row.data.productUseIds } satisfies SubmittedReference;
     }

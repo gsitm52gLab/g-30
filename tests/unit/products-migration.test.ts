@@ -9,15 +9,20 @@ const clock = () => "2026-09-21T00:00:00.000Z", ctx = "ctx-jp-a-luna", marker = 
 for (const mode of ["mock", "sqlite"] as const)
     describe(`${mode} bounded legacy migration diagnostic`, () => {
         let repo: RecordRepository;
-        afterEach(() => repo?.close());
-        async function setup() { if (mode === "mock")
-            repo = createMockRepository(clock);
-        else {
-            const db = openDatabase(":memory:", true);
-            migrate(db);
-            repo = createSqliteRepository(db, clock);
-        } await repo.transaction(s => { for (const f of fixtures)
-            s.create(f.kind, f.input); }); }
+        afterEach(async () => (await repo?.close()));
+        async function setup() {
+            if (mode === "mock")
+                repo = createMockRepository(clock);
+            else {
+                const db = openDatabase(":memory:", true);
+                migrate(db);
+                repo = createSqliteRepository(db, clock);
+            }
+            await repo.transaction(async (s) => {
+                for (const f of fixtures)
+                    (await s.create(f.kind, f.input));
+            });
+        }
         for (const [reason, data, contextId] of [
             ["missing_required_name", { name: "" }, ctx],
             ["missing_required_code", { code: "" }, ctx],
@@ -26,9 +31,9 @@ for (const mode of ["mock", "sqlite"] as const)
         ] as const)
             it(`${reason} leaves all original rows and no partial migrated versions`, async () => {
                 await setup();
-                await repo.transaction(s => s.create("product", { id: "zz-invalid-legacy", contextId, data: { ...s.get("product", "product-serum")!.data, name: marker, code: "LEGACY-UNIQUE", privateRaw: marker, ...data } as unknown as ProductData }));
+                await repo.transaction(async (s) => (await s.create("product", { id: "zz-invalid-legacy", contextId, data: { ...(await s.get("product", "product-serum"))!.data, name: marker, code: "LEGACY-UNIQUE", privateRaw: marker, ...data } as unknown as ProductData })));
                 const before = await repo.list("product"), tasks = await repo.list("task");
-                const error = await repo.transaction(s => migrateLegacyProducts(s)).catch(e => e);
+                const error = await repo.transaction(async (s) => (await migrateLegacyProducts(s))).catch(e => e);
                 expect(productMigrationDiagnostic(error)).toEqual({ module: "G06", productID: "zz-invalid-legacy", sourceContextID: contextId, reason });
                 expect(JSON.stringify(productMigrationDiagnostic(error))).not.toContain(marker);
                 expect(await repo.list("product")).toEqual(before);

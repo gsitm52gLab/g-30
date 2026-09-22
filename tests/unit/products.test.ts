@@ -25,37 +25,45 @@ for (const mode of ["mock", "sqlite"] as const)
     describe(`${mode} G06 product contracts`, () => {
         let repo: RecordRepository, identity: IdentityService, products: ProductService;
         const directories: string[] = [];
-        function repository() { if (mode === "mock")
-            repo = createMockRepository(() => NOW);
-        else {
-            const db = openDatabase(":memory:", true);
-            migrate(db);
-            repo = createSqliteRepository(db, () => NOW);
-        } return repo; }
+        function repository() {
+            if (mode === "mock")
+                repo = createMockRepository(() => NOW);
+            else {
+                const db = openDatabase(":memory:", true);
+                migrate(db);
+                repo = createSqliteRepository(db, () => NOW);
+            }
+            return repo;
+        }
         async function setup() { repository(); identity = await policyFixture(repo); products = new ProductService(identity); }
         async function create(code: string = randomUUID(), contextId = A, token = brand, common = { ...blankCommon(), name: "합성 상품", code }) { return (await products.create(token, { contextId, brandId: "brand-luna", common, idempotencyKey: randomUUID() })).ids[0]; }
-        const detail = (pid: string, contextId = A, token = brand) => products.detail(token, pid, contextId);
+        const detail = async (pid: string, contextId = A, token = brand) => products.detail(token, pid, contextId);
         async function command(pid: string, command: string, extra: Record<string, unknown>, contextId = A, token = brand) { return products.command(token, pid, { contextId, command, idempotencyKey: randomUUID(), ...extra }); }
         async function upload(pid: string, token = brand, visibility: "public" | "internal" = "public") { const dir = await mkdtemp(path.join(os.tmpdir(), "gs-hale-g06-")); directories.push(dir); const fs = new FileService(identity, dir); return { fs, dir, file: (await fs.upload(token, { kind: "product", contextId: A, productId: pid }, [uploadFile], visibility)).files[0] }; }
-        afterEach(async () => { repo?.close(); await Promise.all(directories.splice(0).map(d => rm(d, { recursive: true, force: true }))); });
+        afterEach(async () => { (await repo?.close()); await Promise.all(directories.splice(0).map(d => rm(d, { recursive: true, force: true }))); });
         it("SA24 legacy migration preserves arbitrary edited IDs, unknown fields and original links; fault rolls back both adapters", async () => {
             repository();
-            await repo.transaction(s => { for (const f of fixtures)
-                s.create(f.kind, f.input); const old = s.get("product", "product-serum")!; s.update("product", old.id, old.revision, { ...old.data, name: "사전 수정", size: "30 g / refill unknown", custom: { preserve: "original" } } as typeof old.data); s.create("product", { id: "custom-before-migration", contextId: A, data: { ...old.data, code: "CUSTOM-001", name: "기존 사용자 상품" } }); });
+            await repo.transaction(async (s) => {
+                for (const f of fixtures)
+                    (await s.create(f.kind, f.input));
+                const old = (await s.get("product", "product-serum"))!;
+                (await s.update("product", old.id, old.revision, { ...old.data, name: "사전 수정", size: "30 g / refill unknown", custom: { preserve: "original" } } as typeof old.data));
+                (await s.create("product", { id: "custom-before-migration", contextId: A, data: { ...old.data, code: "CUSTOM-001", name: "기존 사용자 상품" } }));
+            });
             const old = await repo.list("product"), tasks = await repo.list("task");
-            await expect(repo.transaction(s => migrateLegacyProducts(s, () => { throw new Error("migration fault"); }))).rejects.toThrow("migration fault");
+            await expect(repo.transaction(async (s) => (await migrateLegacyProducts(s, () => { throw new Error("migration fault"); })))).rejects.toThrow("migration fault");
             expect(await repo.list("product")).toEqual(old);
             expect(await repo.list("productMigration")).toEqual([]);
             expect(await repo.list("contextProduct")).toEqual([]);
-            expect(await repo.transaction(s => migrateLegacyProducts(s))).toEqual({ migrated: 4 });
+            expect(await repo.transaction(async (s) => (await migrateLegacyProducts(s)))).toEqual({ migrated: 4 });
             expect(await repo.list("task")).toEqual(tasks);
             expect((await repo.get("product", "product-serum"))!.contextId).toBeNull();
             const provenance = (await repo.list("productMigration")).find(m => m.data.productId === "product-serum")!;
             expect(provenance.data.legacyData).toEqual(old.find(p => p.id === "product-serum")!.data);
             expect((await repo.list("productVersion")).find(v => v.data.productId === "product-serum")!.data.common.capacity).toEqual({ amount: null, unit: "", raw: "30 g / refill unknown" });
             expect((await seed(repo)).products.migrated).toBe(0);
-            await expect(repo.transaction(s => { const p = s.get("product", "product-serum")!; s.update("product", p.id, p.revision, p.data, { legacyProductContextId: A }); })).rejects.toMatchObject({ code: "INVALID_RECORD" });
-            await expect(repo.transaction(s => { const t = s.get("task", "task-pop")!; s.update("task", t.id, t.revision, t.data, { legacyProductContextId: A }); })).rejects.toMatchObject({ code: "INVALID_RECORD" });
+            await expect(repo.transaction(async (s) => { const p = (await s.get("product", "product-serum"))!; (await s.update("product", p.id, p.revision, p.data, { legacyProductContextId: A })); })).rejects.toMatchObject({ code: "INVALID_RECORD" });
+            await expect(repo.transaction(async (s) => { const t = (await s.get("task", "task-pop"))!; (await s.update("task", t.id, t.revision, t.data, { legacyProductContextId: A })); })).rejects.toMatchObject({ code: "INVALID_RECORD" });
         });
         it("AC06-01 SA23/24 minimum three values and every common/context field round-trip without generated unknown facts", async () => {
             await setup();
@@ -115,7 +123,7 @@ for (const mode of ["mock", "sqlite"] as const)
             expect(granted.internal!.current!.fields.supplyRate).toBe("0.4");
             expect(granted.retail.current!.fields.amount).toBe("0");
             await expect(command(pid, "save_internal", { price: blankInternalPrice(), expectedPriceRevision: granted.internal!.revision }, A, gsg)).rejects.toMatchObject({ status: 404 });
-            await repo.transaction(s => { const m = s.list("membership", A).find(x => x.data.userId === "user-price")!; s.update("membership", m.id, m.revision, { ...m.data, internalPriceAccess: false }); });
+            await repo.transaction(async (s) => { const m = (await s.list("membership", A)).find(x => x.data.userId === "user-price")!; (await s.update("membership", m.id, m.revision, { ...m.data, internalPriceAccess: false })); });
             expect(await detail(pid, A, price)).not.toHaveProperty("internal");
         });
         it("AC06-01 CAS/idempotency, concurrent duplicate and injected transaction failure preserve all or nothing", async () => {
@@ -164,7 +172,7 @@ for (const mode of ["mock", "sqlite"] as const)
             await command(pid, "save_files", { files: [{ ...binding, title: "공개 수정" }], expectedContextRevision: publicD.contextRevision });
             expect((await detail(pid, A, admin)).files.map(f => f.id)).toEqual(["hidden", "doc-one"]);
             await command(pid, "save_context", { fields: { ...(await detail(pid)).local, sku: "SAME-CONTEXT" }, expectedContextRevision: (await detail(pid)).contextRevision });
-            await repo.transaction(s => { const m = s.list("membership", A).find(m => m.data.userId === "user-luna")!; s.update("membership", m.id, m.revision, { ...m.data, status: "suspended" }); });
+            await repo.transaction(async (s) => { const m = (await s.list("membership", A)).find(m => m.data.userId === "user-luna")!; (await s.update("membership", m.id, m.revision, { ...m.data, status: "suspended" })); });
             await expect(u.fs.download(brand, u.file.id, { kind: "product", contextId: A, productId: pid }, "download")).rejects.toMatchObject({ status: 404 });
         });
         it("AC06-05 file uploader/time use immutable source for product and legacy task files, safe current labels and unchanged history", async () => {
@@ -175,7 +183,7 @@ for (const mode of ["mock", "sqlite"] as const)
             const taskFile = (await uploaded.fs.upload(gsg, tid, [uploadFile], "public")).files[0];
             const original = (await repo.get("fileVersion", taskFile.id))!;
             const legacyId = "legacy-task-file-provenance";
-            await repo.transaction(s => { const { owner, ...legacyData } = original.data; void owner; s.create("fileVersion", { id: legacyId, contextId: A, data: legacyData }); });
+            await repo.transaction(async (s) => { const { owner, ...legacyData } = original.data; void owner; (await s.create("fileVersion", { id: legacyId, contextId: A, data: legacyData })); });
             let task = await tasks.detail(admin, tid);
             await tasks.command(admin, tid, { command: "save", expectedRevision: task.task.revision, content: { ...taskContent, referenceFileIds: [legacyId] }, idempotencyKey: randomUUID() });
             task = await tasks.detail(admin, tid);
@@ -192,18 +200,19 @@ for (const mode of ["mock", "sqlite"] as const)
             await command(pid, "save_files", { files: d.files.map(f => ({ ...blankFileBinding(f.id, f.fileVersionId), title: "다른 편집자의 후속 메타 수정" })), expectedContextRevision: d.contextRevision });
             d = await detail(pid);
             expect(d.contextHistory.flatMap(h => h.files).filter(f => f.fileVersionId === uploaded.file.id).every(f => f.file.uploaderLabel === "브랜드 팀원" && f.file.uploadedAt === productRow.createdAt)).toBe(true);
-            await repo.transaction(s => {
-                const membership = s.list("membership", A).find(m => m.data.userId === "user-team")!;
-                s.update("membership", membership.id, membership.revision, { ...membership.data, status: "suspended" });
-                const user = s.get("user", "user-gsg")!;
-                s.update("user", user.id, user.revision, { ...user.data, status: "suspended" });
+            await repo.transaction(async (s) => {
+                const membership = (await s.list("membership", A)).find(m => m.data.userId === "user-team")!;
+                (await s.update("membership", membership.id, membership.revision, { ...membership.data, status: "suspended" }));
+                const user = (await s.get("user", "user-gsg"))!;
+                (await s.update("user", user.id, user.revision, { ...user.data, status: "suspended" }));
             });
             d = await detail(pid);
             expect(d.files.every(f => f.file.uploaderLabel === "이전 업로더")).toBe(true);
             expect(d.contextHistory.flatMap(h => h.files).every(f => f.file.uploaderLabel === "이전 업로더")).toBe(true);
             expect(d.reusableFiles.filter(f => [uploaded.file.id, legacyId].includes(f.id)).every(f => f.uploaderLabel === "이전 업로더")).toBe(true);
             expect(d.files[0].file.uploadedAt).toBe(productRow.createdAt);
-            for (const key of ["uploaderId", "email", "user", "membership", "storageKey"]) expect(Object.hasOwn(d.files[0].file, key)).toBe(false);
+            for (const key of ["uploaderId", "email", "user", "membership", "storageKey"])
+                expect(Object.hasOwn(d.files[0].file, key)).toBe(false);
             expect(await repo.list("fileVersion")).toEqual(raw);
             await expect(detail(pid, A, team)).rejects.toMatchObject({ status: 404 });
         });
@@ -214,20 +223,20 @@ for (const mode of ["mock", "sqlite"] as const)
             await command(pid, "save_retail", { price: { ...blankRetailPrice(), amount: "100", currency: "JPY", effectiveFrom: "2026-09-01", effectiveTo: "2026-09-30" }, expectedPriceRevision: 0 });
             const d = await detail(pid);
             const input = { contextId: A, productId: pid, expectedCommonRevision: d.commonRevision, expectedContextRevision: d.contextRevision, bindingIds: ["capture"], retailPriceVersionId: d.retail.current!.id, asOfDate: "2026-09-21", ownerType: "prior_use_fixture" as const, ownerId: "initial-use-fixture", taskId: null, requestId: null };
-            const snap = await repo.transaction(s => captureProductUse(s, identity.principal(s, brand), input, () => NOW));
-            await expect(repo.transaction(s => captureProductUse(s, identity.principal(s, brand), { ...input, asOfDate: "2027-01-01" }, () => NOW))).rejects.toMatchObject({ status: 422 });
+            const snap = await repo.transaction(async (s) => (await captureProductUse(s, (await identity.principal(s, brand)), input, () => NOW)));
+            await expect(repo.transaction(async (s) => (await captureProductUse(s, (await identity.principal(s, brand)), { ...input, asOfDate: "2027-01-01" }, () => NOW)))).rejects.toMatchObject({ status: 422 });
             await command(pid, "save_common", { common: { ...d.common, name: "새 현재 이름" }, expectedCommonRevision: d.commonRevision });
             await command(pid, "save_context", { fields: { ...d.local, sku: "NEW" }, expectedContextRevision: d.contextRevision });
             await command(pid, "save_retail", { price: { ...blankRetailPrice(), amount: "200", currency: "JPY", effectiveFrom: "2027-01-01" }, expectedPriceRevision: d.retail.revision });
             expect(await repo.get("productUseSnapshot", snap.id)).toEqual(snap);
-            const read = await repo.transaction(s => readProductUse(s, identity.principal(s, brand), snap.id, () => NOW));
+            const read = await repo.transaction(async (s) => (await readProductUse(s, (await identity.principal(s, brand)), snap.id, () => NOW)));
             expect(read.common.name).toBe(d.common.name);
             expect(read.retailPrice!.amount).toBe("100");
             expect(read.files[0].sha256).toBe(u.file.sha256);
             expect(read.contentHash).toBe(snap.data.contentHash);
             expect(read).not.toHaveProperty("internalPriceVersionId");
             expect((await detail(pid)).uses[0]).toMatchObject({ id: snap.id, producer: "prior_use_fixture", contentHash: snap.data.contentHash });
-            await expect(repo.transaction(s => s.update("productUseSnapshot", snap.id, snap.revision, snap.data))).rejects.toMatchObject({ code: "INVALID_RECORD" });
+            await expect(repo.transaction(async (s) => (await s.update("productUseSnapshot", snap.id, snap.revision, snap.data)))).rejects.toMatchObject({ code: "INVALID_RECORD" });
         });
         it("G04 bridge retains Product IDs, actual task link CAS and product file public request access", async () => {
             await setup();
@@ -257,7 +266,7 @@ for (const mode of ["mock", "sqlite"] as const)
             await expect(new FileService(identity, dir, () => { throw new Error("file fault"); }).upload(brand, { kind: "product", contextId: A, productId: pid }, [uploadFile], "public")).rejects.toThrow("file fault");
             expect(await readdir(dir)).toEqual([]);
             expect(await repo.list("fileVersion")).toHaveLength(0);
-            await repo.transaction(s => { const p = s.get("product", pid)!, old = s.get("productVersion", p.data.currentVersionId!)!; const v = s.create("productVersion", { id: randomUUID(), contextId: null, data: { ...old.data, sequence: old.data.sequence + 1, previousId: old.id, common: { ...old.data.common, unknown: "G06_CANARY", capacity: { ...old.data.common.capacity, secret: "G06_CANARY" }, localNames: [{ language: "ko", name: "공개", secret: "G06_CANARY" }] } as unknown as typeof old.data.common } }); s.update("product", p.id, p.revision, { ...p.data, currentVersionId: v.id }); });
+            await repo.transaction(async (s) => { const p = (await s.get("product", pid))!, old = (await s.get("productVersion", p.data.currentVersionId!))!; const v = (await s.create("productVersion", { id: randomUUID(), contextId: null, data: { ...old.data, sequence: old.data.sequence + 1, previousId: old.id, common: { ...old.data.common, unknown: "G06_CANARY", capacity: { ...old.data.common.capacity, secret: "G06_CANARY" }, localNames: [{ language: "ko", name: "공개", secret: "G06_CANARY" }] } as unknown as typeof old.data.common } })); (await s.update("product", p.id, p.revision, { ...p.data, currentVersionId: v.id })); });
             for (const actor of [brand, admin]) {
                 expect(JSON.stringify(await detail(pid, A, actor))).not.toContain("G06_CANARY");
                 expect(JSON.stringify(await products.list(actor))).not.toContain("G06_CANARY");

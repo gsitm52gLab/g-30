@@ -1,6 +1,6 @@
 import { route, json, readBody } from "@/server/http/identity";
 import { ProductService } from "@/server/products/service";
-export function POST(request: Request, context: {
+export async function POST(request: Request, context: {
     params: Promise<{
         id: string;
     }>;

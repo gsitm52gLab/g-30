@@ -129,7 +129,7 @@ async function fixture<T>(input: NoticeFixtureInput): Promise<T> {
             return await noticeFixture(repo, input) as T;
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     const child = children.get(port)!;
@@ -215,7 +215,11 @@ async function command(id: string, command: string, extra: Record<string, unknow
 async function uploaded(id: string, bytes = png, name = 'synthetic.png', visibility = 'public') {
     const response = await admin.upload(`noticeId=${id}`, bytes, name, 'image/png', visibility);
     assert.equal(response.status, 201, await response.clone().text());
-    return (await response.json()).files[0] as { id: string; name: string; sha256: string };
+    return (await response.json()).files[0] as {
+        id: string;
+        name: string;
+        sha256: string;
+    };
 }
 function persist(name: string, value: unknown) { writeFileSync(`${reportFile}.${name}.json`, JSON.stringify(value, null, 2), { mode: 0o600 }); }
 async function taskCommand(id: string, command: string) {
@@ -230,7 +234,9 @@ async function actualSubmission() {
     const id = (await created.json()).ids[0] as string;
     await taskCommand(id, 'publish');
     let w = await brand.get<SubmissionWorkspace>(`/api/tasks/${id}/submissions`);
-    const csrf = await brand.get<{ csrfToken: string }>('/api/auth/csrf'), form = new FormData();
+    const csrf = await brand.get<{
+        csrfToken: string;
+    }>('/api/auth/csrf'), form = new FormData();
     form.append('files', new Blob([new Uint8Array(png)], { type: 'image/png' }), 'submitted-original.png');
     form.append('clientItemIds', randomUUID());
     const url = `/api/tasks/${id}/submission-files?requestId=${w.request.id}`;
@@ -239,7 +245,8 @@ async function actualSubmission() {
     assert.equal(response.status, 200);
     const item = (await response.json()).items[0] as UploadResult;
     assert.equal(item.state, 'ready');
-    if (item.state !== 'ready') throw Error('synthetic upload failed');
+    if (item.state !== 'ready')
+        throw Error('synthetic upload failed');
     const fileId = item.file.id;
     const product = await brand.get<ProductDetail>(`/api/products/product-serum?context=${A}`);
     const saved = await brand.mutate(`/api/tasks/${id}/submission-draft`, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: 0, content: { ...blankDraft(), answers: [{ requestId: w.request.id, requirementKey: 'answer', productId: null, type: 'long_text', input: { text: '실제 HTTP 합성 답변' } }], artifacts: [{ fileVersionId: fileId, role: 'editable_original', answer: null }], productSelections: [{ productId: 'product-serum', expectedCommonRevision: product.commonRevision, expectedContextRevision: product.contextRevision, bindingIds: [], retailPriceVersionId: null, asOfDate: '2026-09-21' }] }, idempotencyKey: randomUUID() });
@@ -251,9 +258,16 @@ async function actualSubmission() {
 }
 let reachedEnd = false;
 try {
-    if (mode === 'sqlite') { const db = openDatabase(database, true); migrate(db); const repo = createSqliteRepository(db); await seed(repo); repo.close(); }
+    if (mode === 'sqlite') {
+        const db = openDatabase(database, true);
+        migrate(db);
+        const repo = createSqliteRepository(db);
+        await seed(repo);
+        (await repo.close());
+    }
     await start();
-    for (const [client, name] of [[admin, 'admin'], [brand, 'luna'], [team, 'team'], [foreign, 'wave'], [operator, 'operator'], [newcomer, 'none']] as const) await client.login(`${name}@example.test`);
+    for (const [client, name] of [[admin, 'admin'], [brand, 'luna'], [team, 'team'], [foreign, 'wave'], [operator, 'operator'], [newcomer, 'none']] as const)
+        await client.login(`${name}@example.test`);
     const id = await create(), f1 = await uploaded(id);
     check('anonymous list denied', (await new Client().send(`/api/notices?context=${A}`)).status === 401);
     check('brand draft hidden in list and exact detail', !(await list(brand)).items.some(n => n.id === id) && (await brand.send(`/api/notices/${id}`)).status === 404);
@@ -265,7 +279,11 @@ try {
     check('false image signature rejected', (await admin.upload(`noticeId=${id}`, Buffer.from('not an image'), 'invalid.png')).status === 422, ['D02']);
     const internal = await uploaded(id, png, 'PRIVATE_INTERNAL_FILE.png', 'internal');
     await command(id, 'save', { content: content({ fileIds: [f1.id, internal.id] }) });
-    const preview = await admin.get<{ files: { id: string }[] }>(`/api/notices/${id}?preview=1`);
+    const preview = await admin.get<{
+        files: {
+            id: string;
+        }[];
+    }>(`/api/notices/${id}?preview=1`);
     check('preview excludes internal file metadata', preview.files.length === 1 && preview.files[0].id === f1.id && !JSON.stringify(preview).includes(internal.id));
     const beforeInvalidPublish = await fixture<NoticeFixtureSnapshot>({ noticeId: id }), revision = (await detail(admin, id)).revision;
     check('internal attachment blocks public publish', (await admin.mutate(`/api/notices/${id}`, { command: 'publish', expectedRevision: revision, idempotencyKey: randomUUID() })).status === 422);
@@ -274,7 +292,8 @@ try {
     const c1 = content({ fileIds: [f1.id, actual.fileId], taskIds: [actual.id] });
     await command(id, 'save', { content: c1 });
     const publishInput = { command: 'publish', expectedRevision: (await detail(admin, id)).revision, idempotencyKey: randomUUID() };
-    const pub = await admin.mutate(`/api/notices/${id}`, publishInput); assert.equal(pub.status, 200);
+    const pub = await admin.mutate(`/api/notices/${id}`, publishInput);
+    assert.equal(pub.status, 200);
     const pubIds = (await pub.json()).ids as string[], v1 = pubIds[1];
     const replay = await admin.mutate(`/api/notices/${id}`, publishInput);
     check('publish same-key retry returns exact version', replay.status === 200 && hash((await replay.json()).ids) === hash(pubIds), ['AC-08-03']);
@@ -290,14 +309,17 @@ try {
         check(`exact private notice reference bytes ${f.id}`, byteHash(bytes) === byteHash(png), ['AC-08-03', 'D02']);
     }
     check('internal file and mixed reference denied', (await brand.send(`/api/files/${internal.id}?noticeId=${id}&versionId=${v1}&mode=original`)).status === 404 && (await brand.send(`/api/files/${f1.id}?noticeId=${id}&taskId=${actual.id}&mode=original`)).status === 422, ['D02']);
-    const beforeRead = await fixture<NoticeFixtureSnapshot>({ noticeId: id }); persist('before-read', beforeRead);
+    const beforeRead = await fixture<NoticeFixtureSnapshot>({ noticeId: id });
+    persist('before-read', beforeRead);
     check('read invariance baseline includes an actual submission product capture', beforeRead.business.find(r => r.kind === 'productUseSnapshot')!.rows.length === 1 && beforeRead.business.find(r => r.kind === 'submission')!.rows.length === 1, ['AC-08-02'], 'DB_FIXTURE');
     const readInput = { command: 'read', versionId: v1, idempotencyKey: randomUUID() };
-    const read = await brand.mutate(`/api/notices/${id}`, readInput); assert.equal(read.status, 200);
+    const read = await brand.mutate(`/api/notices/${id}`, readInput);
+    assert.equal(read.status, 200);
     const readIds = (await read.json()).ids;
     const readReplay = await brand.mutate(`/api/notices/${id}`, readInput), readNewKey = await brand.mutate(`/api/notices/${id}`, { ...readInput, idempotencyKey: randomUUID() });
     check('read same and new-key retries preserve one server-attributed fact', hash((await readReplay.json()).ids) === hash(readIds) && hash((await readNewKey.json()).ids) === hash(readIds));
-    const afterRead = await fixture<NoticeFixtureSnapshot>({ noticeId: id }); persist('after-read', afterRead);
+    const afterRead = await fixture<NoticeFixtureSnapshot>({ noticeId: id });
+    persist('after-read', afterRead);
     check('notice read leaves all task submission capture file records identical', beforeRead.businessSha256 === afterRead.businessSha256, ['AC-08-02'], 'DB_FIXTURE');
     const savedV1 = (await detail(brand, id)).selected;
     const managed = await detail(admin, id), readRows = afterRead.rows.find(r => r.kind === 'noticeRead')!.rows;
@@ -311,13 +333,16 @@ try {
     const v2 = (await command(id, 'publish'))[1], latest = await detail(brand, id), historic = await detail(brand, id, v1);
     check('v2 unread while exact v1 body file read remain unchanged', latest.selected!.ownReadAt === null && hash(historic.selected) === hash(savedV1) && historic.selected!.content.body === c1.body && historic.selected!.ownReadAt !== null && latest.versions.length === 2, ['AC-08-03']);
     check('removed current file retained only through authorized historical version', (await brand.send(`/api/files/${f1.id}?noticeId=${id}&versionId=${v2}&mode=original`)).status === 404 && byteHash(Buffer.from(await (await brand.send(`/api/files/${f1.id}?noticeId=${id}&versionId=${v1}&mode=original`)).arrayBuffer())) === byteHash(png), ['AC-08-03', 'D02']);
-    const versionSnapshot = await fixture<NoticeFixtureSnapshot>({ noticeId: id }); persist('versions', versionSnapshot);
+    const versionSnapshot = await fixture<NoticeFixtureSnapshot>({ noticeId: id });
+    persist('versions', versionSnapshot);
     check('two distinct version-bound durable events preserved', versionSnapshot.rows.find(r => r.kind === 'domainEvent')!.rows.length === 2 && hash(versionSnapshot.rows.find(r => r.kind === 'noticeRead')!.rows) === hash(readRows), ['AC-08-03'], 'DB_FIXTURE');
     const target = await create(content({ title: '선택 대상', audience: { mode: 'selected', userIds: ['user-luna'] } })), t1 = (await command(target, 'publish'))[1];
     check('selected target excludes current nonrecipient', (await team.send(`/api/notices/${target}`)).status === 404);
-    await command(target, 'save', { content: content({ title: '전체 대상' }) }); await command(target, 'publish');
+    await command(target, 'save', { content: content({ title: '전체 대상' }) });
+    await command(target, 'publish');
     check('newly eligible reader cannot access previous excluded version or its ID', (await detail(team, target)).versions.length === 1 && !JSON.stringify(await detail(team, target)).includes(t1) && (await team.send(`/api/notices/${target}?version=${t1}`)).status === 404);
-    await command(target, 'save', { content: content({ audience: { mode: 'selected', userIds: [] } }) }); await command(target, 'publish');
+    await command(target, 'save', { content: content({ audience: { mode: 'selected', userIds: [] } }) });
+    await command(target, 'publish');
     check('empty selection grants nobody and current exclusion denies old version', (await brand.send(`/api/notices/${target}?version=${t1}`)).status === 404 && (await team.send(`/api/notices/${target}`)).status === 404);
     const originNotice = await create(content({ title: '원본 권한 자료' })), originFile = await uploaded(originNotice, png, 'original-scope.png');
     const productBefore = await brand.get<ProductDetail>(`/api/products/product-serum?context=${A}`);
@@ -325,27 +350,32 @@ try {
     const binding = blankFileBinding('notice-origin', originFile.id);
     const prematureBind = await admin.mutate('/api/products/product-serum', { contextId: A, command: 'save_files', files: [binding], expectedContextRevision: productBefore.contextRevision, idempotencyKey: randomUUID() });
     check('known unpublished notice file ID cannot bypass product binding', prematureBind.status === 422, ['D02']);
-    await command(originNotice, 'save', { content: content({ fileIds: [originFile.id] }) }); await command(originNotice, 'publish');
+    await command(originNotice, 'save', { content: content({ fileIds: [originFile.id] }) });
+    await command(originNotice, 'publish');
     const productReady = await brand.get<ProductDetail>(`/api/products/product-serum?context=${A}`);
     check('published notice file becomes permission-filtered reusable product source', productReady.reusableFiles.some(f => f.id === originFile.id), ['D02']);
     const bound = await brand.mutate('/api/products/product-serum', { contextId: A, command: 'save_files', files: [binding], expectedContextRevision: productReady.contextRevision, idempotencyKey: randomUUID() });
     check('actual product binding consumes published notice file owner', bound.status === 200, ['D02']);
-    const targetNotice = await create(content({ title: '다른 공지에서 명시 참조', fileIds: [originFile.id] })); await command(targetNotice, 'publish');
+    const targetNotice = await create(content({ title: '다른 공지에서 명시 참조', fileIds: [originFile.id] }));
+    await command(targetNotice, 'publish');
     const targetFile = (await detail(brand, targetNotice)).selected!.content.files[0];
     check('explicit second notice reference serves exact original bytes', byteHash(Buffer.from(await (await brand.send(targetFile.originalUrl)).arrayBuffer())) === byteHash(png), ['D02']);
     const cross = await admin.mutate('/api/notices', { contextId: 'ctx-jp-b-luna', content: content({ fileIds: [originFile.id] }), idempotencyKey: randomUUID() });
     check('cross-context reference denied even for global GSG', cross.status === 404, ['D02']);
-    await command(originNotice, 'save', { content: content({ audience: { mode: 'selected', userIds: ['user-team'] }, fileIds: [originFile.id] }) }); await command(originNotice, 'publish');
+    await command(originNotice, 'save', { content: content({ audience: { mode: 'selected', userIds: ['user-team'] }, fileIds: [originFile.id] }) });
+    await command(originNotice, 'publish');
     const afterOriginChange = await brand.get<ProductDetail>(`/api/products/product-serum?context=${A}`);
     check('origin target exclusion hides reference metadata in notice and product', (await detail(brand, targetNotice)).selected!.content.files.length === 0 && !afterOriginChange.reusableFiles.some(f => f.id === originFile.id) && !afterOriginChange.files.some(f => f.fileVersionId === originFile.id), ['D02']);
     check('origin AND reference permissions deny original bytes through both consumers', (await brand.send(targetFile.originalUrl)).status === 404 && (await brand.send(`/api/files/${originFile.id}?productId=product-serum&contextId=${A}&mode=original`)).status === 404, ['D02']);
-    const empty = await create(content({ title: '가입 후 공지' }), 'ctx-empty'); await command(empty, 'publish');
+    const empty = await create(content({ title: '가입 후 공지' }), 'ctx-empty');
+    await command(empty, 'publish');
     const emptyDetail = await detail(admin, empty);
     check('zero active target roster and scoped GSG denial', 'roster' in emptyDetail && emptyDetail.roster.targetCount === 0 && (await operator.send(`/api/notices/${empty}`)).status === 404);
     await fixture({ noticeId: empty, action: 'add_later_member' });
     check('later active member reads previously published all-member rule', (await detail(newcomer, empty)).selected!.content.title === '가입 후 공지');
     const racer = new Client(mode === 'sqlite' ? auxPort : port);
-    if (mode === 'sqlite') await start(auxPort);
+    if (mode === 'sqlite')
+        await start(auxPort);
     await racer.login('admin@example.test');
     const raceRevision = (await detail(admin, id)).revision;
     const results = await Promise.all([admin, racer].map((c, i) => c.mutate(`/api/notices/${id}`, { command: 'save', expectedRevision: raceRevision, content: content({ title: `경합 ${i}`, fileIds: [f2.id] }), idempotencyKey: randomUUID() })));
@@ -354,23 +384,43 @@ try {
     const publishes = await Promise.all([admin, racer].map(c => c.mutate(`/api/notices/${id}`, sharedPublish)));
     const replies = await Promise.all(publishes.map(r => r.json()));
     check('concurrent same-key publication produces exactly one version', publishes.every(r => r.status === 200) && hash(replies[0]) === hash(replies[1]), ['AC-08-03']);
-    const extended = await fixture<NoticeFixtureSnapshot>({ noticeId: target, action: 'extend_version' }); persist('stored-extension', extended);
+    const extended = await fixture<NoticeFixtureSnapshot>({ noticeId: target, action: 'extend_version' });
+    persist('stored-extension', extended);
     check('valid stored unknown extension remains stored without API exposure', JSON.stringify(extended).includes('G08_STORED_EXTENSION_CANARY') && !JSON.stringify(await detail(admin, target)).includes('G08_STORED_EXTENSION_CANARY'), ['A19']);
     const beforeRestart = await detail(brand, id), restartRows = await fixture<NoticeFixtureSnapshot>({ noticeId: id });
     if (mode === 'sqlite') {
-        await stop(auxPort); await stop(port); await start(); const relogged = new Client(); await relogged.login('luna@example.test');
+        await stop(auxPort);
+        await stop(port);
+        await start();
+        const relogged = new Client();
+        await relogged.login('luna@example.test');
         check('SQLite new PID after actual server restart', processes[0].pid !== processes.at(-1)!.pid, ['AC-08-03'], 'PROCESS');
         check('relogin restores exact versions receipts task links and file metadata', hash(await detail(relogged, id)) === hash(beforeRestart) && (await fixture<NoticeFixtureSnapshot>({ noticeId: id })).rowsSha256 === restartRows.rowsSha256, ['AC-08-03']);
         check('restart historical original bytes remain exact', byteHash(Buffer.from(await (await relogged.send(`/api/files/${f1.id}?noticeId=${id}&versionId=${v1}&mode=original`)).arrayBuffer())) === byteHash(png), ['AC-08-03', 'D02']);
     }
-    const members = await admin.get<{ members: { id: string; revision: number; data: { userId: string; scope: string } }[] }>(`/api/contexts/${A}/members`), member = members.members.find(m => m.data.userId === 'user-luna')!;
+    const members = await admin.get<{
+        members: {
+            id: string;
+            revision: number;
+            data: {
+                userId: string;
+                scope: string;
+            };
+        }[];
+    }>(`/api/contexts/${A}/members`), member = members.members.find(m => m.data.userId === 'user-luna')!;
     const revoked = await admin.mutate(`/api/contexts/${A}/members/${member.id}`, { expectedRevision: member.revision, status: 'suspended', scope: member.data.scope, internalPriceAccess: false }, 'PATCH');
     check('current membership revoke denies detail history files and idempotent read replay', revoked.status === 200 && (await brand.send(`/api/notices/${id}`)).status === 404 && (await brand.send(`/api/notices/${id}?version=${v1}`)).status === 404 && (await brand.send(`/api/files/${f1.id}?noticeId=${id}&versionId=${v1}&mode=original`)).status === 404 && (await brand.mutate(`/api/notices/${id}`, readInput)).status === 404, ['AC-08-01', 'D02']);
     check('revocation does not erase immutable notice facts', (await fixture<NoticeFixtureSnapshot>({ noticeId: id })).rowsSha256 === restartRows.rowsSha256, ['AC-08-03'], 'DB_FIXTURE');
     reachedEnd = true;
-} catch (error) { failure = error instanceof Error ? error.message : 'unknown failure'; process.exitCode = 1; }
+}
+catch (error) {
+    failure = error instanceof Error ? error.message : 'unknown failure';
+    process.exitCode = 1;
+}
 finally {
-    for (const p of [...children.keys()]) await stop(p);
+    for (const p of [...children.keys()])
+        await stop(p);
     const report = { candidate_commit: candidate, runner_sha256: hash(readFileSync('scripts/verify-notices-http.ts', 'utf8')), fixture_runner_sha256: hash(readFileSync('scripts/verify-notices-fixtures.ts', 'utf8')), status: failure ? 'FAIL' : 'PASS', mode, cwd: process.cwd(), startedAt, finishedAt: new Date().toISOString(), failure, unit: 'assertion', pass: checks.filter(c => c.status === 'PASS').length, fail: checks.filter(c => c.status === 'FAIL').length + (failure && !checks.some(c => c.status === 'FAIL') ? 1 : 0), skip: 0, reachedEnd, not_run: 'Browser/UI/HTML/RSC, G07 assembly and independent verification remain NOT_RUN', checks, transcript, processes, resources: { primaryPort: port, auxPort, database, files }, fixture_boundary: 'Actual HTTP task/submission/notice/file producers. Private read snapshots; explicit later membership and unknown extension setup via IPC/repository only. No application test endpoint, no auth bypass.' };
-    writeFileSync(reportFile, JSON.stringify(report, null, 2), { mode: 0o600 }); console.log(JSON.stringify({ status: report.status, pass: report.pass, fail: report.fail, reportFile }));
+    writeFileSync(reportFile, JSON.stringify(report, null, 2), { mode: 0o600 });
+    console.log(JSON.stringify({ status: report.status, pass: report.pass, fail: report.fail, reportFile }));
 }

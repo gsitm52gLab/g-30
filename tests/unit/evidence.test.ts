@@ -26,8 +26,11 @@ for (const mode of ['mock', 'sqlite'] as const)
         let repo: RecordRepository, identity: IdentityService, service: EvidenceService, products: ProductService, dir: string;
         async function setup() { repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); identity = await policyFixture(repo); service = new EvidenceService(identity); products = new ProductService(identity); dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-g07-evidence-')); }
         async function source() { const pid = 'product-serum', file = (await new FileService(identity, dir).upload(brand, { kind: 'product', productId: pid, contextId: A }, [{ name: 'invoice.png', type: 'image/png', bytes: png }], 'public')).files[0]; const p = await products.detail(brand, pid, A), binding = blankFileBinding(randomUUID(), file.id); await products.command(brand, pid, { command: 'save_files', contextId: A, expectedContextRevision: p.contextRevision, files: [binding], idempotencyKey: randomUUID() }); const d = await products.detail(brand, pid, A); return { kind: 'product_binding' as const, productId: pid, contextProductId: d.contextProductId, contextVersionId: d.contextVersionId, bindingId: binding.id, fileVersionId: file.id }; }
-        afterEach(async () => { repo?.close(); if (dir)
-            await rm(dir, { recursive: true, force: true }); });
+        afterEach(async () => {
+            (await repo?.close());
+            if (dir)
+                await rm(dir, { recursive: true, force: true });
+        });
         it('AC07-01/02 one exact file, two independent application histories; invoice never becomes certification', async () => {
             await setup();
             const src = await source(), second = (await products.create(brand, { contextId: A, brandId: 'brand-luna', common: { name: 'second', code: 'SECOND' }, idempotencyKey: randomUUID() })).ids[0];
@@ -48,11 +51,11 @@ for (const mode of ['mock', 'sqlite'] as const)
             const revised = await service.detail(brand, d.id);
             expect(revised.current.links.every(l => l.assessments.length === 0)).toBe(true);
             expect(await repo.get('evidenceVersion', old!.id)).toEqual(old);
-            await expect(repo.transaction(s => s.update('evidenceVersion', old!.id, old!.revision, old!.data))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
+            await expect(repo.transaction(async (s) => (await s.update('evidenceVersion', old!.id, old!.revision, old!.data)))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
         });
         it('actual G05 producer drives canonical table/counts; standalone N/A never waives required response', async () => {
             await setup();
-            const tasks = new TaskService(identity), sub = new SubmissionService(identity), uploads = new SubmissionFiles(identity, dir), content = { ...blankContent(), title: '자료 요청', description: '합성 자료 제출 요청', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('doc', 'file'), label: '문서', productIds: ['product-serum'], specifications: [{text:'서명 내용 확인',source:'합성 요청',version:'1',severity:'required' as const,check:'human' as const}] }, { ...blankRequirement('text', 'short_text'), label: '일반 답변' }] };
+            const tasks = new TaskService(identity), sub = new SubmissionService(identity), uploads = new SubmissionFiles(identity, dir), content = { ...blankContent(), title: '자료 요청', description: '합성 자료 제출 요청', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('doc', 'file'), label: '문서', productIds: ['product-serum'], specifications: [{ text: '서명 내용 확인', source: '합성 요청', version: '1', severity: 'required' as const, check: 'human' as const }] }, { ...blankRequirement('text', 'short_text'), label: '일반 답변' }] };
             const taskId = (await tasks.create(admin, { targets: [{ contextId: A, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: [], productIds: ['product-serum'] }], content, category: 'spot', idempotencyKey: randomUUID() })).ids[0];
             await tasks.command(admin, taskId, { command: 'publish', expectedRevision: (await repo.get('task', taskId))!.revision, idempotencyKey: randomUUID() });
             let w = await sub.workspace(brand, taskId);
@@ -75,30 +78,30 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect((await products.detail(brand, 'product-serum', A)).materialCounts).toEqual(row.counts);
             expect(row.cells.find(c => c.taskId === taskId && c.requirementKey === 'doc')!.submissionUrl).toContain(submissionId);
             const emitted = row.cells.find(c => c.taskId === taskId && c.requirementKey === 'doc')!;
-            expect([...new URL(emitted.requestUrl,'http://local').searchParams.keys()]).toEqual(['context']);
-            const historical = new URL(emitted.submissionUrl!,'http://local').searchParams;
-            expect(['context','requestId','submissionId','requirementKey','productId'].every(k=>historical.has(k))).toBe(true);
+            expect([...new URL(emitted.requestUrl, 'http://local').searchParams.keys()]).toEqual(['context']);
+            const historical = new URL(emitted.submissionUrl!, 'http://local').searchParams;
+            expect(['context', 'requestId', 'submissionId', 'requirementKey', 'productId'].every(k => historical.has(k))).toBe(true);
             const pendingCount = row.counts.unconfirmed;
             let currentLink = (await service.detail(admin, d.id)).current.links[0];
-            await service.command(admin,d.id,{command:'assess',linkId:link.id,expectedLinkRevision:currentLink.revision,status:'application_confirmed',reason:'상품 관계만 확인',idempotencyKey:randomUUID()});
-            row=(await service.table(brand,A)).rows.find(r=>r.productId==='product-serum')!;
-            expect(row.cells.find(c=>c.taskId===taskId&&c.requirementKey==='doc')!.status).toBe('content_confirmation');
+            await service.command(admin, d.id, { command: 'assess', linkId: link.id, expectedLinkRevision: currentLink.revision, status: 'application_confirmed', reason: '상품 관계만 확인', idempotencyKey: randomUUID() });
+            row = (await service.table(brand, A)).rows.find(r => r.productId === 'product-serum')!;
+            expect(row.cells.find(c => c.taskId === taskId && c.requirementKey === 'doc')!.status).toBe('content_confirmation');
             expect(row.counts.unconfirmed).toBe(pendingCount);
-            const missingBefore=row.counts.missing;
-            currentLink=(await service.detail(admin,d.id)).current.links[0];
+            const missingBefore = row.counts.missing;
+            currentLink = (await service.detail(admin, d.id)).current.links[0];
             await service.command(admin, d.id, { command: 'assess', linkId: link.id, expectedLinkRevision: currentLink.revision, status: 'correction_needed', reason: '서명 보완 필요', idempotencyKey: randomUUID() });
             row = (await service.table(brand, A)).rows.find(r => r.productId === 'product-serum')!;
             expect(row.cells.find(c => c.taskId === taskId && c.requirementKey === 'doc')!.status).toBe('correction_needed');
-            expect(row.counts.unconfirmed).toBe(pendingCount-1);
-            expect(row.counts.missing).toBe(missingBefore+1);
+            expect(row.counts.unconfirmed).toBe(pendingCount - 1);
+            expect(row.counts.missing).toBe(missingBefore + 1);
             expect((await sub.workspace(brand, taskId)).submittedEvaluation!.evaluation.missing).toBe(1);
-            const beforeRevision = await service.detail(brand,d.id);
-            await service.command(brand,d.id,{command:'revise',expectedRevision:beforeRevision.revision,source,metadata:{...beforeRevision.current.metadata,title:'개정 질문지 정보'},productIds:['product-serum'],idempotencyKey:randomUUID()});
-            const revisedCell=(await service.table(brand,A)).rows.find(r=>r.productId==='product-serum')!.cells.find(c=>c.taskId===taskId&&c.requirementKey==='doc')!;
+            const beforeRevision = await service.detail(brand, d.id);
+            await service.command(brand, d.id, { command: 'revise', expectedRevision: beforeRevision.revision, source, metadata: { ...beforeRevision.current.metadata, title: '개정 질문지 정보' }, productIds: ['product-serum'], idempotencyKey: randomUUID() });
+            const revisedCell = (await service.table(brand, A)).rows.find(r => r.productId === 'product-serum')!.cells.find(c => c.taskId === taskId && c.requirementKey === 'doc')!;
             expect(revisedCell.evidenceLinks).toHaveLength(1);
             expect(revisedCell.evidenceLinks[0].status).toBe('pending');
             expect(revisedCell.status).toBe('content_confirmation');
-            expect((await service.detail(brand,d.id)).versions.find(v=>v.id===beforeRevision.current.id)!.links[0].assessments[0].status).toBe('correction_needed');
+            expect((await service.detail(brand, d.id)).versions.find(v => v.id === beforeRevision.current.id)!.links[0].assessments[0].status).toBe('correction_needed');
         });
         it('fresh scope/current file authorization, assessment role, CAS, and late rollback enforced', async () => {
             await setup();
@@ -109,7 +112,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             await expect(service.command(brand, d.id, { command: 'assess', linkId: link.id, expectedLinkRevision: link.revision, status: 'application_confirmed', reason: '확인', idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 403 });
             await expect(service.command(admin, d.id, { command: 'unlink', linkId: link.id, expectedLinkRevision: 999, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
             await expect(service.detail(tokenFor('user-wave'), d.id)).rejects.toMatchObject({ status: 404 });
-            await repo.transaction(s => { const m = s.list('membership', A).find(m => m.data.userId === 'user-luna')!; s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' }); });
+            await repo.transaction(async (s) => { const m = (await s.list('membership', A)).find(m => m.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
             await expect(service.register(brand, input)).rejects.toMatchObject({ status: 404 });
             await expect(service.download(brand, d.id, d.current.id, link.id, 'download', dir)).rejects.toMatchObject({ status: 404 });
         });

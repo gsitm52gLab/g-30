@@ -129,7 +129,7 @@ async function fixture<T>(input: CompletionFixtureInput): Promise<T> {
             return await completionFixture(repo, input) as T;
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     const child = children.get(port)!;
@@ -249,7 +249,7 @@ async function actualCorrection(target: ReviewTarget) {
     const draftId = (await post(admin, '/api/corrections', { command: 'save_draft', taskId, draftId: null, expectedRevision: 0, draft: { title: 'Actual public batch', summary: 'Unresolved correction', items: [{ key: 'change', target, internalOpinionVersionIds: [opinion], publicSource: 'Public source', change: 'Change expression', reason: 'Check specification', publicDescription: 'G11_PUBLIC_CORRECTION', priority: 'normal', issue: 'correction' }], mode: 'urgent_partial', pendingScopes: [{ agency: 'Later agency', scope: 'More opinion', expectedOn: null }], previousBatchVersionId: null }, idempotencyKey: randomUUID() })).ids[0];
     return (await post(admin, '/api/corrections', { command: 'publish', taskId, draftId, expectedRevision: 1, idempotencyKey: randomUUID() })).ids[0];
 }
-const sourceFacts=(x:ExternalAction)=>({requestId:x.source.requestId,submissionId:x.source.submissionId,submissionContentHash:x.source.submissionContentHash,fileVersionIds:x.source.fileVersionIds,productUseIds:x.source.productUseIds,files:x.source.files.map(f=>({id:f.id,bytes:f.bytes,sha256:f.sha256})),products:x.source.products.map(p=>({id:p.id,contentHash:p.contentHash,productVersionId:p.productVersionId,contextProductVersionId:p.contextProductVersionId}))});
+const sourceFacts = (x: ExternalAction) => ({ requestId: x.source.requestId, submissionId: x.source.submissionId, submissionContentHash: x.source.submissionContentHash, fileVersionIds: x.source.fileVersionIds, productUseIds: x.source.productUseIds, files: x.source.files.map(f => ({ id: f.id, bytes: f.bytes, sha256: f.sha256 })), products: x.source.products.map(p => ({ id: p.id, contentHash: p.contentHash, productVersionId: p.productVersionId, contextProductVersionId: p.contextProductVersionId })) });
 function action(target: ReviewTarget): ExternalActionInput { return { purpose: 'review_request', destination: 'Synthetic outside agency', requester: { kind: 'user', userId: 'user-luna' }, performer: { kind: 'external', label: 'Actual outside performer', source: 'Synthetic observed message' }, source: { requestId: target.requestId, submissionId: target.submissionId, submissionContentHash: target.submissionContentHash, fileVersionIds: target.fileVersionIds, productUseIds: target.productUseIds }, observedAt: { value: '2026-09-21', precision: 'date', timezone: 'Asia/Tokyo', source: 'Observed message' }, evidenceFileVersionIds: [], latestProgress: 'Waiting factual response', waitingExternal: true, visibility: 'public' }; }
 try {
     if (mode === 'sqlite') {
@@ -257,7 +257,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     check('G11-H01 anonymous and invalid CSRF denied', (await new Client().send('/api/completion?taskId=task-onboarding')).status === 401 && (await admin.send('/api/completion', 'POST', {})).status === 403, ['A19']);

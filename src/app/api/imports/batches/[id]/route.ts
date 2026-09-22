@@ -5,4 +5,4 @@ type Context = {
         id: string;
     }>;
 };
-export function GET(request: Request, context: Context) { return route(request, async (identity, token) => json(await new ImportService(identity).batch(token, (await context.params).id))); }
+export async function GET(request: Request, context: Context) { return route(request, async (identity, token) => json(await new ImportService(identity).batch(token, (await context.params).id))); }

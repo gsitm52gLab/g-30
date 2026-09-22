@@ -3,7 +3,7 @@ import { ImportService } from '@/server/imports/service';
 import { importLimits } from '@/domain/imports/types';
 import { fail } from '@/server/auth/errors';
 export const runtime = 'nodejs';
-export function POST(request: Request) {
+export async function POST(request: Request) {
     return route(request, async (identity, token) => {
         const contextId = new URL(request.url).searchParams.get('context') ?? '', service = new ImportService(identity);
         await service.configuration(token, contextId);

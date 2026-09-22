@@ -1,23 +1,132 @@
-import {chromium,expect,type BrowserContext,type Page} from '@playwright/test';
-import {spawn,execFileSync,type ChildProcess} from 'node:child_process';
-import {createWriteStream,mkdirSync,writeFileSync} from 'node:fs';
+import { chromium, expect, type BrowserContext, type Page } from '@playwright/test';
+import { spawn, execFileSync, type ChildProcess } from 'node:child_process';
+import { createWriteStream, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import net from 'node:net';
-import {createHash} from 'node:crypto';
-import {openDatabase,migrate} from '@/server/db/database';
-import {createSqliteRepository} from '@/server/repositories/sqlite';
-import {seed} from '@/server/db/seed';
-import {ctx,login,detail,createTask,taskCommand,png,status} from '../tests/fixtures/notices';
-const output=path.resolve(process.env.EVIDENCE_ROOT!,'restart-'+Date.now()),port=Number(process.env.E2E_PORT),origin=`http://127.0.0.1:${port}`,database=path.join(output,'private.sqlite');mkdirSync(output,{recursive:true});
-const listening=()=>new Promise<boolean>(resolve=>{const s=net.connect(port,'127.0.0.1');s.once('connect',()=>{s.destroy();resolve(true);});s.once('error',()=>resolve(false));});if(await listening())throw Error('Assigned port already busy');
-const db=openDatabase(database,true);migrate(db);const repo=createSqliteRepository(db);await seed(repo);repo.close();
-const browser=await chromium.launch(),checks:{id:string;status:string;requirements:string[];unit:string}[]=[],processes:{pid:number|undefined;command:string[];cwd:string;log:string;exit?:number|null;signal?:string|null}[]=[];let context:BrowserContext|undefined,server:ChildProcess|undefined,failed=false;
-async function check(id:string,action:()=>Promise<unknown>|unknown){try{await action();checks.push({id,status:'PASS',requirements:['AC-08-01','AC-08-02','AC-08-03','A19','D10'],unit:'assertion'});}catch(e){checks.push({id,status:'FAIL',requirements:['AC-08-01','AC-08-02','AC-08-03','A19','D10'],unit:'assertion'});throw e;}}
-async function start(){const command=[process.execPath,'node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],log=path.join(output,`server-${processes.length+1}.log`),stream=createWriteStream(log);server=spawn(command[0],command.slice(1),{cwd:process.cwd(),env:{...process.env,DATA_SOURCE:'sqlite',DATABASE_FILE:database,FILE_STORAGE_DIR:path.join(output,'files'),APP_ORIGIN:origin,SESSION_COOKIE_NAME:`gs_hale_g08_restart_${port}`,OPENAI_API_KEY:'',NEXT_TELEMETRY_DISABLED:'1'},stdio:['ignore','pipe','pipe']});server.stdout!.pipe(stream,{end:false});server.stderr!.pipe(stream,{end:false});server.once('close',()=>stream.end());processes.push({pid:server.pid,command,cwd:process.cwd(),log});for(let i=0;i<200;i++){if(server.exitCode!==null)throw Error('Server exited');try{if((await fetch(origin+'/api/health')).ok)return;}catch{}await new Promise(r=>setTimeout(r,50));}throw Error('Server readiness timed out');}
-async function stop(){if(!server)return;const p=server;await new Promise<void>(r=>{if(p.exitCode!==null)return r();p.once('close',()=>r());p.kill('SIGTERM');});processes.at(-1)!.exit=p.exitCode;processes.at(-1)!.signal=p.signalCode;server=undefined;}
-async function session(){context=await browser.newContext({baseURL:origin,viewport:{width:390,height:844}});await context.tracing.start({screenshots:true,snapshots:true,sources:true});return context.newPage();}
-async function close(label:string){if(!context)return;const p=context.pages()[0];writeFileSync(path.join(output,label+'-dom-private.html'),await p.content());await p.screenshot({path:path.join(output,label+'-private.png'),fullPage:true});await p.evaluate(()=>scrollTo(0,0));await p.screenshot({path:path.join(output,label+'-390-viewport-private.png')});await context.tracing.stop({path:path.join(output,label+'-private-trace.zip')});await context.close();context=undefined;}
-function rows(){const db=openDatabase(database);try{return db.prepare("SELECT kind,id,context_id,revision,data,created_at,updated_at FROM records WHERE kind IN ('notice','noticeVersion','noticeRead','domainEvent','commandReceipt','fileVersion','task','requestVersion','taskActivity') ORDER BY kind,id").all();}finally{db.close();}}
-const field=(p:Page,name:string)=>p.getByRole('textbox',{name,exact:true});
-try{await start();let page=await session();await login(page);const task=await createTask(page.request,'재시작 연결 실제 업무');await taskCommand(page.request,task,'publish');await page.goto(`/notices/new?context=${ctx}`);await field(page,'공지 제목').fill('재시작 실제 UI 공지');await field(page,'공지 본문').fill('보존할 v1 공지 원문');await page.getByRole('button',{name:'공지 초안 만들기',exact:true}).click();await check('R08-01 actual UI creates notice',()=>expect(page).toHaveURL(/\/notices\/[a-f0-9-]+/));const id=new URL(page.url()).pathname.split('/').at(-1)!;await page.getByLabel('공지 파일 선택',{exact:true}).setInputFiles({name:'restart-notice.png',mimeType:'image/png',buffer:png()});await page.getByRole('button',{name:'이 파일 업로드',exact:true}).click();await check('R08-02 actual private file upload',()=>expect(page.getByText('업로드됨 · 공지 저장·공개는 별도',{exact:true})).toBeVisible());await page.getByRole('group',{name:'같은 컨텍스트의 기존 업무',exact:true}).getByRole('checkbox',{name:'재시작 연결 실제 업무',exact:true}).check();await page.getByRole('button',{name:'공지 초안 저장',exact:true}).click();await status(page,'초안을 저장했습니다');await page.getByRole('button',{name:'저장된 초안 공개',exact:true}).click();await check('R08-03 actual v1 publication task link',async()=>{await status(page,'새 공개본');expect((await detail(page.request,id)).selected!.content.tasks[0].id).toBe(task);});await login(page,'luna@example.test');await page.goto(`/notices/${id}?context=${ctx}`);await page.getByRole('button',{name:'이 공지 버전 읽음 확인',exact:true}).click();await check('R08-04 exact v1 UI read',()=>status(page,'선택한 공지 버전'));const v1=(await detail(page.request,id)).selected!;await login(page);await page.goto(`/notices/${id}?context=${ctx}`);await field(page,'공지 본문').fill('보존할 v2 공지 원문');await page.getByRole('button',{name:'공지 초안 저장',exact:true}).click();await status(page,'초안을 저장했습니다');await page.getByRole('button',{name:'저장된 초안 공개',exact:true}).click();await status(page,'새 공개본');await login(page,'luna@example.test');await page.goto(`/notices/${id}?context=${ctx}`);const before=await detail(page.request,id);await check('R08-05 v2 unread separate from v1',()=>{expect(before.versions).toHaveLength(2);expect(before.selected!.ownReadAt).toBeNull();expect(before.versions.find(v=>v.id===v1.id)!.ownReadAt).toBe(v1.ownReadAt);});const records=rows();writeFileSync(path.join(output,'before-private.json'),JSON.stringify({id,task,notice:before,records},null,2));await close('before');await stop();await start();await check('R08-06 new actual process PID',()=>expect(processes[0].pid).not.toBe(processes[1].pid));page=await session();await login(page,'luna@example.test');await page.goto(`/notices/${id}?context=${ctx}`);await check('R08-07 fresh login sees exact current public UI',async()=>{await expect(page.getByRole('heading',{name:'공개본 v2 · 현재',exact:true})).toBeVisible();await expect(page.getByText('보존할 v2 공지 원문',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'이 공지 버전 읽음 확인',exact:true})).toBeEnabled();expect(await page.evaluate(()=>Object.keys(sessionStorage).filter(k=>k.startsWith('gs-hale:notice-edit:')))).toEqual([]);});const after=await detail(page.request,id);await check('R08-08 exact notice versions reads tasks survived',()=>expect(after).toEqual(before));await check('R08-09 business records events receipts files survived',()=>expect(rows()).toEqual(records));await page.getByRole('link',{name:'v1 · 확인함',exact:true}).click();await check('R08-10 historical UI exact read and original bytes',async()=>{await expect(page.getByRole('heading',{name:'공개본 v1 · 과거 이력',exact:true})).toBeVisible();await expect(page.getByText('보존할 v1 공지 원문',{exact:true})).toBeVisible();const f=v1.content.files[0],r=await page.request.get(f.downloadUrl);expect(r.status()).toBe(200);expect(createHash('sha256').update(await r.body()).digest('hex')).toBe(f.sha256);});await check('R08-11 390px no overflow and linked real task',async()=>{expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await expect(page.getByRole('link',{name:'재시작 연결 실제 업무 ↗',exact:true})).toBeVisible();});writeFileSync(path.join(output,'after-private.json'),JSON.stringify({id,task,notice:after,records:rows()},null,2));}
-catch(e){failed=true;console.error(e instanceof Error?e.stack:String(e));}finally{await close(failed?'failure':'after');await browser.close();await stop();writeFileSync(path.join(output,'report.json'),JSON.stringify({candidate:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),cwd:process.cwd(),checks,processes,counts:{unit:'assertion',pass:checks.filter(c=>c.status==='PASS').length,fail:checks.filter(c=>c.status==='FAIL').length,skip:0,not_run:11-checks.length},port_released:!(await listening()),outcome:failed?'FAIL':'PASS'},null,2));console.log(JSON.stringify({output,checks:checks.length,outcome:failed?'FAIL':'PASS'}));}if(failed)process.exitCode=1;
+import { createHash } from 'node:crypto';
+import { openDatabase, migrate } from '@/server/db/database';
+import { createSqliteRepository } from '@/server/repositories/sqlite';
+import { seed } from '@/server/db/seed';
+import { ctx, login, detail, createTask, taskCommand, png, status } from '../tests/fixtures/notices';
+const output = path.resolve(process.env.EVIDENCE_ROOT!, 'restart-' + Date.now()), port = Number(process.env.E2E_PORT), origin = `http://127.0.0.1:${port}`, database = path.join(output, 'private.sqlite');
+mkdirSync(output, { recursive: true });
+const listening = () => new Promise<boolean>(resolve => { const s = net.connect(port, '127.0.0.1'); s.once('connect', () => { s.destroy(); resolve(true); }); s.once('error', () => resolve(false)); });
+if (await listening())
+    throw Error('Assigned port already busy');
+const db = openDatabase(database, true);
+migrate(db);
+const repo = createSqliteRepository(db);
+await seed(repo);
+(await repo.close());
+const browser = await chromium.launch(), checks: {
+    id: string;
+    status: string;
+    requirements: string[];
+    unit: string;
+}[] = [], processes: {
+    pid: number | undefined;
+    command: string[];
+    cwd: string;
+    log: string;
+    exit?: number | null;
+    signal?: string | null;
+}[] = [];
+let context: BrowserContext | undefined, server: ChildProcess | undefined, failed = false;
+async function check(id: string, action: () => Promise<unknown> | unknown) { try {
+    await action();
+    checks.push({ id, status: 'PASS', requirements: ['AC-08-01', 'AC-08-02', 'AC-08-03', 'A19', 'D10'], unit: 'assertion' });
+}
+catch (e) {
+    checks.push({ id, status: 'FAIL', requirements: ['AC-08-01', 'AC-08-02', 'AC-08-03', 'A19', 'D10'], unit: 'assertion' });
+    throw e;
+} }
+async function start() { const command = [process.execPath, 'node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', String(port)], log = path.join(output, `server-${processes.length + 1}.log`), stream = createWriteStream(log); server = spawn(command[0], command.slice(1), { cwd: process.cwd(), env: { ...process.env, DATA_SOURCE: 'sqlite', DATABASE_FILE: database, FILE_STORAGE_DIR: path.join(output, 'files'), APP_ORIGIN: origin, SESSION_COOKIE_NAME: `gs_hale_g08_restart_${port}`, OPENAI_API_KEY: '', NEXT_TELEMETRY_DISABLED: '1' }, stdio: ['ignore', 'pipe', 'pipe'] }); server.stdout!.pipe(stream, { end: false }); server.stderr!.pipe(stream, { end: false }); server.once('close', () => stream.end()); processes.push({ pid: server.pid, command, cwd: process.cwd(), log }); for (let i = 0; i < 200; i++) {
+    if (server.exitCode !== null)
+        throw Error('Server exited');
+    try {
+        if ((await fetch(origin + '/api/health')).ok)
+            return;
+    }
+    catch { }
+    await new Promise(r => setTimeout(r, 50));
+} throw Error('Server readiness timed out'); }
+async function stop() { if (!server)
+    return; const p = server; await new Promise<void>(r => { if (p.exitCode !== null)
+    return r(); p.once('close', () => r()); p.kill('SIGTERM'); }); processes.at(-1)!.exit = p.exitCode; processes.at(-1)!.signal = p.signalCode; server = undefined; }
+async function session() { context = await browser.newContext({ baseURL: origin, viewport: { width: 390, height: 844 } }); await context.tracing.start({ screenshots: true, snapshots: true, sources: true }); return context.newPage(); }
+async function close(label: string) { if (!context)
+    return; const p = context.pages()[0]; writeFileSync(path.join(output, label + '-dom-private.html'), await p.content()); await p.screenshot({ path: path.join(output, label + '-private.png'), fullPage: true }); await p.evaluate(() => scrollTo(0, 0)); await p.screenshot({ path: path.join(output, label + '-390-viewport-private.png') }); await context.tracing.stop({ path: path.join(output, label + '-private-trace.zip') }); await context.close(); context = undefined; }
+function rows() { const db = openDatabase(database); try {
+    return db.prepare("SELECT kind,id,context_id,revision,data,created_at,updated_at FROM records WHERE kind IN ('notice','noticeVersion','noticeRead','domainEvent','commandReceipt','fileVersion','task','requestVersion','taskActivity') ORDER BY kind,id").all();
+}
+finally {
+    db.close();
+} }
+const field = (p: Page, name: string) => p.getByRole('textbox', { name, exact: true });
+try {
+    await start();
+    let page = await session();
+    await login(page);
+    const task = await createTask(page.request, '재시작 연결 실제 업무');
+    await taskCommand(page.request, task, 'publish');
+    await page.goto(`/notices/new?context=${ctx}`);
+    await field(page, '공지 제목').fill('재시작 실제 UI 공지');
+    await field(page, '공지 본문').fill('보존할 v1 공지 원문');
+    await page.getByRole('button', { name: '공지 초안 만들기', exact: true }).click();
+    await check('R08-01 actual UI creates notice', () => expect(page).toHaveURL(/\/notices\/[a-f0-9-]+/));
+    const id = new URL(page.url()).pathname.split('/').at(-1)!;
+    await page.getByLabel('공지 파일 선택', { exact: true }).setInputFiles({ name: 'restart-notice.png', mimeType: 'image/png', buffer: png() });
+    await page.getByRole('button', { name: '이 파일 업로드', exact: true }).click();
+    await check('R08-02 actual private file upload', () => expect(page.getByText('업로드됨 · 공지 저장·공개는 별도', { exact: true })).toBeVisible());
+    await page.getByRole('group', { name: '같은 컨텍스트의 기존 업무', exact: true }).getByRole('checkbox', { name: '재시작 연결 실제 업무', exact: true }).check();
+    await page.getByRole('button', { name: '공지 초안 저장', exact: true }).click();
+    await status(page, '초안을 저장했습니다');
+    await page.getByRole('button', { name: '저장된 초안 공개', exact: true }).click();
+    await check('R08-03 actual v1 publication task link', async () => { await status(page, '새 공개본'); expect((await detail(page.request, id)).selected!.content.tasks[0].id).toBe(task); });
+    await login(page, 'luna@example.test');
+    await page.goto(`/notices/${id}?context=${ctx}`);
+    await page.getByRole('button', { name: '이 공지 버전 읽음 확인', exact: true }).click();
+    await check('R08-04 exact v1 UI read', () => status(page, '선택한 공지 버전'));
+    const v1 = (await detail(page.request, id)).selected!;
+    await login(page);
+    await page.goto(`/notices/${id}?context=${ctx}`);
+    await field(page, '공지 본문').fill('보존할 v2 공지 원문');
+    await page.getByRole('button', { name: '공지 초안 저장', exact: true }).click();
+    await status(page, '초안을 저장했습니다');
+    await page.getByRole('button', { name: '저장된 초안 공개', exact: true }).click();
+    await status(page, '새 공개본');
+    await login(page, 'luna@example.test');
+    await page.goto(`/notices/${id}?context=${ctx}`);
+    const before = await detail(page.request, id);
+    await check('R08-05 v2 unread separate from v1', () => { expect(before.versions).toHaveLength(2); expect(before.selected!.ownReadAt).toBeNull(); expect(before.versions.find(v => v.id === v1.id)!.ownReadAt).toBe(v1.ownReadAt); });
+    const records = rows();
+    writeFileSync(path.join(output, 'before-private.json'), JSON.stringify({ id, task, notice: before, records }, null, 2));
+    await close('before');
+    await stop();
+    await start();
+    await check('R08-06 new actual process PID', () => expect(processes[0].pid).not.toBe(processes[1].pid));
+    page = await session();
+    await login(page, 'luna@example.test');
+    await page.goto(`/notices/${id}?context=${ctx}`);
+    await check('R08-07 fresh login sees exact current public UI', async () => { await expect(page.getByRole('heading', { name: '공개본 v2 · 현재', exact: true })).toBeVisible(); await expect(page.getByText('보존할 v2 공지 원문', { exact: true })).toBeVisible(); await expect(page.getByRole('button', { name: '이 공지 버전 읽음 확인', exact: true })).toBeEnabled(); expect(await page.evaluate(() => Object.keys(sessionStorage).filter(k => k.startsWith('gs-hale:notice-edit:')))).toEqual([]); });
+    const after = await detail(page.request, id);
+    await check('R08-08 exact notice versions reads tasks survived', () => expect(after).toEqual(before));
+    await check('R08-09 business records events receipts files survived', () => expect(rows()).toEqual(records));
+    await page.getByRole('link', { name: 'v1 · 확인함', exact: true }).click();
+    await check('R08-10 historical UI exact read and original bytes', async () => { await expect(page.getByRole('heading', { name: '공개본 v1 · 과거 이력', exact: true })).toBeVisible(); await expect(page.getByText('보존할 v1 공지 원문', { exact: true })).toBeVisible(); const f = v1.content.files[0], r = await page.request.get(f.downloadUrl); expect(r.status()).toBe(200); expect(createHash('sha256').update(await r.body()).digest('hex')).toBe(f.sha256); });
+    await check('R08-11 390px no overflow and linked real task', async () => { expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); await expect(page.getByRole('link', { name: '재시작 연결 실제 업무 ↗', exact: true })).toBeVisible(); });
+    writeFileSync(path.join(output, 'after-private.json'), JSON.stringify({ id, task, notice: after, records: rows() }, null, 2));
+}
+catch (e) {
+    failed = true;
+    console.error(e instanceof Error ? e.stack : String(e));
+}
+finally {
+    await close(failed ? 'failure' : 'after');
+    await browser.close();
+    await stop();
+    writeFileSync(path.join(output, 'report.json'), JSON.stringify({ candidate: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), cwd: process.cwd(), checks, processes, counts: { unit: 'assertion', pass: checks.filter(c => c.status === 'PASS').length, fail: checks.filter(c => c.status === 'FAIL').length, skip: 0, not_run: 11 - checks.length }, port_released: !(await listening()), outcome: failed ? 'FAIL' : 'PASS' }, null, 2));
+    console.log(JSON.stringify({ output, checks: checks.length, outcome: failed ? 'FAIL' : 'PASS' }));
+}
+if (failed)
+    process.exitCode = 1;

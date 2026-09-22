@@ -2,7 +2,6 @@ import type { RecordRepository, UnitOfWork } from "@/domain/records";
 import { IdentityService } from "@/server/auth/service";
 import { digestToken } from "@/server/auth/crypto";
 import { seed } from "@/server/db/seed";
-
 export const NOW = "2026-09-21T12:00:00.000Z";
 export const CONTEXT = "ctx-jp-a-luna";
 export const actors = ["user-admin", "user-selected-admin", "user-gsg", "user-price", "user-luna", "user-wave", "user-co", "user-team", "user-none", "user-suspended", "user-invited"];
@@ -11,22 +10,22 @@ export const marker = "G02_PRIVATE_CANARY";
 export const tokenFor = (id: string) => `synthetic-policy-token-${id}`;
 export async function policyFixture(repo: RecordRepository) {
     await seed(repo);
-    await repo.transaction(s => {
+    await repo.transaction(async (s) => {
         for (const userId of actors) {
-            s.create("session", { id: `policy-session-${userId}`, contextId: null, data: {
-                userId, tokenHash: digestToken(tokenFor(userId)), csrfToken: "synthetic-csrf",
-                authVersion: 1, expiresAt: "2026-09-22T12:00:00.000Z", revokedAt: null,
-            } });
+            (await s.create("session", { id: `policy-session-${userId}`, contextId: null, data: {
+                    userId, tokenHash: digestToken(tokenFor(userId)), csrfToken: "synthetic-csrf",
+                    authVersion: 1, expiresAt: "2026-09-22T12:00:00.000Z", revokedAt: null,
+                } }));
         }
-        const task = s.get("task", "task-onboarding")!;
-        s.update("task", task.id, task.revision, { ...task.data, internalOriginal: marker, internalMemo: marker,
-            privateNested: { secret: marker }, unknownField: marker } as typeof task.data);
-        const product = s.get("product", "product-serum")!;
-        s.update("product", product.id, product.revision, { ...product.data,
-            internalSupplyPrice: "1700", internalSupplyRate: "0.4", privateNested: { secret: marker } } as typeof product.data);
+        const task = (await s.get("task", "task-onboarding"))!;
+        (await s.update("task", task.id, task.revision, { ...task.data, internalOriginal: marker, internalMemo: marker,
+            privateNested: { secret: marker }, unknownField: marker } as typeof task.data));
+        const product = (await s.get("product", "product-serum"))!;
+        (await s.update("product", product.id, product.revision, { ...product.data,
+            internalSupplyPrice: "1700", internalSupplyRate: "0.4", privateNested: { secret: marker } } as typeof product.data));
     });
     return new IdentityService(repo, () => NOW);
 }
-export function principal(service: IdentityService, store: UnitOfWork, userId: string) {
-    return service.principal(store, tokenFor(userId));
+export async function principal(service: IdentityService, store: UnitOfWork, userId: string) {
+    return (await service.principal(store, tokenFor(userId)));
 }

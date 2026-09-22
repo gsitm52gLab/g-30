@@ -3,7 +3,7 @@ import { SubmissionFiles } from '@/server/submissions/files';
 import { fail } from '@/server/auth/errors';
 import { MAX_FILE_BYTES, MAX_BATCH_FILES } from '@/domain/files/validate';
 export const runtime = 'nodejs';
-export function POST(request: Request, context: {
+export async function POST(request: Request, context: {
     params: Promise<{
         id: string;
     }>;

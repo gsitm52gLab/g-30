@@ -29,7 +29,7 @@ for (const mode of ['mock', 'sqlite'] as const)
         async function publish(id: string) { return (await command(id, 'publish')).ids[1]; }
         const business = async () => Promise.all((['notice', 'noticeVersion', 'noticeRead', 'commandReceipt', 'audit', 'domainEvent'] as RecordKind[]).map(k => repo.list(k)));
         afterEach(async () => {
-            repo?.close();
+            (await repo?.close());
             if (dir)
                 await rm(dir, { recursive: true, force: true });
         });
@@ -38,7 +38,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             const id = await create();
             await expect(service.detail(brand, id)).rejects.toMatchObject({ status: 404 });
             expect((await service.list(brand, A)).items).toEqual([]);
-            await expect(service.detail(admin,id,'')).rejects.toMatchObject({status:422});
+            await expect(service.detail(admin, id, '')).rejects.toMatchObject({ status: 422 });
             const v = await publish(id), read = { command: 'read', versionId: v, idempotencyKey: randomUUID() };
             const first = await service.command(brand, id, read);
             expect(await service.command(brand, id, read)).toEqual(first);
@@ -77,13 +77,13 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect((await files.download(brand, f1.id, { ...ref, versionId: v1 }, 'original')).bytes).toEqual(png);
             await expect(files.download(brand, f1.id, { ...ref, versionId: v2 }, 'original')).rejects.toMatchObject({ status: 404 });
             expect((await repo.list('domainEvent')).filter(e => e.data.targetId === id).map(e => e.data.sourceVersionId).sort()).toEqual([v1, v2].sort());
-            await expect(repo.transaction(s => s.update('noticeVersion', v1, s.get('noticeVersion', v1)!.revision, s.get('noticeVersion', v1)!.data))).rejects.toBeDefined();
+            await expect(repo.transaction(async (s) => (await s.update('noticeVersion', v1, (await s.get('noticeVersion', v1))!.revision, (await s.get('noticeVersion', v1))!.data)))).rejects.toBeDefined();
         });
         it('all-member rule includes later active members; explicit empty selected never expands; current target AND historical target apply', async () => {
             await setup();
             const id = await create({ ...blankNotice(), title: '대상 없는 컨텍스트', body: '가입 후 보이는 안내' }, 'ctx-empty'), v = await publish(id), before = await service.detail(admin, id);
             expect('roster' in before && before.roster.targetCount).toBe(0);
-            await repo.transaction(s => s.create('membership', { id: randomUUID(), contextId: 'ctx-empty', data: { userId: 'user-none', role: 'brand', status: 'active', scope: '', internalPriceAccess: false, activatedAt: NOW, suspendedAt: null } }));
+            await repo.transaction(async (s) => (await s.create('membership', { id: randomUUID(), contextId: 'ctx-empty', data: { userId: 'user-none', role: 'brand', status: 'active', scope: '', internalPriceAccess: false, activatedAt: NOW, suspendedAt: null } })));
             expect((await service.detail(tokenFor('user-none'), id)).selected?.id).toBe(v);
             const other = await create({ ...blankNotice(), title: '선택 공지', body: '선택 공개', audience: { mode: 'selected', userIds: ['user-luna'] } }), v1 = await publish(other);
             await expect(service.detail(team, other)).rejects.toMatchObject({ status: 404 });
@@ -107,7 +107,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             await expect(service.command(admin, id, { ...input, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
             const read = { command: 'read', versionId: good.ids[1], idempotencyKey: randomUUID() };
             await service.command(brand, id, read);
-            await repo.transaction(s => { const m = s.list('membership', A).find(x => x.data.userId === 'user-luna')!; s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' }); });
+            await repo.transaction(async (s) => { const m = (await s.list('membership', A)).find(x => x.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
             await expect(service.command(brand, id, read)).rejects.toMatchObject({ status: 404 });
             expect(await repo.list('noticeRead')).toHaveLength(1);
         });
@@ -134,7 +134,7 @@ for (const mode of ['mock', 'sqlite'] as const)
         it('corrupted known sequence never crosses read projections; valid unknown extensions retain immutable history', async () => {
             await setup();
             const id = await create(), v = await publish(id), original = (await repo.get('noticeVersion', v))!;
-            await expect(repo.transaction(s => s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } as unknown as typeof original.data }))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
+            await expect(repo.transaction(async (s) => (await s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } as unknown as typeof original.data })))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
             // Native write guards are not weakened. Simulate an adapter read corruption below the service boundary.
             const corrupt = (r: StoredRecord | null) => r?.kind === 'noticeVersion' && r.id === v ? { ...r, data: { ...r.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } } : r;
             const wrapped: RecordRepository = { ...repo, transaction: async (operation) => repo.transaction(s => operation(new Proxy(s, { get(target, prop: keyof UnitOfWork) { return (...args: unknown[]) => { const result = Reflect.apply(target[prop], target, args); return prop === 'get' ? corrupt(result) : prop === 'list' ? result.map(corrupt) : result; }; } }))) };
@@ -142,7 +142,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             await expect(faulty.detail(brand, id)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
             await expect(faulty.list(brand, A)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
             expect(await repo.get('noticeVersion', v)).toEqual(original);
-            const extended = await repo.transaction(s => { const n = s.get('notice', id)!, version = s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: 2, previousId: v, extra: { secret: 'G08_EXTRA_CANARY' } } as typeof original.data }); s.update('notice', id, n.revision, { ...n.data, currentVersionId: version.id }); return version; });
+            const extended = await repo.transaction(async (s) => { const n = (await s.get('notice', id))!, version = (await s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: 2, previousId: v, extra: { secret: 'G08_EXTRA_CANARY' } } as typeof original.data })); (await s.update('notice', id, n.revision, { ...n.data, currentVersionId: version.id })); return version; });
             expect(JSON.stringify(await service.detail(brand, id))).not.toContain('G08_EXTRA_CANARY');
             expect(await repo.get('noticeVersion', extended.id)).toEqual(extended);
         });
@@ -177,7 +177,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             const wrapped: RecordRepository = { ...repo, transaction: async (op) => {
                     const result = await repo.transaction(op);
                     if (++calls === 1)
-                        await repo.transaction(s => { const m = s.list('membership', A).find(x => x.data.userId === 'user-luna')!; s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' }); });
+                        await repo.transaction(async (s) => { const m = (await s.list('membership', A)).find(x => x.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
                     return result;
                 } };
             await expect(new FileService(new IdentityService(wrapped, () => NOW), dir).download(brand, file.id, { ...ref, versionId }, 'original')).rejects.toMatchObject({ status: 404 });

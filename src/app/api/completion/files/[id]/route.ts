@@ -1,7 +1,7 @@
 import { route } from '@/server/http/identity';
 import { CompletionFiles } from '@/server/completion/files';
 export const runtime = 'nodejs';
-export function GET(request: Request, c: {
+export async function GET(request: Request, c: {
     params: Promise<{
         id: string;
     }>;

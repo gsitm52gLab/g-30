@@ -11,10 +11,13 @@ mkdirSync(".data", { recursive: true });
 const directory = mkdtempSync(path.resolve(".data/g06-cli-")), filename = path.join(directory, "invalid-legacy.db"), db = openDatabase(filename, true);
 migrate(db);
 const repo = createSqliteRepository(db);
-await repo.transaction(s => { for (const f of fixtures)
-    s.create(f.kind, f.input); s.create("product", { id: "zz-invalid-legacy", contextId: "ctx-jp-a-luna", data: { ...s.get("product", "product-serum")!.data, name: "", code: "RAW_VALUE_MUST_NOT_LOG" } }); });
+await repo.transaction(async (s) => {
+    for (const f of fixtures)
+        (await s.create(f.kind, f.input));
+    (await s.create("product", { id: "zz-invalid-legacy", contextId: "ctx-jp-a-luna", data: { ...(await s.get("product", "product-serum"))!.data, name: "", code: "RAW_VALUE_MUST_NOT_LOG" } }));
+});
 const before = await repo.list("product");
-repo.close();
+(await repo.close());
 const command = ["--import", "tsx", "scripts/db.ts", "seed"], result = spawnSync(process.execPath, command, { cwd: process.cwd(), encoding: "utf8", env: { ...process.env, DATA_SOURCE: "sqlite", DATABASE_FILE: filename, OPENAI_API_KEY: "", OPENAI_MODEL: "", OPENAI_BASE_URL: "https://api.openai.com/v1" } });
 const log = path.join(root, `migration-cli-${Date.now()}.log`);
 writeFileSync(log, result.stdout + result.stderr, { mode: 0o600 });
@@ -27,7 +30,7 @@ const after = createSqliteRepository(openDatabase(filename));
 assert.deepEqual(await after.list("product"), before);
 assert.equal((await after.list("contextProduct")).length, 0);
 assert.equal((await after.list("productVersion")).length, 0);
-after.close();
+(await after.close());
 const report = { status: "PASS", unit: "assertion", pass: 7, fail: 0, expectedCliExit: 1, actualCliExit: result.status, cwd: process.cwd(), command: [process.execPath, ...command], database: filename, output, rawLog: log };
 const reportFile = path.join(root, `migration-cli-${Date.now()}.json`);
 writeFileSync(reportFile, JSON.stringify(report, null, 2), { mode: 0o600 });
