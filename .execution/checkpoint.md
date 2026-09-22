@@ -1,3 +1,11 @@
+## State 177 — Supabase 자격증명 읽기 전용 확인 / Goal paused
+
+DATABASE_URL/Transaction pooler와 DIRECT_URL/Session pooler 모두 TLS 1.3·서버 인증서/hostname 검증을 포함한 READ ONLY SELECT 1 성공. Storage 인증 읽기 HTTP 200. public 테이블 0개, gs-hale-private 버킷 없음. 원격 데이터 변경 0회. 앱 통합/Vercel 환경변수 검증은 미실행. Goal 재개 전까지 제품 구현은 시작하지 않는다. 기존 16/19 수용 기록은 유지하고 신규 SB-01~18은 모두 NOT_RUN이다. v3 계약과 다음 실행 프롬프트를 따른다.
+
+# Latest state176 — 2026-09-22T01:40:45.740480+00:00
+
+Goal remains paused; user requested Supabase + g-30 preparation before explicit restart. New execution-v3 contract/full prompt and 18 NOT_RUN supplemental ACs. Prior accepted16/19 at ddb is preserved as historical local evidence, not Supabase acceptance. origin now g-30; legacy-gs-hale retained. New main85bcb tree equals historical f3f868c, allowing history connection without product changes. Preparation branch run/supabase-transition; main unchanged. Supabase Storage read-only HTTP200, target private bucket absent, DATABASE_URL/DIRECT_URL pending. Source/doc independent review 01a0c6bc resolved2P2, runtime NOT_RUN. G14 arrived UI verification c0035e1 / consumer author e2af76de / G03 readonly navigation8b6143 require main review after restart. No automatic Goal activation.
+
 # Latest state175 — 2026-09-22T01:00:49.788223+00:00
 
 Accepted16ddb. Root preliminarycombined4093417 (106consumer+25aeUI) preserved801source bytes, READMEonlyappendresolution; stillNOTACCEPTED andlatestauthor01f helperchangesmustmerge. Prd provider own713unit/build, actualHTTP finalmock12P5sqlitefaultSKIP/sqlite17P; actualoldG17 14SQL->16P06sixP, providerhistory10P/audithistory20P; finalpacketpending. Original8P1F8NOT_RUNtwomodes/publicbaseline andoldSQL15assumption failures preserved. WorkflowUI25ae independent636/24browser/10restart/own20 actualaccountswitchprice/heldAPI-RSC PASS reported; ownhelper201/DTOerrors preserved, finalpacketpending. GoalsG03 readonlyroute/nav task59f652 on frozen409 gitshow, noimplbeforeG14accepted. G18ai_verify preparation91e5 root7ff1 reviewed48refs24Git207uniqueJSONpointers/newPASS0; agentidle independentwholeappnonauthor. G18currentmigration15observationdatedddb, finalunion16rederive.

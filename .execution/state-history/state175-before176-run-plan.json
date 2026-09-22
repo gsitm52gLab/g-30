@@ -3,8 +3,8 @@
   "product": "GS HALE",
   "project_root": "/Users/evan/workspace/gs-hale",
   "source_revision": "DP-20260921-03",
-  "plan_status": "PAUSED",
-  "active_goal_count": 0,
+  "plan_status": "ACTIVE",
+  "active_goal_count": 1,
   "intended_active_goal_count": 1,
   "runtime_state_path": ".execution/run-plan.json",
   "max_sessions_including_main": 4,
@@ -4098,9 +4098,7 @@
     }
   ],
   "mandatory_external_integration": [
-    "OpenAI: synthetic or permitted public input, actual response/schema/grounding contract/usage evidence",
-    "Supabase PostgreSQL + private Storage: actual synthetic integration, two instances, persisted sessions/data/files",
-    "Vercel: exact deployed SHA, authorized browser/API flows, large files/Excel/OCR and persistence evidence"
+    "OpenAI: synthetic or permitted public input, actual response/schema/grounding contract/usage evidence"
   ],
   "operational_unverified_allowed": [
     "actual business Excel compatibility",
@@ -4114,8 +4112,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "G14",
-  "next_action": "Await user Goal restart; credentials verified by read-only SQL/Storage. Read execution-v3/current ledger, implement Supabase+private Storage/TLS under preserved G00~18 and SB-01~18, provision app tables/bucket non-destructively, review arrived G14 packets and finish G14/G03/G18. Verify actual Vercel env/runtime separately. No product completion or supplemental PASS claimed.",
-  "state_version": 177,
+  "next_action": "Accepted16ddb. G14twoverdictpackets closing, wholeunionindependent next. G03sourceonly navigation goals, G18readonly207rowprep reviewed7ff1, finalaudit ai_verify nonauthor.",
+  "state_version": 175,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4135,12 +4133,9 @@
     "When implementing pharmaceutical-law AI, first refer to relevant material on repository main and reuse as needed. No git fetch was requested during the earlier prompt-only edit.",
     "Current attached Goal and execution-v1 govern execution. Unpublished execution-v2 draft is not a new binding contract.",
     "2026-09-21: User explicitly requested continuing the existing Goal through completion. Existing subagents resumed without resetting worktrees or evidence.",
-    "2026-09-22: User again explicitly requested continuing existing active Goal to full completion; no scope or acceptance relaxation.",
-    "2026-09-22: User selected Supabase PostgreSQL/private Storage for the full Vercel deployment; browser-only mock alternative not selected. Existing required product scope remains.",
-    "2026-09-22: User instructed origin https://github.com/gsitm52gLab/g-30.git and authorized commit-by-commit non-force push. Previous remote retained as legacy-gs-hale.",
-    "2026-09-22: Prepare revised Goal first; user will explicitly restart. execution-v3 overrides old SQLite-only deployment and push-prohibited provisions."
+    "2026-09-22: User again explicitly requested continuing existing active Goal to full completion; no scope or acceptance relaxation."
   ],
-  "integration_branch": "run/supabase-transition",
+  "integration_branch": "run/integration",
   "integration_worktree": "/Users/evan/workspace/gs-hale",
   "implementation_branch": "run/g04-projection-fix1",
   "initial_commit": "1f108fe",
@@ -4150,14 +4145,14 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T01:49:36.515967+00:00",
+  "updated_at": "2026-09-22T01:00:49.788223+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
-    "at": "2026-09-22T01:40:45.740480+00:00",
-    "reported_status": "paused",
-    "user_resume_instruction_received": false,
-    "note": "User requested Supabase/Git/Goal preparation and will restart Goal afterward. No platform Goal activation performed."
+    "at": "2026-09-21T10:15:35.178189+00:00",
+    "reported_status": "active",
+    "user_resume_instruction_received": true,
+    "note": "Authoritative get_goal confirms existing goal active; no new goal created."
   },
   "session_log_submission_derivative": {
     "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/submission-log-derivatives/state122/manifest.json",
@@ -4192,44 +4187,5 @@
       "scope": "G16 readiness-compatible verification_result/regression_result are absolute path strings; separately named hash refs retained. Both actual author session IDs listed.",
       "original_failure": "state155 readiness line75 TypeError PosixPath/dict then empty-outputJSONdecode; originalcommitted metadata preserved5ea7b05. No acceptance evidence/product/source changed."
     }
-  ],
-  "supplemental_acceptance": {
-    "revision": "SUPABASE-20260922-01",
-    "baseline_path": "docs/execution-v3/02-supabase-acceptance.json",
-    "runtime_path": ".execution/supabase-acceptance.json",
-    "expected_ids": [
-      "SB-01",
-      "SB-02",
-      "SB-03",
-      "SB-04",
-      "SB-05",
-      "SB-06",
-      "SB-07",
-      "SB-08",
-      "SB-09",
-      "SB-10",
-      "SB-11",
-      "SB-12",
-      "SB-13",
-      "SB-14",
-      "SB-15",
-      "SB-16",
-      "SB-17",
-      "SB-18"
-    ],
-    "required_for_goal": true
-  },
-  "supabase_transition": {
-    "contract": "docs/execution-v3/00-supabase-transition.md",
-    "resume_prompt": "docs/execution-v3/05-goal-prompt.md",
-    "resume_plan": "docs/execution-v3/04-resume-plan.json",
-    "historical_acceptance_is_not_supabase_acceptance": true,
-    "runtime_status": "NOT_RUN",
-    "preflight": "DATABASE_URL/Transaction pooler와 DIRECT_URL/Session pooler 모두 TLS 1.3·서버 인증서/hostname 검증을 포함한 READ ONLY SELECT 1 성공. Storage 인증 읽기 HTTP 200. public 테이블 0개, gs-hale-private 버킷 없음. 원격 데이터 변경 0회. 앱 통합/Vercel 환경변수 검증은 미실행.",
-    "origin": "https://github.com/gsitm52gLab/g-30.git",
-    "previous_remote": "legacy-gs-hale",
-    "source_review_session_id": "01a0c6bc-d9f3-73f1-ae63-d88781905c0a",
-    "preflight_evidence": ".execution/private/preparation/SUPABASE-20260922-01/connection-check-1790041704368.json",
-    "guard_review": "Independent read-only review found missing-contract bypass; fixed fail-closed contract and 6/6 targeted checks; independent follow-up source review PASS. Product runtime NOT_RUN."
-  }
+  ]
 }
