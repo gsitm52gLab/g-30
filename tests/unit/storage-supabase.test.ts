@@ -170,4 +170,6 @@ describe('Supabase private storage transport', () => {
     const changed=new SupabasePrivateStorage(config,async(url,init)=>{const r=await f.fetcher(url,init);if(init?.method==='POST')f.add(input.key,Buffer.from('bad'));return r;});await expect(changed.createGeneratedPart(input)).rejects.toMatchObject({code:'INTEGRITY'});
   });
 
+  it('WebP promotion requires the server-derived AI image flag and preserves signature/type limits',async()=>{const f=fixture(),storage=new SupabasePrivateStorage(config,f.fetcher),bytes=Buffer.from('RIFF0000WEBPsynthetic'),stagingKey=f.add(key(),bytes),input={stagingKey,finalKey:storage.allocateFinalKey(),originalName:'source.webp',declaredMime:'image/webp',expectedBytes:bytes.length};await expect(storage.promoteVerified(input)).rejects.toBeDefined();const v=await storage.promoteVerified({...input,aiAssetImage:true});expect(v.mime).toBe('image/webp');expect(v.sha256).toBe(createHash('sha256').update(bytes).digest('hex'));expect(v.preview).toBe(true);});
+
 });

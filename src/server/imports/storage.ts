@@ -10,6 +10,7 @@ import { fail } from '@/server/auth/errors';
 import { StorageCore } from '@/server/storage/core';
 import { SharedImportStaging, createImportStage } from '@/server/storage/staging';
 import type { StorageTransport } from '@/server/storage/contracts';
+import { StorageCoreError } from '@/server/storage/contracts';
 import { receipt, audit } from '@/server/products/store';
 import { consumerStorage } from './storage-runtime';
 import { importAccess, type SourceStage, type PreviewStage } from './service';
@@ -85,8 +86,15 @@ export class ImportStorage {
   issue(token: string | undefined, input: UploadInput) { return this.core(token).issue(token, input); }
   status(token: string | undefined, id: string) { return this.core(token).status(token, id); }
   finalize(token: string | undefined, id: string) { return this.core(token).finalize(token, id); }
-  async source(token: string | undefined, id: string) { const v = sourceStage(await this.staging.get(token, id)); await this.match(token, id, v, 'source'); return v; }
-  async preview(token: string | undefined, id: string) { const v = previewStage(await this.staging.get(token, id)); await this.match(token, id, v, 'preview'); return v; }
+  private async get(token: string | undefined, id: string, type: 'source' | 'preview') {
+    try { return await this.staging.get(token, id); }
+    catch (e) {
+      if (e instanceof StorageCoreError) fail(e.code === 'EXPIRED' ? type === 'preview' ? 'PREVIEW_EXPIRED' : 'SOURCE_EXPIRED' : e.code, e.code === 'EXPIRED' && type === 'preview' ? 409 : e.status, e.code === 'EXPIRED' ? '유효 시간이 지났습니다. 원본 또는 미리보기를 다시 확인해 주세요.' : '가져오기 자료를 확인해 주세요.');
+      throw e;
+    }
+  }
+  async source(token: string | undefined, id: string) { const v = sourceStage(await this.get(token, id, 'source')); await this.match(token, id, v, 'source'); return v; }
+  async preview(token: string | undefined, id: string) { const v = previewStage(await this.get(token, id, 'preview')); await this.match(token, id, v, 'preview'); return v; }
   private async match(token: string | undefined, id: string, payload: SourceStage | PreviewStage, type: 'source' | 'preview') {
     await this.identity.repo.transaction(async s => { const p = await this.identity.principal(s, token), row = await s.get('importStage', id); if (!row || row.contextId !== payload.contextId || row.data.actorId !== p.user.id || row.data.actorId !== payload.actorId || row.data.sourceHash !== payload.sourceHash || row.data.stageType !== type) bad(); });
   }

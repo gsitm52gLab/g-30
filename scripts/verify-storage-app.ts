@@ -71,8 +71,8 @@ if (mode === 'recover') {
       if (exists) { const rows = (await sql(`SELECT * FROM ${schema}.records ORDER BY kind,id`)).rows; originalCount = rows.length; originalHash = digest(JSON.stringify(rows)); historyCount = Number((await sql(`SELECT count(*) AS count FROM ${schema}.schema_migrations`)).rows[0].count); }
       return { targetPreviouslyExisted: exists, originalCount, originalHash, historyCount };
     });
-    await check('PG02 fresh additive migration18, exact existing rows and repeat0', async () => {
-      const migration = await migratePostgres(config); assert.equal(migration.total, 18); assert.equal(migration.applied, 18 - historyCount);
+    await check('PG02 fresh additive migration19, exact existing rows and repeat0', async () => {
+      const migration = await migratePostgres(config); assert.equal(migration.total, 19); assert.equal(migration.applied, 19 - historyCount);
       const rows = (await sql(`SELECT * FROM ${schema}.records ORDER BY kind,id`)).rows; assert.equal(rows.length, originalCount); if (originalCount) assert.equal(digest(JSON.stringify(rows)), originalHash);
       assert.equal((await migratePostgres(config)).applied, 0); return { applied: migration.applied, total: migration.total, repeat: 0 };
     });

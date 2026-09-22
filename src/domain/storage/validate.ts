@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { StoreError } from '../records';
-import { validateFileMetadata } from '../files/validate';
+import { validateFileMetadata, validateFile } from '../files/validate';
+import { preflight } from '../ai-input/preflight';
 import { STORAGE_LIMITS, type UploadInput, type StorageOwner, type VerifiedDescriptor, type StorageGrantData, type ImportStageData, type UploadCapability, type StorageCommitResult } from './types';
 const UUID = '[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}';
 const id = (v: unknown): v is string => typeof v === 'string' && /^[A-Za-z0-9_-]{1,160}$/.test(v);
@@ -32,9 +33,20 @@ export function uploadInput(v: UploadInput): UploadInput {
       typeof v.declaredMime !== 'string' || v.declaredMime.length > 256 || /[\x00-\x1f\x7f]/.test(v.declaredMime) || !sha(v.expectedSha256)) throw new StoreError('INVALID_RECORD');
   const scope = owner(v.owner), maximum = ['ai_asset', 'import_source'].includes(scope.purpose) ? STORAGE_LIMITS.specificBytes : STORAGE_LIMITS.generalBytes;
   if (!Number.isSafeInteger(v.expectedBytes) || v.expectedBytes < 1 || v.expectedBytes > maximum) throw new StoreError('INVALID_RECORD');
-  if (scope.purpose === 'import_source' && !/\.xlsx$/i.test(v.originalName) || scope.purpose === 'ai_asset' && !(scope.inputKind === 'pdf' ? /\.pdf$/i : /\.(png|jpe?g)$/i).test(v.originalName)) throw new StoreError('INVALID_RECORD');
-  try { validateFileMetadata(v.originalName, v.declaredMime, v.expectedBytes); } catch { throw new StoreError('INVALID_RECORD'); }
+  if (scope.purpose === 'import_source' && !/\.xlsx$/i.test(v.originalName) || scope.purpose === 'ai_asset' && !(scope.inputKind === 'pdf' ? /\.pdf$/i : /\.(png|jpe?g|webp)$/i).test(v.originalName)) throw new StoreError('INVALID_RECORD');
+  const aiWebp = scope.purpose === 'ai_asset' && scope.inputKind === 'image' && /\.webp$/i.test(v.originalName);
+  if (aiWebp) { if (v.declaredMime !== 'image/webp') throw new StoreError('INVALID_RECORD'); }
+  else try { validateFileMetadata(v.originalName, v.declaredMime, v.expectedBytes); } catch { throw new StoreError('INVALID_RECORD'); }
   return { contextId: v.contextId, owner: scope, visibility: v.visibility, clientItemId: v.clientItemId, originalName: v.originalName, declaredMime: v.declaredMime, expectedBytes: v.expectedBytes, expectedSha256: v.expectedSha256 };
+}
+/** Existing G15 WebP support is purpose-specific; ordinary file MIME admission is unchanged. */
+export function aiWebpFile(name: string, mime: string, bytes: Buffer) {
+  const valid = preflight({ scope: { classification: 'general_cosmetic', language: 'ja', media: 'pop', use: 'upload validation' }, kind: 'images', sources: [{ sourceId: 'storage', versionId: 'storage', contextId: 'storage', filename: name, mime, bytes, sha256: digest(bytes) }] });
+  if (!valid.ok || !/\.webp$/i.test(name) || mime !== 'image/webp') throw new StoreError('INVALID_RECORD');
+  return { name, mime: 'image/webp', preview: true };
+}
+export function storageFile(input: Pick<UploadInput, 'owner' | 'originalName' | 'declaredMime'>, bytes: Buffer) {
+  return input.owner.purpose === 'ai_asset' && input.owner.inputKind === 'image' && /\.webp$/i.test(input.originalName) ? aiWebpFile(input.originalName, input.declaredMime, bytes) : validateFile(input.originalName, input.declaredMime, bytes);
 }
 export function descriptor(v: VerifiedDescriptor, lane: 'staging' | 'final'): VerifiedDescriptor {
   if (!v || typeof v.key !== 'string' || !new RegExp(`^[a-z0-9][a-z0-9_-]{0,63}/${lane}/${UUID}$`).test(v.key) || !id(v.id) || !id(v.version) || !Number.isSafeInteger(v.bytes) || v.bytes < 1 || v.bytes > STORAGE_LIMITS.generalBytes || !sha(v.sha256) || typeof v.etag !== 'string' || !/^"[a-f0-9]{32}(?:-\d+)?"$/.test(v.etag) || typeof v.contentType !== 'string' || v.contentType.length > 256 || typeof v.mime !== 'string' || v.mime.length > 256 || typeof v.originalName !== 'string' || v.originalName.length > 240 || typeof v.preview !== 'boolean') throw new StoreError('INVALID_RECORD');

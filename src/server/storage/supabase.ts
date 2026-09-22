@@ -1,6 +1,7 @@
 import 'server-only';
 import { createHash, randomUUID } from 'node:crypto';
 import { MAX_FILE_BYTES, validateFile } from '@/domain/files/validate';
+import { aiWebpFile } from '@/domain/storage/validate';
 
 export const STORAGE_CHUNK_BYTES = 4 * 1024 * 1024;
 export const STORAGE_TUS_CHUNK_BYTES = 6 * 1024 * 1024;
@@ -226,12 +227,12 @@ export class SupabasePrivateStorage {
     return { object: before, bytes, sha256: createHash('sha256').update(bytes).digest('hex') };
   }
   /** Persist finalKey in a pending DB receipt BEFORE this call. No retries/deletion on an ambiguous mutation. */
-  async promoteVerified(input: { stagingKey: string; finalKey: string; originalName: string; declaredMime: string; expectedBytes: number }): Promise<VerifiedObject> {
+  async promoteVerified(input: { stagingKey: string; finalKey: string; originalName: string; declaredMime: string; expectedBytes: number; aiAssetImage?: boolean }): Promise<VerifiedObject> {
     this.#key(input.stagingKey, 'staging'); this.#key(input.finalKey, 'final');
     if (!integer(input.expectedBytes, 1, MAX_FILE_BYTES)) throw new StorageError('INVALID_INPUT');
     const snapshot = await this.readSnapshot(input.stagingKey);
     if (snapshot.bytes.length !== input.expectedBytes) throw new StorageError('INTEGRITY');
-    const verified = validateFile(input.originalName, input.declaredMime, snapshot.bytes);
+    const verified = input.aiAssetImage === true && /\.webp$/i.test(input.originalName) ? aiWebpFile(input.originalName, input.declaredMime, snapshot.bytes) : validateFile(input.originalName, input.declaredMime, snapshot.bytes);
     // Copy the measured immutable snapshot, not a mutable source path. Never upsert a final object.
     await this.#request(`/object/${this.#objectPath(input.finalKey)}`, 'POST', async r => { await boundedBody(r, JSON_LIMIT); }, snapshot.bytes, { 'content-type': verified.mime, 'x-upsert': 'false', 'cache-control': 'no-store' });
     const final = await this.readSnapshot(input.finalKey);
