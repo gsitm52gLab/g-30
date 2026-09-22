@@ -118,6 +118,8 @@ export class TaskService {
                 fail("VALIDATION", 422, "서로 다른 대상 컨텍스트를 선택해 주세요.");
             const c = content(input.content);
             const category = enumValue(input.category, ["onboarding", "spot"]);
+            // Transitional draft compatibility for existing API callers; registration UI always publishes.
+            const mode = enumValue(input.mode ?? "draft", ["draft", "publish"]);
             return (await this.receipt(s, p, targets[0].contextId, "task.create", input, async () => {
                 const result: string[] = [];
                 for (const t of targets) {
@@ -130,6 +132,8 @@ export class TaskService {
                     if (targets.length > 1 && c.requirements.some(q => q.productIds.length) && !t.productIds.length)
                         fail("VALIDATION", 422, "제품별 요청을 복제할 각 컨텍스트의 제품을 선택해 주세요.");
                     const tid = (await this.createOne(s, p, t, localContent, category, projectId, template?.id ?? null, str(input.subtype ?? "직접 작성", 200)));
+                    if (mode === "publish")
+                        await this.publish(s, p, (await s.get("task", tid))!, localContent);
                     result.push(tid);
                     if (project)
                         (await s.update("project", project.id, project.revision, { ...project.data, taskIds: [...project.data.taskIds, tid] }));
@@ -142,12 +146,19 @@ export class TaskService {
         return this.identity.repo.transaction(async (s) => {
             const p = (await this.identity.principal(s, token)), t = (await this.target(s, p, input.target));
             const title = str(input.title, 200, true);
+            const mode = enumValue(input.mode ?? "draft", ["draft", "publish"]);
             const templates = (await asyncMap(ids(input.templateVersionIds, 20), async (x) => (await this.template(s, p, t.contextId, x))!));
             if (!templates.length)
                 fail("VALIDATION", 422, "필요한 업무 유형을 선택해 주세요.");
             return (await this.receipt(s, p, t.contextId, "project.create", input, async () => {
                 const project = (await s.create("project", { id: id(), contextId: t.contextId, data: { title, taskIds: [], dependencies: [], status: "active", createdBy: p.user.id } }));
                 const taskIds = (await asyncMap(templates, async (template) => (await this.createOne(s, p, t, { ...template.data.content, deadline: { ...template.data.content.deadline, responsibleUserId: t.ownerId } }, "onboarding", project.id, template.id, template.data.name))));
+                if (mode === "publish") {
+                    for (const taskId of taskIds) {
+                        const task = (await s.get("task", taskId))!;
+                        await this.publish(s, p, task, task.data.draft!);
+                    }
+                }
                 (await s.update("project", project.id, project.revision, { ...project.data, taskIds }));
                 (await this.audit(s, p, t.contextId, "project.created", project.id, {}, { title, taskCount: taskIds.length }));
                 return { ids: [project.id, ...taskIds] };
@@ -218,7 +229,7 @@ export class TaskService {
     async command(token: string | undefined, taskId: string, input: Record<string, unknown>) {
         return this.identity.repo.transaction(async (s) => {
             const p = (await this.identity.principal(s, token));
-            const cmd = enumValue(input.command, ["save", "publish", "read", "accept", "schedule", "schedule_decide", "assign", "hold", "cancel", "resume", "duplicate"]);
+            const cmd = enumValue(input.command, ["save", "save_publish", "publish", "read", "accept", "schedule", "schedule_decide", "assign", "hold", "cancel", "resume", "duplicate"]);
             const manager = !["read", "accept", "schedule"].includes(cmd), row = (await this.task(s, p, taskId, manager));
             if (!row.contextId || row.data.schemaVersion !== 2 || !row.data.draft)
                 fail("VALIDATION", 422, "기존 합성 예시는 읽기 전용입니다. 새 업무를 만들어 주세요.");
@@ -232,6 +243,8 @@ export class TaskService {
                     (await s.update("task", row.id, row.revision, { ...row.data, draft: c, ...(row.data.visibility === "draft" ? { title: c.title, description: c.description, nextAction: c.nextAction, deadline: c.deadline.value } : {}) }));
                     (await this.audit(s, p, row.contextId!, "task.draft", row.id, { revision: row.revision }, { revision: row.revision + 1 }));
                 }
+                else if (cmd === "save_publish")
+                    await this.publish(s, p, row, content(input.content));
                 else if (cmd === "publish")
                     (await this.publish(s, p, row, row.data.draft!));
                 else if (cmd === "assign") {
