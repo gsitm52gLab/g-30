@@ -34,6 +34,19 @@ function workerPackages(names: string[]): string[] {
 const config: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ["better-sqlite3", "pdfjs-dist", "@napi-rs/canvas", "tesseract.js", "sharp"],
+  // NFT may conservatively follow dynamic config/JSON reads beyond the child runtime.
+  // Development worktrees and private evidence must never become deployment files.
+  outputFileTracingExcludes: {
+    "/*": [
+      "./!(node_modules|src|public|.next|package.json|package-lock.json|tsconfig.json|vercel.json)",
+      "./!(node_modules|src|public|.next|package.json|package-lock.json|tsconfig.json|vercel.json)/**/*",
+      "./**/.worktrees", "./**/.worktrees/**/*", "./**/.execution", "./**/.execution/**/*",
+      "./**/.git", "./**/.git/**/*", "./**/.env", "./**/.env.*", "./**/*.env", "./**/*.log",
+      "./.local/**/*", "./.data/**/*", "./artifacts/**/*", "./logs/**/*", "./sessions/**/*",
+      "./docs/**/*", "./tests/**/*", "./scripts/**/*", "./coverage/**/*",
+      "./test-results/**/*", "./playwright-report/**/*",
+    ],
+  },
   outputFileTracingIncludes: {
     "/*": ["./src/server/postgres/tls/supabase-prod-ca-2021.crt"],
     "/api/imports/source": [

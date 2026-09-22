@@ -1,5 +1,5 @@
 /** Local-only proof: each worker sees only one route's declared NFT files. No DB/provider/env file. */
-import { mkdir, readFile, writeFile, copyFile, mkdtemp, stat, realpath } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, copyFile, mkdtemp, stat, realpath, readdir } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -10,23 +10,78 @@ const evidence = process.env.WORKER_BUNDLE_EVIDENCE;
 if (!evidence || !path.isAbsolute(evidence)) throw Error('WORKER_BUNDLE_EVIDENCE must be an absolute private path');
 await mkdir(evidence, { recursive: true });
 const hash = (b: Buffer | string) => createHash('sha256').update(b).digest('hex');
+const runtimeDirectories = new Set(['node_modules', '.next', 'src', 'public']);
+const runtimeFiles = new Set(['package.json', 'package-lock.json', 'tsconfig.json', 'vercel.json']);
+function pathIssue(absolute: string): string | null {
+  const relative = path.relative(root, absolute), parts = relative.split(path.sep);
+  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) return 'OUTSIDE_RUNTIME_ROOT';
+  if (parts.some(p => ['.worktrees', '.execution', '.git', '.local', '.data'].includes(p) || /^\.env(?:\.|$)/i.test(p) || /\.(env|log)$/i.test(p))) return 'PRIVATE_PATH';
+  if (!runtimeDirectories.has(parts[0]) && !(parts.length === 1 && runtimeFiles.has(relative))) return 'NON_RUNTIME_PATH';
+  return null;
+}
+async function auditTrace(trace: string) {
+  const bytes = await readFile(trace), parsed = JSON.parse(bytes.toString('utf8')) as { files: unknown };
+  assert(Array.isArray(parsed.files), 'Invalid NFT file list');
+  const denied: Record<string, number> = {};
+  const safe: { lexical: string; resolved: string }[] = [];
+  for (const file of new Set(parsed.files)) {
+    if (typeof file !== 'string') { denied.INVALID_ENTRY = (denied.INVALID_ENTRY ?? 0) + 1; continue; }
+    const lexical = path.resolve(path.dirname(trace), file), lexicalIssue = pathIssue(lexical);
+    if (lexicalIssue) { denied[`LEXICAL_${lexicalIssue}`] = (denied[`LEXICAL_${lexicalIssue}`] ?? 0) + 1; continue; }
+    // Resolve aliases before any file contents are read or copied. Never print private paths/bytes.
+    let resolved: string;
+    try { resolved = await realpath(lexical); } catch { denied.UNRESOLVED = (denied.UNRESOLVED ?? 0) + 1; continue; }
+    const resolvedIssue = pathIssue(resolved);
+    if (resolvedIssue) { denied[`RESOLVED_${resolvedIssue}`] = (denied[`RESOLVED_${resolvedIssue}`] ?? 0) + 1; continue; }
+    safe.push({ lexical, resolved });
+  }
+  return { trace, sha256: hash(bytes), entries: parsed.files.length, denied, safe };
+}
+async function traceFiles(directory: string): Promise<string[]> {
+  const results: string[] = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) results.push(...await traceFiles(file));
+    else if (entry.isFile() && entry.name.endsWith('.nft.json')) results.push(file);
+  }
+  return results;
+}
+const traceArgument = process.argv.indexOf('--check-trace');
+const traceNames = traceArgument >= 0
+  ? [path.resolve(process.argv[traceArgument + 1] ?? '')]
+  : [...await traceFiles(path.join(root, '.next/server')), path.join(root, '.next/next-server.js.nft.json')];
+const audits: Awaited<ReturnType<typeof auditTrace>>[] = [];
+for (const trace of traceNames) audits.push(await auditTrace(trace));
+const preflight = {
+  traces: audits.map(({ trace, sha256, entries, denied }) => ({ trace: path.relative(root, trace), sha256, entries, denied })),
+  deniedEntries: audits.reduce((sum, trace) => sum + Object.values(trace.denied).reduce((a, b) => a + b, 0), 0),
+  copiedFiles: 0,
+};
+await writeFile(path.join(evidence, 'trace-preflight.json'), JSON.stringify(preflight, null, 2));
+assert.equal(preflight.deniedEntries, 0, 'Unsafe or non-runtime NFT entries rejected before any bundle copy; see aggregate trace-preflight.json');
+if (traceArgument >= 0 || process.argv.includes('--audit-only')) {
+  console.log(JSON.stringify({ traces: audits.length, deniedEntries: 0, copiedFiles: 0 }));
+  process.exit(0);
+}
 const summary: { name: string; status: 'PASS' | 'FAIL'; error?: string }[] = [];
 async function check(name: string, fn: () => Promise<void>) {
   try { await fn(); summary.push({ name, status: 'PASS' }); }
   catch (e) { summary.push({ name, status: 'FAIL', error: e instanceof Error ? e.message : 'unknown' }); }
 }
 async function bundle(label: string, traceName: string) {
-  const trace = path.join(root, traceName), parsed = JSON.parse(await readFile(trace, 'utf8')) as { files: string[] };
+  const trace = path.join(root, traceName), audit = audits.find(a => a.trace === trace);
+  assert(audit, 'Route trace was not checked');
   const destination = await realpath(await mkdtemp(path.join(os.tmpdir(), `gs-hale-${label}-bundle-`)));
   assert(!destination.startsWith(root + path.sep));
   const entries: { path: string; sha256: string; bytes: number }[] = [];
-  for (const f of new Set(parsed.files.map(f => path.resolve(path.dirname(trace), f)))) {
+  for (const { lexical: f, resolved } of audit.safe) {
+    assert.equal(await realpath(f), resolved, 'Trace source changed after preflight');
     const relative = path.relative(root, f);
     assert(relative && !relative.startsWith('..') && !path.isAbsolute(relative), 'Trace escaped project root');
     const dest = path.join(destination, relative);
-    if ((await stat(f)).isDirectory()) { await mkdir(dest, { recursive: true }); continue; }
-    const bytes = await readFile(f);
-    await mkdir(path.dirname(dest), { recursive: true }); await copyFile(f, dest);
+    if ((await stat(resolved)).isDirectory()) { await mkdir(dest, { recursive: true }); continue; }
+    const bytes = await readFile(resolved);
+    await mkdir(path.dirname(dest), { recursive: true }); await copyFile(resolved, dest);
     entries.push({ path: relative, bytes: bytes.length, sha256: hash(bytes) });
   }
   const parentNodeModules: string[] = [];
