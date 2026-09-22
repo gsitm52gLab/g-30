@@ -83,6 +83,11 @@ describe('shared bounded file transport',()=>{
   const cb=callbacks(1);cb.issue=vi.fn(async()=>{throw new RequestError('synthetic_private_message',status,'SOURCE_DENIED');});
   try{await directUpload(new File(['a'],'a.csv'),{clientItemId:'file-item-a',callbacks:cb});throw Error('unexpected success');}catch(error){expect(error).toBeInstanceOf(RequestError);expect(error).toMatchObject({status,code:'ACCESS_CHANGED'});expect((error as Error).message).not.toContain('synthetic_private_message');}
  });
+ it('does not publish a late resolved DTO after cancellation',async()=>{
+  const controller=new AbortController(),cb=callbacks(1);let release!:(value:string)=>void,entered!:()=>void;const held=new Promise<string>(r=>{release=r;}),barrier=new Promise<void>(r=>{entered=r;});
+  cb.resolve=vi.fn(async()=>{entered();return held;});const pending=directUpload(new File(['a'],'a.csv'),{clientItemId:'file-item-a',callbacks:cb,signal:controller.signal,fetcher:fetchAs(async()=>new Response(null,{status:200}))});
+  await barrier;controller.abort();release('old-file');await expect(pending).rejects.toMatchObject({code:'ABORTED'});
+ });
  it('constructs Storage lazily and never falls back after invalid config',()=>{
   const environment=vi.fn(()=>({SUPABASE_URL:'https://sample.supabase.co/rest/v1',SUPABASE_SECRET_KEY:'sb_secret_synthetic_key_123456789'}));const factory=createPrivateStorageFactory(environment);expect(environment).not.toHaveBeenCalled();expect(factory().allocateStagingKey()).toMatch(/^gs-hale\/staging\//);expect(factory()).toBe(factory());expect(environment).toHaveBeenCalledTimes(1);
   const bad=createPrivateStorageFactory(()=>({}));expect(()=>bad()).toThrow();expect(()=>bad()).toThrow();
