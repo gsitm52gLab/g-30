@@ -99,3 +99,12 @@ S2authorSBpostgres currenthelpera385 (base d09)22unit/lint/type0; prior63auth/re
 G03authorab241 includesknownscalarrepair712/eventcontextlabel24eb/Productlist-detail-impact readonlymemo. IndependentactualProductlist58.182s418reads→5.975s41reads sameDTO/no writes; sourceleasegranted. Original60sproductmenufailure retained; finalactualclosurepending. PRDownPGhome PC/mobile/restart/pass/scalar503closure complete; othermenusexactjourney remainsinflight andmayrunbackground whileS3serverhooksbegin ownacceptedbase.
 
 Root+3 active only. Formal S2storage-files-submissions/task.json,S3storage-inquiries/task.json,S4storage-excel-ai/task.json. Finaljourney packetprepared, SB05full2browserlifecycle/Vercelworkers+configuredOpenAI/final225audit stillmandatory.16:25KSTtarget unchanged; Goalactive andsubmissionlogrequestcancelled.
+
+
+## State193 authoritative override
+
+Shared file contract a385 independently38PASS then integrated ca17949 with113targetedPASS/type/lint0;7source paths identical. Bounded helper accepted; feature routes/browser25MiB NOT_RUN. Earlier callback/reselection/lateabort failures retained. S2/S3/S4 now consume accepted helper concurrently.
+
+G03 final a6def freezes readWorkspace readonly memo import/wrapper after ab241 product memo. Independent actual product create/edit/reload and savedAI→task navigation passed on ab241, but task reply form timeout before POST retained; prd now final narrow remaining actual. No full G03 acceptance yet. S4 server baseline11actualPASS remains bounded with recorded scope corrections; AI-only WebP, large JSON bounded read and UI implementation continue. No new shared schema beyond sole S4SQLite18/PG19.
+
+Root+3 sessions; production remains eece434, full Goal active. Required final journeys/SB05/deployed worker+OpenAI/final225 audit unchanged, target16:25KST. Submission-log task remains cancelled.
