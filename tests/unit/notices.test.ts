@@ -20,12 +20,12 @@ import { blankDraft } from '@/domain/submissions/types';
 const A = 'ctx-jp-a-luna', admin = tokenFor('user-admin'), brand = tokenFor('user-luna'), team = tokenFor('user-team'), foreign = tokenFor('user-wave');
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=', 'base64');
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} G08 notice invariants`, () => {
+    describe(`${mode} G08 notice invariants`, async () => {
         let repo: RecordRepository, identity: IdentityService, service: NoticeService, files: FileService, dir: string;
         let now = NOW;
         async function setup() { now = NOW; repo = mode === 'mock' ? createMockRepository(() => now) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => now); })(); identity = await policyFixture(repo); identity.clock = () => now; service = new NoticeService(identity); dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-notice-')); files = new FileService(identity, dir); }
         async function create(content: NoticeContent = { ...blankNotice(), title: '합성 공지', body: '자료와 별도 업무 안내' }, contextId = A) { return (await service.create(admin, { contextId, content, idempotencyKey: randomUUID() })).ids[0]; }
-        async function command(id: string, command: string, extra: Record<string, unknown> = {}) { return service.command(admin, id, { command, expectedRevision: (await repo.get('notice', id))!.revision, idempotencyKey: randomUUID(), ...extra }); }
+        async function command(id: string, command: string, extra: Record<string, unknown> = {}) { return (await service.command(admin, id, { command, expectedRevision: (await repo.get('notice', id))!.revision, idempotencyKey: randomUUID(), ...extra })); }
         async function publish(id: string) { return (await command(id, 'publish')).ids[1]; }
         const business = async () => Promise.all((['notice', 'noticeVersion', 'noticeRead', 'commandReceipt', 'audit', 'domainEvent'] as RecordKind[]).map(k => repo.list(k)));
         afterEach(async () => {
@@ -36,9 +36,9 @@ for (const mode of ['mock', 'sqlite'] as const)
         it('AC08-01 private drafts and foreign scopes deny; own receipt is server attributed and roster GSG only', async () => {
             await setup();
             const id = await create();
-            await expect(service.detail(brand, id)).rejects.toMatchObject({ status: 404 });
+            await expect((await service.detail(brand, id))).rejects.toMatchObject({ status: 404 });
             expect((await service.list(brand, A)).items).toEqual([]);
-            await expect(service.detail(admin,id,'')).rejects.toMatchObject({status:422});
+            await expect((await service.detail(admin, id, ''))).rejects.toMatchObject({ status: 422 });
             const v = await publish(id), read = { command: 'read', versionId: v, idempotencyKey: randomUUID() };
             const first = await service.command(brand, id, read);
             expect(await service.command(brand, id, read)).toEqual(first);
@@ -50,17 +50,17 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(dto).not.toHaveProperty('roster');
             const managed = await service.detail(admin, id);
             expect('roster' in managed && managed.roster.reads).toHaveLength(1);
-            await expect(service.detail(foreign, id)).rejects.toMatchObject({ status: 404 });
+            await expect((await service.detail(foreign, id))).rejects.toMatchObject({ status: 404 });
             expect((await service.detail(tokenFor('user-selected-admin'), id)).capabilities.manage).toBe(true);
             const other = await create({ ...blankNotice(), title: '다른 범위', body: '타 컨텍스트' }, 'ctx-empty');
             await publish(other);
-            await expect(service.detail(tokenFor('user-gsg'), other)).rejects.toMatchObject({ status: 404 });
+            await expect((await service.detail(tokenFor('user-gsg'), other))).rejects.toMatchObject({ status: 404 });
         });
         it('AC08-03 immutable v1 files/read persist, v2 unread and distinct version events; draft emits no public event', async () => {
             await setup();
             const id = await create(), ref = { kind: 'notice' as const, noticeId: id };
             const f1 = (await files.upload(admin, ref, [{ name: 'first.png', type: 'image/png', bytes: png }], 'public')).files[0];
-            await expect(files.download(brand, f1.id, ref, 'original')).rejects.toMatchObject({ status: 404 });
+            await expect((await files.download(brand, f1.id, ref, 'original'))).rejects.toMatchObject({ status: 404 });
             await command(id, 'save', { content: { ...blankNotice(), title: 'v1 안내', body: '과거 본문', fileIds: [f1.id] } });
             const v1 = await publish(id);
             await service.command(brand, id, { command: 'read', versionId: v1, idempotencyKey: randomUUID() });
@@ -75,40 +75,40 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(await repo.get('noticeVersion', v1)).toEqual(saved);
             expect(await repo.list('noticeRead')).toEqual(reads);
             expect((await files.download(brand, f1.id, { ...ref, versionId: v1 }, 'original')).bytes).toEqual(png);
-            await expect(files.download(brand, f1.id, { ...ref, versionId: v2 }, 'original')).rejects.toMatchObject({ status: 404 });
+            await expect((await files.download(brand, f1.id, { ...ref, versionId: v2 }, 'original'))).rejects.toMatchObject({ status: 404 });
             expect((await repo.list('domainEvent')).filter(e => e.data.targetId === id).map(e => e.data.sourceVersionId).sort()).toEqual([v1, v2].sort());
-            await expect(repo.transaction(s => s.update('noticeVersion', v1, s.get('noticeVersion', v1)!.revision, s.get('noticeVersion', v1)!.data))).rejects.toBeDefined();
+            await expect(repo.transaction(async (s) => (await s.update('noticeVersion', v1, (await s.get('noticeVersion', v1))!.revision, (await s.get('noticeVersion', v1))!.data)))).rejects.toBeDefined();
         });
         it('all-member rule includes later active members; explicit empty selected never expands; current target AND historical target apply', async () => {
             await setup();
             const id = await create({ ...blankNotice(), title: '대상 없는 컨텍스트', body: '가입 후 보이는 안내' }, 'ctx-empty'), v = await publish(id), before = await service.detail(admin, id);
             expect('roster' in before && before.roster.targetCount).toBe(0);
-            await repo.transaction(s => s.create('membership', { id: randomUUID(), contextId: 'ctx-empty', data: { userId: 'user-none', role: 'brand', status: 'active', scope: '', internalPriceAccess: false, activatedAt: NOW, suspendedAt: null } }));
+            await repo.transaction(async (s) => (await s.create('membership', { id: randomUUID(), contextId: 'ctx-empty', data: { userId: 'user-none', role: 'brand', status: 'active', scope: '', internalPriceAccess: false, activatedAt: NOW, suspendedAt: null } })));
             expect((await service.detail(tokenFor('user-none'), id)).selected?.id).toBe(v);
             const other = await create({ ...blankNotice(), title: '선택 공지', body: '선택 공개', audience: { mode: 'selected', userIds: ['user-luna'] } }), v1 = await publish(other);
-            await expect(service.detail(team, other)).rejects.toMatchObject({ status: 404 });
+            await expect((await service.detail(team, other))).rejects.toMatchObject({ status: 404 });
             await command(other, 'save', { content: { ...blankNotice(), title: '전체 공개', body: '새 본문' } });
             await publish(other);
             expect((await service.detail(team, other)).versions).toHaveLength(1);
             expect(JSON.stringify(await service.detail(team, other))).not.toContain(v1);
-            await expect(service.detail(team, other, v1)).rejects.toMatchObject({ status: 404 });
+            await expect((await service.detail(team, other, v1))).rejects.toMatchObject({ status: 404 });
             await command(other, 'save', { content: { ...blankNotice(), title: '아무도 없음', body: '선택 없음', audience: { mode: 'selected', userIds: [] } } });
             await publish(other);
-            await expect(service.detail(brand, other, v1)).rejects.toMatchObject({ status: 404 });
+            await expect((await service.detail(brand, other, v1))).rejects.toMatchObject({ status: 404 });
         });
         it('late publication failure rolls back version/current/event/audit/receipt; CAS/idempotency and fresh revoke stay atomic', async () => {
             await setup();
             const id = await create(), input = { command: 'publish', expectedRevision: (await repo.get('notice', id))!.revision, idempotencyKey: randomUUID() }, before = await business();
-            await expect(new NoticeService(identity, () => { throw new Error('late publish'); }).command(admin, id, input)).rejects.toThrow('late publish');
+            await expect((await new NoticeService(identity, () => { throw new Error('late publish'); }).command(admin, id, input))).rejects.toThrow('late publish');
             expect(await business()).toEqual(before);
             const good = await service.command(admin, id, input);
             expect(await service.command(admin, id, input)).toEqual(good);
-            await expect(service.command(admin, id, { ...input, versionId: 'different' })).rejects.toMatchObject({ status: 409 });
-            await expect(service.command(admin, id, { ...input, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+            await expect((await service.command(admin, id, { ...input, versionId: 'different' }))).rejects.toMatchObject({ status: 409 });
+            await expect((await service.command(admin, id, { ...input, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
             const read = { command: 'read', versionId: good.ids[1], idempotencyKey: randomUUID() };
             await service.command(brand, id, read);
-            await repo.transaction(s => { const m = s.list('membership', A).find(x => x.data.userId === 'user-luna')!; s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' }); });
-            await expect(service.command(brand, id, read)).rejects.toMatchObject({ status: 404 });
+            await repo.transaction(async (s) => { const m = (await s.list('membership', A)).find(x => x.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
+            await expect((await service.command(brand, id, read))).rejects.toMatchObject({ status: 404 });
             expect(await repo.list('noticeRead')).toHaveLength(1);
         });
         it('AC08-02 actual G04 task and G05 submitted file stay byte-for-byte unchanged after notice read', async () => {
@@ -134,15 +134,15 @@ for (const mode of ['mock', 'sqlite'] as const)
         it('corrupted known sequence never crosses read projections; valid unknown extensions retain immutable history', async () => {
             await setup();
             const id = await create(), v = await publish(id), original = (await repo.get('noticeVersion', v))!;
-            await expect(repo.transaction(s => s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } as unknown as typeof original.data }))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
+            await expect(repo.transaction(async (s) => (await s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } as unknown as typeof original.data })))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
             // Native write guards are not weakened. Simulate an adapter read corruption below the service boundary.
             const corrupt = (r: StoredRecord | null) => r?.kind === 'noticeVersion' && r.id === v ? { ...r, data: { ...r.data, sequence: { secret: 'G08_SEQUENCE_CANARY' } } } : r;
             const wrapped: RecordRepository = { ...repo, transaction: async (operation) => repo.transaction(s => operation(new Proxy(s, { get(target, prop: keyof UnitOfWork) { return (...args: unknown[]) => { const result = Reflect.apply(target[prop], target, args); return prop === 'get' ? corrupt(result) : prop === 'list' ? result.map(corrupt) : result; }; } }))) };
             const faulty = new NoticeService(new IdentityService(wrapped, () => NOW));
-            await expect(faulty.detail(brand, id)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
-            await expect(faulty.list(brand, A)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+            await expect((await faulty.detail(brand, id))).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+            await expect((await faulty.list(brand, A))).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
             expect(await repo.get('noticeVersion', v)).toEqual(original);
-            const extended = await repo.transaction(s => { const n = s.get('notice', id)!, version = s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: 2, previousId: v, extra: { secret: 'G08_EXTRA_CANARY' } } as typeof original.data }); s.update('notice', id, n.revision, { ...n.data, currentVersionId: version.id }); return version; });
+            const extended = await repo.transaction(async (s) => { const n = (await s.get('notice', id))!, version = (await s.create('noticeVersion', { id: randomUUID(), contextId: A, data: { ...original.data, sequence: 2, previousId: v, extra: { secret: 'G08_EXTRA_CANARY' } } as typeof original.data })); (await s.update('notice', id, n.revision, { ...n.data, currentVersionId: version.id })); return version; });
             expect(JSON.stringify(await service.detail(brand, id))).not.toContain('G08_EXTRA_CANARY');
             expect(await repo.get('noticeVersion', extended.id)).toEqual(extended);
         });
@@ -177,10 +177,10 @@ for (const mode of ['mock', 'sqlite'] as const)
             const wrapped: RecordRepository = { ...repo, transaction: async (op) => {
                     const result = await repo.transaction(op);
                     if (++calls === 1)
-                        await repo.transaction(s => { const m = s.list('membership', A).find(x => x.data.userId === 'user-luna')!; s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' }); });
+                        await repo.transaction(async (s) => { const m = (await s.list('membership', A)).find(x => x.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
                     return result;
                 } };
-            await expect(new FileService(new IdentityService(wrapped, () => NOW), dir).download(brand, file.id, { ...ref, versionId }, 'original')).rejects.toMatchObject({ status: 404 });
+            await expect((await new FileService(new IdentityService(wrapped, () => NOW), dir).download(brand, file.id, { ...ref, versionId }, 'original'))).rejects.toMatchObject({ status: 404 });
             expect(calls).toBe(1);
         });
     });

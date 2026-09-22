@@ -26,15 +26,18 @@ if (process.argv.includes("--mock-server")) {
             pending: Promise<RecordRepository>;
         };
     }).gsHaleRepository = { key: `mock:${process.env.DATABASE_FILE}`, pending: Promise.resolve(repo) };
-    process.on("message", async (message) => { const m = message as {
-        id: string;
-        input: FixtureRequest;
-    }; try {
-        process.send?.({ id: m.id, value: await productFixture(repo, m.input) });
-    }
-    catch (error) {
-        process.send?.({ id: m.id, error: error instanceof Error ? error.message : "fixture failed" });
-    } });
+    process.on("message", async (message) => {
+        const m = message as {
+            id: string;
+            input: FixtureRequest;
+        };
+        try {
+            process.send?.({ id: m.id, value: await productFixture(repo, m.input) });
+        }
+        catch (error) {
+            process.send?.({ id: m.id, error: error instanceof Error ? error.message : "fixture failed" });
+        }
+    });
     const { startServer } = await import("next/dist/server/lib/start-server.js");
     await startServer({ dir: process.cwd(), hostname: "127.0.0.1", port: Number(process.env.E2E_PORT), isDev: false, allowRetry: false });
     await new Promise<never>(() => { });
@@ -98,11 +101,27 @@ async function start(p = port) {
     }
     throw new Error("Owned product server readiness timeout");
 }
-async function stop(p: number) { const child = children.get(p); if (!child)
-    return; const done = new Promise<void>(resolve => child.once("exit", () => resolve())); child.kill("SIGTERM"); if (child.exitCode === null && child.signalCode === null)
-    await done; const record = processes.findLast(r => r.pid === child.pid)!; record.exitCode = child.exitCode; record.signal = child.signalCode; record.stopped = true; children.delete(p); }
+async function stop(p: number) {
+    const child = children.get(p);
+    if (!child)
+        return;
+    const done = new Promise<void>(resolve => child.once("exit", () => resolve()));
+    child.kill("SIGTERM");
+    if (child.exitCode === null && child.signalCode === null)
+        await done;
+    const record = processes.findLast(r => r.pid === child.pid)!;
+    record.exitCode = child.exitCode;
+    record.signal = child.signalCode;
+    record.stopped = true;
+    children.delete(p);
+}
 interface FixtureSnapshot {
-    fileProvenance: { id: string; uploaderId: string; createdAt: string; sha256: string }[];
+    fileProvenance: {
+        id: string;
+        uploaderId: string;
+        createdAt: string;
+        sha256: string;
+    }[];
     sha256: string;
     canaryStored: boolean;
     uses: {
@@ -128,32 +147,60 @@ async function fixture<T>(input: FixtureRequest): Promise<T> {
         }
     }
     const child = children.get(port)!;
-    return new Promise<T>((resolve, reject) => { const id = randomUUID(); const timer = setTimeout(() => reject(new Error("private fixture IPC timeout")), 5000); const listener = (message: unknown) => { const m = message as {
-        id: string;
-        value: T;
-        error?: string;
-    }; if (m.id !== id)
-        return; clearTimeout(timer); child.off("message", listener); if (m.error)
-        reject(new Error(m.error));
-    else
-        resolve(m.value); }; child.on("message", listener); child.send({ id, input }); });
+    return new Promise<T>((resolve, reject) => {
+        const id = randomUUID();
+        const timer = setTimeout(() => reject(new Error("private fixture IPC timeout")), 5000);
+        const listener = (message: unknown) => {
+            const m = message as {
+                id: string;
+                value: T;
+                error?: string;
+            };
+            if (m.id !== id)
+                return;
+            clearTimeout(timer);
+            child.off("message", listener);
+            if (m.error)
+                reject(new Error(m.error));
+            else
+                resolve(m.value);
+        };
+        child.on("message", listener);
+        child.send({ id, input });
+    });
 }
 class Client {
     cookie = "";
     constructor(public slot = port) { }
     get origin() { return `http://127.0.0.1:${this.slot}`; }
     get token() { return this.cookie.slice(this.cookie.indexOf("=") + 1); }
-    async send(url: string, method = "GET", body?: unknown, csrf?: string) { const response = await fetch(this.origin + url, { method, redirect: "manual", headers: { Cookie: this.cookie, ...method !== "GET" ? { "Content-Type": "application/json", Origin: this.origin, "X-CSRF-Token": csrf ?? "" } : {} }, body: body === undefined ? undefined : JSON.stringify(body) }); const cookie = response.headers.get("set-cookie"); if (cookie)
-        this.cookie = cookie.split(";")[0]; transcript.push({ method, path: url, status: response.status }); return response; }
+    async send(url: string, method = "GET", body?: unknown, csrf?: string) {
+        const response = await fetch(this.origin + url, { method, redirect: "manual", headers: { Cookie: this.cookie, ...method !== "GET" ? { "Content-Type": "application/json", Origin: this.origin, "X-CSRF-Token": csrf ?? "" } : {} }, body: body === undefined ? undefined : JSON.stringify(body) });
+        const cookie = response.headers.get("set-cookie");
+        if (cookie)
+            this.cookie = cookie.split(";")[0];
+        transcript.push({ method, path: url, status: response.status });
+        return response;
+    }
     async get<T>(url: string): Promise<T> { const response = await this.send(url); assert.equal(response.status, 200, `GET ${url}`); const body = await response.text(); transcript.at(-1)!.responseSha256 = hash(body); return JSON.parse(body) as T; }
-    async mutate(url: string, body: unknown, method = "POST") { const csrf = await this.get<{
-        csrfToken: string;
-    }>("/api/auth/csrf"); return this.send(url, method, body, csrf.csrfToken); }
+    async mutate(url: string, body: unknown, method = "POST") {
+        const csrf = await this.get<{
+            csrfToken: string;
+        }>("/api/auth/csrf");
+        return this.send(url, method, body, csrf.csrfToken);
+    }
     async login(email: string) { const response = await this.mutate("/api/auth/login", { email, password: DEMO_PASSWORD }); assert.equal(response.status, 200, "synthetic actual login"); }
-    async upload(query: string, bytes: Buffer, name = "synthetic.png", mime = "image/png", visibility = "public", count = 1) { const csrf = await this.get<{
-        csrfToken: string;
-    }>("/api/auth/csrf"), body = new FormData(); for (let n = 0; n < count; n++)
-        body.append("files", new Blob([new Uint8Array(bytes)], { type: mime }), name); body.append("visibility", visibility); const response = await fetch(`${this.origin}/api/files?${query}`, { method: "POST", headers: { Cookie: this.cookie, Origin: this.origin, "X-CSRF-Token": csrf.csrfToken }, body }); transcript.push({ method: "POST multipart", path: `/api/files?${query}`, status: response.status }); return response; }
+    async upload(query: string, bytes: Buffer, name = "synthetic.png", mime = "image/png", visibility = "public", count = 1) {
+        const csrf = await this.get<{
+            csrfToken: string;
+        }>("/api/auth/csrf"), body = new FormData();
+        for (let n = 0; n < count; n++)
+            body.append("files", new Blob([new Uint8Array(bytes)], { type: mime }), name);
+        body.append("visibility", visibility);
+        const response = await fetch(`${this.origin}/api/files?${query}`, { method: "POST", headers: { Cookie: this.cookie, Origin: this.origin, "X-CSRF-Token": csrf.csrfToken }, body });
+        transcript.push({ method: "POST multipart", path: `/api/files?${query}`, status: response.status });
+        return response;
+    }
 }
 const A = "ctx-jp-a-luna", B = "ctx-jp-b-luna", admin = new Client(), brand = new Client(), team = new Client(), gsg = new Client(), price = new Client(), foreign = new Client();
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=", "base64"), privatePriceValue = "7777777777777777777777777.77";
@@ -195,7 +242,7 @@ try {
     const b = await detail(brand, pid, B);
     await command(brand, pid, "save_context", { fields: { ...b.local, sku: "000-B", jan: "00000022", salesStatus: "selling" }, expectedContextRevision: b.contextRevision }, B);
     d = await detail(team, pid);
-    check("non-assignee can edit local public fields", isDeepStrictEqual(d.local,localA), ["SA-25", "A19"]);
+    check("non-assignee can edit local public fields", isDeepStrictEqual(d.local, localA), ["SA-25", "A19"]);
     check("local contexts remain independent", (await detail(brand, pid, B)).local.sku === "000-B", ["AC-06-02"]);
     const impact = await team.mutate(`/api/products/${pid}/impact`, { contextId: A, common: { ...d.common, name: "팀원 공통 수정" }, expectedCommonRevision: d.commonRevision }), impactBody = await impact.json() as ProductImpact;
     check("impact lists only permitted contexts", impact.status === 200 && impactBody.visibleContexts.length === 1 && impactBody.visibleContexts[0].id === A && !JSON.stringify(impactBody).includes(B) && !Object.hasOwn(impactBody, "total"), ["AC-06-04", "SA-28"]);
@@ -352,7 +399,6 @@ try {
     check("suspended original uploader uses safe fallback throughout current and historical product files", afterSuspension.files.find(f => f.fileVersionId === file.id)?.file.uploaderLabel === "이전 업로더" && afterSuspension.image?.uploaderLabel === "이전 업로더" && afterSuspension.reusableFiles.find(f => f.id === file.id)?.uploaderLabel === "이전 업로더" && afterSuspension.contextHistory.flatMap(h => h.files).filter(f => f.fileVersionId === file.id).every(f => f.file.uploaderLabel === "이전 업로더" && f.file.uploadedAt === uploadedRow.createdAt), ["AC-06-05", "U06-08"]);
     const filesAfterSuspension = (await fixture<FixtureSnapshot>({ action: "snapshot", productId: pid, contextId: A })).fileProvenance;
     check("metadata edits/archive/revoke do not rewrite original product or task file rows", filesAfterSuspension.find(f => f.id === file.id)?.sha256 === uploadedRow.sha256 && filesAfterSuspension.find(f => f.id === pendingFile.id)?.sha256 === taskSource.sha256, ["AC-06-05", "U06-08"], "DB_FIXTURE");
-
 }
 catch (error) {
     failure = error instanceof Error ? error.message : "unknown failure";

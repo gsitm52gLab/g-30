@@ -1,3 +1,4 @@
+import { asyncFilter, asyncMap } from "@/domain/async-collections";
 import type { Clock, UnitOfWork } from '@/domain/records';
 import { blankCommon, blankContext, blankRetailPrice, blankInternalPrice, normalizeProductCode, type ProductCommon, type ProductContextFields, type RetailPriceFields, type InternalPriceFields } from '@/domain/products/types';
 import { commonInput, contextInput, retailInput, internalInput } from '@/domain/products/validate';
@@ -37,8 +38,13 @@ export function checkMapping(mapping: Mapping[], privatePrice: boolean) {
     if (!keys.has('contextKey') || !keys.has('common.code'))
         fail('VALIDATION', 422, '컨텍스트 키와 제품 코드를 매핑해 주세요.');
 }
-function setValue(target: object, path: string, value: unknown) { const parts = path.split('.'); let obj = target as Record<string, unknown>; for (const key of parts.slice(0, -1))
-    obj = obj[key] as Record<string, unknown>; obj[parts.at(-1)!] = value; }
+function setValue(target: object, path: string, value: unknown) {
+    const parts = path.split('.');
+    let obj = target as Record<string, unknown>;
+    for (const key of parts.slice(0, -1))
+        obj = obj[key] as Record<string, unknown>;
+    obj[parts.at(-1)!] = value;
+}
 function decimalText(value: string) {
     if (!/^[+]?\d+(?:\.\d+)?(?:[Ee][+-]?\d+)?$/.test(value))
         throw new Error('0 이상의 소수여야 합니다.');
@@ -79,10 +85,10 @@ function valueOf(cell: ParsedCell, field: ImportField): string | boolean | null 
         throw new Error(`허용 값: ${field.options.join(', ')}`);
     return text;
 }
-export function planRows(s: UnitOfWork, p: Principal, clock: Clock, contextId: string, sheet: ParsedSheet, headerRow: number, mapping: Mapping[], choices: RowChoice[], privatePrice: boolean): PlannedRow[] {
+export async function planRows(s: UnitOfWork, p: Principal, clock: Clock, contextId: string, sheet: ParsedSheet, headerRow: number, mapping: Mapping[], choices: RowChoice[], privatePrice: boolean): Promise<PlannedRow[]> {
     checkMapping(mapping, privatePrice);
-    authorize(s, p, 'product.edit', productContextScope(contextId, 'import'), clock);
-    const context = s.get('context', contextId)!;
+    (await authorize(s, p, 'product.edit', productContextScope(contextId, 'import'), clock));
+    const context = (await s.get('context', contextId))!;
     if (!Number.isSafeInteger(headerRow) || headerRow < 1)
         fail('VALIDATION', 422, '헤더 행을 선택해 주세요.');
     const data = sheet.rows.filter(r => r.row > headerRow);
@@ -94,7 +100,7 @@ export function planRows(s: UnitOfWork, p: Principal, clock: Clock, contextId: s
         fail('VALIDATION', 422, '행 선택을 확인해 주세요.');
     const mergeRows = sheet.mergedRanges.map(range => range.split(':').map(a => Number(a.replace(/[A-Z]+/, '')))).filter(([a, b = a]) => b >= headerRow && a <= Math.max(...data.map(r => r.row)));
     const seen = new Map<string, number[]>();
-    const plans = data.map(row => {
+    const plans = (await asyncMap(data, async (row) => {
         const raw: Record<string, string> = {}, normalized: PreviewRow['normalized'] = {}, errors: ImportError[] = [];
         const error = (code: string, message: string, field: string | null = null, column: number | null = null) => errors.push({ code, message, field, column });
         const selected = choices.find(c => c.row === row.row), choice = selected?.action;
@@ -128,17 +134,17 @@ export function planRows(s: UnitOfWork, p: Principal, clock: Clock, contextId: s
             const key = normalizeProductCode(code);
             seen.set(key, [...(seen.get(key) ?? []), row.row]);
         }
-        const cp = code ? s.list('contextProduct', contextId).find(cp => cp.data.normalizedCode === normalizeProductCode(code)) : null, r = cp ? resolveProduct(s, p, contextId, cp.data.productId, clock, true) : null;
+        const cp = code ? (await s.list('contextProduct', contextId)).find(cp => cp.data.normalizedCode === normalizeProductCode(code)) : null, r = cp ? (await resolveProduct(s, p, contextId, cp.data.productId, clock, true)) : null;
         const action = choice ?? (r ? 'update' : 'new');
         if (action === 'new' && r || action === 'update' && !r)
             error('ACTION_MISMATCH', '신규/업데이트 선택과 기존 제품 코드가 일치하지 않습니다.');
         let common = r ? commonDTO(r.common.data.common) : blankCommon(), local = r ? contextDTO(r.local.data.fields) : blankContext();
-        const retailRoot = r ? s.list('retailPrice', contextId).find(x => x.data.contextProductId === r.relation.id) : null;
+        const retailRoot = r ? (await s.list('retailPrice', contextId)).find(x => x.data.contextProductId === r.relation.id) : null;
         // Authorize BEFORE even looking up private roots, revisions, or values.
         if (privatePrice)
-            authorize(s, p, 'price.read', { ...productContextScope(contextId, 'import'), requiresInternalPrice: true }, clock);
-        const internalRoot = privatePrice && r ? s.list('internalPrice', contextId).find(x => x.data.contextProductId === r.relation.id) : null;
-        const oldRetail = retailRoot?.data.currentVersionId ? s.get('retailPriceVersion', retailRoot.data.currentVersionId) : null, oldInternal = internalRoot?.data.currentVersionId ? s.get('internalPriceVersion', internalRoot.data.currentVersionId) : null;
+            (await authorize(s, p, 'price.read', { ...productContextScope(contextId, 'import'), requiresInternalPrice: true }, clock));
+        const internalRoot = privatePrice && r ? (await s.list('internalPrice', contextId)).find(x => x.data.contextProductId === r.relation.id) : null;
+        const oldRetail = retailRoot?.data.currentVersionId ? (await s.get('retailPriceVersion', retailRoot.data.currentVersionId)) : null, oldInternal = internalRoot?.data.currentVersionId ? (await s.get('internalPriceVersion', internalRoot.data.currentVersionId)) : null;
         let retail = oldRetail ? retailDTO(oldRetail.data.fields) : blankRetailPrice(), internal = oldInternal ? internalDTO(oldInternal.data.fields) : blankInternalPrice();
         const changed = { common: !r, local: !r, retail: false, internal: false };
         const clear = selected?.clearFields ?? [];
@@ -172,7 +178,7 @@ export function planRows(s: UnitOfWork, p: Principal, clock: Clock, contextId: s
         try {
             common = commonInput(common);
             local = contextInput(local);
-            validateProductProject(s, p, contextId, local, clock);
+            (await validateProductProject(s, p, contextId, local, clock));
             if (changed.retail)
                 retail = retailInput(retail);
             if (changed.internal)
@@ -181,8 +187,8 @@ export function planRows(s: UnitOfWork, p: Principal, clock: Clock, contextId: s
         catch (e) {
             error('ROW_INVALID', e instanceof AuthError && e.status === 422 ? e.message : '상품 정보 또는 연결 범위를 확인해 주세요.');
         }
-        return { preview: { row: row.row, action, raw, normalized, errors, visibleContexts: r ? s.list('contextProduct').filter(cp => cp.data.productId === r.product.id && decide(s, p, 'product.read', productContextScope(cp.contextId!, r.product.id), clock).allowed).map(cp => { const c = s.get('context', cp.contextId!)!; return { id: c.id, country: c.data.country, retailer: c.data.retailer, brand: c.data.brand }; }) : [], target: r ? { productId: r.product.id, contextProductId: r.relation.id, commonRevision: r.product.revision, contextRevision: r.relation.revision, retailRevision: retailRoot?.revision ?? 0, ...privatePrice ? { internalRevision: internalRoot?.revision ?? 0 } : {} } : null }, common, local, retail: changed.retail ? retail : null, internal: changed.internal ? internal : null, changed };
-    });
+        return { preview: { row: row.row, action, raw, normalized, errors, visibleContexts: r ? (await asyncMap((await asyncFilter((await s.list('contextProduct')), async (cp) => cp.data.productId === r.product.id && (await decide(s, p, 'product.read', productContextScope(cp.contextId!, r.product.id), clock)).allowed)), async (cp) => { const c = (await s.get('context', cp.contextId!))!; return { id: c.id, country: c.data.country, retailer: c.data.retailer, brand: c.data.brand }; })) : [], target: r ? { productId: r.product.id, contextProductId: r.relation.id, commonRevision: r.product.revision, contextRevision: r.relation.revision, retailRevision: retailRoot?.revision ?? 0, ...privatePrice ? { internalRevision: internalRoot?.revision ?? 0 } : {} } : null }, common, local, retail: changed.retail ? retail : null, internal: changed.internal ? internal : null, changed };
+    }));
     for (const plan of plans) {
         const code = plan.preview.normalized['common.code'];
         if (typeof code === 'string' && (seen.get(normalizeProductCode(code))?.length ?? 0) > 1)

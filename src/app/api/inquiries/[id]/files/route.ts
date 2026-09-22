@@ -3,15 +3,16 @@ import { InquiryFiles } from '@/server/inquiries/files';
 import { fail } from '@/server/auth/errors';
 import { MAX_FILE_BYTES, MAX_BATCH_FILES } from '@/domain/files/validate';
 export const runtime = 'nodejs';
-export function POST(request: Request, context: {
+export async function POST(request: Request, context: {
     params: Promise<{
         id: string;
     }>;
 }) {
-    return route(request, async (identity, token) => {
-        const taskId = (await context.params).id, query = new URL(request.url).searchParams, rawVisibility=query.get('visibility')??'public';
-        if([...query.keys()].some(k=>k!=='visibility')||query.getAll('visibility').length>1||!['public','internal'].includes(rawVisibility))fail('VALIDATION',422,'파일 공개 범위를 하나만 지정해 주세요.');
-        const visibility=rawVisibility as 'public'|'internal',service = new InquiryFiles(identity);
+    return (await route(request, async (identity, token) => {
+        const taskId = (await context.params).id, query = new URL(request.url).searchParams, rawVisibility = query.get('visibility') ?? 'public';
+        if ([...query.keys()].some(k => k !== 'visibility') || query.getAll('visibility').length > 1 || !['public', 'internal'].includes(rawVisibility))
+            fail('VALIDATION', 422, '파일 공개 범위를 하나만 지정해 주세요.');
+        const visibility = rawVisibility as 'public' | 'internal', service = new InquiryFiles(identity);
         await service.check(token, taskId, visibility);
         const mime = request.headers.get('content-type');
         if (!mime?.startsWith('multipart/form-data;'))
@@ -47,6 +48,6 @@ export function POST(request: Request, context: {
         const files = form.getAll('files'), itemIds = form.getAll('clientItemIds');
         if (!files.length || files.length > 10 || files.length !== itemIds.length || files.some(f => typeof f === 'string') || itemIds.some(v => typeof v !== 'string'))
             fail('VALIDATION', 422, '파일과 재시도 키를 같은 순서로 1~10개 보내 주세요.');
-        return json(await service.upload(token, taskId, await Promise.all((files as File[]).map(async (f, i) => ({ clientItemId: itemIds[i] as string, name: f.name, type: f.type, bytes: Buffer.from(await f.arrayBuffer()) }))),visibility));
-    });
+        return json(await service.upload(token, taskId, await Promise.all((files as File[]).map(async (f, i) => ({ clientItemId: itemIds[i] as string, name: f.name, type: f.type, bytes: Buffer.from(await f.arrayBuffer()) }))), visibility));
+    }));
 }

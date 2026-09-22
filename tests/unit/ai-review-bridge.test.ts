@@ -11,28 +11,30 @@ import { AiInputService } from '@/server/ai-input/service';
 import { AiReviewService } from '@/server/ai-review/service';
 import { policyFixture, NOW } from '../fixtures/policy';
 import { ctx, staff, brand, readyInput, inputContent } from '../fixtures/ai-review/server';
-for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G15 capability bridge`, () => {
-  let repo: RecordRepository, directory: string;
-  afterEach(async () => { repo?.close(); if (directory) await rm(directory, { recursive: true, force: true }); });
-  it('GSG exact selected-version URLs and constant brand capability reveal no hidden run or provider activity', async () => {
-    directory = await mkdtemp(path.join(os.tmpdir(), 'g16-bridge-'));
-    repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })();
-    const identity = await policyFixture(repo), inputs = new AiInputService(identity, directory), reviews = new AiReviewService(identity, directory), f = await readyInput(identity, directory);
-    const restricted = { connected: true, status: 'RESTRICTED', url: null, providerCalled: false };
-    expect((await inputs.detail(brand, f.input.id)).analysis).toEqual(restricted);
-    expect((await inputs.picker(brand, ctx)).analysis).toEqual(restricted);
-    expect(await repo.list('aiAnalysisRun')).toHaveLength(0);
-    expect((await inputs.detail(staff, f.input.id)).analysis).toEqual({ connected: true, status: 'GSG_INTERNAL', url: `/ai-review/inputs/${f.input.id}?context=${ctx}&versionId=${f.input.version.id}`, providerCalled: false });
-    expect((await inputs.picker(staff, ctx)).analysis).toEqual({ connected: true, status: 'GSG_INTERNAL', url: `/ai-review?context=${ctx}`, providerCalled: false });
-    await reviews.start(staff, f.input.id, f.body);
-    expect((await inputs.detail(brand, f.input.id)).analysis).toEqual(restricted);
-    expect((await inputs.picker(brand, ctx)).analysis).toEqual(restricted);
-    const newer = await inputs.revise(staff, f.input.id, { expectedRevision: f.input.revision, content: inputContent('新しい入力'), idempotencyKey: randomUUID() });
-    expect((await inputs.detail(staff, f.input.id, f.input.version.id)).analysis.url).toContain(`versionId=${f.input.version.id}`);
-    expect((await inputs.detail(staff, f.input.id)).analysis.url).toContain(`versionId=${newer.version.id}`);
-    const unsupported = await inputs.create(staff, { contextId: ctx, visibility: 'context', content: { ...inputContent(), scope: { ...inputContent().scope, classification: 'unknown' } }, idempotencyKey: randomUUID() });
-    const extraction = await inputs.extract(staff, unsupported.id, { versionId: unsupported.version.id, expectedRunId: null, idempotencyKey: randomUUID() });
-    await expect(reviews.start(staff, unsupported.id, { ...f.body, inputVersionId: unsupported.version.id, extractionRunId: extraction.runId, idempotencyKey: randomUUID() })).rejects.toMatchObject({ code: 'EXTRACTION_NOT_READY', status: 409 });
-    expect(await repo.list('aiAnalysisRun')).toHaveLength(1);
-  });
-});
+for (const mode of ['mock', 'sqlite'] as const)
+    describe(`${mode} G15 capability bridge`, async () => {
+        let repo: RecordRepository, directory: string;
+        afterEach(async () => { repo?.close(); if (directory)
+            await rm(directory, { recursive: true, force: true }); });
+        it('GSG exact selected-version URLs and constant brand capability reveal no hidden run or provider activity', async () => {
+            directory = await mkdtemp(path.join(os.tmpdir(), 'g16-bridge-'));
+            repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })();
+            const identity = await policyFixture(repo), inputs = new AiInputService(identity, directory), reviews = new AiReviewService(identity, directory), f = await readyInput(identity, directory);
+            const restricted = { connected: true, status: 'RESTRICTED', url: null, providerCalled: false };
+            expect((await inputs.detail(brand, f.input.id)).analysis).toEqual(restricted);
+            expect((await inputs.picker(brand, ctx)).analysis).toEqual(restricted);
+            expect(await repo.list('aiAnalysisRun')).toHaveLength(0);
+            expect((await inputs.detail(staff, f.input.id)).analysis).toEqual({ connected: true, status: 'GSG_INTERNAL', url: `/ai-review/inputs/${f.input.id}?context=${ctx}&versionId=${f.input.version.id}`, providerCalled: false });
+            expect((await inputs.picker(staff, ctx)).analysis).toEqual({ connected: true, status: 'GSG_INTERNAL', url: `/ai-review?context=${ctx}`, providerCalled: false });
+            await reviews.start(staff, f.input.id, f.body);
+            expect((await inputs.detail(brand, f.input.id)).analysis).toEqual(restricted);
+            expect((await inputs.picker(brand, ctx)).analysis).toEqual(restricted);
+            const newer = await inputs.revise(staff, f.input.id, { expectedRevision: f.input.revision, content: inputContent('新しい入力'), idempotencyKey: randomUUID() });
+            expect((await inputs.detail(staff, f.input.id, f.input.version.id)).analysis.url).toContain(`versionId=${f.input.version.id}`);
+            expect((await inputs.detail(staff, f.input.id)).analysis.url).toContain(`versionId=${newer.version.id}`);
+            const unsupported = await inputs.create(staff, { contextId: ctx, visibility: 'context', content: { ...inputContent(), scope: { ...inputContent().scope, classification: 'unknown' } }, idempotencyKey: randomUUID() });
+            const extraction = await inputs.extract(staff, unsupported.id, { versionId: unsupported.version.id, expectedRunId: null, idempotencyKey: randomUUID() });
+            await expect((await reviews.start(staff, unsupported.id, { ...f.body, inputVersionId: unsupported.version.id, extractionRunId: extraction.runId, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ code: 'EXTRACTION_NOT_READY', status: 409 });
+            expect(await repo.list('aiAnalysisRun')).toHaveLength(1);
+        });
+    });

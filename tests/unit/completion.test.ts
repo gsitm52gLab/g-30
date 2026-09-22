@@ -1,13 +1,13 @@
-import { afterEach,describe,it,expect } from 'vitest';
+import { afterEach, describe, it, expect } from 'vitest';
 import { randomUUID } from 'node:crypto';
-import { mkdtemp,rm } from 'node:fs/promises';
+import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import type { CompletionRecords } from '@/domain/completion/types';
-import type { RecordKind,RecordRepository } from '@/domain/records';
+import type { RecordKind, RecordRepository } from '@/domain/records';
 import { createMockRepository } from '@/server/repositories/mock';
 import { createSqliteRepository } from '@/server/repositories/sqlite';
-import { openDatabase,migrate } from '@/server/db/database';
+import { openDatabase, migrate } from '@/server/db/database';
 import { IdentityService } from '@/server/auth/service';
 import { CompletionService } from '@/server/completion/service';
 import { CompletionFiles } from '@/server/completion/files';
@@ -16,67 +16,207 @@ import { InquiryService } from '@/server/inquiries/service';
 import { SubmissionService } from '@/server/submissions/service';
 import { FileService } from '@/server/files/service';
 import { ProductService } from '@/server/products/service';
-import { policyFixture,NOW } from '../fixtures/policy';
-import { admin,brand,team,contextId,png,createCompletionTask,completionSubmission,completionInquiry,completionCorrection } from '../fixtures/completion';
-const kinds:RecordKind[]=['task','completionSnapshot','completionReopen','completionExternalAction','completionFollowup','audit','domainEvent','commandReceipt'];
-
-for(const mode of ['mock','sqlite'] as const)describe(`${mode} actual G11 producer integration`,()=>{
-    let repo:RecordRepository,identity:IdentityService,service:CompletionService,directory:string,taskId:string;
-    async function setup(){repo=mode==='mock'?createMockRepository(()=>NOW):(()=>{const db=openDatabase(':memory:',true);migrate(db);return createSqliteRepository(db,()=>NOW);})();identity=await policyFixture(repo);service=new CompletionService(identity);directory=await mkdtemp(path.join(os.tmpdir(),'g11-'));taskId=await createCompletionTask(identity);}
-    const rows=()=>Promise.all(kinds.map(k=>repo.list(k)));
-    async function completeInput(){const w=await service.workspace(admin,taskId);return {command:'complete',taskId,expectedTaskRevision:w.taskRevision,expectedBasisHash:w.preview!.basisHash,memo:'',idempotencyKey:randomUUID()};}
-    async function source(){const target=await completionSubmission(identity,directory,taskId);return {requestId:target.requestId,submissionId:target.submissionId,submissionContentHash:target.submissionContentHash,fileVersionIds:target.fileVersionIds,productUseIds:target.productUseIds};}
-    async function externalInput(visibility:'public'|'internal'='public'){return {command:'record_external',taskId,expectedTaskRevision:(await repo.get('task',taskId))!.revision,idempotencyKey:randomUUID(),action:{purpose:'review_request',destination:'합성 외부 기관',requester:{kind:'user',userId:'user-luna'},performer:{kind:'external',label:'외부 수행자',source:'합성 전달 원문'},source:await source(),observedAt:{value:'2026-09-21',precision:'date',timezone:'Asia/Tokyo',source:'전달 기록'},evidenceFileVersionIds:[] as string[],latestProgress:'아직 회신을 기다림',waitingExternal:true,visibility}};}
-    afterEach(async()=>{repo?.close();if(directory)await rm(directory,{recursive:true,force:true});});
-    it('AC11-01/02 actual partial, product use, G09 external wait and unresolved G10 remain; memo/proof absent still completes',async()=>{
-        await setup();const target=await completionSubmission(identity,directory,taskId);await completionInquiry(identity,taskId);await completionCorrection(identity,target);
-        const w=await service.workspace(admin,taskId),basis=w.preview!.basis;expect(basis.currentEvaluation).toMatchObject({state:'available',value:{missing:1}});expect(basis.inquiries).toMatchObject({value:{unresolved:1,externalWaiting:1}});expect(basis.corrections).toMatchObject({value:{unresolved:1}});expect(basis.ai).toEqual({connected:true,state:'available',value:{items:[],failed:0,pending:0,unreviewedFindings:0}});expect(basis.campaign).toEqual({connected:true,state:'available',value:{requestSource:null,campaigns:[]}});
-        const id=(await service.command(admin,await completeInput())).ids[0],snapshot=(await repo.get('completionSnapshot',id))!;expect(snapshot.data.memo).toBe('');expect(snapshot.data.basis).toEqual(basis);expect(snapshot.data.basis.latestSubmission?.id).toBe(target.submissionId);expect(snapshot.data.basis.latestSubmission?.products).toMatchObject({value:[{id:target.productUseIds[0]}]});expect((await repo.get('task',taskId))!.data.status).toBe('completed');expect((await new SubmissionService(identity).snapshot(brand,target.submissionId)).completion).toMatchObject({connected:true,status:'completed',latestCompletionId:id});
-        const before=await rows();for(const token of [brand,team])await expect(service.command(token,await completeInput())).rejects.toMatchObject({status:403});await expect(service.command('ai-untrusted-no-session',await completeInput())).rejects.toMatchObject({status:401});expect(await rows()).toEqual(before);
+import { policyFixture, NOW } from '../fixtures/policy';
+import { admin, brand, team, contextId, png, createCompletionTask, completionSubmission, completionInquiry, completionCorrection } from '../fixtures/completion';
+const kinds: RecordKind[] = ['task', 'completionSnapshot', 'completionReopen', 'completionExternalAction', 'completionFollowup', 'audit', 'domainEvent', 'commandReceipt'];
+for (const mode of ['mock', 'sqlite'] as const)
+    describe(`${mode} actual G11 producer integration`, async () => {
+        let repo: RecordRepository, identity: IdentityService, service: CompletionService, directory: string, taskId: string;
+        async function setup() { repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); identity = await policyFixture(repo); service = new CompletionService(identity); directory = await mkdtemp(path.join(os.tmpdir(), 'g11-')); taskId = await createCompletionTask(identity); }
+        const rows = () => Promise.all(kinds.map(k => repo.list(k)));
+        async function completeInput() { const w = await service.workspace(admin, taskId); return { command: 'complete', taskId, expectedTaskRevision: w.taskRevision, expectedBasisHash: w.preview!.basisHash, memo: '', idempotencyKey: randomUUID() }; }
+        async function source() { const target = await completionSubmission(identity, directory, taskId); return { requestId: target.requestId, submissionId: target.submissionId, submissionContentHash: target.submissionContentHash, fileVersionIds: target.fileVersionIds, productUseIds: target.productUseIds }; }
+        async function externalInput(visibility: 'public' | 'internal' = 'public') { return { command: 'record_external', taskId, expectedTaskRevision: (await repo.get('task', taskId))!.revision, idempotencyKey: randomUUID(), action: { purpose: 'review_request', destination: '합성 외부 기관', requester: { kind: 'user', userId: 'user-luna' }, performer: { kind: 'external', label: '외부 수행자', source: '합성 전달 원문' }, source: await source(), observedAt: { value: '2026-09-21', precision: 'date', timezone: 'Asia/Tokyo', source: '전달 기록' }, evidenceFileVersionIds: [] as string[], latestProgress: '아직 회신을 기다림', waitingExternal: true, visibility } }; }
+        afterEach(async () => { repo?.close(); if (directory)
+            await rm(directory, { recursive: true, force: true }); });
+        it('AC11-01/02 actual partial, product use, G09 external wait and unresolved G10 remain; memo/proof absent still completes', async () => {
+            await setup();
+            const target = await completionSubmission(identity, directory, taskId);
+            await completionInquiry(identity, taskId);
+            await completionCorrection(identity, target);
+            const w = await service.workspace(admin, taskId), basis = w.preview!.basis;
+            expect(basis.currentEvaluation).toMatchObject({ state: 'available', value: { missing: 1 } });
+            expect(basis.inquiries).toMatchObject({ value: { unresolved: 1, externalWaiting: 1 } });
+            expect(basis.corrections).toMatchObject({ value: { unresolved: 1 } });
+            expect(basis.ai).toEqual({ connected: true, state: 'available', value: { items: [], failed: 0, pending: 0, unreviewedFindings: 0 } });
+            expect(basis.campaign).toEqual({ connected: true, state: 'available', value: { requestSource: null, campaigns: [] } });
+            const id = (await service.command(admin, await completeInput())).ids[0], snapshot = (await repo.get('completionSnapshot', id))!;
+            expect(snapshot.data.memo).toBe('');
+            expect(snapshot.data.basis).toEqual(basis);
+            expect(snapshot.data.basis.latestSubmission?.id).toBe(target.submissionId);
+            expect(snapshot.data.basis.latestSubmission?.products).toMatchObject({ value: [{ id: target.productUseIds[0] }] });
+            expect((await repo.get('task', taskId))!.data.status).toBe('completed');
+            expect((await new SubmissionService(identity).snapshot(brand, target.submissionId)).completion).toMatchObject({ connected: true, status: 'completed', latestCompletionId: id });
+            const before = await rows();
+            for (const token of [brand, team])
+                await expect((await service.command(token, await completeInput()))).rejects.toMatchObject({ status: 403 });
+            await expect((await service.command('ai-untrusted-no-session', await completeInput()))).rejects.toMatchObject({ status: 401 });
+            expect(await rows()).toEqual(before);
+        });
+        it('AC11-02 basis detects actual G09 change without task revision; preview is pure and stale complete has no writes', async () => {
+            await setup();
+            await completionSubmission(identity, directory, taskId);
+            const q = await completionInquiry(identity, taskId), cmd = await completeInput(), before = await rows();
+            await service.workspace(admin, taskId);
+            expect(await rows()).toEqual(before);
+            const inquiries = new InquiryService(identity), detail = await inquiries.detail(admin, q.conversationId);
+            if (detail.phase !== 'active')
+                throw Error('active');
+            await inquiries.command(admin, q.conversationId, { command: 'answer', questionId: q.questionId, expectedQuestionRevision: detail.questions[0].revision, content: { clientMessageId: randomUUID(), body: '실제 응답', fileVersionIds: [] }, idempotencyKey: randomUUID() });
+            expect((await repo.get('task', taskId))!.revision).toBe(cmd.expectedTaskRevision);
+            const changed = await rows();
+            await expect((await service.command(admin, cmd))).rejects.toMatchObject({ code: 'BASIS_CHANGED', status: 409 });
+            expect(await rows()).toEqual(changed);
+            const id = (await service.command(admin, await completeInput())).ids[0];
+            expect((await repo.get('completionSnapshot', id))!.data.basis.inquiries).toMatchObject({ value: { unresolved: 0, externalWaiting: 0 } });
+        });
+        it('AC11-03 same exact file two purposes and external performer distinct recorder; no external/task state changed by record', async () => {
+            await setup();
+            const input = await externalInput();
+            input.expectedTaskRevision = (await repo.get('task', taskId))!.revision;
+            const before = await repo.get('task', taskId), a = (await service.command(admin, input)).ids[0];
+            const b = (await service.command(admin, { ...input, action: { ...input.action, purpose: 'final_use' }, idempotencyKey: randomUUID() })).ids[0];
+            expect(await repo.get('task', taskId)).toEqual(before);
+            const d = await service.external(brand, a);
+            expect(d).toMatchObject({ effect: 'record_only', purpose: 'review_request', performer: { kind: 'external', label: '외부 수행자' }, recordedByLabel: '이전 참여자' });
+            expect((await repo.get('completionExternalAction', a))!.data.recordedBy).toBe('user-admin');
+            expect(d.source.fileVersionIds).toEqual((await service.external(brand, b)).source.fileVersionIds);
+            expect(d.source.products[0].id).toBe(input.action.source.productUseIds[0]);
+            expect((await new CompletionFiles(identity, directory).download(brand, d.source.fileVersionIds[0], new URLSearchParams({ externalActionId: a }))).bytes).toEqual(png);
+            const first = await repo.get('completionExternalAction', a);
+            await expect((await service.command(admin, { ...input, action: { ...input.action, source: { ...input.action.source, submissionContentHash: 'f'.repeat(64) } }, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 404 });
+            expect(await repo.get('completionExternalAction', a)).toEqual(first);
+        });
+        it('AC11-04 reasoned reopen, second completion and real followup link keep old immutable snapshots; direct publish cannot bypass reopen', async () => {
+            await setup();
+            await completionSubmission(identity, directory, taskId);
+            const c = (await service.command(admin, await completeInput())).ids[0], original = await repo.get('completionSnapshot', c);
+            let w = await service.workspace(admin, taskId);
+            await expect((await new TaskService(identity).command(admin, taskId, { command: 'publish', expectedRevision: w.taskRevision, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ code: 'REOPEN_REQUIRED' });
+            await expect((await service.command(admin, { command: 'reopen', taskId, completionId: c, expectedTaskRevision: w.taskRevision, reason: '', idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 422 });
+            await service.command(admin, { command: 'reopen', taskId, completionId: c, expectedTaskRevision: w.taskRevision, reason: '후속 자료 확인', idempotencyKey: randomUUID() });
+            expect((await repo.get('task', taskId))!.data.status).toBe('partial');
+            const c2 = (await service.command(admin, await completeInput())).ids[0];
+            expect(c2).not.toBe(c);
+            expect(await repo.get('completionSnapshot', c)).toEqual(original);
+            expect((await repo.get('completionSnapshot', c2))!.data.previousCompletionId).toBe(c);
+            const followup = await createCompletionTask(identity, '실제 후속 업무');
+            w = await service.workspace(admin, taskId);
+            const input = { command: 'link_followup', taskId, completionId: c, followupTaskId: followup, expectedTaskRevision: w.taskRevision, expectedFollowupRevision: (await repo.get('task', followup))!.revision, reason: '추가 업무', idempotencyKey: randomUUID() };
+            const result = await service.command(admin, input);
+            expect(await service.command(admin, input)).toEqual(result);
+            expect((await service.workspace(brand, taskId)).followups[0].taskId).toBe(followup);
+            expect(await repo.get('completionSnapshot', c)).toEqual(original);
+        });
+        it('AC11-05 same intent yields one event/receipt; distinct stale CAS loses; every late fault rolls all records back', async () => {
+            await setup();
+            const cmd = await completeInput(), before = await rows();
+            await expect((await new CompletionService(identity, () => { throw Error('late complete'); }).command(admin, cmd))).rejects.toThrow('late complete');
+            expect(await rows()).toEqual(before);
+            const both = await Promise.all([(await service.command(admin, cmd)), (await service.command(admin, cmd))]);
+            expect(both[0]).toEqual(both[1]);
+            expect(await repo.list('completionSnapshot')).toHaveLength(1);
+            expect((await repo.list('domainEvent')).filter(e => e.data.eventType === 'TASK_MANUALLY_COMPLETED')).toHaveLength(1);
+            await expect((await service.command(admin, { ...cmd, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
+            const w = await service.workspace(admin, taskId), reopen = { command: 'reopen', taskId, completionId: both[0].ids[0], expectedTaskRevision: w.taskRevision, reason: '다시 진행', idempotencyKey: randomUUID() }, completed = await rows();
+            await expect((await new CompletionService(identity, () => { throw Error('late reopen'); }).command(admin, reopen))).rejects.toThrow('late reopen');
+            expect(await rows()).toEqual(completed);
+            await repo.transaction(async (s) => { const session = (await s.get('session', 'policy-session-user-admin'))!; (await s.update('session', session.id, session.revision, { ...session.data, revokedAt: NOW })); });
+            await expect((await service.command(admin, cmd))).rejects.toMatchObject({ status: 401 });
+        });
+        it('A19 completion history omits other brand inquiry and internal action/count/markers; current revoke denies replay and history', async () => {
+            await setup();
+            await completionSubmission(identity, directory, taskId);
+            await completionInquiry(identity, taskId, brand, 'OWN_PUBLIC_QUESTION');
+            await completionInquiry(identity, taskId, team, 'OTHER_PRIVATE_QUESTION');
+            const c = (await service.command(admin, await completeInput())).ids[0];
+            expect((await service.snapshot(admin, c)).basis.inquiries).toMatchObject({ value: { unresolved: 2 } });
+            const publicValue = await service.snapshot(brand, c);
+            expect(publicValue.basis.inquiries).toMatchObject({ value: { unresolved: 1 } });
+            expect(JSON.stringify(publicValue)).toContain('OWN_PUBLIC_QUESTION');
+            expect(JSON.stringify(publicValue)).not.toContain('OTHER_PRIVATE');
+            expect(publicValue).not.toHaveProperty('basisHash');
+            await repo.transaction(async (s) => { const m = (await s.list('membership', contextId)).find(x => x.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
+            await expect((await service.snapshot(brand, c))).rejects.toMatchObject({ status: 404 });
+            await expect((await service.workspace(brand, taskId))).rejects.toMatchObject({ status: 404 });
+        });
+        it('Stored nested unknown extras do not project; malformed known snapshot field safely fails503 and immutable rows remain', async () => {
+            await setup();
+            const id = (await service.command(admin, await completeInput())).ids[0], row = (await repo.get('completionSnapshot', id))!, copy = { ...row.data, sequence: 2, memo: 'normal', extra: { canary: 'UNKNOWN_CANARY' }, basis: { ...row.data.basis, currentRequest: { ...row.data.basis.currentRequest!, extra: 'UNKNOWN_CANARY' } } };
+            const good = randomUUID();
+            await repo.transaction(async (s) => (await s.create('completionSnapshot', { id: good, contextId, data: copy })));
+            expect(JSON.stringify(await service.snapshot(brand, good))).not.toContain('UNKNOWN_CANARY');
+            const bad = randomUUID();
+            await repo.transaction(async (s) => (await s.create('completionSnapshot', { id: bad, contextId, data: { ...row.data, sequence: 3, completedAt: { secret: 'KNOWN_CANARY' } } as unknown as CompletionRecords['completionSnapshot'] })));
+            await expect((await service.snapshot(admin, bad))).rejects.toMatchObject({ status: 503 });
+            expect((await repo.get('completionSnapshot', bad))!.data.completedAt).toEqual({ secret: 'KNOWN_CANARY' });
+            await expect(repo.transaction(async (s) => (await s.update('completionSnapshot', id, row.revision, row.data)))).rejects.toMatchObject({ code: 'INVALID_RECORD' });
+        });
+        it('D02 after-IO reauthorization rejects downloaded external evidence when membership is revoked', async () => {
+            await setup();
+            const input = await externalInput();
+            input.expectedTaskRevision = (await repo.get('task', taskId))!.revision;
+            const id = (await service.command(admin, input)).ids[0];
+            let n = 0;
+            const wrapped: RecordRepository = { ...repo, transaction: async (operation) => { const result = await repo.transaction(operation); if (++n === 2)
+                    await repo.transaction(async (s) => { const m = (await s.list('membership', contextId)).find(m => m.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); }); return result; } };
+            await expect((await new CompletionFiles(new IdentityService(wrapped, () => NOW), directory).download(brand, input.action.source.fileVersionIds[0], new URLSearchParams({ externalActionId: id })))).rejects.toMatchObject({ status: 404 });
+            expect(n).toBe(2);
+        });
+        it('Internal external record uses exact source and existing internal evidence without releasing it to brand', async () => {
+            await setup();
+            const input = await externalInput('internal'), f = (await new FileService(identity, directory).upload(admin, taskId, [{ name: 'private.png', type: 'image/png', bytes: png }], 'internal')).files[0];
+            input.expectedTaskRevision = (await repo.get('task', taskId))!.revision;
+            input.action.evidenceFileVersionIds = [f.id];
+            input.action.latestProgress = 'INTERNAL_EXTERNAL_PROGRESS';
+            const id = (await service.command(admin, input)).ids[0];
+            expect((await service.workspace(brand, taskId)).externalActions).toEqual([]);
+            await expect((await service.external(brand, id))).rejects.toMatchObject({ status: 404 });
+            const c = (await service.command(admin, await completeInput())).ids[0];
+            expect(JSON.stringify(await service.snapshot(brand, c))).not.toContain('INTERNAL_EXTERNAL_PROGRESS');
+            expect(JSON.stringify(await service.snapshot(admin, c))).toContain('INTERNAL_EXTERNAL_PROGRESS');
+        });
+        it('A20 late external/followup writes roll back and failed association keeps actual created followup ID for retry', async () => {
+            await setup();
+            const input = await externalInput();
+            input.expectedTaskRevision = (await repo.get('task', taskId))!.revision;
+            const faulty = new CompletionService(identity, () => { throw Error('late completion command'); }), before = await rows();
+            await expect((await faulty.command(admin, input))).rejects.toThrow('late completion command');
+            expect(await rows()).toEqual(before);
+            const completionId = (await service.command(admin, await completeInput())).ids[0], followupTaskId = await createCompletionTask(identity, '실패 후 유지될 후속 업무'), cmd = { command: 'link_followup', taskId, completionId, followupTaskId, expectedTaskRevision: (await repo.get('task', taskId))!.revision, expectedFollowupRevision: (await repo.get('task', followupTaskId))!.revision, reason: '추가 진행', idempotencyKey: randomUUID() }, created = await rows();
+            await expect((await faulty.command(admin, cmd))).rejects.toThrow('late completion command');
+            expect(await rows()).toEqual(created);
+            const taskCount = (await repo.list('task')).length;
+            const linked = await service.command(admin, cmd);
+            expect(linked.ids[1]).toBe(followupTaskId);
+            expect(await service.command(admin, cmd)).toEqual(linked);
+            expect(await repo.list('task')).toHaveLength(taskCount);
+        });
+        it('Current request and product changes stay separate from original submission/product-use and block stale preview', async () => {
+            await setup();
+            const old = await completionSubmission(identity, directory, taskId), previousUse = await repo.get('productUseSnapshot', old.productUseIds[0]), preview = await completeInput(), task = (await repo.get('task', taskId))!;
+            await new TaskService(identity).command(admin, taskId, { command: 'save', expectedRevision: task.revision, content: { ...task.data.draft!, description: '변경된 현재 요청' }, idempotencyKey: randomUUID() });
+            await new TaskService(identity).command(admin, taskId, { command: 'publish', expectedRevision: task.revision + 1, idempotencyKey: randomUUID() });
+            await expect((await service.command(admin, preview))).rejects.toMatchObject({ status: 409 });
+            const products = new ProductService(identity), product = await products.detail(brand, 'product-serum', contextId), currentPreview = await completeInput();
+            await products.command(brand, 'product-serum', { command: 'save_common', contextId, common: { ...product.common, name: '수정된 현재 상품명' }, expectedCommonRevision: product.commonRevision, idempotencyKey: randomUUID() });
+            await expect((await service.command(admin, currentPreview))).rejects.toMatchObject({ code: 'BASIS_CHANGED' });
+            const before = (await service.workspace(admin, taskId)).preview!.basis;
+            expect(before.currentProducts).toMatchObject({ state: 'available', value: [{ commonRevision: product.commonRevision + 1 }] });
+            expect(before.currentRequest?.id).not.toBe(old.requestId);
+            expect(before.latestSubmission?.requestId).toBe(old.requestId);
+            expect(before.latestMatchesCurrentRequest).toBe(false);
+            const id = (await service.command(admin, await completeInput())).ids[0];
+            expect((await repo.get('completionSnapshot', id))!.data.basis.latestSubmission?.products).toMatchObject({ value: [{ id: old.productUseIds[0], productVersionId: previousUse!.data.productVersionId }] });
+            expect(await repo.get('productUseSnapshot', old.productUseIds[0])).toEqual(previousUse);
+        });
+        it('Opaque record-only source unavailable is reported honestly and never a mandatory completion gate', async () => {
+            await setup();
+            const cmd = await completeInput(), w = await service.workspace(admin, taskId);
+            expect(w.preview!.basis.originalSubmittedEvaluation).toEqual({ connected: true, state: 'unavailable', value: null, reason: 'source_unavailable' });
+            expect(w.preview!.basis.latestSubmission).toBeNull();
+            const id = (await service.command(admin, cmd)).ids[0];
+            expect((await repo.get('completionSnapshot', id))!.data.basis.latestSubmission).toBeNull();
+            expect((await service.workspace(brand, taskId)).summary.status).toBe('completed');
+        });
     });
-    it('AC11-02 basis detects actual G09 change without task revision; preview is pure and stale complete has no writes',async()=>{
-        await setup();await completionSubmission(identity,directory,taskId);const q=await completionInquiry(identity,taskId),cmd=await completeInput(),before=await rows();await service.workspace(admin,taskId);expect(await rows()).toEqual(before);
-        const inquiries=new InquiryService(identity),detail=await inquiries.detail(admin,q.conversationId);if(detail.phase!=='active')throw Error('active');await inquiries.command(admin,q.conversationId,{command:'answer',questionId:q.questionId,expectedQuestionRevision:detail.questions[0].revision,content:{clientMessageId:randomUUID(),body:'실제 응답',fileVersionIds:[]},idempotencyKey:randomUUID()});expect((await repo.get('task',taskId))!.revision).toBe(cmd.expectedTaskRevision);const changed=await rows();await expect(service.command(admin,cmd)).rejects.toMatchObject({code:'BASIS_CHANGED',status:409});expect(await rows()).toEqual(changed);const id=(await service.command(admin,await completeInput())).ids[0];expect((await repo.get('completionSnapshot',id))!.data.basis.inquiries).toMatchObject({value:{unresolved:0,externalWaiting:0}});
-    });
-    it('AC11-03 same exact file two purposes and external performer distinct recorder; no external/task state changed by record',async()=>{
-        await setup();const input=await externalInput();input.expectedTaskRevision=(await repo.get('task',taskId))!.revision;const before=await repo.get('task',taskId),a=(await service.command(admin,input)).ids[0];const b=(await service.command(admin,{...input,action:{...input.action,purpose:'final_use'},idempotencyKey:randomUUID()})).ids[0];expect(await repo.get('task',taskId)).toEqual(before);const d=await service.external(brand,a);expect(d).toMatchObject({effect:'record_only',purpose:'review_request',performer:{kind:'external',label:'외부 수행자'},recordedByLabel:'이전 참여자'});expect((await repo.get('completionExternalAction',a))!.data.recordedBy).toBe('user-admin');expect(d.source.fileVersionIds).toEqual((await service.external(brand,b)).source.fileVersionIds);expect(d.source.products[0].id).toBe(input.action.source.productUseIds[0]);expect((await new CompletionFiles(identity,directory).download(brand,d.source.fileVersionIds[0],new URLSearchParams({externalActionId:a}))).bytes).toEqual(png);
-        const first=await repo.get('completionExternalAction',a);await expect(service.command(admin,{...input,action:{...input.action,source:{...input.action.source,submissionContentHash:'f'.repeat(64)}},idempotencyKey:randomUUID()})).rejects.toMatchObject({status:404});expect(await repo.get('completionExternalAction',a)).toEqual(first);
-    });
-    it('AC11-04 reasoned reopen, second completion and real followup link keep old immutable snapshots; direct publish cannot bypass reopen',async()=>{
-        await setup();await completionSubmission(identity,directory,taskId);const c=(await service.command(admin,await completeInput())).ids[0],original=await repo.get('completionSnapshot',c);let w=await service.workspace(admin,taskId);
-        await expect(new TaskService(identity).command(admin,taskId,{command:'publish',expectedRevision:w.taskRevision,idempotencyKey:randomUUID()})).rejects.toMatchObject({code:'REOPEN_REQUIRED'});
-        await expect(service.command(admin,{command:'reopen',taskId,completionId:c,expectedTaskRevision:w.taskRevision,reason:'',idempotencyKey:randomUUID()})).rejects.toMatchObject({status:422});await service.command(admin,{command:'reopen',taskId,completionId:c,expectedTaskRevision:w.taskRevision,reason:'후속 자료 확인',idempotencyKey:randomUUID()});expect((await repo.get('task',taskId))!.data.status).toBe('partial');const c2=(await service.command(admin,await completeInput())).ids[0];expect(c2).not.toBe(c);expect(await repo.get('completionSnapshot',c)).toEqual(original);expect((await repo.get('completionSnapshot',c2))!.data.previousCompletionId).toBe(c);
-        const followup=await createCompletionTask(identity,'실제 후속 업무');w=await service.workspace(admin,taskId);const input={command:'link_followup',taskId,completionId:c,followupTaskId:followup,expectedTaskRevision:w.taskRevision,expectedFollowupRevision:(await repo.get('task',followup))!.revision,reason:'추가 업무',idempotencyKey:randomUUID()};const result=await service.command(admin,input);expect(await service.command(admin,input)).toEqual(result);expect((await service.workspace(brand,taskId)).followups[0].taskId).toBe(followup);expect(await repo.get('completionSnapshot',c)).toEqual(original);
-    });
-    it('AC11-05 same intent yields one event/receipt; distinct stale CAS loses; every late fault rolls all records back',async()=>{
-        await setup();const cmd=await completeInput(),before=await rows();await expect(new CompletionService(identity,()=>{throw Error('late complete');}).command(admin,cmd)).rejects.toThrow('late complete');expect(await rows()).toEqual(before);const both=await Promise.all([service.command(admin,cmd),service.command(admin,cmd)]);expect(both[0]).toEqual(both[1]);expect(await repo.list('completionSnapshot')).toHaveLength(1);expect((await repo.list('domainEvent')).filter(e=>e.data.eventType==='TASK_MANUALLY_COMPLETED')).toHaveLength(1);await expect(service.command(admin,{...cmd,idempotencyKey:randomUUID()})).rejects.toMatchObject({status:409});const w=await service.workspace(admin,taskId),reopen={command:'reopen',taskId,completionId:both[0].ids[0],expectedTaskRevision:w.taskRevision,reason:'다시 진행',idempotencyKey:randomUUID()},completed=await rows();await expect(new CompletionService(identity,()=>{throw Error('late reopen');}).command(admin,reopen)).rejects.toThrow('late reopen');expect(await rows()).toEqual(completed);
-        await repo.transaction(s=>{const session=s.get('session','policy-session-user-admin')!;s.update('session',session.id,session.revision,{...session.data,revokedAt:NOW});});await expect(service.command(admin,cmd)).rejects.toMatchObject({status:401});
-    });
-    it('A19 completion history omits other brand inquiry and internal action/count/markers; current revoke denies replay and history',async()=>{
-        await setup();await completionSubmission(identity,directory,taskId);await completionInquiry(identity,taskId,brand,'OWN_PUBLIC_QUESTION');await completionInquiry(identity,taskId,team,'OTHER_PRIVATE_QUESTION');const c=(await service.command(admin,await completeInput())).ids[0];expect((await service.snapshot(admin,c)).basis.inquiries).toMatchObject({value:{unresolved:2}});const publicValue=await service.snapshot(brand,c);expect(publicValue.basis.inquiries).toMatchObject({value:{unresolved:1}});expect(JSON.stringify(publicValue)).toContain('OWN_PUBLIC_QUESTION');expect(JSON.stringify(publicValue)).not.toContain('OTHER_PRIVATE');expect(publicValue).not.toHaveProperty('basisHash');
-        await repo.transaction(s=>{const m=s.list('membership',contextId).find(x=>x.data.userId==='user-luna')!;s.update('membership',m.id,m.revision,{...m.data,status:'suspended'});});await expect(service.snapshot(brand,c)).rejects.toMatchObject({status:404});await expect(service.workspace(brand,taskId)).rejects.toMatchObject({status:404});
-    });
-    it('Stored nested unknown extras do not project; malformed known snapshot field safely fails503 and immutable rows remain',async()=>{
-        await setup();const id=(await service.command(admin,await completeInput())).ids[0],row=(await repo.get('completionSnapshot',id))!,copy={...row.data,sequence:2,memo:'normal',extra:{canary:'UNKNOWN_CANARY'},basis:{...row.data.basis,currentRequest:{...row.data.basis.currentRequest!,extra:'UNKNOWN_CANARY'}}};const good=randomUUID();await repo.transaction(s=>s.create('completionSnapshot',{id:good,contextId,data:copy}));expect(JSON.stringify(await service.snapshot(brand,good))).not.toContain('UNKNOWN_CANARY');const bad=randomUUID();await repo.transaction(s=>s.create('completionSnapshot',{id:bad,contextId,data:{...row.data,sequence:3,completedAt:{secret:'KNOWN_CANARY'}} as unknown as CompletionRecords['completionSnapshot']}));await expect(service.snapshot(admin,bad)).rejects.toMatchObject({status:503});expect((await repo.get('completionSnapshot',bad))!.data.completedAt).toEqual({secret:'KNOWN_CANARY'});await expect(repo.transaction(s=>s.update('completionSnapshot',id,row.revision,row.data))).rejects.toMatchObject({code:'INVALID_RECORD'});
-    });
-    it('D02 after-IO reauthorization rejects downloaded external evidence when membership is revoked',async()=>{
-        await setup();const input=await externalInput();input.expectedTaskRevision=(await repo.get('task',taskId))!.revision;const id=(await service.command(admin,input)).ids[0];let n=0;const wrapped:RecordRepository={...repo,transaction:async operation=>{const result=await repo.transaction(operation);if(++n===2)await repo.transaction(s=>{const m=s.list('membership',contextId).find(m=>m.data.userId==='user-luna')!;s.update('membership',m.id,m.revision,{...m.data,status:'suspended'});});return result;}};await expect(new CompletionFiles(new IdentityService(wrapped,()=>NOW),directory).download(brand,input.action.source.fileVersionIds[0],new URLSearchParams({externalActionId:id}))).rejects.toMatchObject({status:404});expect(n).toBe(2);
-    });
-    it('Internal external record uses exact source and existing internal evidence without releasing it to brand',async()=>{
-        await setup();const input=await externalInput('internal'),f=(await new FileService(identity,directory).upload(admin,taskId,[{name:'private.png',type:'image/png',bytes:png}],'internal')).files[0];input.expectedTaskRevision=(await repo.get('task',taskId))!.revision;input.action.evidenceFileVersionIds=[f.id];input.action.latestProgress='INTERNAL_EXTERNAL_PROGRESS';const id=(await service.command(admin,input)).ids[0];expect((await service.workspace(brand,taskId)).externalActions).toEqual([]);await expect(service.external(brand,id)).rejects.toMatchObject({status:404});const c=(await service.command(admin,await completeInput())).ids[0];expect(JSON.stringify(await service.snapshot(brand,c))).not.toContain('INTERNAL_EXTERNAL_PROGRESS');expect(JSON.stringify(await service.snapshot(admin,c))).toContain('INTERNAL_EXTERNAL_PROGRESS');
-    });
-    it('A20 late external/followup writes roll back and failed association keeps actual created followup ID for retry',async()=>{
-        await setup();const input=await externalInput();input.expectedTaskRevision=(await repo.get('task',taskId))!.revision;
-        const faulty=new CompletionService(identity,()=>{throw Error('late completion command');}),before=await rows();await expect(faulty.command(admin,input)).rejects.toThrow('late completion command');expect(await rows()).toEqual(before);
-        const completionId=(await service.command(admin,await completeInput())).ids[0],followupTaskId=await createCompletionTask(identity,'실패 후 유지될 후속 업무'),cmd={command:'link_followup',taskId,completionId,followupTaskId,expectedTaskRevision:(await repo.get('task',taskId))!.revision,expectedFollowupRevision:(await repo.get('task',followupTaskId))!.revision,reason:'추가 진행',idempotencyKey:randomUUID()},created=await rows();
-        await expect(faulty.command(admin,cmd)).rejects.toThrow('late completion command');expect(await rows()).toEqual(created);const taskCount=(await repo.list('task')).length;const linked=await service.command(admin,cmd);expect(linked.ids[1]).toBe(followupTaskId);expect(await service.command(admin,cmd)).toEqual(linked);expect(await repo.list('task')).toHaveLength(taskCount);
-    });
-    it('Current request and product changes stay separate from original submission/product-use and block stale preview',async()=>{
-        await setup();const old=await completionSubmission(identity,directory,taskId),previousUse=await repo.get('productUseSnapshot',old.productUseIds[0]),preview=await completeInput(),task=(await repo.get('task',taskId))!;
-        await new TaskService(identity).command(admin,taskId,{command:'save',expectedRevision:task.revision,content:{...task.data.draft!,description:'변경된 현재 요청'},idempotencyKey:randomUUID()});await new TaskService(identity).command(admin,taskId,{command:'publish',expectedRevision:task.revision+1,idempotencyKey:randomUUID()});await expect(service.command(admin,preview)).rejects.toMatchObject({status:409});
-        const products=new ProductService(identity),product=await products.detail(brand,'product-serum',contextId),currentPreview=await completeInput();await products.command(brand,'product-serum',{command:'save_common',contextId,common:{...product.common,name:'수정된 현재 상품명'},expectedCommonRevision:product.commonRevision,idempotencyKey:randomUUID()});await expect(service.command(admin,currentPreview)).rejects.toMatchObject({code:'BASIS_CHANGED'});const before=(await service.workspace(admin,taskId)).preview!.basis;expect(before.currentProducts).toMatchObject({state:'available',value:[{commonRevision:product.commonRevision+1}]});expect(before.currentRequest?.id).not.toBe(old.requestId);expect(before.latestSubmission?.requestId).toBe(old.requestId);expect(before.latestMatchesCurrentRequest).toBe(false);const id=(await service.command(admin,await completeInput())).ids[0];expect((await repo.get('completionSnapshot',id))!.data.basis.latestSubmission?.products).toMatchObject({value:[{id:old.productUseIds[0],productVersionId:previousUse!.data.productVersionId}]});expect(await repo.get('productUseSnapshot',old.productUseIds[0])).toEqual(previousUse);
-    });
-    it('Opaque record-only source unavailable is reported honestly and never a mandatory completion gate',async()=>{
-        await setup();const cmd=await completeInput(),w=await service.workspace(admin,taskId);expect(w.preview!.basis.originalSubmittedEvaluation).toEqual({connected:true,state:'unavailable',value:null,reason:'source_unavailable'});expect(w.preview!.basis.latestSubmission).toBeNull();const id=(await service.command(admin,cmd)).ids[0];expect((await repo.get('completionSnapshot',id))!.data.basis.latestSubmission).toBeNull();expect((await service.workspace(brand,taskId)).summary.status).toBe('completed');
-    });
-});

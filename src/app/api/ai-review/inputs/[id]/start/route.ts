@@ -1,4 +1,8 @@
 import { route, json, readBody } from '@/server/http/identity';
 import { AiReviewService } from '@/server/ai-review/service';
 export const runtime = 'nodejs';
-export function POST(request: Request, c: { params: Promise<{ id: string }> }) { return route(request, async (i, t) => json(await new AiReviewService(i).start(t, (await c.params).id, await readBody(request, ['inputVersionId', 'extractionRunId', 'expectedRunId', 'corpusReleaseId', 'corpusManifestHash', 'engine', 'idempotencyKey'])))); }
+export async function POST(request: Request, c: {
+    params: Promise<{
+        id: string;
+    }>;
+}) { return (await route(request, async (i, t) => json(await new AiReviewService(i).start(t, (await c.params).id, await readBody(request, ['inputVersionId', 'extractionRunId', 'expectedRunId', 'corpusReleaseId', 'corpusManifestHash', 'engine', 'idempotencyKey']))))); }

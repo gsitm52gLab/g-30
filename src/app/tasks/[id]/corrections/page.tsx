@@ -11,12 +11,15 @@ export default async function CorrectionsPage({ params }: {
     }>;
 }) {
     const { id } = await params;
-    const initial = await new CorrectionService(await identity()).workspace(await currentToken(), id).catch(e => { if (e instanceof AuthError) {
-        if (e.status === 401)
-            redirect('/login');
-        if (e.status === 403 || e.status === 404)
-            notFound();
-    } return null; });
+    const initial = await (await new CorrectionService(await identity()).workspace(await currentToken(), id)).catch(e => {
+        if (e instanceof AuthError) {
+            if (e.status === 401)
+                redirect('/login');
+            if (e.status === 403 || e.status === 404)
+                notFound();
+        }
+        return null;
+    });
     if (!initial)
         return <StorageFailure />;
     return <CorrectionSurface key={JSON.stringify([initial.actorId, initial.contextId, id])} initial={initial}/>;

@@ -24,10 +24,10 @@ async function xlsx(rows: unknown[][], headers = fields) {
     return Buffer.from(await book.xlsx.writeBuffer());
 }
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} G07 atomic standard import`, () => {
+    describe(`${mode} G07 atomic standard import`, async () => {
         let repo: RecordRepository, service: ImportService, products: ProductService, dir: string;
         async function setup() { repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); const identity = await policyFixture(repo); dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-g07-import-')); service = new ImportService(identity, new ImportStaging(dir)); products = new ProductService(identity); }
-        async function preview(rows: unknown[][], headers = fields, token = brand) { const source = await service.inspect(token, A, 'standard.xlsx', await xlsx(rows, headers)); return service.preview(token, { sourceId: source.sourceId, sheetId: source.sheets[0].id, headerRow: 1, mapping: headers.map((field, i) => ({ column: i + 1, field })), choices: [] }); }
+        async function preview(rows: unknown[][], headers = fields, token = brand) { const source = await service.inspect(token, A, 'standard.xlsx', await xlsx(rows, headers)); return (await service.preview(token, { sourceId: source.sourceId, sheetId: source.sheets[0].id, headerRow: 1, mapping: headers.map((field, i) => ({ column: i + 1, field })), choices: [] })); }
         const business = async () => Promise.all((['product', 'contextProduct', 'productVersion', 'contextProductVersion', 'retailPrice', 'retailPriceVersion', 'internalPrice', 'internalPriceVersion', 'audit', 'domainEvent', 'commandReceipt', 'importBatch', 'submission', 'productUseSnapshot'] as RecordKind[]).map(k => repo.list(k)));
         afterEach(async () => {
             repo?.close();
@@ -48,7 +48,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(d.common.code).toBe('000-NEW');
             expect(d.local.jan).toBe('00001234');
             expect(d.retail.current!.fields.amount).toBe('0');
-            await expect(service.apply(brand, { ...command, previewId: 'different' })).rejects.toBeDefined();
+            await expect((await service.apply(brand, { ...command, previewId: 'different' }))).rejects.toBeDefined();
         });
         it('AC07-03 invalid row including skipped duplicate blocks whole batch; forbidden context/numeric identifier explicit', async () => {
             await setup();
@@ -56,7 +56,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(p.errorRows).toBe(3);
             expect(p.rows[0].errors.some(e => e.code === 'DUPLICATE_CODE')).toBe(true);
             expect(p.rows[1].errors.some(e => e.field === 'local.jan')).toBe(true);
-            await expect(service.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() })).rejects.toMatchObject({ code: 'IMPORT_ERRORS' });
+            await expect((await service.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ code: 'IMPORT_ERRORS' });
             expect(await business()).toEqual(before);
         });
         it('AC07-03 injected late exception rolls back all versions/audit/result/receipt; CAS is fresh', async () => {
@@ -66,49 +66,54 @@ for (const mode of ['mock', 'sqlite'] as const)
                 if (row === 3)
                     throw new Error('late batch failure');
             });
-            await expect(faulty.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() })).rejects.toThrow('late batch failure');
+            await expect((await faulty.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() }))).rejects.toThrow('late batch failure');
             expect(await business()).toEqual(before);
             const current = await products.detail(brand, 'product-serum', A), update = await preview([[A, current.common.code, 'Excel update', '', '', '']]);
             await products.command(brand, current.productId, { contextId: A, command: 'save_common', common: { ...current.common, name: 'concurrent' }, expectedCommonRevision: current.commonRevision, idempotencyKey: randomUUID() });
-            await expect(service.apply(brand, { previewId: update.id, idempotencyKey: randomUUID() })).rejects.toMatchObject({ code: 'CONFLICT' });
+            await expect((await service.apply(brand, { previewId: update.id, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ code: 'CONFLICT' });
             expect(await repo.list('importBatch')).toHaveLength(0);
         });
         it('update blanks preserve fields, explicit clears and case-normalized code update share one UoW; skip writes no product', async () => {
             await setup();
             const d = await products.detail(brand, 'product-serum', A);
-            await products.command(brand, d.productId, {contextId:A, command:'save_context', fields:{...d.local, jan:'000KEEP', localName:'preserved local'}, expectedContextRevision:d.contextRevision, idempotencyKey:randomUUID()});
-            const headers = ['contextKey','common.code','common.name','common.description','local.jan','local.localName'];
-            const current = await products.detail(brand, d.productId, A), oldDescription=current.common.description;
-            const source=await service.inspect(brand,A,'choices.xlsx',await xlsx([[A,current.common.code.toLowerCase(),'','','',''],[A,'SKIPPED-NEW','skip','','','']],headers));
-            const p=await service.preview(brand,{sourceId:source.sourceId,sheetId:source.sheets[0].id,headerRow:1,mapping:headers.map((field,i)=>({column:i+1,field})),choices:[{row:2,action:'update',clearFields:['local.jan']},{row:3,action:'skip',clearFields:[]}]});
+            await products.command(brand, d.productId, { contextId: A, command: 'save_context', fields: { ...d.local, jan: '000KEEP', localName: 'preserved local' }, expectedContextRevision: d.contextRevision, idempotencyKey: randomUUID() });
+            const headers = ['contextKey', 'common.code', 'common.name', 'common.description', 'local.jan', 'local.localName'];
+            const current = await products.detail(brand, d.productId, A), oldDescription = current.common.description;
+            const source = await service.inspect(brand, A, 'choices.xlsx', await xlsx([[A, current.common.code.toLowerCase(), '', '', '', ''], [A, 'SKIPPED-NEW', 'skip', '', '', '']], headers));
+            const p = await service.preview(brand, { sourceId: source.sourceId, sheetId: source.sheets[0].id, headerRow: 1, mapping: headers.map((field, i) => ({ column: i + 1, field })), choices: [{ row: 2, action: 'update', clearFields: ['local.jan'] }, { row: 3, action: 'skip', clearFields: [] }] });
             expect(p.errorRows).toBe(0);
-            const id=(await service.apply(brand,{previewId:p.id,idempotencyKey:randomUUID()})).ids[0], after=await products.detail(brand,d.productId,A);
-            expect(after.common.name).toBe(current.common.name); expect(after.common.description).toBe(oldDescription);
-            expect(after.common.code).toBe(current.common.code.toLowerCase()); expect(after.local.jan).toBe(''); expect(after.local.localName).toBe('preserved local');
+            const id = (await service.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() })).ids[0], after = await products.detail(brand, d.productId, A);
+            expect(after.common.name).toBe(current.common.name);
+            expect(after.common.description).toBe(oldDescription);
+            expect(after.common.code).toBe(current.common.code.toLowerCase());
+            expect(after.local.jan).toBe('');
+            expect(after.local.localName).toBe('preserved local');
             expect(after.contextRevision).toBeGreaterThan(current.contextRevision);
-            const result=await service.batch(brand,id); expect(result.rows[1]).toMatchObject({action:'skip',productId:null,versionIds:[]});
-            expect((await repo.list('contextProduct',A)).some(x=>x.data.normalizedCode==='skipped-new')).toBe(false);
+            const result = await service.batch(brand, id);
+            expect(result.rows[1]).toMatchObject({ action: 'skip', productId: null, versionIds: [] });
+            expect((await repo.list('contextProduct', A)).some(x => x.data.normalizedCode === 'skipped-new')).toBe(false);
         });
         it('competing apply calls commit once, same-key different preview conflicts; committed replay survives expiry and staging removal', async () => {
             await setup();
-            const p=await preview([[A,'CONCURRENT','one','','1','JPY']]), key=randomUUID(), command={previewId:p.id,idempotencyKey:key};
-            const results=await Promise.all([service.apply(brand,command),service.apply(brand,command)]);
-            expect(results[0]).toEqual(results[1]); expect(await repo.list('importBatch')).toHaveLength(1);
-            const another=await preview([[A,'ANOTHER','another','','1','JPY']]);
-            await expect(service.apply(brand,{previewId:another.id,idempotencyKey:key})).rejects.toMatchObject({code:'CONFLICT',status:409});
-            service.identity.clock=()=>new Date(Date.parse(NOW)+31*60000).toISOString();
-            await expect(service.apply(brand,{previewId:another.id,idempotencyKey:randomUUID()})).rejects.toMatchObject({code:'PREVIEW_EXPIRED'});
-            await rm(dir,{recursive:true,force:true});
-            expect(await service.apply(brand,command)).toEqual(results[0]);
+            const p = await preview([[A, 'CONCURRENT', 'one', '', '1', 'JPY']]), key = randomUUID(), command = { previewId: p.id, idempotencyKey: key };
+            const results = await Promise.all([(await service.apply(brand, command)), (await service.apply(brand, command))]);
+            expect(results[0]).toEqual(results[1]);
+            expect(await repo.list('importBatch')).toHaveLength(1);
+            const another = await preview([[A, 'ANOTHER', 'another', '', '1', 'JPY']]);
+            await expect((await service.apply(brand, { previewId: another.id, idempotencyKey: key }))).rejects.toMatchObject({ code: 'CONFLICT', status: 409 });
+            service.identity.clock = () => new Date(Date.parse(NOW) + 31 * 60000).toISOString();
+            await expect((await service.apply(brand, { previewId: another.id, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ code: 'PREVIEW_EXPIRED' });
+            await rm(dir, { recursive: true, force: true });
+            expect(await service.apply(brand, command)).toEqual(results[0]);
             expect(await repo.list('importBatch')).toHaveLength(1);
         });
         it('stored batch nested extensions cannot cross the public result DTO', async () => {
             await setup();
             const p = await preview([[A, 'DTO-ROW', 'dto', '', '1', 'JPY']]), id = (await service.apply(brand, { previewId: p.id, idempotencyKey: randomUUID() })).ids[0], original = (await repo.get('importBatch', id))!;
-            const poisoned = await repo.transaction(s => s.create('importBatch', { id: randomUUID(), contextId: A, data: { ...original.data, sourceName: { nested: 'G07_IMPORT_CANARY' }, rows: original.data.rows.map(r => ({ ...r, action: { nested: 'G07_IMPORT_CANARY' }, extra: { secret: 'G07_IMPORT_CANARY' } })), extra: { secret: 'G07_IMPORT_CANARY' } } as unknown as typeof original.data }));
-            await expect(service.batch(brand, poisoned.id)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+            const poisoned = await repo.transaction(async (s) => (await s.create('importBatch', { id: randomUUID(), contextId: A, data: { ...original.data, sourceName: { nested: 'G07_IMPORT_CANARY' }, rows: original.data.rows.map(r => ({ ...r, action: { nested: 'G07_IMPORT_CANARY' }, extra: { secret: 'G07_IMPORT_CANARY' } })), extra: { secret: 'G07_IMPORT_CANARY' } } as unknown as typeof original.data })));
+            await expect((await service.batch(brand, poisoned.id))).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
             expect(await repo.get('importBatch', poisoned.id)).toEqual(poisoned);
-            const extended = await repo.transaction(s => s.create('importBatch', { id: randomUUID(), contextId: A, data: { ...original.data, rows: original.data.rows.map(r => ({ ...r, extra: { secret: 'G07_IMPORT_CANARY' } })), extra: { secret: 'G07_IMPORT_CANARY' } } as typeof original.data }));
+            const extended = await repo.transaction(async (s) => (await s.create('importBatch', { id: randomUUID(), contextId: A, data: { ...original.data, rows: original.data.rows.map(r => ({ ...r, extra: { secret: 'G07_IMPORT_CANARY' } })), extra: { secret: 'G07_IMPORT_CANARY' } } as typeof original.data })));
             const dto = await service.batch(brand, extended.id);
             expect(JSON.stringify(dto)).not.toContain('G07_IMPORT_CANARY');
             expect(dto.rows).toHaveLength(1);
@@ -117,8 +122,8 @@ for (const mode of ['mock', 'sqlite'] as const)
         it('AC07-04 private mapping denied before preview; price-authorized import supported, public export ZIP omits private field/value', async () => {
             await setup();
             const headers = ['contextKey', 'common.code', 'common.name', 'internal.supplyAmount', 'internal.currency'];
-            await expect(preview([[A, 'PRIVATE', 'private', '99123.456', 'JPY']], headers, brand)).rejects.toMatchObject({ status: 403 });
-            await expect(preview([[A, 'PRIVATE', 'private', '99123.456', 'JPY']], headers, gsg)).rejects.toMatchObject({ status: 403 });
+            await expect((await preview([[A, 'PRIVATE', 'private', '99123.456', 'JPY']], headers, brand))).rejects.toMatchObject({ status: 403 });
+            await expect((await preview([[A, 'PRIVATE', 'private', '99123.456', 'JPY']], headers, gsg))).rejects.toMatchObject({ status: 403 });
             const p = await preview([[A, 'PRIVATE', 'private', '99123.456', 'JPY']], headers, price);
             expect(p.canApply).toBe(true);
             await service.apply(price, { previewId: p.id, idempotencyKey: randomUUID() });
@@ -126,7 +131,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(xml).not.toContain('99123.456');
             expect(xml).not.toContain('internal.supplyAmount');
             expect(xml).toContain('retail.amount');
-            await expect(service.workbook(brand, A, 'export', true)).rejects.toMatchObject({ status: 404 });
+            await expect((await service.workbook(brand, A, 'export', true))).rejects.toMatchObject({ status: 404 });
         });
     });
 describe('G07 bounded XLSX parser', () => {

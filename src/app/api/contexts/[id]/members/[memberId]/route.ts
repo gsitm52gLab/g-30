@@ -5,4 +5,4 @@ export async function PATCH(r: Request, c: {
         id: string;
         memberId: string;
     }>;
-}) { return route(r, async (s, t) => { const p = await c.params; return json(await s.setMembership(t, p.id, p.memberId, await readBody(r, ["expectedRevision", "status", "scope", "internalPriceAccess"]))); }); }
+}) { return (await route(r, async (s, t) => { const p = await c.params; return json(await s.setMembership(t, p.id, p.memberId, await readBody(r, ["expectedRevision", "status", "scope", "internalPriceAccess"]))); })); }

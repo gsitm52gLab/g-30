@@ -3,8 +3,8 @@ import { ImportService } from '@/server/imports/service';
 import { importLimits } from '@/domain/imports/types';
 import { fail } from '@/server/auth/errors';
 export const runtime = 'nodejs';
-export function POST(request: Request) {
-    return route(request, async (identity, token) => {
+export async function POST(request: Request) {
+    return (await route(request, async (identity, token) => {
         const contextId = new URL(request.url).searchParams.get('context') ?? '', service = new ImportService(identity);
         await service.configuration(token, contextId);
         const mime = request.headers.get('content-type');
@@ -42,5 +42,5 @@ export function POST(request: Request) {
         if (!file || typeof file === 'string')
             fail('VALIDATION', 422, '파일을 선택해 주세요.');
         return json(await service.inspect(token, contextId, file.name, Buffer.from(await file.arrayBuffer())), 201);
-    });
+    }));
 }

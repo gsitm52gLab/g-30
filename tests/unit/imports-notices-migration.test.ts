@@ -19,14 +19,14 @@ import { blankNotice } from '@/domain/notices/types';
 const contextId = 'ctx-jp-a-luna', admin = tokenFor('user-admin'), brand = tokenFor('user-luna');
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=', 'base64');
 const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
-
-it.each([6, 7])('populated chain through module 000%i gains missing sibling and inquiries; rows/checksums/files/replays remain exact', async firstModule => {
+it.each([6, 7])('populated chain through module 000%i gains missing sibling and inquiries; rows/checksums/files/replays remain exact', async (firstModule) => {
     const directory = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-g07-union-'));
     const sqlSource = path.resolve('src/server/db/migrations'), sqlDirectory = path.join(directory, 'prior');
     await mkdir(sqlDirectory);
     const names = (await readdir(sqlSource)).filter(n => /^\d+.*\.sql$/.test(n)).sort();
     expect(names).toEqual(['0001-foundation.sql', '0002-identity.sql', '0003-tasks.sql', '0004-products.sql', '0005-submissions.sql', '0006-evidence-imports.sql', '0007-notices.sql', '0008-inquiries.sql', '0009-corrections.sql', '0010-campaigns.sql', '0011-completion.sql', '0012-ai-input.sql', '0013-ai-review.sql', '0014-scheduling-notifications.sql', '0015-ai-provider.sql']);
-    for (const name of names.filter(n => Number(n.slice(0, 4)) <= 5 || Number(n.slice(0, 4)) === firstModule)) await copyFile(path.join(sqlSource, name), path.join(sqlDirectory, name));
+    for (const name of names.filter(n => Number(n.slice(0, 4)) <= 5 || Number(n.slice(0, 4)) === firstModule))
+        await copyFile(path.join(sqlSource, name), path.join(sqlDirectory, name));
     const db = openDatabase(path.join(directory, 'populated.sqlite'), true);
     let repo: ReturnType<typeof createSqliteRepository> | undefined;
     try {
@@ -39,7 +39,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
         const p = await products.detail(brand, reference.productId, contextId), binding = blankFileBinding(randomUUID(), file.id);
         await products.command(brand, p.productId, { command: 'save_files', contextId, expectedContextRevision: p.contextRevision, files: [binding], idempotencyKey: randomUUID() });
         await products.command(brand, p.productId, { command: 'save_common', contextId, expectedCommonRevision: p.commonRevision, common: { ...p.common, name: '기존 사용자가 직접 고친 상품' }, idempotencyKey: randomUUID() });
-        await repo.transaction(s => { const t = s.get('task', 'task-pop')!; s.update('task', t.id, t.revision, { ...t.data, title: '합병 전 사용자가 고친 업무' }); });
+        await repo.transaction(async (s) => { const t = (await s.get('task', 'task-pop'))!; (await s.update('task', t.id, t.revision, { ...t.data, title: '합병 전 사용자가 고친 업무' })); });
         const produceG07 = async () => {
             const current = await products.detail(brand, p.productId, contextId);
             const source = { kind: 'product_binding', productId: p.productId, contextProductId: current.contextProductId, contextVersionId: current.contextVersionId, bindingId: binding.id, fileVersionId: file.id };
@@ -56,7 +56,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
             expect(preview.canApply).toBe(true);
             const command = { previewId: preview.id, idempotencyKey: randomUUID() }, result = await imports.apply(brand, command);
             expect((await evidence.detail(brand, eid)).versions).toHaveLength(2);
-            return { replay: () => imports.apply(brand, command), result };
+            return { replay: async () => (await imports.apply(brand, command)), result };
         };
         const produceG08 = async () => {
             const content = { ...blankNotice(), title: '원 공지', body: '보존할 과거 본문', fileIds: [file.id] };
@@ -67,9 +67,9 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
             const command = { command: 'publish', expectedRevision: (await repo!.get('notice', id))!.revision, idempotencyKey: randomUUID() }, result = await notices.command(admin, id, command);
             expect((await notices.detail(brand, id)).versions).toHaveLength(2);
             expect((await notices.detail(brand, id, v1)).selected!.ownReadAt).toBe(NOW);
-            return { replay: () => notices.command(admin, id, command), result };
+            return { replay: async () => (await notices.command(admin, id, command)), result };
         };
-        const original = await (firstModule === 6 ? produceG07() : produceG08());
+        const original = await (firstModule === 6 ? (await produceG07()) : (await produceG08()));
         const rows = () => db.prepare('SELECT * FROM records ORDER BY kind,id').all();
         const before = rows(), oldMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all();
         const fileHash = hash((await files.download(brand, file.id, reference, 'original')).bytes);
@@ -77,20 +77,34 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
         expect((await repo.list('commandReceipt')).length).toBeGreaterThan(4);
         expect(migrate(db)).toEqual({ applied: 9, total: 15 });
         expect(rows()).toEqual(before);
-        const allMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as { name: string; sha256: string; applied_at: string }[];
+        const allMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as {
+            name: string;
+            sha256: string;
+            applied_at: string;
+        }[];
         expect(allMigrations.filter(m => Number(m.name.slice(0, 4)) <= 5 || Number(m.name.slice(0, 4)) === firstModule)).toEqual(oldMigrations);
-        for (const m of allMigrations) expect(m.sha256).toBe(hash(await readFile(path.join(sqlSource, m.name))));
+        for (const m of allMigrations)
+            expect(m.sha256).toBe(hash(await readFile(path.join(sqlSource, m.name))));
         expect(migrate(db)).toEqual({ applied: 0, total: 15 });
         expect(rows()).toEqual(before);
         expect(await original.replay()).toEqual(original.result);
         expect(rows()).toEqual(before);
         expect(hash((await files.download(brand, file.id, reference, 'original')).bytes)).toBe(fileHash);
-        await (firstModule === 6 ? produceG08() : produceG07());
+        await (firstModule === 6 ? (await produceG08()) : (await produceG07()));
         for (const kind of ['evidenceVersion', 'evidenceAssessment', 'importBatch', 'noticeVersion', 'noticeRead']) {
-            const row = db.prepare('SELECT id FROM records WHERE kind=? LIMIT 1').get(kind) as { id: string };
+            const row = db.prepare('SELECT id FROM records WHERE kind=? LIMIT 1').get(kind) as {
+                id: string;
+            };
             expect(row).toBeDefined();
             expect(() => db.prepare('UPDATE records SET revision=revision+1 WHERE kind=? AND id=?').run(kind, row.id)).toThrow();
         }
         console.info('G07_UNION_MIGRATION_EVIDENCE ' + JSON.stringify({ firstModule, missingAdded: [firstModule === 6 ? '0007-notices.sql' : '0006-evidence-imports.sql', '0008-inquiries.sql', '0009-corrections.sql', '0010-campaigns.sql', '0011-completion.sql', '0012-ai-input.sql'], priorRecords: before.length, priorRowsSha256: hash(JSON.stringify(before)), fileSha256: fileHash, migrations: allMigrations, rowsUnchanged: true, receiptReplayUnchanged: true, bothModuleProducersAndImmutableGuards: true }));
-    } finally { if (repo) repo.close(); else db.close(); await rm(directory, { recursive: true, force: true }); }
+    }
+    finally {
+        if (repo)
+            repo.close();
+        else
+            db.close();
+        await rm(directory, { recursive: true, force: true });
+    }
 });
