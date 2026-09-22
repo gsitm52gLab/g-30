@@ -122,7 +122,7 @@ async function fixture<T>(input: SubmissionFixtureInput): Promise<T> {
             return await submissionFixture(repo, input) as T;
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     const child = children.get(port)!;
@@ -224,7 +224,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     for (const [client, email] of [[admin, 'admin'], [brand, 'luna'], [co, 'co'], [team, 'team'], [foreign, 'wave']] as const)

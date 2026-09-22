@@ -10,17 +10,20 @@ const clock = () => "2026-09-21T01:00:00.000Z";
 for (const mode of ["mock", "sqlite"] as const) {
     describe(`${mode} shared repository contract`, () => {
         let repository: RecordRepository;
-        function create() { if (mode === "mock")
-            repository = createMockRepository(clock);
-        else {
-            const db = openDatabase(":memory:", true);
-            migrate(db);
-            repository = createSqliteRepository(db, clock);
-        } return repository; }
+        function create() {
+            if (mode === "mock")
+                repository = createMockRepository(clock);
+            else {
+                const db = openDatabase(":memory:", true);
+                migrate(db);
+                repository = createSqliteRepository(db, clock);
+            }
+            return repository;
+        }
         afterEach(() => repository?.close());
         it("round-trips typed records and context filters with immutable copies", async () => {
             const repo = create();
-            const record = await repo.transaction(s => s.create("checkpoint", { id: "one", contextId: "context-a", data: { value: "first" } }));
+            const record = await repo.transaction(async (s) => (await s.create("checkpoint", { id: "one", contextId: "context-a", data: { value: "first" } })));
             record.data.value = "mutated outside";
             expect((await repo.get("checkpoint", "one"))?.data.value).toBe("first");
             expect(await repo.list("checkpoint", "context-b")).toEqual([]);
@@ -30,30 +33,50 @@ for (const mode of ["mock", "sqlite"] as const) {
         it("rejects duplicates and stale revisions", async () => {
             const repo = create();
             const input = { id: "one", contextId: null, data: { value: "initial" } };
-            await repo.transaction(s => s.create("checkpoint", input));
-            await expect(repo.transaction(s => s.create("checkpoint", input))).rejects.toMatchObject({ code: "CONFLICT" });
-            await repo.transaction(s => s.update("checkpoint", "one", 1, { value: "updated" }));
-            await expect(repo.transaction(s => s.update("checkpoint", "one", 1, { value: "stale" }))).rejects.toMatchObject({ code: "CONFLICT" });
+            await repo.transaction(async (s) => (await s.create("checkpoint", input)));
+            await expect(repo.transaction(async (s) => (await s.create("checkpoint", input)))).rejects.toMatchObject({ code: "CONFLICT" });
+            await repo.transaction(async (s) => (await s.update("checkpoint", "one", 1, { value: "updated" })));
+            await expect(repo.transaction(async (s) => (await s.update("checkpoint", "one", 1, { value: "stale" })))).rejects.toMatchObject({ code: "CONFLICT" });
             expect((await repo.get("checkpoint", "one"))?.revision).toBe(2);
             expect((await repo.get("checkpoint", "one"))?.data.value).toBe("updated");
         });
         it("rolls back every write when an operation fails", async () => {
             const repo = create();
-            await expect(repo.transaction(s => { s.create("checkpoint", { id: "one", contextId: null, data: { value: "should rollback" } }); throw new Error("synthetic failure"); })).rejects.toThrow("synthetic failure");
+            await expect(repo.transaction(async (s) => { (await s.create("checkpoint", { id: "one", contextId: null, data: { value: "should rollback" } })); throw new Error("synthetic failure"); })).rejects.toThrow("synthetic failure");
             expect(await repo.get("checkpoint", "one")).toBeNull();
         });
-        it("rejects async transaction callbacks and blocks escaped writes", async () => {
+        it("awaits callback lifetime, commits both writes and blocks expired handles", async () => {
+            const repo = create(); let escaped!: UnitOfWork;
+            await repo.transaction(async s => { escaped = s; await s.create('checkpoint', {id:'before-await',contextId:null,data:{value:'first'}}); await Promise.resolve(); await s.create('checkpoint', {id:'after-await',contextId:null,data:{value:'second'}}); });
+            expect(await repo.list('checkpoint')).toHaveLength(2);
+            await expect(escaped.get('checkpoint','before-await')).rejects.toMatchObject({code:'ASYNC_TRANSACTION'});
+        });
+        it("serializes transactions and prevents readers observing an uncommitted write", async () => {
+            const repo = create(); let release!:()=>void, entered!:()=>void;
+            const gate = new Promise<void>(r=>{release=r}), ready = new Promise<void>(r=>{entered=r});
+            const first = repo.transaction(async s => {await s.create('checkpoint',{id:'pending',contextId:null,data:{value:'uncommitted'}}); entered(); await gate; throw new Error('rollback');});
+            const firstOutcome = expect(first).rejects.toThrow('rollback');
+            await ready; let observed=false; const read=repo.get('checkpoint','pending').then(value=>{observed=true;return value});
+            await Promise.resolve(); expect(observed).toBe(false); release(); await firstOutcome; expect(await read).toBeNull();
+            await repo.transaction(s=>s.create('checkpoint',{id:'recovered',contextId:null,data:{value:'ok'}}));
+            expect(await repo.get('checkpoint','recovered')).not.toBeNull();
+        });
+        it("rolls back a caught failed operation and rejects unawaited pending work", async () => {
             const repo = create();
-            let escaped: UnitOfWork | undefined;
-            await expect(repo.transaction(async (s) => { escaped = s; s.create("checkpoint", { id: "before-await", contextId: null, data: { value: "rollback" } }); await Promise.resolve(); s.create("checkpoint", { id: "after-await", contextId: null, data: { value: "must reject" } }); })).rejects.toMatchObject({ code: "ASYNC_TRANSACTION" });
-            await Promise.resolve();
-            expect(await repo.list("checkpoint")).toEqual([]);
-            expect(() => escaped?.get("checkpoint", "one")).toThrow(StoreError);
+            await expect(repo.transaction(async s => {await s.create('checkpoint',{id:'poisoned',contextId:null,data:{value:'rollback'}});try{await s.update('checkpoint','missing',1,{value:'absent'});}catch{/* intentionally caught */}})).rejects.toMatchObject({code:'NOT_FOUND'});
+            expect(await repo.get('checkpoint','poisoned')).toBeNull();
+            await expect(repo.transaction(async s => {void s.create('checkpoint',{id:'unawaited',contextId:null,data:{value:'rollback'}});})).rejects.toMatchObject({code:'ASYNC_TRANSACTION'});
+            expect(await repo.get('checkpoint','unawaited')).toBeNull();
+        });
+        it("drains accepted work on close and refuses new work", async () => {
+            const repo=create(); const write=repo.transaction(s=>s.create('checkpoint',{id:'closing',contextId:null,data:{value:'saved'}})); const close=repo.close();
+            await expect(write).resolves.toMatchObject({id:'closing'}); await close;
+            await expect(repo.get('checkpoint','closing')).rejects.toMatchObject({code:'STORAGE_UNAVAILABLE'});
         });
         it("seeds idempotently and preserves existing edits and extra records", async () => {
             const repo = create();
             expect((await seed(repo)).inserted).toBe(fixtures.length + builtins.length);
-            await repo.transaction(s => { const task = s.get("task", "task-pop")!; s.update("task", task.id, task.revision, { ...task.data, title: "User edited title" }); s.create("checkpoint", { id: "extra", contextId: null, data: { value: "keep" } }); });
+            await repo.transaction(async (s) => { const task = (await s.get("task", "task-pop"))!; (await s.update("task", task.id, task.revision, { ...task.data, title: "User edited title" })); (await s.create("checkpoint", { id: "extra", contextId: null, data: { value: "keep" } })); });
             expect(await seed(repo)).toEqual({ inserted: 0, preserved: fixtures.length + builtins.length, products: { migrated: 0 }, corpus: { inserted: 0, preserved: 2 } });
             expect((await repo.get("task", "task-pop"))?.data.title).toBe("User edited title");
             expect(await repo.get("checkpoint", "extra")).not.toBeNull();
@@ -62,8 +85,8 @@ for (const mode of ["mock", "sqlite"] as const) {
             const repo = create();
             expect(await repo.list("task")).toEqual([]);
             expect(await repo.get("task", "unknown")).toBeNull();
-            await expect(repo.transaction(s => s.create("checkpoint", { id: "", contextId: null, data: { value: "invalid" } }))).rejects.toMatchObject({ code: "INVALID_RECORD" });
-            await expect(repo.transaction(s => s.update("checkpoint", "missing", 1, { value: "no" }))).rejects.toMatchObject({ code: "NOT_FOUND" });
+            await expect(repo.transaction(async (s) => (await s.create("checkpoint", { id: "", contextId: null, data: { value: "invalid" } })))).rejects.toMatchObject({ code: "INVALID_RECORD" });
+            await expect(repo.transaction(async (s) => (await s.update("checkpoint", "missing", 1, { value: "no" })))).rejects.toMatchObject({ code: "NOT_FOUND" });
         });
     });
 }

@@ -1,4 +1,4 @@
-import { StoreError, type RecordKind, type RecordInput, type UnitOfWork } from '../records';
+import { StoreError, type RecordKind, type RecordInput, type SyncUnitOfWork as UnitOfWork } from '../records';
 export function noticeRelations<K extends RecordKind>(s: UnitOfWork, kind: K, input: RecordInput<K>) {
     if (!['notice', 'noticeVersion', 'noticeRead'].includes(kind))
         return;

@@ -1,3 +1,4 @@
+import { jsonContentEqual } from '@/domain/json-content';
 import type { ProductCommon, ProductContextFields, ProductFileBinding, RetailPriceFields, InternalPriceFields, VersionProvenance } from "@/domain/products/types";
 const t = (v: unknown) => typeof v === "string" ? v : "";
 const n = (v: unknown) => typeof v === "string" ? v : null;
@@ -23,5 +24,5 @@ export function internalDTO(f: InternalPriceFields): InternalPriceFields { retur
 export function provenanceDTO(d: VersionProvenance, authorLabel: string) { return { sequence: typeof d.sequence === "number" ? d.sequence : 0, previousId: n(d.previousId), changedAt: t(d.changedAt), changedByLabel: t(authorLabel), source: t(d.source) }; }
 export function commonDiff(before: ProductCommon, after: ProductCommon) {
     const a = commonDTO(before), b = commonDTO(after);
-    return (Object.keys(a) as (keyof ProductCommon)[]).filter(k => JSON.stringify(a[k]) !== JSON.stringify(b[k])).map(field => ({ field, before: a[field], after: b[field] }));
+    return (Object.keys(a) as (keyof ProductCommon)[]).filter(k => !jsonContentEqual(a[k], b[k])).map(field => ({ field, before: a[field], after: b[field] }));
 }

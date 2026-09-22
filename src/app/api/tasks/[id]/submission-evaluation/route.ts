@@ -1,6 +1,6 @@
 import { route, json, readBody } from '@/server/http/identity';
 import { SubmissionService } from '@/server/submissions/service';
-export function POST(request: Request, context: {
+export async function POST(request: Request, context: {
     params: Promise<{
         id: string;
     }>;

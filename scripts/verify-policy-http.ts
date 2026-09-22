@@ -7,7 +7,6 @@ import { openDatabase, migrate } from "@/server/db/database";
 import { createSqliteRepository } from "@/server/repositories/sqlite";
 import { seed } from "@/server/db/seed";
 import { DEMO_PASSWORD } from "@/domain/catalog";
-
 const port = process.env.E2E_PORT || "4121";
 const origin = `http://127.0.0.1:${port}`;
 const cookieName = `gs_hale_g02_${port}`;
@@ -23,20 +22,28 @@ await seed(repo);
 const contextId = "ctx-jp-a-luna";
 const marker = "G02_UNKNOWN_NESTED_CANARY";
 const privateMarker = "G02_PRIVATE_ORIGINAL_CANARY";
-await repo.transaction(s => {
-    const task = s.get("task", "task-onboarding")!;
-    s.update("task", task.id, task.revision, { ...task.data, internalOriginal: privateMarker, internalMemo: privateMarker,
-        nestedUnknown: { value: marker } } as typeof task.data);
-    const product = s.get("product", "product-serum")!;
-    s.update("product", product.id, product.revision, { ...product.data, internalSupplyPrice: "G02_PRIVATE_PRICE", nestedUnknown: { value: marker } } as typeof product.data);
-    const admin = s.get("user", "user-admin")!;
-    s.update("user", admin.id, admin.revision, { ...admin.data, adminGrant: { ...admin.data.adminGrant!, unknown: { secret: marker } } } as typeof admin.data);
-    s.create("membership", { id: "policy-peer-admin", contextId, data: { userId: admin.id, role: "operator", status: "active", scope: "합성 권한 검증", internalPriceAccess: false, activatedAt: new Date().toISOString(), suspendedAt: null } });
-    s.create("audit", { id: "policy-audit", contextId, data: { actorId: "user-admin", action: "membership.changed", targetId: "policy-peer-admin", before: { internalSupplyPrice: "G02_PRIVATE_PRICE", nested: { value: marker } }, after: { status: "active" }, at: new Date().toISOString() } });
+await repo.transaction(async (s) => {
+    const task = (await s.get("task", "task-onboarding"))!;
+    (await s.update("task", task.id, task.revision, { ...task.data, internalOriginal: privateMarker, internalMemo: privateMarker,
+        nestedUnknown: { value: marker } } as typeof task.data));
+    const product = (await s.get("product", "product-serum"))!;
+    (await s.update("product", product.id, product.revision, { ...product.data, internalSupplyPrice: "G02_PRIVATE_PRICE", nestedUnknown: { value: marker } } as typeof product.data));
+    const admin = (await s.get("user", "user-admin"))!;
+    (await s.update("user", admin.id, admin.revision, { ...admin.data, adminGrant: { ...admin.data.adminGrant!, unknown: { secret: marker } } } as typeof admin.data));
+    (await s.create("membership", { id: "policy-peer-admin", contextId, data: { userId: admin.id, role: "operator", status: "active", scope: "합성 권한 검증", internalPriceAccess: false, activatedAt: new Date().toISOString(), suspendedAt: null } }));
+    (await s.create("audit", { id: "policy-audit", contextId, data: { actorId: "user-admin", action: "membership.changed", targetId: "policy-peer-admin", before: { internalSupplyPrice: "G02_PRIVATE_PRICE", nested: { value: marker } }, after: { status: "active" }, at: new Date().toISOString() } }));
 });
-
-const checks: { id: string; requirement: string; level: string }[] = [];
-const processes: { pid?: number; command: string[]; cwd: string; exitCode?: number | null }[] = [];
+const checks: {
+    id: string;
+    requirement: string;
+    level: string;
+}[] = [];
+const processes: {
+    pid?: number;
+    command: string[];
+    cwd: string;
+    exitCode?: number | null;
+}[] = [];
 let server: ChildProcess | undefined;
 let failure: string | undefined;
 function check(id: string, condition: boolean, requirement = "A19", level = "HTTP") {
@@ -46,22 +53,29 @@ function check(id: string, condition: boolean, requirement = "A19", level = "HTT
 async function start(database = filename) {
     const args = ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", port];
     server = spawn(process.execPath, args, { stdio: "ignore", env: { ...process.env,
-        DATA_SOURCE: "sqlite", DATABASE_FILE: database, APP_ORIGIN: origin, SESSION_COOKIE_NAME: cookieName,
-        OPENAI_API_KEY: "", OPENAI_MODEL: "", OPENAI_BASE_URL: "https://api.openai.com/v1", NEXT_TELEMETRY_DISABLED: "1" } });
+            DATA_SOURCE: "sqlite", DATABASE_FILE: database, APP_ORIGIN: origin, SESSION_COOKIE_NAME: cookieName,
+            OPENAI_API_KEY: "", OPENAI_MODEL: "", OPENAI_BASE_URL: "https://api.openai.com/v1", NEXT_TELEMETRY_DISABLED: "1" } });
     processes.push({ pid: server.pid, command: [process.execPath, ...args], cwd: process.cwd() });
     for (let i = 0; i < 200; i++) {
-        if (server.exitCode !== null) throw new Error("Owned server exited before ready");
-        try { if ((await fetch(`${origin}/api/health`)).status === (database === filename ? 200 : 503)) return; } catch { }
+        if (server.exitCode !== null)
+            throw new Error("Owned server exited before ready");
+        try {
+            if ((await fetch(`${origin}/api/health`)).status === (database === filename ? 200 : 503))
+                return;
+        }
+        catch { }
         await new Promise(resolve => setTimeout(resolve, 50));
     }
     throw new Error("Owned server startup timeout");
 }
 async function stop() {
-    if (!server) return;
+    if (!server)
+        return;
     const owned = server;
     const done = new Promise<void>(resolve => owned.once("exit", () => resolve()));
     owned.kill("SIGTERM");
-    if (owned.exitCode === null) await done;
+    if (owned.exitCode === null)
+        await done;
     processes[processes.length - 1].exitCode = owned.exitCode;
     server = undefined;
 }
@@ -72,7 +86,10 @@ class Client {
         const result = await fetch(`${origin}${url}`, { method, headers: { Cookie: this.cookie, ...(body === undefined ? {} : { "Content-Type": "application/json" }), ...headers },
             body: body === undefined ? undefined : JSON.stringify(body), redirect: "manual" });
         const set = result.headers.get("set-cookie");
-        if (set) { this.setCookie = set; this.cookie = set.split(";")[0]; }
+        if (set) {
+            this.setCookie = set;
+            this.cookie = set.split(";")[0];
+        }
         return result;
     }
     async mutate(url: string, method: string, body: unknown, extra: Record<string, string> = {}) {
@@ -87,19 +104,26 @@ const digestDomain = async () => {
     const values = await Promise.all([repo.list("context"), repo.list("user"), repo.list("membership"), repo.list("task"), repo.list("audit")]);
     return createHash("sha256").update(JSON.stringify(values)).digest("hex");
 };
-
 try {
     await start();
-    const admin = new Client(); await admin.login("admin@example.test");
-    const selected = new Client(); await selected.login("selected@example.test");
-    const brand = new Client(); await brand.login("luna@example.test");
-    const team = new Client(); await team.login("team@example.test");
-    const operator = new Client(); await operator.login("operator@example.test");
+    const admin = new Client();
+    await admin.login("admin@example.test");
+    const selected = new Client();
+    await selected.login("selected@example.test");
+    const brand = new Client();
+    await brand.login("luna@example.test");
+    const team = new Client();
+    await team.login("team@example.test");
+    const operator = new Client();
+    await operator.login("operator@example.test");
     check("self grant allowlist", !JSON.stringify(await (await admin.send("/api/auth/me")).json()).includes(marker), "AC-02-02");
     const peer = await (await selected.send(`/api/contexts/${contextId}/members`)).json();
-    check("peer administrator has no grant", !Object.hasOwn(peer.members.find((m: { user: { id: string } }) => m.user.id === "user-admin").user, "adminGrant"), "AC-02-02");
+    check("peer administrator has no grant", !Object.hasOwn(peer.members.find((m: {
+        user: {
+            id: string;
+        };
+    }) => m.user.id === "user-admin").user, "adminGrant"), "AC-02-02");
     check("current manager nested task/audit markers excluded", !JSON.stringify(peer).includes(marker) && !JSON.stringify(peer).includes("G02_PRIVATE_PRICE"), "AC-02-02");
-
     for (const client of [team, operator, selected]) {
         const foreign = await client.send("/api/contexts/ctx-jp-a-wave/members");
         const missing = await client.send("/api/contexts/absent-context/members");
@@ -114,11 +138,15 @@ try {
         }
     }
     for (const url of ["/tasks/task-wave?context=ctx-jp-a-wave", "/products/product-balm?context=ctx-jp-a-luna", "/products/product-cream?context=ctx-sg-a-luna"]) {
-        const response = await team.send(url); const text = await response.text();
+        const response = await team.send(url);
+        const text = await response.text();
         check(`foreign page:${url}`, !text.includes("샘플 패키지 자료 확인") && !text.includes("웨이브 립밤") && !text.includes("루나 모이스처 크림"), "AC-02-01", "HTML");
     }
     const before = await digestDomain();
-    const unsafe: [string, string][] = [
+    const unsafe: [
+        string,
+        string
+    ][] = [
         ["/api/auth/login", "POST"], ["/api/auth/logout", "POST"], ["/api/invitations/accept", "POST"],
         ["/api/contexts", "POST"], [`/api/contexts/${contextId}/invitations`, "POST"], ["/api/invitations/missing/reissue", "POST"],
         ["/api/users/user-luna/status", "PATCH"], [`/api/contexts/${contextId}/members/member-user-luna-${contextId}`, "PATCH"],
@@ -135,8 +163,9 @@ try {
     check("URL/resource context mismatch rejected", (await admin.mutate(`/api/contexts/${contextId}/reassignments`, "POST", { taskId: "task-wave", toUserId: "user-team", expectedRevision: 1 })).status === 404, "AC-02-01");
     check("forged actor input rejected", (await admin.mutate("/api/contexts", "POST", { type: "event", countryId: "JP", brandId: "brand-luna", eventName: "forged", actorId: "user-admin" })).status === 422, "AC-02-01");
     check("mutation failures still have no domain changes", await digestDomain() === before, "A20", "DB");
-
-    const fixation = new Client(); await fixation.send("/api/auth/csrf"); const preauthCookie = fixation.cookie;
+    const fixation = new Client();
+    await fixation.send("/api/auth/csrf");
+    const preauthCookie = fixation.cookie;
     await fixation.login("co@example.test");
     check("session rotated on login", fixation.cookie !== preauthCookie);
     check("HttpOnly SameSite path cookie", /httponly/i.test(fixation.setCookie) && /samesite=lax/i.test(fixation.setCookie) && /path=\//i.test(fixation.setCookie));
@@ -147,7 +176,6 @@ try {
     check("old cookie denied after logout", (await fixation.send("/api/auth/me")).status === 401);
     fixation.cookie = `${cookieName}=forged-role-admin`;
     check("forged cookie denied", (await fixation.send("/api/auth/me")).status === 401);
-
     const limited = new Client();
     check("oversize password before hash", (await limited.mutate("/api/auth/login", "POST", { email: "large@example.test", password: "x".repeat(129) })).status === 422);
     check("oversize body before hash", (await limited.mutate("/api/auth/login", "POST", { email: "large@example.test", password: "x".repeat(17000) })).status === 422);
@@ -170,29 +198,45 @@ try {
     check("same session loses only one context", after.contexts.length === 1 && after.contexts[0].id === "ctx-jp-b-luna", "AC-02-05");
     const deniedPage = await (await brand.send(`/tasks/task-onboarding?context=${contextId}`)).text();
     check("same session denied former task", !deniedPage.includes("신규 입점 상품 기본자료 준비"), "AC-02-05", "HTML");
-    await stop(); await start();
+    await stop();
+    await start();
     check("two actual server processes", processes[0].pid !== processes[1].pid, "A20", "PROCESS");
-    const relogin = new Client(); await relogin.login("luna@example.test");
+    const relogin = new Client();
+    await relogin.login("luna@example.test");
     check("membership persists on restart/relogin", (await (await relogin.send("/api/auth/me")).json()).contexts.length === 1, "AC-02-05");
-    const pricing = new Client(); await pricing.login("price@example.test");
+    const pricing = new Client();
+    await pricing.login("price@example.test");
     check("price revoke persists", (await (await pricing.send("/api/auth/me")).json()).memberships[0].data.internalPriceAccess === false, "AC-02-05");
     const retained = await (await admin.send(`/api/contexts/${contextId}/members`)).json();
-    check("grant and suspension audit persists", retained.history.filter((a: { data: { action: string } }) => a.data.action === "membership.changed").length >= 3, "AC-02-05", "DB");
+    check("grant and suspension audit persists", retained.history.filter((a: {
+        data: {
+            action: string;
+        };
+    }) => a.data.action === "membership.changed").length >= 3, "AC-02-05", "DB");
     check("fresh sensitive response is no-store", (await brand.send("/api/auth/me")).headers.get("cache-control")?.includes("no-store") === true);
-
     const assets: string[] = [];
-    function scan(dir: string) { for (const item of readdirSync(dir, { withFileTypes: true })) { const name = path.join(dir, item.name); if (item.isDirectory()) scan(name); else if (item.name.endsWith(".js")) assets.push(name); } }
+    function scan(dir: string) { for (const item of readdirSync(dir, { withFileTypes: true })) {
+        const name = path.join(dir, item.name);
+        if (item.isDirectory())
+            scan(name);
+        else if (item.name.endsWith(".js"))
+            assets.push(name);
+    } }
     scan(".next/static");
     const credentialDigests = (await repo.list("credential")).map(row => row.data.digest);
     check("client bundles exclude runtime markers and stored credential digests", assets.every(file => { const text = readFileSync(file, "utf8"); return !text.includes(marker) && !text.includes(privateMarker) && !text.includes("synthetic-policy-token-") && credentialDigests.every(digest => !text.includes(digest)); }), "A19", "ASSET");
-    await stop(); await start(path.join(directory, "missing", "unavailable.db"));
+    await stop();
+    await start(path.join(directory, "missing", "unavailable.db"));
     check("store outage is 503 with no fallback", (await admin.send("/api/auth/me")).status === 503, "A20");
     const unavailable = await (await admin.send("/")).text();
     check("store outage page has no fixture", unavailable.includes("자료를 불러오지 못했습니다") && !unavailable.includes("신규 입점 상품 기본자료 준비"), "A20", "HTML");
-} catch (error) {
+}
+catch (error) {
     failure = error instanceof Error ? error.message : "unknown failure";
-} finally {
-    await stop(); repo.close();
+}
+finally {
+    await stop();
+    repo.close();
     const report = { status: failure ? "FAIL" : "PASS", level: "IMPLEMENTER_HTTP_DB_RSC", counts: { unit: "assertion", pass: checks.length, fail: failure ? 1 : 0, skip: 0, not_run: 0 },
         checks, failure, processes, cwd: process.cwd(), origin, cookieNamespace: cookieName,
         actualFileSearchExcelAiEndpoints: "NOT_IMPLEMENTED / D02-D05; covered separately by policy harness", secretCapture: "cookies, tokens and response bodies remain memory-only" };
@@ -200,4 +244,5 @@ try {
     writeFileSync(reportPath, JSON.stringify(report, null, 2));
     console.log(JSON.stringify({ status: report.status, counts: report.counts, report: reportPath, failure }));
 }
-if (failure) process.exitCode = 1;
+if (failure)
+    process.exitCode = 1;

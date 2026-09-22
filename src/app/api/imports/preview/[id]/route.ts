@@ -5,4 +5,4 @@ type Context = {
         id: string;
     }>;
 };
-export function GET(request: Request, context: Context) { return route(request, async (identity, token) => json(await new ImportService(identity).readPreview(token, (await context.params).id, Number(new URL(request.url).searchParams.get('page') ?? '1')))); }
+export async function GET(request: Request, context: Context) { return route(request, async (identity, token) => json(await new ImportService(identity).readPreview(token, (await context.params).id, Number(new URL(request.url).searchParams.get('page') ?? '1')))); }

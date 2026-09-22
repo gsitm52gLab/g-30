@@ -30,7 +30,13 @@
     "tasks:http": "tsx scripts/verify-tasks-http.ts",
     "products:http": "tsx scripts/verify-products-http.ts",
     "submissions:http": "tsx scripts/verify-submissions-http.ts",
-    "products:migration-check": "tsx scripts/verify-products-migration-cli.ts"
+    "products:migration-check": "tsx scripts/verify-products-migration-cli.ts",
+    "db:postgres:migrate": "tsx scripts/verify-postgres-db.ts migrate",
+    "db:postgres:seed": "tsx scripts/verify-postgres-db.ts seed",
+    "db:postgres:verify": "tsx scripts/verify-postgres-foundation.ts",
+    "dev:supabase": "cross-env DATA_SOURCE=supabase next dev --hostname 127.0.0.1",
+    "db:supabase:migrate": "cross-env DATA_SOURCE=supabase tsx scripts/db.ts migrate",
+    "db:supabase:seed": "cross-env DATA_SOURCE=supabase tsx scripts/db.ts seed"
   },
   "dependencies": {
     "@napi-rs/canvas": "1.0.9",
@@ -42,6 +48,7 @@
     "next": "16.3.5",
     "openai": "7.20.0",
     "pdfjs-dist": "6.3.289",
+    "pg": "8.23.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "saxes": "5.0.1",
@@ -55,6 +62,7 @@
     "@tailwindcss/postcss": "4.3.3",
     "@types/better-sqlite3": "9.6.0",
     "@types/node": "24.13.6",
+    "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/yauzl": "2.10.3",

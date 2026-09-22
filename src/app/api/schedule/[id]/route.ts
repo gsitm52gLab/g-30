@@ -1,4 +1,8 @@
 import { route, json } from '@/server/http/identity';
 import { SchedulingService } from '@/server/scheduling/service';
 export const runtime = 'nodejs';
-export async function GET(request: Request, context: { params: Promise<{ id: string }> }) { const { id } = await context.params; return route(request, async (s, t) => json(await new SchedulingService(s).detail(t, id))); }
+export async function GET(request: Request, context: {
+    params: Promise<{
+        id: string;
+    }>;
+}) { const { id } = await context.params; return route(request, async (s, t) => json(await new SchedulingService(s).detail(t, id))); }

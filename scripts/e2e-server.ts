@@ -15,7 +15,7 @@ if (mode === "sqlite") {
     migrate(db);
     const repository = createSqliteRepository(db);
     await seed(repository);
-    repository.close();
+    (await repository.close());
 }
 const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", process.env.E2E_PORT || "4111"], {
     stdio: "inherit", env: { ...process.env, DATA_SOURCE: mode, DATABASE_FILE: filename, OPENAI_API_KEY: "", OPENAI_MODEL: "", OPENAI_BASE_URL: "https://api.openai.com/v1", NEXT_TELEMETRY_DISABLED: "1", APP_ORIGIN: `http://127.0.0.1:${process.env.E2E_PORT || "4111"}`, SESSION_COOKIE_NAME: `gs_hale_e2e_${process.env.E2E_PORT || "4111"}` },

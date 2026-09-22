@@ -1,4 +1,4 @@
-import { StoreError,type RecordKind,type RecordInput,type UnitOfWork } from '../records';
+import { StoreError,type RecordKind,type RecordInput,type SyncUnitOfWork as UnitOfWork } from '../records';
 export function campaignRelations<K extends RecordKind>(s:UnitOfWork,kind:K,input:RecordInput<K>){
  if(!kind.startsWith('campaign'))return;
  const d=input.data as unknown as Record<string,unknown>;

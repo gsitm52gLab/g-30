@@ -1,14 +1,14 @@
-import { describe,it,expect,afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { randomUUID } from 'node:crypto';
-import { mkdtemp,rm,readFile,writeFile,readdir } from 'node:fs/promises';
+import { mkdtemp, rm, readFile, writeFile, readdir } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import type { RecordRepository } from '@/domain/records';
 import type { AiContent } from '@/domain/ai-input/records';
 import { createMockRepository } from '@/server/repositories/mock';
 import { createSqliteRepository } from '@/server/repositories/sqlite';
-import { openDatabase,migrate } from '@/server/db/database';
-import { policyFixture,tokenFor,NOW } from '../fixtures/policy';
+import { openDatabase, migrate } from '@/server/db/database';
+import { policyFixture, tokenFor, NOW } from '../fixtures/policy';
 import { AiInputService } from '@/server/ai-input/service';
 import { AiAssets } from '@/server/ai-input/assets';
 import { extractInput } from '@/server/ai-input/extraction';
@@ -18,66 +18,233 @@ import { TaskService } from '@/server/tasks/service';
 import { SubmissionService } from '@/server/submissions/service';
 import { SubmissionFiles } from '@/server/submissions/files';
 import { ProductService } from '@/server/products/service';
-import { blankContent,blankRequirement } from '@/domain/tasks/types';
+import { blankContent, blankRequirement } from '@/domain/tasks/types';
 import { blankDraft } from '@/domain/submissions/types';
-const ctx='ctx-jp-a-luna',brand=tokenFor('user-luna'),gsg=tokenFor('user-gsg'),admin=tokenFor('user-admin'),team=tokenFor('user-team');
-const content=(text=SYNTHETIC_TEXT):AiContent=>({title:'합성 입력',scope:{classification:'general_cosmetic',language:'ja',media:'pop',use:'매장 게시'},kind:'text',text,sources:[],selectedPages:[],submission:null,products:[]});
-for(const mode of ['mock','sqlite']as const)describe(`${mode} G15 persisted inputs`,()=>{
- let repo:RecordRepository,identity:IdentityService,service:AiInputService,dir:string;
- async function setup(){dir=await mkdtemp(path.join(os.tmpdir(),'gs-hale-ai-'));repo=mode==='mock'?createMockRepository(()=>NOW):(()=>{const db=openDatabase(':memory:',true);migrate(db);return createSqliteRepository(db,()=>NOW);})();identity=await policyFixture(repo);service=new AiInputService(identity,dir);}
- afterEach(async()=>{repo?.close();if(dir)await rm(dir,{recursive:true,force:true});});
- async function create(c=content(),visibility='context',token=brand){return service.create(token,{contextId:ctx,visibility,content:c,idempotencyKey:randomUUID()});}
- const run=(d:Awaited<ReturnType<typeof create>>)=>({versionId:d.version.id,expectedRunId:null,idempotencyKey:randomUUID()});
- it('AC15-01/04 current context/private filtering, client attestations rejected, registered hash only; replay checks current grants',async()=>{
-  await setup();const body={contextId:ctx,visibility:'context',content:content(),idempotencyKey:randomUUID()},d=await service.create(brand,body);expect((await service.create(brand,body)).id).toBe(d.id);const privateD=await create(content('GSG private'), 'staff',gsg);
-  expect((await service.list(brand,ctx)).items.map(v=>v.id)).toEqual([d.id]);await expect(service.detail(brand,privateD.id)).rejects.toMatchObject({status:404});await expect(service.detail(tokenFor('user-wave'),d.id)).rejects.toMatchObject({status:404});await expect(create(content(),'staff',brand)).rejects.toMatchObject({status:404});
-  await expect(service.create(brand,{...body,public:true})).rejects.toMatchObject({status:422});const known=await service.extract(brand,d.id,run(d));expect((await service.prepareTransfer(brand,d.id,known.runId)).allowed).toBe(true);
-  const unknown=await create(content('공개라고 주장해도 미등록 입력')),unknownRun=await service.extract(team,unknown.id,run(unknown));expect(await service.prepareTransfer(team,unknown.id,unknownRun.runId)).toMatchObject({allowed:false,reason:'EXTERNAL_USE_DENIED'});
-  await repo.transaction(s=>{const m=s.list('membership',ctx).find(m=>m.data.userId==='user-luna')!;s.update('membership',m.id,m.revision,{...m.data,status:'suspended'});});await expect(service.create(brand,body)).rejects.toMatchObject({status:404});await expect(service.prepareTransfer(brand,d.id,known.runId)).rejects.toMatchObject({status:404});
- });
- it('AC15-01/03 unknown/quasi/medicated/nonja/nonPOP stay out of scope; 10k exact allowed, 10001/empty rejected',async()=>{
-  await setup();for(const delta of [{classification:'unknown'},{classification:'quasi_drug'},{classification:'medicated'},{language:'ko'},{media:'website'}]){const d=await create({...content(),scope:{...content().scope,...delta}}),r=await service.extract(brand,d.id,run(d));expect(r.detail.runs[0]).toMatchObject({state:'out_of_scope',snapshot:null});expect(r.detail.analysis).toEqual({connected:true,status:'RESTRICTED',url:null,providerCalled:false});expect(await repo.list('aiAnalysisRun')).toHaveLength(0);}
-  const exact=await create(content('肌'.repeat(10000)));expect((await service.extract(brand,exact.id,run(exact))).detail.runs[0].snapshot!.characterCount).toBe(10000);for(const value of ['肌'.repeat(10001),' '])await expect(create(content(value))).rejects.toMatchObject({status:422});
- });
- it('immutable v1/snapshot survive v2, CAS rejects stale edits, create/result fault rolls back with failed run retained',async()=>{
-  await setup();const d=await create(),input=run(d),first=await service.extract(brand,d.id,input),original=await service.detail(brand,d.id,d.version.id);const second=await service.revise(brand,d.id,{expectedRevision:d.revision,content:content('v2'),idempotencyKey:randomUUID()});expect(second.version.sequence).toBe(2);expect((await service.detail(brand,d.id,d.version.id)).version).toEqual(original.version);expect((await service.extract(brand,d.id,input)).runId).toBe(first.runId);expect(await repo.list('aiRun')).toHaveLength(1);
-  await expect(service.revise(brand,d.id,{expectedRevision:d.revision,content:content('stale'),idempotencyKey:randomUUID()})).rejects.toMatchObject({status:409});await expect(service.revise(team,d.id,{expectedRevision:second.revision,content:content(),idempotencyKey:randomUUID()})).rejects.toMatchObject({status:403});
-  const before=await repo.list('aiInput');await expect(new AiInputService(identity,dir,{fault:stage=>{if(stage==='create')throw Error('create fault');}}).create(brand,{contextId:ctx,visibility:'context',content:content(),idempotencyKey:randomUUID()})).rejects.toThrow('create fault');expect(await repo.list('aiInput')).toEqual(before);
-  const snapBefore=await repo.list('aiSnapshot');await expect(new AiInputService(identity,dir,{fault:stage=>{if(stage==='result')throw Error('result fault');}}).extract(brand,d.id,run(second))).rejects.toThrow('result fault');expect(await repo.list('aiSnapshot')).toEqual(snapBefore);expect((await service.detail(brand,d.id)).runs[0]).toMatchObject({state:'failed',issue:'STORAGE_UNAVAILABLE',retryable:true});
-  await expect(repo.transaction(s=>{const v=s.get('aiVersion',d.version.id)!;s.update('aiVersion',v.id,v.revision,v.data);})).rejects.toMatchObject({code:'INVALID_RECORD'});
- });
- it('single durable claim for concurrent same intent, no transaction held while worker awaits; revoke after extraction denies protected response',async()=>{
-  await setup();const d=await create(),input=run(d);let release!:()=>void,started!:()=>void,count=0;const gate=new Promise<void>(r=>release=r),start=new Promise<void>(r=>started=r);const worker=new AiInputService(identity,dir,{extract:async request=>{count++;started();await gate;return extractInput(request);}});const pending=worker.extract(brand,d.id,input);await start;expect((await service.extract(brand,d.id,input)).detail.runs[0].state).toBe('reading');expect(count).toBe(1);
-  await repo.transaction(s=>{const m=s.list('membership',ctx).find(m=>m.data.userId==='user-luna')!;s.update('membership',m.id,m.revision,{...m.data,status:'suspended'});});release();await expect(pending).rejects.toMatchObject({status:404});expect(await repo.list('aiSnapshot')).toHaveLength(0);expect((await service.detail(gsg,d.id)).runs[0]).toMatchObject({state:'failed',issue:'ACCESS_CHANGED'});
- });
- it('interrupted claim honest status/new explicit attempt; failures bounded to 3 and receipt queue rollback',async()=>{
-  await setup();let now=NOW;const timed=new IdentityService(repo,()=>now),d=await create();const first=await repo.transaction(s=>s.create('aiRun',{id:randomUUID(),contextId:ctx,data:{inputId:d.id,versionId:d.version.id,attempt:1,createdBy:'user-luna',state:'reading',claimId:randomUUID(),leaseUntil:NOW,startedAt:NOW,endedAt:null,snapshotId:null,issue:null}}));now='2026-09-21T12:02:00.000Z';const svc=new AiInputService(timed,dir,{extract:async()=>{throw Error('worker fault');}});expect((await svc.detail(brand,d.id)).runs[0].state).toBe('interrupted');await expect(svc.extract(brand,d.id,{...run(d),expectedRunId:first.id})).rejects.toThrow('worker fault');const second=(await svc.detail(brand,d.id)).runs[0];expect(second.attempt).toBe(2);await expect(svc.extract(brand,d.id,{...run(d),expectedRunId:second.id})).rejects.toThrow('worker fault');const third=(await svc.detail(brand,d.id)).runs[0];expect(third.retryable).toBe(false);await expect(svc.extract(brand,d.id,{...run(d),expectedRunId:third.id})).rejects.toMatchObject({status:409});
-  const freshD=await create(),before=await repo.list('commandReceipt');await expect(new AiInputService(identity,dir,{fault:stage=>{if(stage==='queue')throw Error('queue fault');}}).extract(brand,freshD.id,run(freshD))).rejects.toThrow('queue fault');expect(await repo.list('commandReceipt')).toEqual(before);expect((await service.detail(brand,freshD.id)).runs).toHaveLength(0);
- });
- it('bounded two-worker claim and sixteen queued runs; explicit same-intent queue continuation',async()=>{
-  await setup();let started=0,release!:()=>void;const gate=new Promise<void>(r=>release=r);const limited=new AiInputService(identity,dir,{extract:async request=>{started++;await gate;return extractInput(request);}});const one=await create(),two=await create(),a=limited.extract(brand,one.id,run(one));while(started<1)await new Promise(r=>setTimeout(r,1));const b=limited.extract(brand,two.id,run(two));while(started<2)await new Promise(r=>setTimeout(r,1));const queued=[];for(let n=0;n<16;n++){const d=await create(),body=run(d);const r=await limited.extract(brand,d.id,body);expect(r.detail.runs[0].state).toBe('queued');queued.push({d,body,id:r.runId});}expect(started).toBe(2);const overflow=await create();await expect(limited.extract(brand,overflow.id,run(overflow))).rejects.toMatchObject({code:'QUEUE_FULL'});expect((await service.detail(brand,overflow.id)).runs).toHaveLength(0);release();await Promise.all([a,b]);const resumed=await limited.extract(brand,queued[0].d.id,queued[0].body);expect(resumed.runId).toBe(queued[0].id);expect(resumed.detail.runs[0].state).toBe('finished');expect(started).toBe(3);
- });
- it('queued recovery with lost intent/current teammate keeps one attempt and claim; stale/body/auth boundaries remain',async()=>{
-  await setup();const d=await create();const q=await repo.transaction(s=>s.create('aiRun',{id:randomUUID(),contextId:ctx,data:{inputId:d.id,versionId:d.version.id,attempt:1,createdBy:'user-luna',state:'queued',claimId:null,leaseUntil:null,startedAt:null,endedAt:null,snapshotId:null,issue:null}}));
-  const body={versionId:d.version.id,expectedRunId:q.id,idempotencyKey:randomUUID()};await expect(service.extract(team,d.id,{...body,expectedRunId:null})).rejects.toMatchObject({status:409,code:'CONFLICT'});await expect(service.extract(tokenFor('user-wave'),d.id,body)).rejects.toMatchObject({status:404});
-  let started!:()=>void,release!:()=>void,count=0;const begun=new Promise<void>(r=>started=r),gate=new Promise<void>(r=>release=r);const worker=new AiInputService(identity,dir,{extract:async request=>{count++;started();await gate;return extractInput(request);}});
-  const pending=worker.extract(team,d.id,body);await begun;expect((await worker.extract(team,d.id,body)).runId).toBe(q.id);await expect(worker.extract(brand,d.id,{...body,idempotencyKey:randomUUID()})).rejects.toMatchObject({status:409,code:'RETRY_UNAVAILABLE'});await expect(worker.extract(team,d.id,{...body,expectedRunId:null})).rejects.toMatchObject({status:409});release();const result=await pending;expect(result.runId).toBe(q.id);expect(result.detail.runs[0]).toMatchObject({attempt:1,state:'finished'});expect(count).toBe(1);expect(await repo.list('aiRun')).toHaveLength(1);expect(await repo.list('aiSnapshot')).toHaveLength(1);expect((await worker.extract(team,d.id,body)).runId).toBe(q.id);expect(count).toBe(1);await expect(worker.extract(brand,d.id,{...body,idempotencyKey:randomUUID()})).rejects.toMatchObject({status:409});
-  await repo.transaction(s=>{const m=s.list('membership',ctx).find(m=>m.data.userId==='user-team')!;s.update('membership',m.id,m.revision,{...m.data,status:'suspended'});});await expect(worker.extract(team,d.id,body)).rejects.toMatchObject({status:404});
- });
- it('stored unknown extensions never project and malformed known run/asset metadata fails closed without mutation',async()=>{
-  await setup();const d=await create(),r=await service.extract(brand,d.id,run(d));await repo.transaction(s=>{const row=s.get('aiInput',d.id)!;s.update('aiInput',row.id,row.revision,{...row.data,internalPrice:{secret:'AI_PRIVATE_CANARY'}} as typeof row.data);});expect(JSON.stringify(await service.detail(brand,d.id))).not.toContain('AI_PRIVATE_CANARY');await repo.transaction(s=>{const row=s.get('aiRun',r.runId)!;s.update('aiRun',row.id,row.revision,{...row.data,issue:{secret:'AI_PRIVATE_CANARY'}} as unknown as typeof row.data);});const before=await repo.get('aiRun',r.runId);await expect(service.detail(brand,d.id)).rejects.toMatchObject({status:503});expect(await repo.get('aiRun',r.runId)).toEqual(before);
-  const a=await repo.transaction(s=>s.create('aiAsset',{id:randomUUID(),contextId:ctx,data:{createdBy:'user-luna',visibility:'context',filename:{secret:'AI_PRIVATE_CANARY'} as unknown as string,mime:'image/png',bytes:1,sha256:'0'.repeat(64),storageKey:randomUUID()}}));await expect(service.picker(brand,ctx)).rejects.toMatchObject({status:503});expect(await repo.get('aiAsset',a.id)).toEqual(a);
- });
- it('AC15-02/03 actual private upload/PDF selected 2 pages, immutable bytes and retry, wrong signature/size rejected',async()=>{
-  await setup();const assets=new AiAssets(identity,dir),bytes=await readFile('tests/fixtures/ai-input/native-12.pdf'),key=randomUUID(),f={name:'native.pdf',type:'application/pdf',bytes};const a=await assets.upload(brand,ctx,'context',key,f);expect((await assets.upload(brand,ctx,'context',key,f)).id).toBe(a.id);expect(await readdir(path.join(dir,'ai-input'))).toHaveLength(1);
-  const d=await create({...content(),kind:'pdf',text:null,sources:[{kind:'upload',assetId:a.id}],selectedPages:[2,10]}),result=await service.extract(brand,d.id,run(d));expect(result.detail.runs[0].snapshot!.text).toContain('PAGE_02');expect(result.detail.runs[0].snapshot!.text).not.toContain('PAGE_01');expect(result.detail.runs[0].snapshot!.units.filter(u=>u.status==='unselected')).toHaveLength(10);expect((await service.prepareTransfer(brand,d.id,result.runId)).allowed).toBe(true);
-  await expect(assets.upload(brand,ctx,'context',randomUUID(),{...f,name:'file.ai'})).rejects.toMatchObject({status:422});await expect(assets.upload(brand,ctx,'context',randomUUID(),{...f,bytes:Buffer.alloc(10485761)})).rejects.toMatchObject({status:422});await writeFile(assets.destination(a.id),Buffer.from('tamper'));await expect(assets.download(brand,a.id)).rejects.toMatchObject({code:'SOURCE_CHANGED'});await expect(service.prepareTransfer(brand,d.id,result.runId)).rejects.toMatchObject({code:'SOURCE_CHANGED'});
- },20000);
- it('AC15-03 persisted actual OCR retains canonical unread hash order and safe replay',async()=>{
-  await setup();const a=await new AiAssets(identity,dir).upload(brand,ctx,'context',randomUUID(),{name:'japanese.png',type:'image/png',bytes:await readFile('tests/fixtures/ai-input/japanese.png')});const d=await create({...content(),kind:'images',text:null,sources:[{kind:'upload',assetId:a.id}],selectedPages:[]}),input=run(d),r=await service.extract(brand,d.id,input);expect(r.detail.runs[0].snapshot).toMatchObject({status:'partial',issues:expect.arrayContaining(['OCR_COVERAGE_UNKNOWN'])});const again=await service.extract(brand,d.id,input);expect(again.detail.runs[0].snapshot!.snapshotHash).toBe(r.detail.runs[0].snapshot!.snapshotHash);expect((await service.prepareTransfer(brand,d.id,r.runId)).allowed).toBe(true);
- },20000);
- it('G05 exact S1/request/file/ProductUse and G06 versions survive S2/live edits; forged or draft-only source forbidden',async()=>{
-  await setup();const tasks=new TaskService(identity),sub=new SubmissionService(identity),products=new ProductService(identity),sf=new SubmissionFiles(identity,dir);const c={...blankContent(),title:'합성 자료',description:'실제 요청',deadline:{...blankContent().deadline,responsibleUserId:'user-gsg'},requirements:[{...blankRequirement('file','file'),label:'PDF'}]};const taskId=(await tasks.create(admin,{targets:[{contextId:ctx,ownerId:'user-gsg',assigneeId:'user-luna',coAssigneeIds:[],productIds:['product-serum']}],content:c,category:'spot',idempotencyKey:randomUUID()})).ids[0];await tasks.command(admin,taskId,{command:'publish',expectedRevision:(await repo.get('task',taskId))!.revision,idempotencyKey:randomUUID()});let w=await sub.workspace(brand,taskId);const uploaded=await sf.upload(brand,taskId,w.request.id,[{clientItemId:randomUUID(),name:'source.pdf',type:'application/pdf',bytes:await readFile('tests/fixtures/ai-input/native-12.pdf')}]);const item=uploaded.items[0];if(item.state!=='ready')throw Error('fixture upload');const p=await products.detail(brand,'product-serum',ctx),draft={...blankDraft(),answers:[{requestId:w.request.id,requirementKey:'file',productId:null,type:'file' as const,input:{fileVersionIds:[item.file.id]}}],productSelections:[{productId:p.productId,expectedCommonRevision:p.commonRevision,expectedContextRevision:p.contextRevision,bindingIds:[],retailPriceVersionId:null,asOfDate:'2026-09-21'}]};await sub.draft(brand,taskId,{command:'save',baseRequestId:w.request.id,expectedDraftRevision:0,content:draft,idempotencyKey:randomUUID()});w=await sub.workspace(brand,taskId);const s1=(await sub.submit(brand,taskId,{baseRequestId:w.request.id,expectedDraftRevision:w.draft!.revision,expectedTaskRevision:w.taskRevision,mode:'full',idempotencyKey:randomUUID()})).ids[0],snap=await sub.snapshot(brand,s1),use=snap.products[0];const linked:AiContent={...content(),kind:'pdf',text:null,sources:[{kind:'submission_file',fileVersionId:item.file.id}],selectedPages:[2],submission:{taskId,requestId:w.request.id,submissionId:s1,productUseIds:[use.id]},products:[{productId:use.productId,productVersionId:use.productVersionId,contextProductVersionId:use.contextProductVersionId}]};const d=await create(linked);
-  await products.command(brand,p.productId,{command:'save_common',contextId:ctx,expectedCommonRevision:p.commonRevision,common:{...p.common,name:'새 현재 상품'},idempotencyKey:randomUUID()});const refreshed=await products.detail(brand,p.productId,ctx);draft.productSelections[0].expectedCommonRevision=refreshed.commonRevision;w=await sub.workspace(brand,taskId);await sub.draft(brand,taskId,{command:'save',baseRequestId:w.request.id,expectedDraftRevision:w.draft!.revision,content:{...draft,narrative:'실제 S2'},idempotencyKey:randomUUID()});w=await sub.workspace(brand,taskId);const s2=(await sub.submit(brand,taskId,{baseRequestId:w.request.id,expectedDraftRevision:w.draft!.revision,expectedTaskRevision:w.taskRevision,mode:'full',idempotencyKey:randomUUID()})).ids[0];expect(s2).not.toBe(s1);expect((await service.detail(brand,d.id)).submission!.submissionId).toBe(s1);expect((await service.detail(brand,d.id)).version.content.products[0].productVersionId).toBe(use.productVersionId);expect((await service.extract(brand,d.id,run(d))).detail.runs[0].snapshot!.sources[0].sourceId).toBe(item.file.id);expect(JSON.stringify(await service.picker(brand,ctx))).not.toContain('internalPrice');await expect(create({...linked,submission:{...linked.submission!,submissionId:'forged'}})).rejects.toMatchObject({status:404});await expect(create({...linked,products:[{...linked.products[0],productVersionId:'forged'}]})).rejects.toMatchObject({status:404});
- },20000);
-});
+const ctx = 'ctx-jp-a-luna', brand = tokenFor('user-luna'), gsg = tokenFor('user-gsg'), admin = tokenFor('user-admin'), team = tokenFor('user-team');
+const content = (text = SYNTHETIC_TEXT): AiContent => ({ title: '합성 입력', scope: { classification: 'general_cosmetic', language: 'ja', media: 'pop', use: '매장 게시' }, kind: 'text', text, sources: [], selectedPages: [], submission: null, products: [] });
+for (const mode of ['mock', 'sqlite'] as const)
+    describe(`${mode} G15 persisted inputs`, () => {
+        let repo: RecordRepository, identity: IdentityService, service: AiInputService, dir: string;
+        async function setup() { dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-ai-')); repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); identity = await policyFixture(repo); service = new AiInputService(identity, dir); }
+        afterEach(async () => { (await repo?.close()); if (dir)
+            await rm(dir, { recursive: true, force: true }); });
+        async function create(c = content(), visibility = 'context', token = brand) { return service.create(token, { contextId: ctx, visibility, content: c, idempotencyKey: randomUUID() }); }
+        const run = (d: Awaited<ReturnType<typeof create>>) => ({ versionId: d.version.id, expectedRunId: null, idempotencyKey: randomUUID() });
+        it('AC15-01/04 current context/private filtering, client attestations rejected, registered hash only; replay checks current grants', async () => {
+            await setup();
+            const body = { contextId: ctx, visibility: 'context', content: content(), idempotencyKey: randomUUID() }, d = await service.create(brand, body);
+            expect((await service.create(brand, body)).id).toBe(d.id);
+            const privateD = await create(content('GSG private'), 'staff', gsg);
+            expect((await service.list(brand, ctx)).items.map(v => v.id)).toEqual([d.id]);
+            await expect(service.detail(brand, privateD.id)).rejects.toMatchObject({ status: 404 });
+            await expect(service.detail(tokenFor('user-wave'), d.id)).rejects.toMatchObject({ status: 404 });
+            await expect(create(content(), 'staff', brand)).rejects.toMatchObject({ status: 404 });
+            await expect(service.create(brand, { ...body, public: true })).rejects.toMatchObject({ status: 422 });
+            const known = await service.extract(brand, d.id, run(d));
+            expect((await service.prepareTransfer(brand, d.id, known.runId)).allowed).toBe(true);
+            const unknown = await create(content('공개라고 주장해도 미등록 입력')), unknownRun = await service.extract(team, unknown.id, run(unknown));
+            expect(await service.prepareTransfer(team, unknown.id, unknownRun.runId)).toMatchObject({ allowed: false, reason: 'EXTERNAL_USE_DENIED' });
+            await repo.transaction(async (s) => { const m = (await s.list('membership', ctx)).find(m => m.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
+            await expect(service.create(brand, body)).rejects.toMatchObject({ status: 404 });
+            await expect(service.prepareTransfer(brand, d.id, known.runId)).rejects.toMatchObject({ status: 404 });
+        });
+        it('AC15-01/03 unknown/quasi/medicated/nonja/nonPOP stay out of scope; 10k exact allowed, 10001/empty rejected', async () => {
+            await setup();
+            for (const delta of [{ classification: 'unknown' }, { classification: 'quasi_drug' }, { classification: 'medicated' }, { language: 'ko' }, { media: 'website' }]) {
+                const d = await create({ ...content(), scope: { ...content().scope, ...delta } }), r = await service.extract(brand, d.id, run(d));
+                expect(r.detail.runs[0]).toMatchObject({ state: 'out_of_scope', snapshot: null });
+                expect(r.detail.analysis).toEqual({ connected: true, status: 'RESTRICTED', url: null, providerCalled: false });
+                expect(await repo.list('aiAnalysisRun')).toHaveLength(0);
+            }
+            const exact = await create(content('肌'.repeat(10000)));
+            expect((await service.extract(brand, exact.id, run(exact))).detail.runs[0].snapshot!.characterCount).toBe(10000);
+            for (const value of ['肌'.repeat(10001), ' '])
+                await expect(create(content(value))).rejects.toMatchObject({ status: 422 });
+        });
+        it('immutable v1/snapshot survive v2, CAS rejects stale edits, create/result fault rolls back with failed run retained', async () => {
+            await setup();
+            const d = await create(), input = run(d), first = await service.extract(brand, d.id, input), original = await service.detail(brand, d.id, d.version.id);
+            const second = await service.revise(brand, d.id, { expectedRevision: d.revision, content: content('v2'), idempotencyKey: randomUUID() });
+            expect(second.version.sequence).toBe(2);
+            expect((await service.detail(brand, d.id, d.version.id)).version).toEqual(original.version);
+            expect((await service.extract(brand, d.id, input)).runId).toBe(first.runId);
+            expect(await repo.list('aiRun')).toHaveLength(1);
+            await expect(service.revise(brand, d.id, { expectedRevision: d.revision, content: content('stale'), idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+            await expect(service.revise(team, d.id, { expectedRevision: second.revision, content: content(), idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 403 });
+            const before = await repo.list('aiInput');
+            await expect(new AiInputService(identity, dir, { fault: stage => { if (stage === 'create')
+                    throw Error('create fault'); } }).create(brand, { contextId: ctx, visibility: 'context', content: content(), idempotencyKey: randomUUID() })).rejects.toThrow('create fault');
+            expect(await repo.list('aiInput')).toEqual(before);
+            const snapBefore = await repo.list('aiSnapshot');
+            await expect(new AiInputService(identity, dir, { fault: stage => { if (stage === 'result')
+                    throw Error('result fault'); } }).extract(brand, d.id, run(second))).rejects.toThrow('result fault');
+            expect(await repo.list('aiSnapshot')).toEqual(snapBefore);
+            expect((await service.detail(brand, d.id)).runs[0]).toMatchObject({ state: 'failed', issue: 'STORAGE_UNAVAILABLE', retryable: true });
+            await expect(repo.transaction(async (s) => { const v = (await s.get('aiVersion', d.version.id))!; (await s.update('aiVersion', v.id, v.revision, v.data)); })).rejects.toMatchObject({ code: 'INVALID_RECORD' });
+        });
+        it('single durable claim for concurrent same intent, no transaction held while worker awaits; revoke after extraction denies protected response', async () => {
+            await setup();
+            const d = await create(), input = run(d);
+            let release!: () => void, started!: () => void, count = 0;
+            const gate = new Promise<void>(r => release = r), start = new Promise<void>(r => started = r);
+            const worker = new AiInputService(identity, dir, { extract: async (request) => { count++; started(); await gate; return extractInput(request); } });
+            const pending = worker.extract(brand, d.id, input);
+            await start;
+            expect((await service.extract(brand, d.id, input)).detail.runs[0].state).toBe('reading');
+            expect(count).toBe(1);
+            await repo.transaction(async (s) => { const m = (await s.list('membership', ctx)).find(m => m.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
+            release();
+            await expect(pending).rejects.toMatchObject({ status: 404 });
+            expect(await repo.list('aiSnapshot')).toHaveLength(0);
+            expect((await service.detail(gsg, d.id)).runs[0]).toMatchObject({ state: 'failed', issue: 'ACCESS_CHANGED' });
+        });
+        it('interrupted claim honest status/new explicit attempt; failures bounded to 3 and receipt queue rollback', async () => {
+            await setup();
+            let now = NOW;
+            const timed = new IdentityService(repo, () => now), d = await create();
+            const first = await repo.transaction(async (s) => (await s.create('aiRun', { id: randomUUID(), contextId: ctx, data: { inputId: d.id, versionId: d.version.id, attempt: 1, createdBy: 'user-luna', state: 'reading', claimId: randomUUID(), leaseUntil: NOW, startedAt: NOW, endedAt: null, snapshotId: null, issue: null } })));
+            now = '2026-09-21T12:02:00.000Z';
+            const svc = new AiInputService(timed, dir, { extract: async () => { throw Error('worker fault'); } });
+            expect((await svc.detail(brand, d.id)).runs[0].state).toBe('interrupted');
+            await expect(svc.extract(brand, d.id, { ...run(d), expectedRunId: first.id })).rejects.toThrow('worker fault');
+            const second = (await svc.detail(brand, d.id)).runs[0];
+            expect(second.attempt).toBe(2);
+            await expect(svc.extract(brand, d.id, { ...run(d), expectedRunId: second.id })).rejects.toThrow('worker fault');
+            const third = (await svc.detail(brand, d.id)).runs[0];
+            expect(third.retryable).toBe(false);
+            await expect(svc.extract(brand, d.id, { ...run(d), expectedRunId: third.id })).rejects.toMatchObject({ status: 409 });
+            const freshD = await create(), before = await repo.list('commandReceipt');
+            await expect(new AiInputService(identity, dir, { fault: stage => { if (stage === 'queue')
+                    throw Error('queue fault'); } }).extract(brand, freshD.id, run(freshD))).rejects.toThrow('queue fault');
+            expect(await repo.list('commandReceipt')).toEqual(before);
+            expect((await service.detail(brand, freshD.id)).runs).toHaveLength(0);
+        });
+        it('bounded two-worker claim and sixteen queued runs; explicit same-intent queue continuation', async () => {
+            await setup();
+            let started = 0, release!: () => void;
+            const gate = new Promise<void>(r => release = r);
+            const limited = new AiInputService(identity, dir, { extract: async (request) => { started++; await gate; return extractInput(request); } });
+            const one = await create(), two = await create(), a = limited.extract(brand, one.id, run(one));
+            while (started < 1)
+                await new Promise(r => setTimeout(r, 1));
+            const b = limited.extract(brand, two.id, run(two));
+            while (started < 2)
+                await new Promise(r => setTimeout(r, 1));
+            const queued = [];
+            for (let n = 0; n < 16; n++) {
+                const d = await create(), body = run(d);
+                const r = await limited.extract(brand, d.id, body);
+                expect(r.detail.runs[0].state).toBe('queued');
+                queued.push({ d, body, id: r.runId });
+            }
+            expect(started).toBe(2);
+            const overflow = await create();
+            await expect(limited.extract(brand, overflow.id, run(overflow))).rejects.toMatchObject({ code: 'QUEUE_FULL' });
+            expect((await service.detail(brand, overflow.id)).runs).toHaveLength(0);
+            release();
+            await Promise.all([a, b]);
+            const resumed = await limited.extract(brand, queued[0].d.id, queued[0].body);
+            expect(resumed.runId).toBe(queued[0].id);
+            expect(resumed.detail.runs[0].state).toBe('finished');
+            expect(started).toBe(3);
+        });
+        it('queued recovery with lost intent/current teammate keeps one attempt and claim; stale/body/auth boundaries remain', async () => {
+            await setup();
+            const d = await create();
+            const q = await repo.transaction(async (s) => (await s.create('aiRun', { id: randomUUID(), contextId: ctx, data: { inputId: d.id, versionId: d.version.id, attempt: 1, createdBy: 'user-luna', state: 'queued', claimId: null, leaseUntil: null, startedAt: null, endedAt: null, snapshotId: null, issue: null } })));
+            const body = { versionId: d.version.id, expectedRunId: q.id, idempotencyKey: randomUUID() };
+            await expect(service.extract(team, d.id, { ...body, expectedRunId: null })).rejects.toMatchObject({ status: 409, code: 'CONFLICT' });
+            await expect(service.extract(tokenFor('user-wave'), d.id, body)).rejects.toMatchObject({ status: 404 });
+            let started!: () => void, release!: () => void, count = 0;
+            const begun = new Promise<void>(r => started = r), gate = new Promise<void>(r => release = r);
+            const worker = new AiInputService(identity, dir, { extract: async (request) => { count++; started(); await gate; return extractInput(request); } });
+            const pending = worker.extract(team, d.id, body);
+            await begun;
+            expect((await worker.extract(team, d.id, body)).runId).toBe(q.id);
+            await expect(worker.extract(brand, d.id, { ...body, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409, code: 'RETRY_UNAVAILABLE' });
+            await expect(worker.extract(team, d.id, { ...body, expectedRunId: null })).rejects.toMatchObject({ status: 409 });
+            release();
+            const result = await pending;
+            expect(result.runId).toBe(q.id);
+            expect(result.detail.runs[0]).toMatchObject({ attempt: 1, state: 'finished' });
+            expect(count).toBe(1);
+            expect(await repo.list('aiRun')).toHaveLength(1);
+            expect(await repo.list('aiSnapshot')).toHaveLength(1);
+            expect((await worker.extract(team, d.id, body)).runId).toBe(q.id);
+            expect(count).toBe(1);
+            await expect(worker.extract(brand, d.id, { ...body, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+            await repo.transaction(async (s) => { const m = (await s.list('membership', ctx)).find(m => m.data.userId === 'user-team')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
+            await expect(worker.extract(team, d.id, body)).rejects.toMatchObject({ status: 404 });
+        });
+        it('stored unknown extensions never project and malformed known run/asset metadata fails closed without mutation', async () => {
+            await setup();
+            const d = await create(), r = await service.extract(brand, d.id, run(d));
+            await repo.transaction(async (s) => { const row = (await s.get('aiInput', d.id))!; (await s.update('aiInput', row.id, row.revision, { ...row.data, internalPrice: { secret: 'AI_PRIVATE_CANARY' } } as typeof row.data)); });
+            expect(JSON.stringify(await service.detail(brand, d.id))).not.toContain('AI_PRIVATE_CANARY');
+            await repo.transaction(async (s) => { const row = (await s.get('aiRun', r.runId))!; (await s.update('aiRun', row.id, row.revision, { ...row.data, issue: { secret: 'AI_PRIVATE_CANARY' } } as unknown as typeof row.data)); });
+            const before = await repo.get('aiRun', r.runId);
+            await expect(service.detail(brand, d.id)).rejects.toMatchObject({ status: 503 });
+            expect(await repo.get('aiRun', r.runId)).toEqual(before);
+            const a = await repo.transaction(async (s) => (await s.create('aiAsset', { id: randomUUID(), contextId: ctx, data: { createdBy: 'user-luna', visibility: 'context', filename: { secret: 'AI_PRIVATE_CANARY' } as unknown as string, mime: 'image/png', bytes: 1, sha256: '0'.repeat(64), storageKey: randomUUID() } })));
+            await expect(service.picker(brand, ctx)).rejects.toMatchObject({ status: 503 });
+            expect(await repo.get('aiAsset', a.id)).toEqual(a);
+        });
+        it('AC15-02/03 actual private upload/PDF selected 2 pages, immutable bytes and retry, wrong signature/size rejected', async () => {
+            await setup();
+            const assets = new AiAssets(identity, dir), bytes = await readFile('tests/fixtures/ai-input/native-12.pdf'), key = randomUUID(), f = { name: 'native.pdf', type: 'application/pdf', bytes };
+            const a = await assets.upload(brand, ctx, 'context', key, f);
+            expect((await assets.upload(brand, ctx, 'context', key, f)).id).toBe(a.id);
+            expect(await readdir(path.join(dir, 'ai-input'))).toHaveLength(1);
+            const d = await create({ ...content(), kind: 'pdf', text: null, sources: [{ kind: 'upload', assetId: a.id }], selectedPages: [2, 10] }), result = await service.extract(brand, d.id, run(d));
+            expect(result.detail.runs[0].snapshot!.text).toContain('PAGE_02');
+            expect(result.detail.runs[0].snapshot!.text).not.toContain('PAGE_01');
+            expect(result.detail.runs[0].snapshot!.units.filter(u => u.status === 'unselected')).toHaveLength(10);
+            expect((await service.prepareTransfer(brand, d.id, result.runId)).allowed).toBe(true);
+            await expect(assets.upload(brand, ctx, 'context', randomUUID(), { ...f, name: 'file.ai' })).rejects.toMatchObject({ status: 422 });
+            await expect(assets.upload(brand, ctx, 'context', randomUUID(), { ...f, bytes: Buffer.alloc(10485761) })).rejects.toMatchObject({ status: 422 });
+            await writeFile(assets.destination(a.id), Buffer.from('tamper'));
+            await expect(assets.download(brand, a.id)).rejects.toMatchObject({ code: 'SOURCE_CHANGED' });
+            await expect(service.prepareTransfer(brand, d.id, result.runId)).rejects.toMatchObject({ code: 'SOURCE_CHANGED' });
+        }, 20000);
+        it('AC15-03 persisted actual OCR retains canonical unread hash order and safe replay', async () => {
+            await setup();
+            const a = await new AiAssets(identity, dir).upload(brand, ctx, 'context', randomUUID(), { name: 'japanese.png', type: 'image/png', bytes: await readFile('tests/fixtures/ai-input/japanese.png') });
+            const d = await create({ ...content(), kind: 'images', text: null, sources: [{ kind: 'upload', assetId: a.id }], selectedPages: [] }), input = run(d), r = await service.extract(brand, d.id, input);
+            expect(r.detail.runs[0].snapshot).toMatchObject({ status: 'partial', issues: expect.arrayContaining(['OCR_COVERAGE_UNKNOWN']) });
+            const again = await service.extract(brand, d.id, input);
+            expect(again.detail.runs[0].snapshot!.snapshotHash).toBe(r.detail.runs[0].snapshot!.snapshotHash);
+            expect((await service.prepareTransfer(brand, d.id, r.runId)).allowed).toBe(true);
+        }, 20000);
+        it('G05 exact S1/request/file/ProductUse and G06 versions survive S2/live edits; forged or draft-only source forbidden', async () => {
+            await setup();
+            const tasks = new TaskService(identity), sub = new SubmissionService(identity), products = new ProductService(identity), sf = new SubmissionFiles(identity, dir);
+            const c = { ...blankContent(), title: '합성 자료', description: '실제 요청', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('file', 'file'), label: 'PDF' }] };
+            const taskId = (await tasks.create(admin, { targets: [{ contextId: ctx, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: [], productIds: ['product-serum'] }], content: c, category: 'spot', idempotencyKey: randomUUID() })).ids[0];
+            await tasks.command(admin, taskId, { command: 'publish', expectedRevision: (await repo.get('task', taskId))!.revision, idempotencyKey: randomUUID() });
+            let w = await sub.workspace(brand, taskId);
+            const uploaded = await sf.upload(brand, taskId, w.request.id, [{ clientItemId: randomUUID(), name: 'source.pdf', type: 'application/pdf', bytes: await readFile('tests/fixtures/ai-input/native-12.pdf') }]);
+            const item = uploaded.items[0];
+            if (item.state !== 'ready')
+                throw Error('fixture upload');
+            const p = await products.detail(brand, 'product-serum', ctx), draft = { ...blankDraft(), answers: [{ requestId: w.request.id, requirementKey: 'file', productId: null, type: 'file' as const, input: { fileVersionIds: [item.file.id] } }], productSelections: [{ productId: p.productId, expectedCommonRevision: p.commonRevision, expectedContextRevision: p.contextRevision, bindingIds: [], retailPriceVersionId: null, asOfDate: '2026-09-21' }] };
+            await sub.draft(brand, taskId, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: 0, content: draft, idempotencyKey: randomUUID() });
+            w = await sub.workspace(brand, taskId);
+            const s1 = (await sub.submit(brand, taskId, { baseRequestId: w.request.id, expectedDraftRevision: w.draft!.revision, expectedTaskRevision: w.taskRevision, mode: 'full', idempotencyKey: randomUUID() })).ids[0], snap = await sub.snapshot(brand, s1), use = snap.products[0];
+            const linked: AiContent = { ...content(), kind: 'pdf', text: null, sources: [{ kind: 'submission_file', fileVersionId: item.file.id }], selectedPages: [2], submission: { taskId, requestId: w.request.id, submissionId: s1, productUseIds: [use.id] }, products: [{ productId: use.productId, productVersionId: use.productVersionId, contextProductVersionId: use.contextProductVersionId }] };
+            const d = await create(linked);
+            await products.command(brand, p.productId, { command: 'save_common', contextId: ctx, expectedCommonRevision: p.commonRevision, common: { ...p.common, name: '새 현재 상품' }, idempotencyKey: randomUUID() });
+            const refreshed = await products.detail(brand, p.productId, ctx);
+            draft.productSelections[0].expectedCommonRevision = refreshed.commonRevision;
+            w = await sub.workspace(brand, taskId);
+            await sub.draft(brand, taskId, { command: 'save', baseRequestId: w.request.id, expectedDraftRevision: w.draft!.revision, content: { ...draft, narrative: '실제 S2' }, idempotencyKey: randomUUID() });
+            w = await sub.workspace(brand, taskId);
+            const s2 = (await sub.submit(brand, taskId, { baseRequestId: w.request.id, expectedDraftRevision: w.draft!.revision, expectedTaskRevision: w.taskRevision, mode: 'full', idempotencyKey: randomUUID() })).ids[0];
+            expect(s2).not.toBe(s1);
+            expect((await service.detail(brand, d.id)).submission!.submissionId).toBe(s1);
+            expect((await service.detail(brand, d.id)).version.content.products[0].productVersionId).toBe(use.productVersionId);
+            expect((await service.extract(brand, d.id, run(d))).detail.runs[0].snapshot!.sources[0].sourceId).toBe(item.file.id);
+            expect(JSON.stringify(await service.picker(brand, ctx))).not.toContain('internalPrice');
+            await expect(create({ ...linked, submission: { ...linked.submission!, submissionId: 'forged' } })).rejects.toMatchObject({ status: 404 });
+            await expect(create({ ...linked, products: [{ ...linked.products[0], productVersionId: 'forged' }] })).rejects.toMatchObject({ status: 404 });
+        }, 20000);
+    });

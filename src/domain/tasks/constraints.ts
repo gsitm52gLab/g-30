@@ -1,4 +1,4 @@
-import { StoreError, type UnitOfWork, type RecordKind, type RecordInput } from "../records";
+import { StoreError, type SyncUnitOfWork as UnitOfWork, type RecordKind, type RecordInput } from "../records";
 export function taskRelations<K extends RecordKind>(s: UnitOfWork, kind: K, input: RecordInput<K>) {
     const immutable: RecordKind[] = ["requestVersion", "templateVersion", "taskActivity", "priorSubmission", "domainEvent", "commandReceipt", "fileVersion"];
     if (immutable.includes(kind) && s.get(kind, input.id)) throw new StoreError("INVALID_RECORD");

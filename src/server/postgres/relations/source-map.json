@@ -1,0 +1,92 @@
+[
+  {
+    "source": "src/domain/constraints.ts",
+    "sha256": "3e4074fa7efecb15d302555e3e233aca6eaaf518033c77766e0ae5964117129b",
+    "async": "index.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/ai-input/constraints.ts",
+    "sha256": "f8e651091e0feba9be479eb421fe04b7aafc2a3a3f990637b5816eddcef9e5fe",
+    "async": "ai-input.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/ai-provider/constraints.ts",
+    "sha256": "f5e90e972b864169d3ee291524402aacdac2d8d3c48891ba44cb9ae4a94d9be1",
+    "async": "ai-provider.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/ai-review/constraints.ts",
+    "sha256": "ffec42d43ebe5149f7228b20f9dc07a52c73abb8e19365268222ea3550251e68",
+    "async": "ai-review.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/campaigns/constraints.ts",
+    "sha256": "5d4d81f32813b1125555f10fa097adfd99785ad2e02b924441b8dc59c67cc114",
+    "async": "campaigns.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/completion/constraints.ts",
+    "sha256": "b2b4832228759405ce1a654df38c13d635c904b2d413f8e8dd8e59bed24c71f0",
+    "async": "completion.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/corrections/constraints.ts",
+    "sha256": "ac22336576aa5d05e3a2d9a32ae7cc4f2a658d601cb168d7f28ac1aeee76146b",
+    "async": "corrections.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/evidence/constraints.ts",
+    "sha256": "d30f64e57fe1c5f2b047d8fbb7d967cfa95642e26f00cbe94937289e952a2dc7",
+    "async": "evidence.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/inquiries/constraints.ts",
+    "sha256": "0c38c40f703800af0eb3ca28f9f2c343356cabcc3e0a0a885e3014d745b62926",
+    "async": "inquiries.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/notices/constraints.ts",
+    "sha256": "f23f684416ba565451c87973ed35e5d91076d3f18aa7ace8ed76622ecc30e9ae",
+    "async": "notices.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/notifications/constraints.ts",
+    "sha256": "61b8286276d2137a189cae4562b28cf0ce685fc56ea374e7f9b8c6e8e96cdf98",
+    "async": "notifications.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/products/constraints.ts",
+    "sha256": "189633542b179732111f18feb170f830d3481343d02a77ef1b7c0eb1c41ef15b",
+    "async": "products.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/scheduling/constraints.ts",
+    "sha256": "a3dda583e7c28735ec06f26384f9dfe314946949ae3bdf53114d59be4951f056",
+    "async": "scheduling.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/submissions/constraints.ts",
+    "sha256": "3953ea9a35153d6b702e3dccb71c3f8319959e049abd5bba1d00ecad1c844e75",
+    "async": "submissions.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  },
+  {
+    "source": "src/domain/tasks/constraints.ts",
+    "sha256": "2ebb9e934da832f23aabda955346a2c5a6dd2ccb6d0f9d1ec9bff02689876d7b",
+    "async": "tasks.ts",
+    "change_note": "AUTH-DURABILITY-20260922-01: source changed only UnitOfWork import to SyncUnitOfWork alias; relationship behavior unchanged."
+  }
+]

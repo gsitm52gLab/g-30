@@ -1,0 +1,232 @@
+{
+  "sqlite_through": "0015",
+  "migrations": [
+    {
+      "name": "0001-foundation.sql",
+      "sqlite_sha256": "93b046ba2f462930affa719fbea61065d27305cc0c68d0ad3b68379ae594060f",
+      "postgres_sha256": "64950dd0468050b4407d59b32707b5215df82422ba732298f4546ac1ffa3ef20",
+      "indexes": [
+        "records_kind_context"
+      ],
+      "triggers": []
+    },
+    {
+      "name": "0002-identity.sql",
+      "sqlite_sha256": "893b72dffd930c25700b586771147c3c8084e1ee442e2031900159f5f68f1d77",
+      "postgres_sha256": "9e23ad2f988d16d0f022aeca77e5b94a73cc478507d4c5b37f385677cae2e7e4",
+      "indexes": [
+        "context_combination",
+        "user_email",
+        "member_identity",
+        "credential_user",
+        "session_token",
+        "invitation_token"
+      ],
+      "triggers": [
+        "membership_reference_insert",
+        "invitation_reference_insert"
+      ]
+    },
+    {
+      "name": "0003-tasks.sql",
+      "sqlite_sha256": "37015139e8a6ed2e93a3964da0a74eb09cb08d38901ea0e6f048bafe80185e32",
+      "postgres_sha256": "6d3d0bb483f98b3450d56300cafbcbd6e0505eecbcdccc2dfccfb4d6500ba03f",
+      "indexes": [
+        "task_receipt_key",
+        "task_request_sequence",
+        "template_sequence"
+      ],
+      "triggers": [
+        "immutable_task_versions"
+      ]
+    },
+    {
+      "name": "0004-products.sql",
+      "sqlite_sha256": "30a6d48795c7a0a74cbcfd84047b0f1ce56364bc63fb64a18c52698ae4ac9596",
+      "postgres_sha256": "6ac9dd3f375c22a941dda3c7a93505d1808ff7f49392ac81a79391b4dd00f85d",
+      "indexes": [
+        "context_product_identity",
+        "context_product_code",
+        "product_version_sequence",
+        "context_product_version_sequence",
+        "product_price_identity",
+        "product_price_version_sequence"
+      ],
+      "triggers": [
+        "immutable_product_versions"
+      ]
+    },
+    {
+      "name": "0005-submissions.sql",
+      "sqlite_sha256": "d5d8bbe97c2931715f67047a41a0f9c8174cf2efffd812077c4b9a6324b9b54a",
+      "postgres_sha256": "bb7f1a605a8c729f3e3320edabbc13e6f3a111c91b207d6e8d25086b03f7b31a",
+      "indexes": [
+        "submission_shared_draft",
+        "submission_sequence",
+        "submission_consumed_draft",
+        "submission_upload_key"
+      ],
+      "triggers": [
+        "immutable_submission_version",
+        "immutable_submission_delete"
+      ]
+    },
+    {
+      "name": "0006-evidence-imports.sql",
+      "sqlite_sha256": "69cda3eb52060acf2bd9a9628129617c28911ef672e9853ace5d6f56786d442b",
+      "postgres_sha256": "95f98b1822cffa5874f6acf170045c2a9e702267589354c3506582ccc71e0543",
+      "indexes": [
+        "evidence_version_sequence",
+        "evidence_product_link",
+        "evidence_assessment_sequence"
+      ],
+      "triggers": [
+        "immutable_evidence_import_update",
+        "immutable_evidence_import_delete"
+      ]
+    },
+    {
+      "name": "0007-notices.sql",
+      "sqlite_sha256": "434251433a8626665980d26f7bbded2f3ccc06ed7197a6695158a64184145abb",
+      "postgres_sha256": "7a2758c34eb82fe51aac07262680ad94df11bc7be922bb50623f23f875dc9ab2",
+      "indexes": [
+        "notice_version_sequence",
+        "notice_version_reader"
+      ],
+      "triggers": [
+        "immutable_notice_records_update",
+        "immutable_notice_records_delete"
+      ]
+    },
+    {
+      "name": "0008-inquiries.sql",
+      "sqlite_sha256": "57a728af4fe8dc5b81850390a80d3dc9555e1ae7c5b9a5461e9ecabe916b45d6",
+      "postgres_sha256": "2d6be7dd1724e2c9dc8f3b8c315450170d5a2eb04ccee2ee1167b8c7816bd342",
+      "indexes": [
+        "inquiry_message_intent",
+        "inquiry_event_position",
+        "inquiry_read_fact",
+        "inquiry_cursor_token"
+      ],
+      "triggers": [
+        "immutable_inquiry_update",
+        "immutable_inquiry_delete"
+      ]
+    },
+    {
+      "name": "0009-corrections.sql",
+      "sqlite_sha256": "eef927db984bdeb138444aebb6e3760761bd161b241e56f8816c8b8fb3b84dd8",
+      "postgres_sha256": "2895f2efd569145f8bcf3f6a134a7affe3d9e18f35464e1be7c561e8b0a6643b",
+      "indexes": [
+        "correction_opinion_sequence",
+        "correction_batch_sequence",
+        "correction_batch_draft",
+        "correction_item_key"
+      ],
+      "triggers": [
+        "correction_immutable_update",
+        "correction_immutable_delete",
+        "correction_published_draft_update",
+        "correction_published_draft_delete"
+      ]
+    },
+    {
+      "name": "0010-campaigns.sql",
+      "sqlite_sha256": "90a18a8f8f783f821fb85024162836549d9ee33b3492eeef8a8a19a251e475cc",
+      "postgres_sha256": "4367e16b9df12285ac49c5f0e9ab9e7a751c0a34c2fae8962e963db4bbb664c4",
+      "indexes": [
+        "campaign_catalog_sequence",
+        "campaign_version_sequence",
+        "campaign_selection_sequence",
+        "campaign_external_sequence",
+        "campaign_physical_sequence",
+        "campaign_followup_sequence"
+      ],
+      "triggers": [
+        "campaign_immutable_update",
+        "campaign_immutable_delete"
+      ]
+    },
+    {
+      "name": "0011-completion.sql",
+      "sqlite_sha256": "c5291c000491ec399b3ace74a05ce4cece367129db3e5b1dda06db6d51057b7e",
+      "postgres_sha256": "66ed750d7e579cb5f92c570febcf730c9fc5bbc209582e94b396a605c3494dc6",
+      "indexes": [
+        "completion_snapshot_sequence",
+        "completion_external_sequence",
+        "completion_reopen_once"
+      ],
+      "triggers": [
+        "completion_immutable_update",
+        "completion_immutable_delete"
+      ]
+    },
+    {
+      "name": "0012-ai-input.sql",
+      "sqlite_sha256": "26f5f1c69ff6a0f7362bbc9ba2f4b66eb4c84c2264563410a3b9809e627fb7d9",
+      "postgres_sha256": "e70c42c2c28316bb8e46e4cdf84c3602ca7aa75e5321ea41f39a8a16a7187483",
+      "indexes": [
+        "ai_version_sequence",
+        "ai_run_attempt",
+        "ai_snapshot_run"
+      ],
+      "triggers": [
+        "immutable_ai_update",
+        "immutable_ai_delete"
+      ]
+    },
+    {
+      "name": "0013-ai-review.sql",
+      "sqlite_sha256": "d91bf4604d48b76e38e94588c89eadeeee9f89b23ab7549b45b8393b1f0e2c74",
+      "postgres_sha256": "127388784f8788f1ebe3077c529e0a38d6227b42e4abc68bda24471e57968c49",
+      "indexes": [
+        "ai_analysis_attempt",
+        "ai_analysis_result_run",
+        "ai_finding_review_key",
+        "ai_review_action_sequence"
+      ],
+      "triggers": [
+        "immutable_ai_review_update",
+        "immutable_ai_review_delete"
+      ]
+    },
+    {
+      "name": "0014-scheduling-notifications.sql",
+      "sqlite_sha256": "1980fce2f051a775363a116b0494409131226ab0df47199efcdc6369f6091f80",
+      "postgres_sha256": "68f50edd26d28a3c3ff21420e04263862dcdf9216944a5be8abf615cf129c67a",
+      "indexes": [
+        "scheduling_version_sequence",
+        "notification_event_recipient",
+        "notification_semantic_recipient",
+        "notification_receipt_key"
+      ],
+      "triggers": [
+        "scheduling_immutable_update",
+        "scheduling_immutable_delete",
+        "notification_content_immutable"
+      ]
+    },
+    {
+      "name": "0015-ai-provider.sql",
+      "sqlite_sha256": "2d87cd03cfd54952fc347c0e181b9784148390bc980bcd47576e437991de0108",
+      "postgres_sha256": "c6dda4f4725c93c4f9aca748c47ac049f01a1cbb58212ca8735a996aa3e473b7",
+      "indexes": [
+        "ai_provider_setting_context",
+        "ai_provider_plan_run",
+        "ai_provider_attempt_sequence",
+        "ai_provider_outcome_attempt"
+      ],
+      "triggers": [
+        "immutable_ai_provider_update",
+        "immutable_ai_provider_delete"
+      ]
+    }
+  ],
+  "postgres_only": [
+    {
+      "name": "0016-revision-width.sql",
+      "postgres_sha256": "be6f77e37d50bccfa9347b01af7c6f85aaa30085a8a9d143976bb032784bbfa9",
+      "purpose": "BIGINT revisions retain exact JavaScript-safe integer range; not G14 SQLite0016"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
+import { createAsyncLocalRepository } from './async-local';
 import { checkRelations } from "@/domain/constraints";
-import { assertSynchronous, updatedContext, checkInput, jsonCopy, StoreError, systemClock, type Clock, type RecordDataMap, type RecordInput, type RecordKind, type RecordRepository, type StoredRecord, type UnitOfWork } from "@/domain/records";
+import { updatedContext, checkInput, jsonCopy, StoreError, systemClock, type Clock, type RecordDataMap, type RecordInput, type RecordKind, type RecordRepository, type StoredRecord, type SyncUnitOfWork as UnitOfWork } from "@/domain/records";
 export function createMockRepository(clock: Clock = systemClock): RecordRepository {
     let records = new Map<string, StoredRecord>();
     const key = (kind: RecordKind, id: string) => `${kind}:${id}`;
@@ -22,6 +23,7 @@ export function createMockRepository(clock: Clock = systemClock): RecordReposito
             const current = store.get(kind, id);
             if (!current)
                 throw new StoreError("NOT_FOUND");
+            if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1 || current.revision >= Number.MAX_SAFE_INTEGER) throw new StoreError("INVALID_RECORD");
             if (current.revision !== expectedRevision)
                 throw new StoreError("CONFLICT");
             const contextId = updatedContext(current, data, migration);
@@ -32,22 +34,8 @@ export function createMockRepository(clock: Clock = systemClock): RecordReposito
             return jsonCopy(record);
         },
     };
-    return { mode: "mock", get: async (kind, id) => store.get(kind, id), list: async (kind, contextId) => store.list(kind, contextId),
-        async transaction<T>(operation: (uow: UnitOfWork) => T): Promise<T> {
-            const before = new Map(records);
-            let active = true;
-            const guarded = new Proxy(store, { get(target, prop: keyof UnitOfWork) { return (...args: unknown[]) => { if (!active)
-                    throw new StoreError("ASYNC_TRANSACTION"); return Reflect.apply(target[prop], target, args); }; } });
-            try {
-                return assertSynchronous(operation(guarded));
-            }
-            catch (error) {
-                records = before;
-                throw error;
-            }
-            finally {
-                active = false;
-            }
-        }, close() { records.clear(); },
-    };
+    let before = records;
+    return createAsyncLocalRepository('mock', store, {
+        begin() { before = new Map(records); }, commit() {}, rollback() { records = before; }, close() { records.clear(); },
+    });
 }

@@ -1,0 +1,8 @@
+{
+  "status": 200,
+  "source": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt",
+  "discovered_in": "https://raw.githubusercontent.com/supabase/supabase/master/apps/studio/hooks/custom-content/custom-content.json",
+  "ca": true,
+  "valid_to": "Apr 26 10:56:53 2031 GMT",
+  "sha256": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7"
+}

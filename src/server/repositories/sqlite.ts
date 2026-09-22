@@ -1,6 +1,7 @@
+import { createAsyncLocalRepository } from './async-local';
 import { checkRelations } from "@/domain/constraints";
 import type Database from "better-sqlite3";
-import { assertSynchronous, updatedContext, checkInput, jsonCopy, StoreError, systemClock, type Clock, type RecordDataMap, type RecordInput, type RecordKind, type RecordRepository, type StoredRecord, type UnitOfWork } from "@/domain/records";
+import { updatedContext, checkInput, jsonCopy, StoreError, systemClock, type Clock, type RecordDataMap, type RecordInput, type RecordKind, type RecordRepository, type StoredRecord, type SyncUnitOfWork as UnitOfWork } from "@/domain/records";
 interface Row {
     kind: RecordKind;
     id: string;
@@ -39,6 +40,7 @@ export function createSqliteRepository(db: Database.Database, clock: Clock = sys
             const old = uow.get(kind, id);
             if (!old)
                 throw new StoreError("NOT_FOUND");
+            if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1 || old.revision >= Number.MAX_SAFE_INTEGER) throw new StoreError("INVALID_RECORD");
             const contextId = updatedContext(old, data, migration);
             checkInput({ id, contextId, data });
             checkRelations(uow, kind, { id, contextId, data });
@@ -50,19 +52,8 @@ export function createSqliteRepository(db: Database.Database, clock: Clock = sys
             return { ...old, contextId, data: copy, revision: old.revision + 1, updatedAt: now };
         },
     };
-    return { mode: "sqlite", get: async (kind, id) => uow.get(kind, id), list: async (kind, contextId) => uow.list(kind, contextId),
-        async transaction<T>(operation: (store: UnitOfWork) => T): Promise<T> {
-            return db.transaction(() => {
-                let active = true;
-                const guarded = new Proxy(uow, { get(target, prop: keyof UnitOfWork) { return (...args: unknown[]) => { if (!active)
-                        throw new StoreError("ASYNC_TRANSACTION"); return Reflect.apply(target[prop], target, args); }; } });
-                try {
-                    return assertSynchronous(operation(guarded));
-                }
-                finally {
-                    active = false;
-                }
-            }).immediate();
-        }, close() { db.close(); },
-    };
+    return createAsyncLocalRepository('sqlite', uow, {
+        begin() { db.exec('BEGIN IMMEDIATE'); }, commit() { db.exec('COMMIT'); },
+        rollback() { if (db.inTransaction) db.exec('ROLLBACK'); }, close() { db.close(); },
+    });
 }

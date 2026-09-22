@@ -1,4 +1,4 @@
-import { StoreError, type RecordKind, type RecordInput, type UnitOfWork } from '../records';
+import { StoreError, type RecordKind, type RecordInput, type SyncUnitOfWork as UnitOfWork } from '../records';
 const immutable: RecordKind[] = ['inquiryMessage','inquiryRead','inquiryTransition','inquiryTaskLink','inquiryEvent','inquiryCursor'];
 export function inquiryRelations<K extends RecordKind>(s: UnitOfWork, kind: K, input: RecordInput<K>) {
     if (kind !== 'conversation' && kind !== 'inquiryQuestion' && !immutable.includes(kind)) return;

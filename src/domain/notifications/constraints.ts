@@ -1,4 +1,4 @@
-import { StoreError, type RecordKind, type RecordInput, type UnitOfWork } from '@/domain/records';
+import { StoreError, type RecordKind, type RecordInput, type SyncUnitOfWork as UnitOfWork } from '@/domain/records';
 export function notificationRelations<K extends RecordKind>(s: UnitOfWork, kind: K, input: RecordInput<K>) {
     if (!['notification', 'notificationReceipt', 'notificationAttempt'].includes(kind)) return;
     const d = input.data as import('./records').NotificationData | import('./records').NotificationReceiptData | import('./records').NotificationAttemptData;
