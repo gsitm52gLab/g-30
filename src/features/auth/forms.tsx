@@ -1,20 +1,20 @@
 "use client";
 import { useEffect, useState, useRef, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { api } from "./client";
 import {clearSubmissionRecovery} from "@/features/submissions/recovery";
-export function LoginForm() { const router = useRouter(); const [error, setError] = useState(""); const [busy, setBusy] = useState(false); async function submit(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const f = new FormData(e.currentTarget); setBusy(true); setError(""); try {
+export function LoginForm() { const [error, setError] = useState(""); const [busy, setBusy] = useState(false); async function submit(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const f = new FormData(e.currentTarget); setBusy(true); setError(""); try {
     await api("/api/auth/login", "POST", { email: f.get("email"), password: f.get("password") });
     clearSubmissionRecovery();
-    router.replace("/");
-    router.refresh();
+    // The session cookie changed: load fresh server content instead of a cached RSC tree.
+    window.location.replace("/");
 }
 catch (e) {
     setError((e as Error).message);
     setBusy(false);
 } } return <form onSubmit={submit} className="identity-form"><label>이메일<input name="email" type="email" autoComplete="username" required/></label><label>비밀번호<input name="password" type="password" autoComplete="current-password" minLength={12} maxLength={128} required/></label>{error && <p role="alert" className="form-error">{error}</p>}<button className="button" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button></form>; }
-export function AccountMenu() { const router = useRouter(); const pathname = usePathname(); const [user, setUser] = useState<{
+export function AccountMenu() { const pathname = usePathname(); const [user, setUser] = useState<{
     name: string;
 } | null>(null); const [error, setError] = useState(""); useEffect(() => { api<{
     user: {
@@ -24,8 +24,7 @@ export function AccountMenu() { const router = useRouter(); const pathname = use
     await api("/api/auth/logout", "POST");
     clearSubmissionRecovery();
     setUser(null);
-    router.replace("/login");
-    router.refresh();
+    window.location.replace("/login");
 }
 catch (e) {
     setError((e as Error).message);
