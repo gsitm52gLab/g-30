@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { boundedDownload } from './download';
 import { FileTransferError } from './contracts';
-/** The URL always stays an authenticated application reference, never a public Storage URL. */
+/** PDF uses the browser native viewer after exact PDF MIME and complete hash verification.
+ * The URL always stays an authenticated application reference, never a public Storage URL. */
 type Props={href:string;children:ReactNode;preview?:boolean;className?:string};
 export function FileLink(props:Props){return <FileLinkContent key={props.href} {...props}/>;}
 function FileLinkContent({href,children,preview=false,className}:Props) {
@@ -19,5 +20,5 @@ function FileLinkContent({href,children,preview=false,className}:Props) {
     finally{if(id===turn.current&&!c.signal.aborted)setBusy(false);}
   }
   function close(){turn.current++;clear();setShown(null);setBusy(false);}
-  return <span style={{maxWidth:'100%',overflowWrap:'anywhere'}}><button type="button" className={className} onClick={()=>void open()} disabled={busy}>{busy?'파일 확인 중…':children}</button>{busy&&<button type="button" onClick={close}>파일 처리 취소</button>}{error&&<span role="alert">{error}</span>}{shown?.href===href&&<span role="region" aria-label={`${shown.name} 미리보기`} style={{display:'block',maxWidth:'100%'}}><button type="button" onClick={close}>미리보기 닫기</button>{shown.mime==='application/pdf'?<iframe title={`${shown.name} PDF 미리보기`} sandbox="" src={shown.url} style={{width:'100%',height:480,border:0}}/>:<img alt={shown.name} src={shown.url} style={{maxWidth:'100%',height:'auto'}}/>}</span>}</span>;
+  return <span style={{maxWidth:'100%',overflowWrap:'anywhere'}}><button type="button" className={className} onClick={()=>void open()} disabled={busy}>{busy?'파일 확인 중…':children}</button>{busy&&<button type="button" onClick={close}>파일 처리 취소</button>}{error&&<span role="alert">{error}</span>}{shown?.href===href&&<span role="region" aria-label={`${shown.name} 미리보기`} style={{display:'block',maxWidth:'100%'}}><button type="button" onClick={close}>미리보기 닫기</button>{shown.mime==='application/pdf'?<iframe title={`${shown.name} PDF 미리보기`} src={shown.url} style={{width:'100%',height:480,border:0}}/>:<img alt={shown.name} src={shown.url} style={{maxWidth:'100%',height:'auto'}}/>}</span>}</span>;
 }
