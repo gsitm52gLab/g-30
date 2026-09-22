@@ -2942,7 +2942,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd ownHTTP/races/history continuing frozenserver7cf19; root reviewed634unit/build; goals UI afterV01repair handoff, workflow futureindependent.",
+      "next_action": "prd ownruntime plus currentassignee search requirement investigation; goalsUIready7cf19 notassigned untilG17repair/finalG14contract.",
       "readonly_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/preparation-task.json",
         "sha256": "8d2e5fb5bc7c7c59a0c1db0c615a3f8625ecd293b9d120d2402970426dd6bdab"
@@ -3015,7 +3015,12 @@
       "ui_draft_v2": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-task-draft-v2.json",
         "sha256": "eb09776ad9cc64fbcd83887795c966003defb013896da1f7ba758916ecfa78b7"
-      }
+      },
+      "ui_task_ready": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-task.json",
+        "sha256": "66fa667b9a8b63ec51fdb24821d6465e708138a523cf30fde2bf886d8bf40650"
+      },
+      "ui_worktree_ready": "/Users/evan/workspace/gs-hale/.worktrees/g14-ui"
     },
     {
       "id": "G15",
@@ -3639,7 +3644,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Goals narrow V01 repair4cfd exactcheck/build; workflow finish9dd independent unaffected groups, actualAPI HELD0. Root newcandidate review then exactrepair verifier+actualminimumcall.",
+      "next_action": "Workflow independent bodydeadline4cfd vs9dd boundedrepro; goals separate narrowbodytimeout red/fix; rootreview then exactfinalindependent/live1. ActualAPI0 HELD; previous560unit/UI32/HTTP39+3skip preserved.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/task-draft.json",
         "sha256": "acf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3"
@@ -3788,6 +3793,36 @@
       "integration_preparation": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/integration-impact-preparation.json",
         "sha256": "0904a7c2d3126af1310d85e25ccaf53eaefa4a63760963622a9b583c8806e876"
+      },
+      "verification_result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/verification-result.json",
+      "verification_result_ref": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/verification-result.json",
+        "sha256": "8a97bb60e57dbe2984dc6844a5d019a009889dee8c15fa439ec28379792793b3"
+      },
+      "main_verification_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/verification/main-review.json",
+        "sha256": "5fd49d3310cb909cbf0702f37ccb10f5d31b6a7c29ace9afa166524fa0c5b868"
+      },
+      "v01_repair_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/2/v01-repair/implementation-result.json",
+        "sha256": "1d80c4c5630c839cb38c047e4c012c2ad1246a210360d91c25f6bb167fd4eae0"
+      },
+      "v01_repair_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/2/v01-repair/main-review.json",
+        "sha256": "9439c6f9d3689ae2bc27c2425ea6bf0f03e582fab511b1b16d66cc96a60b0614"
+      },
+      "verification_repair_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verification-repair1-task.json",
+        "sha256": "0174d1116e95c13ddd3ca705627c802f0af0833373fd588823d04afe169dee41"
+      },
+      "verification_repair_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g17-verification-repair1",
+      "body_timeout_observation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/2/v01-repair/body-timeout-static-observation.json",
+        "sha256": "073f955ce61e75848c1e88e91a60b513c9ae0790a47ecdc765e780a47acf2735"
+      },
+      "body_timeout_repair_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/body-timeout-repair-task.json",
+        "sha256": "e2079fb075ea38781a3c94471481a64cd35c4d771fc0ed0f50b513c14fd7777c"
       }
     },
     {
@@ -3882,8 +3917,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "f48e3487544f46d46118f856d823111fd953f073",
   "current_goal": "G14",
-  "next_action": "Close G17-V01 repair then independent exactnewcandidate incl minimalactualAPI; G14 typedserver7cf19 reviewed and commonlease released, UI aftergoals repair. 15/19 accepted f48e.",
-  "state_version": 166,
+  "next_action": "Close G17 SDKwholebodydeadline plusV01 independent thenactual1; G14runtime/currentassignee search review thenUI. Accepted15/19 f48e, G03/G18 pending.",
+  "state_version": 167,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3915,7 +3950,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T00:12:50.582242+00:00",
+  "updated_at": "2026-09-22T00:17:44.578917+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

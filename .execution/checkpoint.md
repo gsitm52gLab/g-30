@@ -1,3 +1,7 @@
+# Latest state167 — 2026-09-22T00:17:44.578917+00:00
+
+G17 9dd independent FAILpacket8a97/root5fd49 reviewed1576artifacts662sources17commands36ZIP. V01repair4cfd author568unit/build reviewed9439; SDKasResponse bypassesbodydeadline staticobservation073f, rootassigned narrowauthorbodyrepair e207 plusworkflow independent4cfd repro0174 in .worktrees/g17-verification-repair1, actualAPI0HELD. Original9dd evidence untouched. G14 typed7cf19 root13db reviewed; UIworktree .worktrees/g14-ui created+task66fa ready NOTASSIGNED pendinggoalsG17repair. prd ownHTTP/history continues androotcurrentassignee-vsactor gap queried. Allleasescommonreleased; userdocs untouched; accepted15f48e noadvance.
+
 # Latest state166 — 2026-09-22T00:12:50.582242+00:00
 
 Goal ACTIVE. Accepted15/19 f48e; root+prd/goals/workflow. G17 independent9dd confirmed V01 real object:response malformed output/content throws inside SDK before safe metadata; author goals narrowrepair4cfd finalcheck/build underway. workflow old9dd unaffected groups continue, actualOpenAI0 HELD until repaired candidate. Failure early-findings and main-v01-review retained. G14 typedserver7cf19 frozen634unit/build and root40artifacts54sources verified; commonlease RELEASED; prd ownHTTP/history continues. UI taskdraft-v2 intendedgoals afterV01repair; workflow remainsG14nonauthor. Userdocs execution-v2 untouched. Next exactrepair independent+minimumactualcall; G14UI then combinedindependent; G03 andG18 remain.
