@@ -1,4 +1,4 @@
-# GS HALE checkpoint — state189 / Goal active
+# GS HALE checkpoint — state190 / Goal active
 
 Actual Goal re-observed active through get_goal on 2026-09-22 after the user continuation. No second Goal created. Latest user wanted background work; no return to synchronous broad questioning. Previous turn is PROGRESS: code integrated/pushed and real deployed auth + populated screens observed.
 
@@ -72,3 +72,10 @@ StorageS1 prd candidate6e6b8b8 frozen30paths, full864check and40core tests PASS,
 G03 sb_postgres e45a3d2 author831check/buildPASS; actualPG probe94086 mustbe polled, not restarted just from delay. Brandmenu discovered staff-only /ai-review mismatch; navigate common brand label to existing functional /ai-input, retain internal resultserverdenial. No policy weakening/newplaceholder. Menu oracle genericheading falsepositive retained and being corrected.
 
 SB01 independent7PASS0FAIL1NOT_RUN (Storage-specificbadconfig pending),83hasheschecked. SB06 newpublickey actual11PASS,14hasheschecked (gateway+schema/directrole, notfullappmatrix). User keyaddition authorized and nosecretoutput. Root G14 HTTP28PASS on1c054 but separateWorkerpackagingFAIL, fullGoal remains incomplete.
+
+
+State190: Worker source906 accepted bounded local packaging at root401e6eac89af5ca52d6179d76de73a1483f9694b. Author186+independent59hashesmatch. Actual populatedroot freshWebpack build0, allNFT133 denied0, isolated7PASS, G14HTTP28PASS0FAIL0skip; owned4255/4256 allstopped. Runnerignored G14_HTTP envnames, used recordedfresh.local mkdtemp; no failure/repetition needed. ActualLinux/Vercel remainsNOT_RUN. Root process73287 finished0.
+
+S1 core unchanged6e product, final591 adds2actualharness only; amendment sourcebound; independent191unit+12newinvariantsPASS, actualprocess6471 inownschema running; authoractual11PASS5pending atlatestreport. G03 actual PG02 fixtures passed1349649ms (22.5min), remainingcount/UI/restart/revoke pending, candidatee45 unchanged untilprobeends. Long existingproducerroundtrips remain recorded latency concern, no broadlatencyPASS.
+
+User requests3hgoalcompletion target16:25KST; no scopewaiver. Codex configtop model_reasoning_effort xhigh→medium (otherbytesunchanged/privatebackup), currentactive effortnotverified. Exactlyroot+3liveagents; coreauthor/prd, independent/scope, homeauthor/sbpostgres. S1 P2ready staging duplicatespersist (uptoroughly2x storage) trackedoperationalcleanup gap, no extra schemainvention orfinaldeletion. NextS2preparedpacket exists; consolidate files+submissions+commonbrowser+wrappers verticallease afterS1accepted; Inquiry/ExcelAI separateowners.
