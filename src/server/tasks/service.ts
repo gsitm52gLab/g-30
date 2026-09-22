@@ -271,6 +271,7 @@ export class TaskService {
                     (await this.audit(s, p, row.contextId!, "task.state", row.id, { status: row.data.status, resumeStatus: row.data.resumeStatus ?? null }, { status, resumeStatus, reason, domainEventId: event }));
                 }
                 else if (cmd === "duplicate") {
+                    const mode = enumValue(input.mode ?? "draft", ["draft", "publish"]);
                     const cycle = object(input.cycle, ["label", "start", "end"]), start = dateValue(cycle.start), end = dateValue(cycle.end);
                     if (end < start)
                         fail("VALIDATION", 422, "대상 기간 순서를 확인해 주세요.");
@@ -281,6 +282,8 @@ export class TaskService {
                     const tid = (await this.createOne(s, p, target, c, "spot", null, row.data.templateVersionId ?? null, row.data.subtype ?? "정기 업데이트"));
                     const fresh = (await s.get("task", tid))!;
                     (await s.update("task", tid, fresh.revision, { ...fresh.data, cycle: { sourceTaskId: row.id, label: str(cycle.label, 100, true), start, end } }));
+                    if (mode === "publish")
+                        await this.publish(s, p, (await s.get("task", tid))!, c);
                     return { ids: [tid] };
                 }
                 else {

@@ -109,6 +109,19 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} one-save task 
         await expect(tasks.command(admin, id, { ...body, expectedRevision: (await repo.get('task', id))!.revision, content: { ...body.content, description: '' }, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 422 });
         expect(await snapshot()).toEqual(stable);
     });
+    it('explicit cycle registration publishes its own request once and never changes source or old versions', async () => {
+        await setup(); const id = (await tasks.create(admin, input())).ids[0], source = (await repo.get('task', id))!;
+        const versions = (await repo.list('requestVersion')).filter(v => v.data.taskId === id);
+        const body = { command: 'duplicate', mode: 'publish', expectedRevision: source.revision, cycle: { label: '10월', start: '2026-10-01', end: '2026-10-31' }, productIds: target.productIds, idempotencyKey: randomUUID() };
+        const copied = await tasks.command(admin, id, body); expect(await tasks.command(admin, id, body)).toEqual(copied);
+        const brandCopy = await tasks.detail(brand, copied.ids[0]);
+        expect(brandCopy.task.data).toMatchObject({ visibility: 'public', status: 'requested', cycle: { sourceTaskId: id } });
+        expect(brandCopy.versions).toHaveLength(1); expect(await repo.get('task', id)).toEqual(source);
+        expect((await repo.list('requestVersion')).filter(v => v.data.taskId === id)).toEqual(versions);
+        const before = await snapshot();
+        await expect(tasks.command(admin, id, { ...body, expectedRevision: source.revision - 1, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+        expect(await snapshot()).toEqual(before);
+    });
     it('existing drafts stay private until their explicit send action; brand cannot manage', async () => {
         await setup(); const a = (await tasks.create(admin, { ...input(), mode: 'draft' })).ids[0], b = (await tasks.create(admin, { ...input(), mode: 'draft' })).ids[0];
         await expect(tasks.detail(brand, a)).rejects.toMatchObject({ status: 404 });
