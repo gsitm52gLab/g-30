@@ -9,7 +9,7 @@ import { resolveCampaign } from '@/server/campaigns/access';
 import { versionDTO } from '@/server/campaigns/projection';
 import { menuProgress } from '@/server/campaigns/read';
 import { menuIdentityKey } from '@/domain/campaigns/types';
-import { activeInquiry, staff } from '@/server/inquiries/access';
+import { resolveInquiry, staff } from '@/server/inquiries/access';
 import { questions } from '@/server/inquiries/projection';
 import { currentActor, sourceTask, brandRecipientIds, recipientFacts, ownerRecipientIds } from './access';
 import { sourceDeadline, sourceText, taskActionUrl } from './projection';
@@ -103,7 +103,10 @@ export async function campaignSchedules(s: UnitOfWork, principal: Principal, cam
     return result;
 }
 export async function inquirySchedules(s: UnitOfWork, principal: Principal, conversationId: string, clock: Clock): Promise<SourceSchedule[]> {
-    const { row } = (await activeInquiry(s, principal, conversationId, clock)), p = (await currentActor(s, principal, row.contextId!, clock));
+    const { row } = (await resolveInquiry(s, principal, conversationId, clock)), p = (await currentActor(s, principal, row.contextId!, clock));
+    // A valid, authorized unsent inquiry has no external follow-up schedule yet.
+    if (row.data.phase === 'draft')
+        return [];
     if (p.user.data.role !== 'gsg')
         return []; // External confirmation belongs to GSG, never a brand nag.
     const currentStaff = (await staff(s, row.contextId!));

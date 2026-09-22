@@ -9,6 +9,10 @@ import { migrate, openDatabase } from '@/server/db/database';
 import { IdentityService } from '@/server/auth/service';
 import { HomeService, homeQuery } from '@/server/home/service';
 import { InquiryService } from '@/server/inquiries/service';
+import { TaskService } from '@/server/tasks/service';
+import { inquirySchedules } from '@/server/scheduling/sources';
+import { scheduleSources } from '@/server/scheduling/read';
+import { blankContent, blankRequirement } from '@/domain/tasks/types';
 import { navigationMenus } from '@/features/home/navigation';
 import { createHomeFixtures, A, B } from '../../scripts/verify-home-fixtures';
 import { policyFixture, tokenFor, NOW, marker } from '../fixtures/policy';
@@ -17,6 +21,27 @@ for (const mode of ['mock', 'sqlite'] as const) describe(`${mode} G03 home`, () 
   let repo: RecordRepository;
   afterEach(async () => { await repo?.close(); });
   async function setup() { if (mode === 'mock') repo = createMockRepository(() => NOW); else { const db = openDatabase(':memory:', true); migrate(db); repo = createSqliteRepository(db, () => NOW); } const identity = await policyFixture(repo); return { identity, home: new HomeService(identity) }; }
+  it('unsent inquiry does not block brand home or schedules, stays private and unchanged, while registered tasks remain visible', async () => {
+    const { identity, home } = await setup(), inquiry = new InquiryService(identity);
+    const task = (await new TaskService(identity).create(actors.admin, { mode: 'publish', category: 'spot', targets: [{ contextId: A, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: [], productIds: [] }], content: { ...blankContent(), title: '홈에 바로 보일 업무', description: '합성 요청', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('answer'), label: '답변' }] }, idempotencyKey: crypto.randomUUID() })).ids[0];
+    const d = await inquiry.createDraft(actors.brand, { contextId: A, taskId: null, idempotencyKey: crypto.randomUUID() });
+    const kinds = ['conversation', 'inquiryMessage', 'inquiryQuestion', 'inquiryCursor', 'audit', 'domainEvent', 'commandReceipt', 'task'] as const;
+    const before = await Promise.all(kinds.map(k => repo.list(k)));
+    const result = await home.read(actors.brand, { scope: 'context', context: A });
+    expect(result.tasks.some(t => t.id === task)).toBe(true); expect(result.questions).toEqual([]);
+    const own = await repo.transaction(async s => inquirySchedules(s, await identity.principal(s, actors.brand), d.conversationId, identity.clock));
+    expect(own).toEqual([]);
+    expect((await repo.transaction(async s => scheduleSources(s, await identity.principal(s, actors.brand), A, identity.clock))).some(x => x.taskId === task)).toBe(true);
+    expect((await home.read(actors.gsg, { scope: 'context', context: A })).tasks.some(t => t.id === task)).toBe(true);
+    for (const actor of [actors.gsg, actors.team, tokenFor('user-wave')]) await expect(repo.transaction(async s => inquirySchedules(s, await identity.principal(s, actor), d.conversationId, identity.clock))).rejects.toMatchObject({ status: 404 });
+    expect(await Promise.all(kinds.map(k => repo.list(k)))).toEqual(before);
+  });
+  it('invalid persisted inquiry draft is still a storage failure, not silently omitted', async () => {
+    const { identity } = await setup(), d = await new InquiryService(identity).createDraft(actors.brand, { contextId: A, taskId: null, idempotencyKey: crypto.randomUUID() });
+    const corrupted: RecordRepository = { ...repo, transaction: fn => repo.transaction(s => fn({ ...s, list: async (kind, contextId) => (await s.list(kind, contextId)).map(row => kind === 'conversation' && row.id === d.conversationId ? { ...row, data: { ...row.data, title: 'invalid draft title' } } as typeof row : row), get: async (kind, id) => { const row = await s.get(kind, id); return kind === 'conversation' && id === d.conversationId && row ? { ...row, data: { ...row.data, title: 'invalid draft title' } } as typeof row : row; } })) };
+    await expect(new HomeService(new IdentityService(corrupted, identity.clock)).read(actors.brand, { scope: 'context', context: A })).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+    expect((await repo.get('conversation', d.conversationId))!.data.title).toBe('');
+  });
   it('AC03-01 exact role counts, current assignments, current needs and five questions/four answers', async () => {
     const { identity, home } = await setup(), f = await createHomeFixtures(identity, actors, 'G03');
     const staff = await home.read(actors.gsg, { scope: 'context', context: A }), brand = await home.read(actors.brand, { scope: 'context', context: A });
