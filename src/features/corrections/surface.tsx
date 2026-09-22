@@ -1,0 +1,17 @@
+'use client';
+import Link from 'next/link';
+import type { Workspace } from './model';
+import { useCorrections } from './controller';
+import { Opinions } from './opinions';
+import { Drafts, PublicContent } from './drafts';
+import { Reviews } from './reviews';
+import { Batches } from './batches';
+import s from './ui.module.css';
+export function CorrectionSurface({ initial }: {
+    initial: Workspace;
+}) {
+    const c = useCorrections(initial), w = c.w;
+    return <div className={s.stack}>{!w ? <section className={s.panel} role="alert"><h1>수정·검토 접근 확인</h1><p>{c.error}</p><Link className="button subtle" href="/login">로그인 확인</Link></section> : <><Link className="back-link" href={`/tasks/${w.taskId}?context=${w.contextId}`}>← 업무 상세</Link><header className="page-heading"><p className="eyebrow">CORRECTIONS & REVIEW</p><h1>수정 취합과 사람 검토</h1><p>{w.title}</p></header>{c.error && <p role="alert" className={s.error}>{c.error}</p>}{c.storageError && <p role="alert" className={s.notice}>{c.storageError}</p>}{c.message && <p role="status" className={s.notice}>{c.message}</p>}<div className={s.actions}><button className="button subtle" onClick={() => void c.reread()} disabled={c.busy}>최신 기록 재조회 · 입력 유지</button></div>{!c.ready ? <p role="status">현재 권한과 기록을 확인하는 중…</p> : <>{c.recoverable && <section className={s.notice}><p>현재 계정·컨텍스트·업무의 보관된 작성값이 있습니다.</p><button className="button" onClick={c.restore}>작성값 복구하기</button><button className="button subtle" onClick={c.discardRecovery}>보관 입력 버리기</button></section>}{c.pending && <section className={s.notice} aria-label="명령 복구"><h2>{c.pending.ids ? '확정 결과 재조회' : c.pending.conflict ? '동시 변경 확인' : '요청 결과 확인 필요'}</h2>{c.pending.ids ? <><p>서버가 확정한 ID: {c.pending.ids.join(', ')}</p><button className="button" onClick={() => void c.reread()}>확정 기록 다시 조회</button></> : c.pending.conflict ? <><p>작성값은 유지했습니다. 서버 최신 내용과 비교한 뒤 다시 실행하세요.</p><button className="button subtle" onClick={() => void c.refresh()}>서버 최신 기록 비교</button><details><summary>서버에 저장된 공개 초안 비교</summary>{w.staff?.drafts.filter(d => d.id === c.editors.draftId).map(d => <PublicContent key={d.id} value={d.draft} w={w}/>)}</details><button className="button" onClick={() => void c.acceptCurrent()}>입력 유지 · 최신 기준 선택</button></> : <><p>새 명령을 만들지 않고 같은 키와 내용으로 확인합니다.</p><button className="button" disabled={c.busy} onClick={() => void c.execute()}>같은 요청 다시 확인</button></>}</section>}
+ {!w.submissions.length && <section className={s.panel}><h2>아직 실제 제출본이 없습니다</h2><p>업무에서 답변을 제출한 뒤 정확한 버전을 대상으로 의견과 검토를 기록할 수 있습니다.</p><Link className={s.link} href={`/tasks/${w.taskId}?context=${w.contextId}#submissions`}>업무 답변으로 이동 ↗</Link></section>}
+ <nav className={s.tabs} aria-label="수정 검토 화면"><button className={c.editors.tab === 'public' ? s.active : ''} onClick={() => c.edit({ ...c.editors, tab: 'public' })}>공개 묶음</button>{w.staff && (['opinions', 'draft', 'reviews'] as const).map((tab, i) => <button className={c.editors.tab === tab ? s.active : ''} key={tab} onClick={() => c.edit({ ...c.editors, tab })}>{['내부 의견', '공개 초안', '검토 기록'][i]}</button>)}</nav>{c.editors.tab === 'public' || !w.staff ? <Batches c={c}/> : c.editors.tab === 'opinions' ? <Opinions c={c}/> : c.editors.tab === 'draft' ? <Drafts c={c}/> : <Reviews c={c}/>}</>}</>}</div>;
+}

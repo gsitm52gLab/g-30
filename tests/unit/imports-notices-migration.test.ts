@@ -1,0 +1,96 @@
+import { it, expect } from 'vitest';
+import { createHash, randomUUID } from 'node:crypto';
+import { mkdtemp, mkdir, readdir, copyFile, readFile, rm } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import ExcelJS from 'exceljs';
+import { openDatabase, migrate } from '@/server/db/database';
+import { createSqliteRepository } from '@/server/repositories/sqlite';
+import { policyFixture, tokenFor, NOW } from '../fixtures/policy';
+import { FileService } from '@/server/files/service';
+import { ProductService } from '@/server/products/service';
+import { EvidenceService } from '@/server/evidence/service';
+import { ImportService } from '@/server/imports/service';
+import { ImportStaging } from '@/server/imports/staging';
+import { NoticeService } from '@/server/notices/service';
+import { blankFileBinding } from '@/domain/products/types';
+import { blankEvidenceMetadata } from '@/domain/evidence/types';
+import { blankNotice } from '@/domain/notices/types';
+const contextId = 'ctx-jp-a-luna', admin = tokenFor('user-admin'), brand = tokenFor('user-luna');
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=', 'base64');
+const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
+
+it.each([6, 7])('populated chain through module 000%i gains missing sibling and inquiries; rows/checksums/files/replays remain exact', async firstModule => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-g07-union-'));
+    const sqlSource = path.resolve('src/server/db/migrations'), sqlDirectory = path.join(directory, 'prior');
+    await mkdir(sqlDirectory);
+    const names = (await readdir(sqlSource)).filter(n => /^\d+.*\.sql$/.test(n)).sort();
+    expect(names).toEqual(['0001-foundation.sql', '0002-identity.sql', '0003-tasks.sql', '0004-products.sql', '0005-submissions.sql', '0006-evidence-imports.sql', '0007-notices.sql', '0008-inquiries.sql', '0009-corrections.sql', '0010-campaigns.sql', '0011-completion.sql', '0012-ai-input.sql', '0013-ai-review.sql', '0014-scheduling-notifications.sql']);
+    for (const name of names.filter(n => Number(n.slice(0, 4)) <= 5 || Number(n.slice(0, 4)) === firstModule)) await copyFile(path.join(sqlSource, name), path.join(sqlDirectory, name));
+    const db = openDatabase(path.join(directory, 'populated.sqlite'), true);
+    let repo: ReturnType<typeof createSqliteRepository> | undefined;
+    try {
+        expect(migrate(db, sqlDirectory)).toEqual({ applied: 6, total: 6 });
+        repo = createSqliteRepository(db, () => NOW);
+        const identity = await policyFixture(repo), files = new FileService(identity, path.join(directory, 'files')), products = new ProductService(identity);
+        const evidence = new EvidenceService(identity), notices = new NoticeService(identity), imports = new ImportService(identity, new ImportStaging(path.join(directory, 'imports')));
+        const reference = { kind: 'product' as const, productId: 'product-serum', contextId };
+        const file = (await files.upload(brand, reference, [{ name: 'preserved.png', type: 'image/png', bytes: png }], 'public')).files[0];
+        const p = await products.detail(brand, reference.productId, contextId), binding = blankFileBinding(randomUUID(), file.id);
+        await products.command(brand, p.productId, { command: 'save_files', contextId, expectedContextRevision: p.contextRevision, files: [binding], idempotencyKey: randomUUID() });
+        await products.command(brand, p.productId, { command: 'save_common', contextId, expectedCommonRevision: p.commonRevision, common: { ...p.common, name: '기존 사용자가 직접 고친 상품' }, idempotencyKey: randomUUID() });
+        await repo.transaction(s => { const t = s.get('task', 'task-pop')!; s.update('task', t.id, t.revision, { ...t.data, title: '합병 전 사용자가 고친 업무' }); });
+        const produceG07 = async () => {
+            const current = await products.detail(brand, p.productId, contextId);
+            const source = { kind: 'product_binding', productId: p.productId, contextProductId: current.contextProductId, contextVersionId: current.contextVersionId, bindingId: binding.id, fileVersionId: file.id };
+            const eid = (await evidence.register(brand, { contextId, source, metadata: { ...blankEvidenceMetadata(), title: '합성 원본 증빙', documentType: 'product_introduction' }, productIds: [p.productId], idempotencyKey: randomUUID() })).ids[0];
+            const d = await evidence.detail(brand, eid);
+            await evidence.command(brand, eid, { command: 'revise', expectedRevision: d.revision, source, metadata: { ...d.current.metadata, title: '보존할 증빙 개정' }, productIds: [p.productId], idempotencyKey: randomUUID() });
+            const currentEvidence = await evidence.detail(admin, eid), link = currentEvidence.current.links[0];
+            await evidence.command(admin, eid, { command: 'assess', linkId: link.id, expectedLinkRevision: link.revision, status: 'application_confirmed', reason: '상품 관계만 명시 확인', idempotencyKey: randomUUID() });
+            const book = new ExcelJS.Workbook(), sheet = book.addWorksheet('상품');
+            sheet.addRow(['contextKey', 'common.code', 'common.name', 'local.jan', 'retail.amount', 'retail.currency']);
+            sheet.addRow([contextId, 'UNION-NEW', '합성 Excel 신규 상품', '00001234', '0', 'JPY']);
+            const parsed = await imports.inspect(brand, contextId, 'union.xlsx', Buffer.from(await book.xlsx.writeBuffer()));
+            const preview = await imports.preview(brand, { sourceId: parsed.sourceId, sheetId: parsed.sheets[0].id, headerRow: 1, mapping: ['contextKey', 'common.code', 'common.name', 'local.jan', 'retail.amount', 'retail.currency'].map((field, i) => ({ column: i + 1, field })), choices: [] });
+            expect(preview.canApply).toBe(true);
+            const command = { previewId: preview.id, idempotencyKey: randomUUID() }, result = await imports.apply(brand, command);
+            expect((await evidence.detail(brand, eid)).versions).toHaveLength(2);
+            return { replay: () => imports.apply(brand, command), result };
+        };
+        const produceG08 = async () => {
+            const content = { ...blankNotice(), title: '원 공지', body: '보존할 과거 본문', fileIds: [file.id] };
+            const id = (await notices.create(admin, { contextId, content, idempotencyKey: randomUUID() })).ids[0];
+            const v1 = (await notices.command(admin, id, { command: 'publish', expectedRevision: (await repo!.get('notice', id))!.revision, idempotencyKey: randomUUID() })).ids[1];
+            await notices.command(brand, id, { command: 'read', versionId: v1, idempotencyKey: randomUUID() });
+            await notices.command(admin, id, { command: 'save', expectedRevision: (await repo!.get('notice', id))!.revision, content: { ...content, title: '새 공지', changeSummary: '합성 개정' }, idempotencyKey: randomUUID() });
+            const command = { command: 'publish', expectedRevision: (await repo!.get('notice', id))!.revision, idempotencyKey: randomUUID() }, result = await notices.command(admin, id, command);
+            expect((await notices.detail(brand, id)).versions).toHaveLength(2);
+            expect((await notices.detail(brand, id, v1)).selected!.ownReadAt).toBe(NOW);
+            return { replay: () => notices.command(admin, id, command), result };
+        };
+        const original = await (firstModule === 6 ? produceG07() : produceG08());
+        const rows = () => db.prepare('SELECT * FROM records ORDER BY kind,id').all();
+        const before = rows(), oldMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all();
+        const fileHash = hash((await files.download(brand, file.id, reference, 'original')).bytes);
+        expect(fileHash).toBe(hash(png));
+        expect((await repo.list('commandReceipt')).length).toBeGreaterThan(4);
+        expect(migrate(db)).toEqual({ applied: 8, total: 14 });
+        expect(rows()).toEqual(before);
+        const allMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all() as { name: string; sha256: string; applied_at: string }[];
+        expect(allMigrations.filter(m => Number(m.name.slice(0, 4)) <= 5 || Number(m.name.slice(0, 4)) === firstModule)).toEqual(oldMigrations);
+        for (const m of allMigrations) expect(m.sha256).toBe(hash(await readFile(path.join(sqlSource, m.name))));
+        expect(migrate(db)).toEqual({ applied: 0, total: 14 });
+        expect(rows()).toEqual(before);
+        expect(await original.replay()).toEqual(original.result);
+        expect(rows()).toEqual(before);
+        expect(hash((await files.download(brand, file.id, reference, 'original')).bytes)).toBe(fileHash);
+        await (firstModule === 6 ? produceG08() : produceG07());
+        for (const kind of ['evidenceVersion', 'evidenceAssessment', 'importBatch', 'noticeVersion', 'noticeRead']) {
+            const row = db.prepare('SELECT id FROM records WHERE kind=? LIMIT 1').get(kind) as { id: string };
+            expect(row).toBeDefined();
+            expect(() => db.prepare('UPDATE records SET revision=revision+1 WHERE kind=? AND id=?').run(kind, row.id)).toThrow();
+        }
+        console.info('G07_UNION_MIGRATION_EVIDENCE ' + JSON.stringify({ firstModule, missingAdded: [firstModule === 6 ? '0007-notices.sql' : '0006-evidence-imports.sql', '0008-inquiries.sql', '0009-corrections.sql', '0010-campaigns.sql', '0011-completion.sql', '0012-ai-input.sql'], priorRecords: before.length, priorRowsSha256: hash(JSON.stringify(before)), fileSha256: fileHash, migrations: allMigrations, rowsUnchanged: true, receiptReplayUnchanged: true, bothModuleProducersAndImmutableGuards: true }));
+    } finally { if (repo) repo.close(); else db.close(); await rm(directory, { recursive: true, force: true }); }
+});

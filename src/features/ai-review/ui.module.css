@@ -1,0 +1,49 @@
+.stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; min-width: 0; }
+.stack > *, .panel > *, .heading > *, .facts > div { min-width: 0; }
+.panel { min-width: 0; padding: 24px; border: 1px solid var(--line, #d9e2df); border-radius: 16px; background: #fff; color: #183e35; overflow-wrap: anywhere; line-height: 1.7; }
+.panel h2, .panel h3, .panel h4, .panel h5 { margin: 0 0 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.panel h2 { font-size: 21px; }
+.panel h3 { font-size: 18px; }
+.panel h4 { font-size: 16px; }
+.panel h5 { font-size: 14px; }
+.panel p { margin: 10px 0; }
+.panel a { color: #185d48; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.panel ul { padding-inline-start: 22px; }
+.heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px; }
+.heading h2 { flex: 1 1 240px; }
+.badge { display: inline-block; width: fit-content; max-width: 100%; padding: 4px 10px; border-radius: 12px; color: #205344; background: #e9f4ed; font-size: 13px; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; margin: 16px 0; }
+.facts dt { color: #587369; font-size: 13px; }
+.facts dd { margin: 4px 0 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.section { min-width: 0; margin: 20px 0; }
+.evidence { min-width: 0; padding: 18px; margin: 12px 0; border: 1px solid #dbe5de; border-radius: 12px; background: #fcfdfc; overflow-wrap: anywhere; }
+.body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.quote { margin: 12px 0; padding: 16px; border-inline-start: 3px solid #689680; background: #f3f7f4; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.9; }
+.meta { color: #526b61; font-size: 13px; line-height: 1.7; }
+.notice { padding: 14px 16px; border: 1px solid #e4d4aa; border-radius: 10px; background: #fff9e9; color: #684d1c; overflow-wrap: anywhere; }
+.records { margin-top: 14px; color: #526b61; font-size: 12px; overflow-wrap: anywhere; }
+.records summary { min-height: 44px; padding: 10px 0; cursor: pointer; }
+.review { margin-top: 22px; min-width: 0; overflow-wrap: anywhere; line-height: 1.7; }
+.review fieldset { display: grid; gap: 16px; min-width: 0; margin: 0; padding: 18px; border: 1px solid #c9dad0; border-radius: 12px; }
+.review legend { padding: 0 6px; font-weight: 600; }
+.field { display: grid; gap: 8px; min-width: 0; font-size: 14px; font-weight: 600; }
+.field input, .field select, .field textarea { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; min-height: 44px; padding: 12px; border: 1px solid #a9c2b5; border-radius: 8px; background: #fff; color: #183e35; font: inherit; }
+.field textarea { resize: vertical; font-weight: 400; line-height: 1.7; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.actions button { min-height: 44px; min-width: 0; max-width: 100%; padding: 10px 16px; border: 1px solid #174d3e; border-radius: 8px; background: #174d3e; color: #fff; font: inherit; white-space: normal; overflow-wrap: anywhere; cursor: pointer; }
+.actions button:disabled { opacity: .6; cursor: not-allowed; }
+.review fieldset:disabled { opacity: .75; }
+.error { padding: 14px; border: 1px solid #efb4aa; border-radius: 10px; background: #fff3ef; color: #7f2c1c; overflow-wrap: anywhere; }
+.panel :focus-visible, .review :focus-visible { outline: 3px solid #1c7458; outline-offset: 3px; }
+@media (max-width: 680px) {
+  .panel { padding: 16px; }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .evidence, .review fieldset { padding: 13px; }
+  .quote { padding: 12px; }
+  .actions button { flex: 1 1 150px; }
+}
+
+.links { display: flex; flex-wrap: wrap; gap: 12px 18px; min-width: 0; }
+.links a, .actions a { color: #185d48; text-decoration: underline; overflow-wrap: anywhere; min-height: 44px; display: inline-flex; align-items: center; }
+.stack h1 { overflow-wrap: anywhere; }
+.stack > header { min-width: 0; }

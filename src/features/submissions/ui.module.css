@@ -1,0 +1,6 @@
+@media (max-width: 600px) {
+  .commitActions > button { flex: 1 1 130px; min-width: 130px; white-space: normal; }
+}
+
+.selectedAnswer { border: 2px solid #205f53; background: #eef8f4; scroll-margin: 5rem; overflow-wrap: anywhere; }
+.selectedAnswer:focus { outline: 3px solid #aa6b00; outline-offset: 3px; }

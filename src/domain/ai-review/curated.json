@@ -1,0 +1,694 @@
+{
+  "schemaVersion": "gs-hale-ai-review/1",
+  "id": "jp-general-cosmetics-20260922-1",
+  "asOf": "2026-09-22",
+  "sources": [
+    {
+      "id": "egov66-eda87daf875769c6",
+      "sourceId": "egov66",
+      "title": "医薬品、医療機器等の品質、有効性及び安全性の確保等に関する法律",
+      "authority": "statute",
+      "bindingStatus": "statutory_rule",
+      "revision": "335AC0000000145_20260521_505AC0000000063",
+      "effectiveDate": "2026-05-21",
+      "url": "https://laws.e-gov.go.jp/law/335AC0000000145",
+      "originalHash": "eda87daf875769c6253f6e905e012ccb5ffde255d9f7e8fb2f7f904c3b48d3bf",
+      "inspectedAsOf": "2026-09-22",
+      "scope": "Only selected general-cosmetic advertising passages; no whole-law/corpus/expert approval",
+      "readScope": "All3 Article66 paragraphs + law/revision metadata in cached officialAPI response; asof2026-09-22. No whole statute."
+    },
+    {
+      "id": "mhlw2017-e0a48779966e1b14",
+      "sourceId": "mhlw2017",
+      "title": "医薬品等適正広告基準の改正について",
+      "authority": "official_notification",
+      "bindingStatus": "administrative_advertising_standard",
+      "revision": "薬生発0929第4号_2017-09-29",
+      "effectiveDate": null,
+      "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000179264.pdf",
+      "originalHash": "e0a48779966e1b142051632d8f488865a6b6a17546a920458830e3c19499779d",
+      "inspectedAsOf": "2026-09-22",
+      "scope": "Only selected general-cosmetic advertising passages; no whole-law/corpus/expert approval",
+      "readScope": "PDF1 metadata, PDF3 section3 including(1)–(7), PDF5 section10 and surrounding page; all3pages visually inspected. Only selected general-cosmetic excerpts adopted."
+    },
+    {
+      "id": "effects2011-47d5a1734b1f2ac0",
+      "sourceId": "effects2011",
+      "title": "化粧品の効能の範囲の改正について",
+      "authority": "official_notification",
+      "bindingStatus": "administrative_efficacy_scope",
+      "revision": "薬食発0721第1号_2011-07-21",
+      "effectiveDate": null,
+      "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/kesyouhin_hanni_20111.pdf",
+      "originalHash": "47d5a1734b1f2ac03a6a6cbc806a461eb27b666b3ba33cfbc96cb2858112663b",
+      "inspectedAsOf": "2026-09-22",
+      "scope": "Only selected general-cosmetic advertising passages; no whole-law/corpus/expert approval",
+      "readScope": "All3 PDFpages text and visual, including entries1–56 and notes1–3; only17/24/56 minimal excerpts proposed."
+    },
+    {
+      "id": "handling2011-fbbee56b1e7c88b4",
+      "sourceId": "handling2011",
+      "title": "化粧品の効能の範囲の改正に係る取扱いについて",
+      "authority": "official_notification",
+      "bindingStatus": "administrative_handling_notice_only_pages1_2",
+      "revision": "薬食審査発0721第1号_薬食監麻発0721第1号_2011-07-21",
+      "effectiveDate": null,
+      "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/kesyouhin_hanni_20112.pdf",
+      "originalHash": "fbbee56b1e7c88b4d20f0985e4f76221146b59e33cc01770fd9973c02fc6631c",
+      "inspectedAsOf": "2026-09-22",
+      "scope": "Only selected general-cosmetic advertising passages; no whole-law/corpus/expert approval",
+      "readScope": "All4pages text; PDF1–2 visually inspected official notice; industry appendix3–4 read for boundary only, not adopted as official law."
+    },
+    {
+      "id": "ingredient2025-1ede329f3a1b410d",
+      "sourceId": "ingredient2025",
+      "title": "化粧品における特定成分の特記表示について",
+      "authority": "official_notification",
+      "bindingStatus": "administrative_ingredient_display_notice",
+      "revision": "医薬監麻発0310第3号_2025-03-10",
+      "effectiveDate": null,
+      "url": "https://www.mhlw.go.jp/web/t_doc?dataId=00tc9762&dataType=1&pageNo=1",
+      "originalHash": "1ede329f3a1b410d19441341b53c254daca86683e4e8fbd72a00ef8d60acc2fb",
+      "inspectedAsOf": "2026-09-22",
+      "scope": "Only selected general-cosmetic advertising passages; no whole-law/corpus/expert approval",
+      "readScope": "RawHTML intro/repeal/Ⅰ1–2/Ⅱ Q&A1–12 and17–18 source text. OnlyⅠ1(1)/(2) andQ&A8 excerpts proposed. No statement of entireHTML visual inspection."
+    },
+    {
+      "id": "jcia2026-4245805759cd3546",
+      "sourceId": "jcia2026",
+      "title": "化粧品等の適正広告ガイドライン 改訂α版",
+      "authority": "industry_guidance",
+      "bindingStatus": "industry_voluntary_guidance_not_statute",
+      "revision": "改訂α版_2026-07-24",
+      "effectiveDate": null,
+      "url": "https://www.jcia.org/user/common/download/business/guideline/appropriateadvertising/20260724_AppropriateAdvertising_Guideline-2.pdf",
+      "originalHash": "4245805759cd3546305ef89a1f016d97c16302ed5c4c2791e2114e60c7218f21",
+      "inspectedAsOf": "2026-09-22",
+      "scope": "Only selected general-cosmetic advertising passages; no whole-law/corpus/expert approval",
+      "readScope": "PDF15/17 text + visual (printed26–27 and30–31); onlyF8.2 andE7.1 minimal excerpts proposed; other guide pages/fullbook not claimed read."
+    }
+  ],
+  "excerpts": [
+    {
+      "id": "law66-p1",
+      "sourceVersionId": "egov66-eda87daf875769c6",
+      "locator": "MainProvision-Article_66-Paragraph_1-Sentence_1",
+      "pdfPages": null,
+      "printedPages": null,
+      "japanese": "虚偽又は誇大な記事を広告し、記述し、又は流布してはならない。",
+      "japaneseHash": "2dd9498838a26c99523c521ce608907f5e6c7f68cebcbbffbbc8b4a603e1f07e",
+      "contextNote": "같은 항의 대상은 명칭·제조방법·효능·효과·성능이며 명시·암시를 함께 다룬다. 이 발췌만으로 특정 문안을 위법 판정하지 않는다.",
+      "categories": [
+        "YK-01",
+        "YK-02",
+        "EV-01"
+      ],
+      "match": {
+        "containerHash": "07b90c233f9fa2eb0701d5c66811e00d7068977dee272266fb5f098ed8720196",
+        "start": 73,
+        "end": 103,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "law66-p2",
+      "sourceVersionId": "egov66-eda87daf875769c6",
+      "locator": "MainProvision-Article_66-Paragraph_2-Sentence_1",
+      "pdfPages": null,
+      "printedPages": null,
+      "japanese": "医師その他の者がこれを保証したものと誤解されるおそれ",
+      "japaneseHash": "e23e044bee00940ab328f1b161be5248cad01463c95f6789c6a2a024266d1ac8",
+      "contextNote": "제2항은 효능·효과·성능을 보증한 것으로 오해될 우려가 있는 광고 등을 제1항에 해당하는 것으로 정한다. 모든 전문가 언급을 단어만으로 판정하는 규칙이 아니다.",
+      "categories": [
+        "YK-03"
+      ],
+      "match": {
+        "containerHash": "3529b3b988a613ec5ed617b4c35399d5a6945369c7b579836067fe76bd6f4e50",
+        "start": 42,
+        "end": 68,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "std4-3-2",
+      "sourceVersionId": "mhlw2017-e0a48779966e1b14",
+      "locator": "第4の3(2), second paragraph referring to2011 notice",
+      "pdfPages": [
+        3
+      ],
+      "printedPages": null,
+      "japanese": "定める範囲をこえてはならない。",
+      "japaneseHash": "32af31c1e5a6f01033ba010f9a5a35802b6ca1d3239808e694e7334293545aa4",
+      "contextNote": "승인이 필요 없는 화장품 효능 표현은 명시된2011년 통지 범위와 연결한다. 의약부외품 승인 경로를 일반 화장품 경로로 가져오지 않는다.",
+      "categories": [
+        "YK-05",
+        "YK-06"
+      ],
+      "match": {
+        "containerHash": "362e2464fd3de041a6e192673556868db3c36aaedad913bc16d0013750242235",
+        "start": 371,
+        "end": 386,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "std4-3-5",
+      "sourceVersionId": "mhlw2017-e0a48779966e1b14",
+      "locator": "第4の3(5), body sentence1",
+      "pdfPages": [
+        3
+      ],
+      "printedPages": null,
+      "japanese": "それが確実である保証をするような表現",
+      "japaneseHash": "01da679c35f9e2c5b36e9e67e910edacc8850d4596195a2fd72972e0f4685b7c",
+      "contextNote": "효능·효과 또는 안전성을 구체적으로 제시하면서 확실성을 보증하는 표현에 대한 기준이다. 문맥과 근거를 사람이 확인할 후보로만 사용한다.",
+      "categories": [
+        "YK-02",
+        "YK-11"
+      ],
+      "match": {
+        "containerHash": "362e2464fd3de041a6e192673556868db3c36aaedad913bc16d0013750242235",
+        "start": 754,
+        "end": 772,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "std4-3-6",
+      "sourceVersionId": "mhlw2017-e0a48779966e1b14",
+      "locator": "第4の3(6), body sentence1",
+      "pdfPages": [
+        3
+      ],
+      "printedPages": null,
+      "japanese": "最大級の表現又はこれに類する表現",
+      "japaneseHash": "dc4474e6a70eaf4ed2a3832752f8ae2e6ce467036661e1d6ebe21d613eb1973b",
+      "contextNote": "효능·효과 또는 안전성에 관한 최상급 표현의 기준이다. 판매 순위에 관한 모든 No.1 표현을 자동으로 이 범주에 넣지 않는다.",
+      "categories": [
+        "YK-09"
+      ],
+      "match": {
+        "containerHash": "362e2464fd3de041a6e192673556868db3c36aaedad913bc16d0013750242235",
+        "start": 838,
+        "end": 854,
+        "occurrence": 2,
+        "totalMatches": 2,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "std4-3-7",
+      "sourceVersionId": "mhlw2017-e0a48779966e1b14",
+      "locator": "第4の3(7), body sentence1",
+      "pdfPages": [
+        3
+      ],
+      "printedPages": null,
+      "japanese": "医学、薬学上認められている範囲",
+      "japaneseHash": "9bf67d7b1fbf2e158596126434f2cbb2c32a101bff24dd384ed6aac78197e423",
+      "contextNote": "신속성·지속성 등의 표현에 대한 범위다. 실제 자료 없이 효과 발현·지속을 확정하거나 승인하지 않는다.",
+      "categories": [
+        "YK-09"
+      ],
+      "match": {
+        "containerHash": "362e2464fd3de041a6e192673556868db3c36aaedad913bc16d0013750242235",
+        "start": 907,
+        "end": 922,
+        "occurrence": 3,
+        "totalMatches": 3,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "effects17",
+      "sourceVersionId": "effects2011-47d5a1734b1f2ac0",
+      "locator": "別紙・別表第1(17)",
+      "pdfPages": [
+        2
+      ],
+      "printedPages": null,
+      "japanese": "皮膚を清浄にする。",
+      "japaneseHash": "d7cdae994cb17418e57bae6fb2360596b593cc41f6a9c67dbfeb734416eebc1f",
+      "contextNote": "원문 항목에는 오염을 제거함으로써라는 괄호 조건이 있으며 사용형태 조건을 버리지 않는다. 정상 예시 대조도 적법 인증을 뜻하지 않는다.",
+      "categories": [
+        "YK-06"
+      ],
+      "match": {
+        "containerHash": "f59b1c319b39e78e8d297fea35e8a4b1825fa96a0258e9375f88840246385223",
+        "start": 276,
+        "end": 285,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "effects24",
+      "sourceVersionId": "effects2011-47d5a1734b1f2ac0",
+      "locator": "別紙・別表第1(24)",
+      "pdfPages": [
+        2
+      ],
+      "printedPages": null,
+      "japanese": "皮膚にうるおいを与える。",
+      "japaneseHash": "ec55423009fa7ba2227e8815f3bdcc4747c839c5fb7105e423b5bb720b42fe57",
+      "contextNote": "이 항목의 문구가 목록에 있다는 사실과 실제 해당 제품의 효능 확인은 별개다. 적용제품 확인은 handling1과 함께 본다.",
+      "categories": [
+        "YK-06"
+      ],
+      "match": {
+        "containerHash": "f59b1c319b39e78e8d297fea35e8a4b1825fa96a0258e9375f88840246385223",
+        "start": 377,
+        "end": 389,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "effects56",
+      "sourceVersionId": "effects2011-47d5a1734b1f2ac0",
+      "locator": "別紙・別表第1(56)",
+      "pdfPages": [
+        3
+      ],
+      "printedPages": null,
+      "japanese": "乾燥による小ジワを目立たなくする。",
+      "japaneseHash": "97e175ff4106c7ad1c8f937b36d9a4a75bec0c9e601906f28d5fb7f87ba37599",
+      "contextNote": "건조로 인한이라는 범위와 눈에 띄지 않게 한다는 표현을 보존한다. 모든 주름 해소·예방으로 확대하지 않으며 시험/제품 적용조건은 별도 근거다.",
+      "categories": [
+        "YK-07"
+      ],
+      "match": {
+        "containerHash": "4468c62028b53488824350fff4c9e8d94ee7db76c8bbdb1f2e83f0b35437c28f",
+        "start": 410,
+        "end": 427,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "handling1",
+      "sourceVersionId": "handling2011-fbbee56b1e7c88b4",
+      "locator": "記1",
+      "pdfPages": [
+        1
+      ],
+      "printedPages": null,
+      "japanese": "かつ当該製品について該当する効能の範囲であること。",
+      "japaneseHash": "abba2c2f7ec9ee7889d8ad8d255358d64fb20efb377bbbae2069fba120324a76",
+      "contextNote": "효능 목록의 존재만으로 그 제품의 모든 표현을 인정하지 않는다. 이 문서는 공식 통지 PDF1–2이고 첨부업계자료3–4와 권위가 다르다.",
+      "categories": [
+        "YK-06",
+        "EV-01"
+      ],
+      "match": {
+        "containerHash": "081bff3927cf4f284b1d6de3422a7ccbced3097412154ee432278ef3630f8a92",
+        "start": 376,
+        "end": 401,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "handling2-1",
+      "sourceVersionId": "handling2011-fbbee56b1e7c88b4",
+      "locator": "記2(1), paragraph continuing fromPDF1 toPDF2",
+      "pdfPages": [
+        1,
+        2
+      ],
+      "printedPages": null,
+      "japanese": "それと同等以上の適切な試験を行い、効果を確認すること。",
+      "japaneseHash": "82cd1be588453666037ff3224acf26d7a23d9fb75c6043546b90898da732af7b",
+      "contextNote": "이 앞의 기준은 원문이 지정한 항주름 제품 평가 가이드라인이다. 제조판매업자 책임의 시험·평가, 결과자료 보관 및 판단책임을 포함한다. 그 가이드라인의 의약부외품 절과 Table1은 이 추가효능에 적용되지 않는다는 주의도 보존한다.",
+      "categories": [
+        "YK-07",
+        "EV-01"
+      ],
+      "match": {
+        "containerHash": "c45a60e2fd68bb63e089e0f54696e8ab6d0463c12b91847131794f14d24fdbd0",
+        "start": 611,
+        "end": 638,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "ingredient-I-1-1",
+      "sourceVersionId": "ingredient2025-1ede329f3a1b410d",
+      "locator": "Ⅰ1(1); HTML#l000000015",
+      "pdfPages": null,
+      "printedPages": null,
+      "japanese": "配合目的を必ず併記すること。",
+      "japaneseHash": "8eb4c4540e7d5f0fbf41c5c4dc3fadcdc87dcda709ec273f2f9e585a2abce264",
+      "contextNote": "특정 성분 강조 시 목적은 화장품 효능·제제기술에 근거하고 객관적으로 입증되어야 한다.2025 통지는1985 통지를 폐지한다고 명시한다.",
+      "categories": [
+        "YK-12",
+        "EV-01"
+      ],
+      "match": {
+        "containerHash": "c47acc26e37535a9a2517d951972e5b29706e8b232915e83a9d294db3e9022dc",
+        "start": 671,
+        "end": 685,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "ingredient-I-1-2",
+      "sourceVersionId": "ingredient2025-1ede329f3a1b410d",
+      "locator": "Ⅰ1(2); HTML#l000000016",
+      "pdfPages": null,
+      "printedPages": null,
+      "japanese": "配合目的とともに成分名も記載すること。",
+      "japaneseHash": "28ef4a10301e105aa06885b8a2642ab1b3b421541366d07ac274ff389a8c53da",
+      "contextNote": "사진·디자인(영문 표기 포함)으로 특정 성분을 표현하는 경우의 조건이다. 패키지 자체를 이번 AI 지원 범위로 확대하는 근거가 아니다.",
+      "categories": [
+        "YK-10",
+        "YK-12"
+      ],
+      "match": {
+        "containerHash": "c47acc26e37535a9a2517d951972e5b29706e8b232915e83a9d294db3e9022dc",
+        "start": 794,
+        "end": 813,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "ingredient-QA8",
+      "sourceVersionId": "ingredient2025-1ede329f3a1b410d",
+      "locator": "Ⅱ Q&A8 answer second paragraph; HTML#e000000082",
+      "pdfPages": null,
+      "printedPages": null,
+      "japanese": "容易に読めるようにすること。",
+      "japaneseHash": "142d3708007b1a654c4234a997c4f60fed20c5fe0fa024ee479d8266905bbf41",
+      "contextNote": "성분명과 떨어진 곳에 주석 등을 쓸 때 글자 크기·폰트·배치·대비·색·표시시간 등을 고려하는 문맥이다. 읽지 못한 이미지 구간의 조건 충족을 추정하지 않는다.",
+      "categories": [
+        "YK-01",
+        "YK-10",
+        "YK-12"
+      ],
+      "match": {
+        "containerHash": "c47acc26e37535a9a2517d951972e5b29706e8b232915e83a9d294db3e9022dc",
+        "start": 1573,
+        "end": 1587,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "jcia-F8-2",
+      "sourceVersionId": "jcia2026-4245805759cd3546",
+      "locator": "第2章 F8.2, printed26 left-hand page",
+      "pdfPages": [
+        15
+      ],
+      "printedPages": [
+        26
+      ],
+      "japanese": "客観的調査に基づく結果",
+      "japaneseHash": "ecf229b63bc41f1ed27567c6bd08143b40874c41e121dfcc204b22ea7fc9b60a",
+      "contextNote": "효능·안전성 No.1과 판매 No.1 등의 구분을 직접 읽었다. 후자는 소비자 오인을 주지 않는 표현, 객관적 조사 결과의 정확·적절한 인용 및 조사기관·기간·출처 표시 조건을 함께 확인해야 한다. 업계 자율 지침이며 법령 또는 판매순위 적법 승인으로 격상하지 않는다.",
+      "categories": [
+        "YK-09",
+        "YK-10",
+        "EV-01"
+      ],
+      "match": {
+        "containerHash": "68088e8be6a7afce26351e54a807a15c42426abe440f4d9464db9fbf7885c35b",
+        "start": 1678,
+        "end": 1689,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    },
+    {
+      "id": "jcia-E7-1",
+      "sourceVersionId": "jcia2026-4245805759cd3546",
+      "locator": "第3章 E7.1, first paragraph; printed31 right-hand page",
+      "pdfPages": [
+        17
+      ],
+      "printedPages": [
+        31
+      ],
+      "japanese": "全てのシワに効果があるものと誤認される表現",
+      "japaneseHash": "5092038f24c33c70dcb441f7e3cd95269f35138dddbfc0e2ae85a71ea6146c40",
+      "contextNote": "건조 잔주름 표현의 범위를 전체 주름 효과로 확대하지 않도록 한 업계 지침이다. 같은 면의 약용화장품 예외는 지원하지 않는다. 공식 시험조건과 자율표기 조언을 합치지 않는다.",
+      "categories": [
+        "YK-07"
+      ],
+      "match": {
+        "containerHash": "a6c64b3cc9ed47e689617761568cc74e7167d99e1814169bf6d708fd16ce771d",
+        "start": 490,
+        "end": 511,
+        "occurrence": 1,
+        "totalMatches": 1,
+        "offsets": "Unicode-code-points-with-layout-whitespace-removed"
+      }
+    }
+  ],
+  "translations": [
+    {
+      "id": "law66-p1-ko-1",
+      "excerptId": "law66-p1",
+      "sourceVersionId": "egov66-eda87daf875769c6",
+      "sourceHash": "eda87daf875769c6253f6e905e012ccb5ffde255d9f7e8fb2f7f904c3b48d3bf",
+      "japaneseHash": "2dd9498838a26c99523c521ce608907f5e6c7f68cebcbbffbbc8b4a603e1f07e",
+      "korean": "허위 또는 과대한 내용을 광고하거나 기술하거나 유포해서는 안 된다.",
+      "koreanHash": "243831c99401573130127f20599a59b16a86f8b102cfbbe19a7741f9786dd089",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "law66-p2-ko-1",
+      "excerptId": "law66-p2",
+      "sourceVersionId": "egov66-eda87daf875769c6",
+      "sourceHash": "eda87daf875769c6253f6e905e012ccb5ffde255d9f7e8fb2f7f904c3b48d3bf",
+      "japaneseHash": "e23e044bee00940ab328f1b161be5248cad01463c95f6789c6a2a024266d1ac8",
+      "korean": "의사나 그 밖의 사람이 이를 보증한 것으로 오해될 우려",
+      "koreanHash": "08b3e25116e7c102d1c36fe39e96e4369e05bfd8a3311320d3f7b4ad08e1a99f",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "std4-3-2-ko-1",
+      "excerptId": "std4-3-2",
+      "sourceVersionId": "mhlw2017-e0a48779966e1b14",
+      "sourceHash": "e0a48779966e1b142051632d8f488865a6b6a17546a920458830e3c19499779d",
+      "japaneseHash": "32af31c1e5a6f01033ba010f9a5a35802b6ca1d3239808e694e7334293545aa4",
+      "korean": "정한 범위를 넘어서는 안 된다.",
+      "koreanHash": "7f70fd35573890b3c9707b418641ee90941947b42989daf23ffa5dc231bc459f",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "std4-3-5-ko-1",
+      "excerptId": "std4-3-5",
+      "sourceVersionId": "mhlw2017-e0a48779966e1b14",
+      "sourceHash": "e0a48779966e1b142051632d8f488865a6b6a17546a920458830e3c19499779d",
+      "japaneseHash": "01da679c35f9e2c5b36e9e67e910edacc8850d4596195a2fd72972e0f4685b7c",
+      "korean": "그것이 확실하다고 보증하는 듯한 표현",
+      "koreanHash": "205cf6b593c950fca148ff9d8648d3561785712931806babf883414265c5e3a9",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "std4-3-6-ko-1",
+      "excerptId": "std4-3-6",
+      "sourceVersionId": "mhlw2017-e0a48779966e1b14",
+      "sourceHash": "e0a48779966e1b142051632d8f488865a6b6a17546a920458830e3c19499779d",
+      "japaneseHash": "dc4474e6a70eaf4ed2a3832752f8ae2e6ce467036661e1d6ebe21d613eb1973b",
+      "korean": "최상급 표현 또는 이에 유사한 표현",
+      "koreanHash": "ac313c62deb5612cab5b9a0da8e98b81b3405c9aff9284b23423f4ecae82ab34",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "std4-3-7-ko-1",
+      "excerptId": "std4-3-7",
+      "sourceVersionId": "mhlw2017-e0a48779966e1b14",
+      "sourceHash": "e0a48779966e1b142051632d8f488865a6b6a17546a920458830e3c19499779d",
+      "japaneseHash": "9bf67d7b1fbf2e158596126434f2cbb2c32a101bff24dd384ed6aac78197e423",
+      "korean": "의학·약학상 인정되는 범위",
+      "koreanHash": "1a7bc4de233381909799b1edde30988841144635d348d13d99667967461632d7",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "effects17-ko-1",
+      "excerptId": "effects17",
+      "sourceVersionId": "effects2011-47d5a1734b1f2ac0",
+      "sourceHash": "47d5a1734b1f2ac03a6a6cbc806a461eb27b666b3ba33cfbc96cb2858112663b",
+      "japaneseHash": "d7cdae994cb17418e57bae6fb2360596b593cc41f6a9c67dbfeb734416eebc1f",
+      "korean": "피부를 깨끗하게 한다.",
+      "koreanHash": "c62ebdbdc0fa5ecc0572e61e8b9d44dbe57688a1d968b9cd796007edc8fd08d1",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "effects24-ko-1",
+      "excerptId": "effects24",
+      "sourceVersionId": "effects2011-47d5a1734b1f2ac0",
+      "sourceHash": "47d5a1734b1f2ac03a6a6cbc806a461eb27b666b3ba33cfbc96cb2858112663b",
+      "japaneseHash": "ec55423009fa7ba2227e8815f3bdcc4747c839c5fb7105e423b5bb720b42fe57",
+      "korean": "피부에 수분을 제공한다.",
+      "koreanHash": "10db42ea8fa7734dedc2042cd175138d5dbeb4102429dd53a441ad59f8f45d0c",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "effects56-ko-1",
+      "excerptId": "effects56",
+      "sourceVersionId": "effects2011-47d5a1734b1f2ac0",
+      "sourceHash": "47d5a1734b1f2ac03a6a6cbc806a461eb27b666b3ba33cfbc96cb2858112663b",
+      "japaneseHash": "97e175ff4106c7ad1c8f937b36d9a4a75bec0c9e601906f28d5fb7f87ba37599",
+      "korean": "건조로 인한 잔주름이 눈에 띄지 않게 한다.",
+      "koreanHash": "86a9065964c02fbcd669aa1cb3d721d080160d30195dc27d12a3fa66d9a4e2e0",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "handling1-ko-1",
+      "excerptId": "handling1",
+      "sourceVersionId": "handling2011-fbbee56b1e7c88b4",
+      "sourceHash": "fbbee56b1e7c88b4d20f0985e4f76221146b59e33cc01770fd9973c02fc6631c",
+      "japaneseHash": "abba2c2f7ec9ee7889d8ad8d255358d64fb20efb377bbbae2069fba120324a76",
+      "korean": "또한 해당 제품에 적용되는 효능의 범위여야 한다.",
+      "koreanHash": "ef51ef0e84a65c35bb3b021761a9b10ed5df5d77f899e87914c2a37c573532f3",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "handling2-1-ko-1",
+      "excerptId": "handling2-1",
+      "sourceVersionId": "handling2011-fbbee56b1e7c88b4",
+      "sourceHash": "fbbee56b1e7c88b4d20f0985e4f76221146b59e33cc01770fd9973c02fc6631c",
+      "japaneseHash": "82cd1be588453666037ff3224acf26d7a23d9fb75c6043546b90898da732af7b",
+      "korean": "그와 동등 이상인 적절한 시험을 실시하여 효과를 확인해야 한다.",
+      "koreanHash": "6d1390c31aa9d62498b1e4920fac2126bbe22142fe5ca8c5cc5f94925237ffcd",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "ingredient-I-1-1-ko-1",
+      "excerptId": "ingredient-I-1-1",
+      "sourceVersionId": "ingredient2025-1ede329f3a1b410d",
+      "sourceHash": "1ede329f3a1b410d19441341b53c254daca86683e4e8fbd72a00ef8d60acc2fb",
+      "japaneseHash": "8eb4c4540e7d5f0fbf41c5c4dc3fadcdc87dcda709ec273f2f9e585a2abce264",
+      "korean": "배합 목적을 반드시 함께 표기해야 한다.",
+      "koreanHash": "0f9c34dd86f7524774aed5957cce9b1f45806b3e584e8ae7ef436dc7dddc5da4",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "ingredient-I-1-2-ko-1",
+      "excerptId": "ingredient-I-1-2",
+      "sourceVersionId": "ingredient2025-1ede329f3a1b410d",
+      "sourceHash": "1ede329f3a1b410d19441341b53c254daca86683e4e8fbd72a00ef8d60acc2fb",
+      "japaneseHash": "28ef4a10301e105aa06885b8a2642ab1b3b421541366d07ac274ff389a8c53da",
+      "korean": "배합 목적과 함께 성분명도 기재해야 한다.",
+      "koreanHash": "28769bf517fcd8d9074f520eaa11115481b0c4564f4a21ba40f96d7dc87d356a",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "ingredient-QA8-ko-1",
+      "excerptId": "ingredient-QA8",
+      "sourceVersionId": "ingredient2025-1ede329f3a1b410d",
+      "sourceHash": "1ede329f3a1b410d19441341b53c254daca86683e4e8fbd72a00ef8d60acc2fb",
+      "japaneseHash": "142d3708007b1a654c4234a997c4f60fed20c5fe0fa024ee479d8266905bbf41",
+      "korean": "쉽게 읽을 수 있도록 해야 한다.",
+      "koreanHash": "1f196eb7c959c5e12d7076e6d171d58bb6b2ab8beb4e0970d69c2c52a027cb3b",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "jcia-F8-2-ko-1",
+      "excerptId": "jcia-F8-2",
+      "sourceVersionId": "jcia2026-4245805759cd3546",
+      "sourceHash": "4245805759cd3546305ef89a1f016d97c16302ed5c4c2791e2114e60c7218f21",
+      "japaneseHash": "ecf229b63bc41f1ed27567c6bd08143b40874c41e121dfcc204b22ea7fc9b60a",
+      "korean": "객관적 조사에 근거한 결과",
+      "koreanHash": "0ddf71d12b5af1323ff67f3d1007a5894bbd6ac69e6a72a02004f49aa6a334ef",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    },
+    {
+      "id": "jcia-E7-1-ko-1",
+      "excerptId": "jcia-E7-1",
+      "sourceVersionId": "jcia2026-4245805759cd3546",
+      "sourceHash": "4245805759cd3546305ef89a1f016d97c16302ed5c4c2791e2114e60c7218f21",
+      "japaneseHash": "5092038f24c33c70dcb441f7e3cd95269f35138dddbfc0e2ae85a71ea6146c40",
+      "korean": "모든 주름에 효과가 있는 것으로 오해될 표현",
+      "koreanHash": "ac4f51de20a3c4bcae4427880037ec1e4790e0dc4460d03c0c54e5203eda6ee1",
+      "version": "adoption-prep-1",
+      "status": "machine_unreviewed",
+      "reviewer": null,
+      "reviewedAt": null,
+      "unofficial": true
+    }
+  ]
+}

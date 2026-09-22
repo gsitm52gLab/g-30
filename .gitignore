@@ -1,0 +1,23 @@
+.env
+.env.*
+!.env.example
+!.env.*.example
+node_modules/
+.next/
+.local/
+.worktrees/
+.execution/private/
+artifacts/private/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.DS_Store
+*.env
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+next-env.d.ts
+
+# Private task attachment bytes and isolated G04 data
+.data/

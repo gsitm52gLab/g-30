@@ -1,0 +1,21 @@
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
+mkdirSync(".local", { recursive: true });
+const directory = mkdtempSync(path.resolve(".local/restart-"));
+const filename = path.join(directory, "restart.db");
+const results = ["write", "read"].map(action => {
+    const args = ["--import", "tsx", "scripts/persistence-worker.ts", action, filename];
+    const result = spawnSync(process.execPath, args, { cwd: process.cwd(), encoding: "utf8" });
+    assert.equal(result.status, 0, `worker ${action} failed: ${result.stderr}`);
+    return { command: [process.execPath, ...args], cwd: process.cwd(), exitCode: result.status, ...JSON.parse(result.stdout.trim()) };
+});
+assert.notEqual(results[0].pid, results[1].pid);
+assert.deepEqual(results[0].record, results[1].record);
+assert.equal(results[1].record.data.value, "synthetic-persisted-value");
+const evidence = { requirement: "AC-00-02", status: "PASS", passed: 3, failed: 0, skipped: 0, processRestart: true, authentication: "NOT_TESTED_BY_FOUNDATION_PROBE", results };
+const report = process.env.RESTART_REPORT || path.join(directory, "restart.json");
+mkdirSync(path.dirname(report), { recursive: true });
+writeFileSync(report, JSON.stringify(evidence, null, 2));
+console.log(JSON.stringify({ status: evidence.status, assertions: 3, report: path.resolve(report) }));

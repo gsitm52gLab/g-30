@@ -1,0 +1,21 @@
+'use client';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import type { InquiryList } from '@/server/inquiries/contracts';
+import { api, changedEvent, deniedEvent, errorText, inquiryUrl } from './client';
+import { clearAll } from './recovery';
+import { Counts, time } from './views';
+import { InquiryPopup } from './popup';
+import s from './ui.module.css';
+export function InquiryListScreen({ contextId, taskId, home = false }: {
+    contextId: string;
+    taskId?: string;
+    home?: boolean;
+}) { const [data, setData] = useState<InquiryList | null>(null), [error, setError] = useState(''), [state, setState] = useState(home ? 'unresolved' : 'all'), [offset, setOffset] = useState(0), [retry, setRetry] = useState(0), [popup, setPopup] = useState<string | null>(null); useEffect(() => { let live = true, halted = false; const get = () => { if (halted)
+    return; void api<InquiryList>(`/api/inquiries?${new URLSearchParams({ context: contextId, ...(taskId ? { task: taskId } : {}), state, offset: String(offset), limit: home ? '5' : '30' })}`).then(d => { if (live && !halted) {
+    setData(d);
+    setError('');
+} }).catch(e => { if (live) {
+    setData(null);
+    setError(errorText(e));
+} }); }; const deny = () => { halted = true; setData(null); setPopup(null); clearAll(); setError('현재 권한을 확인할 수 없어 보호된 문의 목록을 지웠습니다.'); }; const focus = () => { setData(null); get(); }; get(); window.addEventListener(changedEvent, get); window.addEventListener('focus', focus); window.addEventListener(deniedEvent, deny); return () => { live = false; window.removeEventListener(changedEvent, get); window.removeEventListener('focus', focus); window.removeEventListener(deniedEvent, deny); }; }, [contextId, taskId, home, state, offset, retry]); const compact = home || !!taskId; return <section className={s.stack} aria-label={taskId ? '업무 연결 문의' : home ? '현재 컨텍스트 문의' : '문의 목록'}><header className={s.heading}><div><p className="eyebrow">INQUIRIES</p>{compact ? <h2>{taskId ? '이 업무의 문의' : '확인할 문의'}</h2> : <h1>문의</h1>}<p className={s.meta}>질문마다 남은 확인을 이어갑니다. 업무 수락·자료 제출과는 별도입니다.</p></div><div className={s.actions}>{data?.capabilities.create && <Link className="button" href={`/inquiries/new?context=${contextId}${taskId ? `&task=${taskId}` : ''}`}>새 문의 작성</Link>}{home && <Link href={`/inquiries?context=${contextId}`}>전체 문의 보기 ↗</Link>}<button className="button subtle" onClick={() => { setData(null); setRetry(x => x + 1); }}>문의 새로 확인</button></div></header>{!home && <label className={s.field}>문의 상태 필터<select value={state} onChange={e => { setData(null); setOffset(0); setState(e.target.value); }}><option value="all">전체 문의</option><option value="unresolved">남은 질문 있음</option></select></label>}{error ? <p className={s.error} role="alert">{error} · 조회 실패는 남은 질문 0건을 뜻하지 않습니다.</p> : !data ? <p role="status">문의 현황을 불러오는 중…</p> : <><Counts value={data.counts}/><p className={s.meta}>조건에 맞는 문의 {data.total}건{home ? ' · 최근 5건' : ''}</p>{data.items.length ? data.items.map(n => <article className={s.item} key={n.id}><h3><Link href={inquiryUrl(n.id, contextId)}>{n.title} ↗</Link></h3><p className={s.meta}>{n.initiatorLabel} · 최근 대화 {time(n.updatedAt)} · 읽지 않은 메시지 {n.unreadCount}</p><p>질문 {n.counts.questions} · 답변 완료 {n.counts.answered} · 남은 질문 {n.counts.unresolved}</p>{n.nextChecks.map(x => <p className={s.notice} key={x.questionId}>다음 확인일 {x.date} · {x.timezone} · {x.responsibleLabel}</p>)}{n.task && <p><Link href={`/tasks/${n.task.id}?context=${contextId}`}>연결 업무: {n.task.title}</Link></p>}<button className="button subtle" onClick={() => setPopup(n.id)}>대화 팝업 열기 · {n.title}</button></article>) : <div className={s.empty}><h3>{state === 'unresolved' ? '남은 질문이 있는 문의가 없습니다' : '아직 전송된 문의가 없습니다'}</h3><p>브랜드가 첫 질문을 보내면 이곳에서 함께 확인합니다. 비공개 초안은 포함하지 않습니다.</p></div>}{!home && <div className={s.actions}><button className="button subtle" disabled={!offset} onClick={() => setOffset(v => Math.max(0, v - 30))}>이전 문의</button><button className="button subtle" disabled={offset + 30 >= data.total} onClick={() => setOffset(v => v + 30)}>다음 문의</button></div>}</>}{popup && <InquiryPopup key={popup} id={popup} contextId={contextId} onClose={() => setPopup(null)}/>}</section>; }
