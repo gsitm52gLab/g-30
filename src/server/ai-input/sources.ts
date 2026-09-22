@@ -1,3 +1,4 @@
+import { VersionSourceStorage } from './storage-source';
 import { asyncFlatMap, asyncMap } from "@/domain/async-collections";
 import { storedText, storedCount, storedHash, storedId } from './stored';
 import type { AiContent } from '@/domain/ai-input/records';
@@ -22,7 +23,7 @@ export async function loadRequest(identity: IdentityService, token: string | und
     const r = await identity.repo.transaction(async (s) => { const r = (await resolveVersion(s, (await identity.principal(s, token)), inputId, versionId, identity.clock)); return { ...r, identities: (await sourceIdentities(s, r.version, r.content)) }; });
     if (r.content.kind === 'text')
         return { scope: r.content.scope, kind: 'text', text: r.content.text!, source: r.identities[0] };
-    const sources = await Promise.all(r.content.sources.map(async (ref, index) => { const loaded = ref.kind === 'upload' ? await new AiAssets(identity, directory).download(token, ref.assetId) : await new FileService(identity, directory).download(token, ref.fileVersionId, r.content.submission!.taskId, 'original'); return { ...r.identities[index], filename: ref.kind === 'upload' ? (loaded.metadata as ReturnType<typeof assetDTO>).filename : (loaded.metadata as {
+    const sources = await Promise.all(r.content.sources.map(async (ref, index) => { const loaded = identity.repo.mode === 'supabase' ? await new VersionSourceStorage(identity).snapshot(token, inputId, versionId, index) : ref.kind === 'upload' ? await new AiAssets(identity, directory).download(token, ref.assetId) : await new FileService(identity, directory).download(token, ref.fileVersionId, r.content.submission!.taskId, 'original'); return { ...r.identities[index], filename: identity.repo.mode === 'supabase' ? (loaded.metadata as {name:string}).name : ref.kind === 'upload' ? (loaded.metadata as ReturnType<typeof assetDTO>).filename : (loaded.metadata as {
             name: string;
         }).name, mime: loaded.metadata.mime, bytes: loaded.bytes }; }));
     await identity.repo.transaction(async (s) => (await resolveVersion(s, (await identity.principal(s, token)), inputId, versionId, identity.clock)));

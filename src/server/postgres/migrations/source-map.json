@@ -248,6 +248,17 @@
         "storage_grant_guard",
         "storage_stage_guard"
       ]
+    },
+    {
+      "name": "0018-import-export.sql",
+      "postgres_name": "0019-import-export.sql",
+      "sqlite_sha256": "5d3ba752f1113f72e8ae2bd5c3d32b47fd99e3fd312f9a91fe3a77b557c487a3",
+      "postgres_sha256": "0630d005f87ff491d4e0cced7e6ae33a9abcaba4289e6a30f9d46bb236e45530",
+      "indexes": [],
+      "triggers": [
+        "import_export_no_update",
+        "import_export_no_delete"
+      ]
     }
   ],
   "postgres_only": [

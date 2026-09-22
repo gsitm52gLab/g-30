@@ -1,6 +1,7 @@
 import 'server-only';
 import { createHash, randomUUID } from 'node:crypto';
 import { MAX_FILE_BYTES, validateFile } from '@/domain/files/validate';
+import { aiWebpFile } from '@/domain/storage/validate';
 
 export const STORAGE_CHUNK_BYTES = 4 * 1024 * 1024;
 export const STORAGE_TUS_CHUNK_BYTES = 6 * 1024 * 1024;
@@ -226,17 +227,27 @@ export class SupabasePrivateStorage {
     return { object: before, bytes, sha256: createHash('sha256').update(bytes).digest('hex') };
   }
   /** Persist finalKey in a pending DB receipt BEFORE this call. No retries/deletion on an ambiguous mutation. */
-  async promoteVerified(input: { stagingKey: string; finalKey: string; originalName: string; declaredMime: string; expectedBytes: number }): Promise<VerifiedObject> {
+  async promoteVerified(input: { stagingKey: string; finalKey: string; originalName: string; declaredMime: string; expectedBytes: number; aiAssetImage?: boolean }): Promise<VerifiedObject> {
     this.#key(input.stagingKey, 'staging'); this.#key(input.finalKey, 'final');
     if (!integer(input.expectedBytes, 1, MAX_FILE_BYTES)) throw new StorageError('INVALID_INPUT');
     const snapshot = await this.readSnapshot(input.stagingKey);
     if (snapshot.bytes.length !== input.expectedBytes) throw new StorageError('INTEGRITY');
-    const verified = validateFile(input.originalName, input.declaredMime, snapshot.bytes);
+    const verified = input.aiAssetImage === true && /\.webp$/i.test(input.originalName) ? aiWebpFile(input.originalName, input.declaredMime, snapshot.bytes) : validateFile(input.originalName, input.declaredMime, snapshot.bytes);
     // Copy the measured immutable snapshot, not a mutable source path. Never upsert a final object.
     await this.#request(`/object/${this.#objectPath(input.finalKey)}`, 'POST', async r => { await boundedBody(r, JSON_LIMIT); }, snapshot.bytes, { 'content-type': verified.mime, 'x-upsert': 'false', 'cache-control': 'no-store' });
     const final = await this.readSnapshot(input.finalKey);
     if (final.sha256 !== snapshot.sha256 || final.bytes.length !== snapshot.bytes.length) throw new StorageError('INTEGRITY');
     return { ...final.object, sha256: final.sha256, originalName: verified.name, mime: verified.mime, preview: verified.preview };
+  }
+  /** Each call is one <=4MiB chunk. Caller rechecks current ACL before and after each call. */
+  async createGeneratedPart(input: { key: string; bytes: Buffer; filename: string; sha256: string }): Promise<VerifiedObject> {
+    this.#key(input.key, 'final');
+    if (!integer(input.bytes.length, 1, STORAGE_CHUNK_BYTES) || !/^[A-Za-z0-9_-]+\.xlsx$/.test(input.filename) || input.filename.length > 240 || createHash('sha256').update(input.bytes).digest('hex') !== input.sha256) throw new StorageError('INVALID_INPUT');
+    const mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    await this.#request(`/object/${this.#objectPath(input.key)}`, 'POST', async r => { await boundedBody(r, JSON_LIMIT); }, input.bytes, { 'content-type': mime, 'x-upsert': 'false', 'cache-control': 'no-store' });
+    const final = await this.readSnapshot(input.key);
+    if (final.sha256 !== input.sha256 || final.bytes.length !== input.bytes.length) throw new StorageError('INTEGRITY');
+    return { ...final.object, sha256: final.sha256, originalName: input.filename, mime, preview: false };
   }
   /** Each call is one <=4MiB chunk. Caller rechecks current ACL before and after each call. */
   async readRange(expected: StorageObject, start: number, end: number): Promise<Buffer> {

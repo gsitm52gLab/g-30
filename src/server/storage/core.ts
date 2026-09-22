@@ -2,8 +2,7 @@ import 'server-only';
 import { randomUUID } from 'node:crypto';
 import type { Clock, RecordRepository, StoredRecord, UnitOfWork } from '@/domain/records';
 import { systemClock, StoreError } from '@/domain/records';
-import { validateFile } from '@/domain/files/validate';
-import { canonical, digest, descriptor, grantShape, uploadInput, resultShape } from '@/domain/storage/validate';
+import { storageFile, canonical, digest, descriptor, grantShape, uploadInput, resultShape } from '@/domain/storage/validate';
 import { STORAGE_LIMITS, type GrantStatus, type StorageGrantData, type UploadCapability, type UploadInput, type VerifiedDescriptor, type BatchGrantResult } from '@/domain/storage/types';
 import { StorageError } from './supabase';
 import { StorageCoreError, type StorageHooks, type StorageTransport, type StorageAction } from './contracts';
@@ -108,12 +107,12 @@ export class StorageCore<Credentials, Validated> {
         // Unknown prior writes are inspected at the SAME key only. Absence is not permission to retry a mutation.
         const snapshot = await remote.readSnapshot(row.data.identity.finalKey);
         if (!row.data.verifiedStaging || snapshot.sha256 !== row.data.verifiedStaging.sha256 || snapshot.bytes.length !== row.data.verifiedStaging.bytes) throw new StorageCoreError('RECOVERY_REQUIRED');
-        final = descriptor({ ...snapshot.object, ...validateFile(row.data.identity.originalName, row.data.identity.declaredMime, snapshot.bytes), originalName: row.data.identity.originalName, sha256: snapshot.sha256 }, 'final');
+        final = descriptor({ ...snapshot.object, ...storageFile(row.data.identity, snapshot.bytes), originalName: row.data.identity.originalName, sha256: snapshot.sha256 }, 'final');
         validated = await this.hooks.validate(row.data.identity, snapshot.bytes);
       } else {
         const snapshot = await remote.readSnapshot(row.data.identity.stagingKey), input = row.data.identity;
         if (snapshot.sha256 !== input.expectedSha256 || snapshot.bytes.length !== input.expectedBytes) throw new StorageCoreError('REJECTED');
-        const format = validateFile(input.originalName, input.declaredMime, snapshot.bytes);
+        const format = storageFile(input, snapshot.bytes);
         validated = await this.hooks.validate(input, snapshot.bytes);
         const verified = descriptor({ ...snapshot.object, sha256: snapshot.sha256, originalName: input.originalName, mime: format.mime, preview: format.preview }, 'staging');
         row = await this.repository.transaction(async s => {
@@ -124,7 +123,7 @@ export class StorageCore<Credentials, Validated> {
           const current = await this.claimed(s, credentials, id, claim);
           return s.update('storageUploadGrant', id, current.revision, { ...current.data, promotionStarted: true });
         });
-        final = descriptor(await remote.promoteVerified({ stagingKey: input.stagingKey, finalKey: input.finalKey, originalName: input.originalName, declaredMime: input.declaredMime, expectedBytes: input.expectedBytes }), 'final');
+        final = descriptor(await remote.promoteVerified({ stagingKey: input.stagingKey, finalKey: input.finalKey, originalName: input.originalName, declaredMime: input.declaredMime, expectedBytes: input.expectedBytes, ...(input.owner.purpose === 'ai_asset' && input.owner.inputKind === 'image' ? { aiAssetImage: true } : {}) }), 'final');
         if (final.sha256 !== verified.sha256 || final.bytes !== verified.bytes) throw new StorageCoreError('RECOVERY_REQUIRED');
       }
       return await this.repository.transaction(async s => {

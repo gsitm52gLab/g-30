@@ -1,8 +1,8 @@
 import { StoreError, type RecordKind, type RecordInput, type StoredRecord, type SyncUnitOfWork } from '../records';
-import { canonical, digest, descriptor, grantShape, stageShape } from './validate';
+import { canonical, digest, descriptor, grantShape, stageShape, exportShape } from './validate';
 import { STORAGE_LIMITS, type StorageGrantData, type StorageObjectData, type ImportStageData, type StorageBinding, type GrantState } from './types';
 export type StorageRelationReader = Pick<SyncUnitOfWork, 'get' | 'list'>;
-const kinds: RecordKind[] = ['storageUploadGrant', 'storageObject', 'importStage'];
+const kinds: RecordKind[] = ['storageUploadGrant', 'storageObject', 'importStage', 'importExport'];
 const transitions: Record<GrantState, GrantState[]> = {
   issuing: ['issuing', 'issued', 'rejected', 'recovery_required', 'cleanup_claimed'],
   issued: ['finalizing', 'rejected', 'cleanup_claimed'],
@@ -15,6 +15,7 @@ export function storageDependencies(kind: RecordKind, input: RecordInput<RecordK
   const grant = input.data as StorageGrantData, object = input.data as StorageObjectData, stage = input.data as ImportStageData;
   if (kind === 'storageUploadGrant') grantShape(grant);
   if (kind === 'importStage') stageShape(stage);
+  if (kind === 'importExport') exportShape(input.data as import('./types').ImportExportData);
   const result: { kind: RecordKind; id: string }[] = [{ kind, id: input.id }, { kind: 'context', id: input.contextId ?? '' }];
   result.push({ kind: 'user', id: kind === 'storageUploadGrant' ? grant.identity.actorId : kind === 'storageObject' ? object.actorId : stage.actorId });
   const binding: StorageBinding | undefined = kind === 'storageUploadGrant' ? grant.identity : kind === 'storageObject' ? object.binding : undefined;
@@ -37,6 +38,13 @@ export function storageRelations(s: StorageRelationReader, kind: RecordKind, inp
   const bad = () => { throw new StoreError('INVALID_RECORD'); };
   if (!input.contextId || !s.get('context', input.contextId)) bad();
   const old = s.get(kind, input.id);
+  if (kind === 'importExport') {
+    const d = input.data as import('./types').ImportExportData; exportShape(d);
+    if (old || !s.get('user', d.actorId)) bad();
+    const keys = new Set(d.parts.map(p => p.descriptor.key));
+    if (s.list('importExport').some(row => row.data.parts.some(p => keys.has(p.descriptor.key)))) bad();
+    return;
+  }
   if (kind === 'storageUploadGrant') {
     const d = input.data as StorageGrantData; grantShape(d);
     const i = d.identity;
@@ -84,6 +92,6 @@ export function storageRelations(s: StorageRelationReader, kind: RecordKind, inp
   }
 }
 /** Build a small synchronous view after awaited reads, sharing exactly the same validation rules. */
-export function relationView(rows: StoredRecord[], stages: StoredRecord<'importStage'>[]): StorageRelationReader {
-  return { get: ((kind: RecordKind, id: string) => rows.find(r => r.kind === kind && r.id === id) ?? null) as StorageRelationReader['get'], list: ((kind: RecordKind) => kind === 'importStage' ? stages : []) as StorageRelationReader['list'] };
+export function relationView(rows: StoredRecord[], stages: StoredRecord<'importStage'>[], exports: StoredRecord<'importExport'>[] = []): StorageRelationReader {
+  return { get: ((kind: RecordKind, id: string) => rows.find(r => r.kind === kind && r.id === id) ?? null) as StorageRelationReader['get'], list: ((kind: RecordKind) => kind === 'importStage' ? stages : kind === 'importExport' ? exports : []) as StorageRelationReader['list'] };
 }

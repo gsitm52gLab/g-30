@@ -97,8 +97,8 @@
   },
   {
     "source": "src/domain/storage/constraints.ts",
-    "sha256": "493b8c59755f72dad80abd1705fb99e0e0ac87832404c425802a890d468dd745",
+    "sha256": "3021de36c29bb9567c364275c4925d054732b746d8f57e9409ae5f60aba31dbe",
     "async": "storage.ts",
-    "change_note": "Same pure relation validation over awaited dependency rows."
+    "change_note": "S4 immutable generated export manifest addition; existing storage relations unchanged."
   }
 ]
