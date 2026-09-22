@@ -394,6 +394,10 @@
       "canonical_home_preparation_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/canonical-home-preparation/main-review.json",
         "sha256": "53cde430af5ba31a79727fbfef70c1540dcfea8eacc3a9b341fefaf76bc4df31"
+      },
+      "route_navigation_preparation_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G03/route-navigation-preparation-task.json",
+        "sha256": "59f6527a752809e8a0de4f3afff048122e78ca83a5bb54f82cc65bcab4bc0c58"
       }
     },
     {
@@ -2955,7 +2959,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd providerconsumer on7382union; goals UI helperfrozen50ec route405 independentworkflow diagnosis; root wholecandidatecombine afterbothfrozen.",
+      "next_action": "WorkflowUI exact25ae closing24+10+20 PASS; prd consumer final01f helperfix/history concluding. Root preliminary409 needs finalauthorhelpercommit merge before wholeG14independent.",
       "readonly_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/preparation-task.json",
         "sha256": "8d2e5fb5bc7c7c59a0c1db0c615a3f8625ecd293b9d120d2402970426dd6bdab"
@@ -3113,7 +3117,13 @@
       "provider_consumer_p04_boundary": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/provider-consumer-p04-boundary-addendum.json",
         "sha256": "116a7b6f2c86004e2489069da7464b94680a4cfa66cdb84d62335410f911727f"
-      }
+      },
+      "preliminary_combined_candidate": "409341742c9202d2dc504f0730be5c8e61dd217a",
+      "combined_source_preservation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/combined/source-preservation.json",
+        "sha256": "4565fbf32e5d65832aa89c017c8e694e082233a4e6d5532a0797d36991c869da"
+      },
+      "combined_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g14-combined"
     },
     {
       "id": "G15",
@@ -4076,7 +4086,15 @@
         "sha256": "0b9029f497c1107b366232dd93d7c1606f9293f82979d1a2fd4c61b61817d30e"
       },
       "audit_preparation_agent": "/root/ai_verify",
-      "audit_preparation_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g18-audit-preparation"
+      "audit_preparation_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g18-audit-preparation",
+      "audit_preparation_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G18/audit-preparation/result.json",
+        "sha256": "91e5f4ec657a61ac9b7ea5f6ea7be850311177e72bd960684d3d070a4513d262"
+      },
+      "audit_preparation_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G18/audit-preparation/main-review.json",
+        "sha256": "7ff1d0ae3f83d38b3a8e5e0f7e34de3b748904226ee86c4b9b78ff1c71248c90"
+      }
     }
   ],
   "mandatory_external_integration": [
@@ -4094,8 +4112,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "G14",
-  "next_action": "WorkflowG14UI25ae independent4263/64, prdproviderconsumer7382 own, ai_verifyfinalreadonlyprep. Goalsidle. Accepted16ddb unchanged.",
-  "state_version": 174,
+  "next_action": "Accepted16ddb. G14twoverdictpackets closing, wholeunionindependent next. G03sourceonly navigation goals, G18readonly207rowprep reviewed7ff1, finalaudit ai_verify nonauthor.",
+  "state_version": 175,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4127,7 +4145,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T00:52:59.154342+00:00",
+  "updated_at": "2026-09-22T01:00:49.788223+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

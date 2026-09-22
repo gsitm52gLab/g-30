@@ -1,3 +1,7 @@
+# Latest state175 — 2026-09-22T01:00:49.788223+00:00
+
+Accepted16ddb. Root preliminarycombined4093417 (106consumer+25aeUI) preserved801source bytes, READMEonlyappendresolution; stillNOTACCEPTED andlatestauthor01f helperchangesmustmerge. Prd provider own713unit/build, actualHTTP finalmock12P5sqlitefaultSKIP/sqlite17P; actualoldG17 14SQL->16P06sixP, providerhistory10P/audithistory20P; finalpacketpending. Original8P1F8NOT_RUNtwomodes/publicbaseline andoldSQL15assumption failures preserved. WorkflowUI25ae independent636/24browser/10restart/own20 actualaccountswitchprice/heldAPI-RSC PASS reported; ownhelper201/DTOerrors preserved, finalpacketpending. GoalsG03 readonlyroute/nav task59f652 on frozen409 gitshow, noimplbeforeG14accepted. G18ai_verify preparation91e5 root7ff1 reviewed48refs24Git207uniqueJSONpointers/newPASS0; agentidle independentwholeappnonauthor. G18currentmigration15observationdatedddb, finalunion16rederive.
+
 # Latest state174 — 2026-09-22T00:52:59.154342+00:00
 
 Accepted16ddb. G14UI author25ae rootb8c864 reviewed1402artifacts816sources26commands81ZIP/24browser+10restart, 9nonzerohistoricalcommands preserved. WorkflowindependentUI task a076696cdaedc842479c1eeec8b19a5c2a8d7ce9b0088bfe97ea99d4de829712 exact .worktrees/g14-ui-verification ports4263/64; wholeG14 stillrequiresproviderconsumerunion. Prd7382consumer continues withP04sourceboundary116a7 clarifiedfault vs actualmembershiprevoke, no unsupportednewAPI. ai_verifyG18readonlyprep207finishing; goalsidle. G03/G18dependenciespending.
