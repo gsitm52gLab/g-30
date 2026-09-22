@@ -4135,8 +4135,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "Active full GS HALE implementation and Supabase revalidation; bounded deployed auth accepted, complete Goal not achieved",
-  "next_action": "S1accepted d09: implementS2 files/submission/UI/wrappers andS4ExcelAI parallel; G03author finisheslatency+storedprojectionrepair andprdindependent, thenprdInquiry. RemainingSB05/fullflows/VercelAIworkers/final225audit required.",
-  "state_version": 191,
+  "next_action": "S1 author+independent actual completes then rootintegrate/regress; G03 finish e45 actual and menu selector correction thenindependent. Reuse3subagents for vertical files/UI+wrappers, Inquiry and Excel/AI after prerequisitesaccepted. Final deployment/audit required.",
+  "state_version": 190,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4171,7 +4171,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T04:47:51.798594+00:00",
+  "updated_at": "2026-09-22T04:29:10.607225+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
@@ -4338,36 +4338,73 @@
     ],
     "current_parallel_tasks": [
       {
+        "id": "G14-ASYNC-PORT",
+        "owner": "/root/sb_postgres_foundation",
+        "state": "ACCEPTED_BOUNDED_CONTRACT",
+        "last_fullcheck_candidate": "5cc1c283e1f816eb8b7ebc68fc0d6428440dc23a",
+        "author_unit_pass": 783,
+        "baseline_actual_pg03_ms": 41870,
+        "baseline_pg02_ms": 94350,
+        "interrupted_probe_exit": 143,
+        "scope": "Single read-only UoW rawrowmemo, no requestcrossing cache; schemafrozen.",
+        "current_candidate": "15233cde67d462e0fd6791e76ddd25340f14ac96",
+        "harness_failure_preserved": "Admin productquery correctly included internalprice extra hit; firstrole oracle wronglyexpected1. Newharness team query thenadminedit; productunchangedf524.",
+        "mobile_finding": "Original real normalclick failure preserved; headingCSS fixed. IndependentlocalPC/mobilefocused1+1PASS geometry390. ActualPGmobile/restart/revoke running.",
+        "service_race_diagnosis": "Original directservice status oracle invalid; independent directservice+HTTP race2PASS with HTTP200/409. Originalfailure retained.",
+        "root_integration": "92eba683afa6e68692b0c2761bc87a460ad9cea9",
+        "next_task": "G03-SUPABASE-HOME"
+      },
+      {
+        "id": "G14-INDEPENDENT",
+        "owner": "/root/supabase_scope_review",
+        "state": "PASS_BOUNDED_CONTRACT",
+        "candidate": "5cc1c283e1f816eb8b7ebc68fc0d6428440dc23a",
+        "unit_pass": 783,
+        "unit_fail": 0,
+        "app_browser": "Actualdesktop/mobile/restart/revokePASS; originalfailures retained",
+        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g14-async-independent/task.json",
+        "current_candidate": "15233cde67d462e0fd6791e76ddd25340f14ac96",
+        "harness_failure_preserved": "Admin productquery correctly included internalprice extra hit; firstrole oracle wronglyexpected1. Newharness team query thenadminedit; productunchangedf524.",
+        "mobile_finding": "Original real normalclick failure preserved; headingCSS fixed. IndependentlocalPC/mobilefocused1+1PASS geometry390. ActualPGmobile/restart/revoke running.",
+        "service_race_diagnosis": "Original directservice status oracle invalid; independent directservice+HTTP race2PASS with HTTP200/409. Originalfailure retained."
+      },
+      {
+        "id": "STORAGE-APP-PLAN",
+        "owner": "/root/prd",
+        "state": "PREPARATION_COMPLETE_NOT_IMPLEMENTATION",
+        "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-app-plan/result.json",
+        "next_prepared_task": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-app-core/prepared-task.json",
+        "owner_current_task": "SB13-WORKER-BUNDLE-ROOT-LEAK-FIX",
+        "storage_s1": "G14contract prerequisite nowaccepted; assign afterWorkerfix releasesprd"
+      },
+      {
+        "id": "SB01-06-REVALIDATION-PLAN",
+        "owner": "/root/supabase_scope_review",
+        "state": "PREPARATION_COMPLETE",
+        "result": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/sb01-06-audit-plan/plan.json"
+      },
+      {
         "id": "G03-HOME",
         "owner": "/root/sb_postgres_foundation",
-        "state": "LATENCY_ACTUAL_AND_PROJECTION_REPAIR",
-        "candidate": "879d1d9bdc3e2e1722450f0560acbc04423e2ad1",
-        "actual_latency": {
-          "before_ms": 85025,
-          "after_ms": 6754,
-          "before_reads": 440,
-          "after_reads": 40,
-          "dto_hash_identical": true
-        },
-        "open_finding": "Storedtitle object may leak nested value; not demonstrated user-input path; author narrowruntimeprojectionrepair pending",
-        "next": "S2verticalfiles"
+        "state": "AUTHOR_ACTUAL_AND_MENU_REPAIR",
+        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/g03-supabase-home/task.json",
+        "base_commit": "92eba683afa6e68692b0c2761bc87a460ad9cea9",
+        "candidate": "e45a3d2df62d8cf1dd47e90f852567900658fc3f",
+        "author_check_pass": 831,
+        "known_issue": "Brand common AI review nav targeted staff-only internal endpoint; role-aware menu to existing ai-input authorized, no policy change."
       },
       {
-        "id": "G03-INDEPENDENT",
-        "owner": "/root/prd",
-        "state": "OWN_PG_UI_RUNNING_WAIT_FINAL_REPAIR_SHA",
-        "candidate": "d26e155109a9eb8104779ba20934ede9ac7a0699",
-        "focused_pass": 55,
-        "new_projection_fail": 2,
-        "actual_pg_parity": true,
-        "next": "S3Inquiry"
-      },
-      {
-        "id": "S4-EXCEL-AI",
+        "id": "SB01-RUNTIME-FAIL-CLOSED-INDEPENDENT",
         "owner": "/root/supabase_scope_review",
-        "state": "PREPARATION_S1_JUST_ACCEPTED",
-        "base_commit": "d09c76efaa01e53aa1137f9c8e92c5a6d2557010",
-        "scope": "Ownimports/AI assetserver/UI consumers; commonexportextension decisionpending"
+        "state": "PASS_BOUNDED_STORAGE_NOT_RUN",
+        "candidate": "e5e653bc149690873dfa32c4daf4ca16eddbf954",
+        "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/sb01-runtime-independent/task.json",
+        "live_process_session_observed": null,
+        "scope": "Actual failclosedconfig/no clientcanary/minimalruntime withoutDIRECT_URL; Storage predicateNOT_RUN",
+        "pass": 7,
+        "fail": 0,
+        "not_run": 1,
+        "root_review": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/sb01-runtime-independent/root-review.json"
       }
     ],
     "storage_primitive_acceptance": {
@@ -4517,27 +4554,18 @@
       }
     },
     "storage_s1_next": {
-      "state": "ACCEPTED_BOUNDED_STORAGE_S1_CORE",
+      "state": "AUTHOR_AND_INDEPENDENT_ACTUAL_RUNNING",
       "owner": "/root/prd",
       "base_commit": "e5e653bc149690873dfa32c4daf4ca16eddbf954",
       "packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-app-core/task.json",
       "packet_sha256": "b35c58e23c99c2207d86e4958cb11ad34b9f30b430d76e8211c849a16b0c22da",
       "dependency": "G14async/schema boundedcontract accepted; Workerpackaging disjoint so no need consume unverifiedfix",
-      "candidate": "c5dc4990105cecb33f5c8895a14e0d34f7875a38",
+      "candidate": "59188abfc873135a55df28de1d1d1e9c9c02b0a7",
       "author_check_pass": 864,
       "author_core_pass": 40,
       "independent_packet": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-core-independent/task.json",
       "independent_unit_pass": 191,
-      "independent_new_invariant_pass": 12,
-      "integration_commit": "d09c76efaa01e53aa1137f9c8e92c5a6d2557010",
-      "acceptance": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/SUPABASE/storage-core-root-integration/acceptance.json",
-      "root_unit_pass": 877,
-      "independent_actual_pass": 16,
-      "final_absent_pass": 3,
-      "independent_artifacts": 75,
-      "tracked_nonblocking": [
-        "Ready staging duplicate retention roughly2x; no automatic final deletion"
-      ]
+      "independent_new_invariant_pass": 12
     },
     "public_key_configuration": {
       "state": "PRESENT_ACTUAL_DIRECT_GATE_PASS",

@@ -1,4 +1,4 @@
-# GS HALE checkpoint — state190 / Goal active
+# GS HALE checkpoint — state191 / Goal active
 
 Actual Goal re-observed active through get_goal on 2026-09-22 after the user continuation. No second Goal created. Latest user wanted background work; no return to synchronous broad questioning. Previous turn is PROGRESS: code integrated/pushed and real deployed auth + populated screens observed.
 
@@ -79,3 +79,12 @@ State190: Worker source906 accepted bounded local packaging at root401e6eac89af5
 S1 core unchanged6e product, final591 adds2actualharness only; amendment sourcebound; independent191unit+12newinvariantsPASS, actualprocess6471 inownschema running; authoractual11PASS5pending atlatestreport. G03 actual PG02 fixtures passed1349649ms (22.5min), remainingcount/UI/restart/revoke pending, candidatee45 unchanged untilprobeends. Long existingproducerroundtrips remain recorded latency concern, no broadlatencyPASS.
 
 User requests3hgoalcompletion target16:25KST; no scopewaiver. Codex configtop model_reasoning_effort xhigh→medium (otherbytesunchanged/privatebackup), currentactive effortnotverified. Exactlyroot+3liveagents; coreauthor/prd, independent/scope, homeauthor/sbpostgres. S1 P2ready staging duplicatespersist (uptoroughly2x storage) trackedoperationalcleanup gap, no extra schemainvention orfinaldeletion. NextS2preparedpacket exists; consolidate files+submissions+commonbrowser+wrappers verticallease afterS1accepted; Inquiry/ExcelAI separateowners.
+
+
+## State191 authoritative override
+
+S1 c5dc499 accepted boundedcore at rootd09c76efaa01e53aa1137f9c8e92c5a6d2557010. Independent75artifacts allhashesmatch; actual16baseline plus3absent-recovery and missing/neveruploadedcleanup finalclosure. Root877PASS/lint/type/build0;34candidatepaths identical. Earlier HTTP400 semantic404 failure preserved and fixedbounded64KiB exactenvelope/GET only. P2 ready stagingduplication retained; featurebrowser ACL and fullSB remainNOT_RUN.
+
+G03 current879 latency memo drops actualSubmission.workspace85.0s/440reads to6.75s/40reads identicalDTO, actual UIcontinuation running. Independentprd ownPG330validrows+4actorparity/restart/revoke; storedtasktitle object projection2FAIL remainsopenauthorlease, not demonstrated userinputinjection. FinalSHAwillchange.
+
+Parallel root+3: sbpostgres G03repair thenS2verticalfiles/submissions/UI/wrappers; prdG03independent thenInquiry; scopeS1done nowS4ExcelAI. S1accepted d09base available.3htarget16:25KST remainsaspirational; fullrequiredvalidation unchanged. Submission-logrequestcancelled; do notresume.
