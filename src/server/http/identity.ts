@@ -3,6 +3,14 @@ import { NextResponse } from "next/server";
 import { authConfig, identity } from "@/server/auth/runtime";
 import { AuthError, fail, type IdentityService } from "@/server/auth/service";
 import { StoreError } from "@/domain/records";
+import { ConfigurationError } from "@/server/config/parse";
+import { PostgresConfigurationError } from "@/server/postgres/errors";
+const publicConfigurationFields = new Set([
+    "DATA_SOURCE", "DATABASE_FILE", "DATABASE_URL", "DIRECT_URL", "SUPABASE_URL",
+    "SUPABASE_DB_SCHEMA", "SUPABASE_POOL_MAX", "SUPABASE_STATEMENT_TIMEOUT_MS",
+    "SUPABASE_LOCK_TIMEOUT_MS", "SUPABASE_IDLE_TRANSACTION_TIMEOUT_MS",
+    "SUPABASE_CA_CERTIFICATE", "OPENAI_BASE_URL",
+]);
 export function requestToken(request: Request) { const name = authConfig().cookieName; return request.headers.get("cookie")?.split(";").map(x => x.trim()).find(x => x.startsWith(`${name}=`))?.slice(name.length + 1); }
 export function json(data: unknown, status = 200) { return NextResponse.json(data, { status, headers: { "Cache-Control": "no-store, private", "Referrer-Policy": "no-referrer" } }); }
 export function sessionCookie(response: NextResponse, token: string, expiresAt: string) { const c = authConfig(); response.cookies.set(c.cookieName, token, { httpOnly: true, sameSite: "lax", secure: c.secure, path: "/", expires: new Date(expiresAt) }); }
@@ -54,6 +62,11 @@ export async function route(request: Request, action: (service: IdentityService,
         return await action(service, token);
     }
     catch (error) {
+        if (error instanceof ConfigurationError || error instanceof PostgresConfigurationError) {
+            // Only fixed field names cross this boundary: never values, messages, causes or stacks.
+            const field = publicConfigurationFields.has(error.field) ? error.field : "SERVER_CONFIGURATION";
+            return json({ error: { code: "CONFIGURATION", field, message: "서버 설정을 확인해 주세요." } }, 503);
+        }
         if (error instanceof AuthError) {
             const response = json({ error: { code: error.code, message: error.status === 404 ? "자료를 찾을 수 없습니다." : error.message } }, error.status);
             if (error.status === 429)
