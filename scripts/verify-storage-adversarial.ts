@@ -67,10 +67,23 @@ try {
   });
   await check('same_content_new_final_version_rejects_old_range_descriptor', async () => {
     const { stagingKey, finalKey, grant } = await setup(); await upload(grant); const final = await storage.promoteVerified({ stagingKey, finalKey, originalName: 'synthetic.csv', declaredMime: 'text/csv', expectedBytes: bytes.length });
-    // Privileged synthetic corruption probe. Product transport never offers final upsert.
-    assert(await cancel(await server(`/object/${config.bucket}/${finalKey}`, 'POST', bytes, 'text/csv')) === 200);
+    // Same-byte upsert can retain the provider version. Establish a genuinely new
+    // owned object before testing the old descriptor; product transport never deletes final keys.
+    assert(owned.includes(finalKey) && finalKey.startsWith(`${config.namespace}/final/`));
+    const deletionStatus = await cancel(await server(`/object/${config.bucket}`, 'DELETE', JSON.stringify({ prefixes: [{ path: finalKey, versionId: final.version }] }), 'application/json'));
+    assert(deletionStatus === 200);
+    const absent = await safeFetch(`${config.projectUrl}/storage/v1/object/info/authenticated/${config.bucket}/${finalKey}`, { headers: { apikey: config.secretKey, authorization: `Bearer ${config.secretKey}` } });
+    const absenceStatus = absent.status;
+    // Storage can encode object-not-found as HTTP400 + statusCode404. Do not count arbitrary failures as absence.
+    const absenceBody: unknown = await absent.json();
+    assert(absenceStatus === 404 || (absenceStatus === 400 && !!absenceBody && typeof absenceBody === 'object' && 'statusCode' in absenceBody && String(absenceBody.statusCode) === '404'));
+    const replacementStatus = await cancel(await server(`/object/${config.bucket}/${finalKey}`, 'POST', bytes, 'text/csv'));
+    assert(replacementStatus === 200);
+    const current = await storage.inspect(finalKey), snapshot = await storage.readSnapshot(finalKey);
+    assert(current.id !== final.id && current.version !== final.version);
+    assert(current.bytes === final.bytes && current.etag === final.etag && snapshot.sha256 === final.sha256 && snapshot.bytes.equals(bytes));
     let rejected = false; try { await storage.readRange(final, 0, 1); } catch (e) { rejected = e instanceof StorageError && e.code === 'INTEGRITY'; }
-    assert(rejected); return { privilegedSyntheticMutation: true, staleRangeRejected: true };
+    assert(rejected); return { privilegedSyntheticMutation: true, deletionStatus, absenceStatus, absenceConfirmed: true, replacementStatus, idChanged: true, versionChanged: true, bytesUnchanged: true, sha256Unchanged: true, etagUnchanged: true, staleRangeRejected: true };
   });
 } catch (e) { results.push({ name: 'probe_setup', status: 'FAIL', details: { code: e instanceof StorageError ? e.code : 'REDACTED_ERROR' } }); }
 finally {

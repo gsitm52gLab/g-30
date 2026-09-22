@@ -39,6 +39,10 @@ node --conditions=react-server --import tsx scripts/verify-storage-supabase.ts
 
 실제 probe는 `sb_storage_foundation_20260922` namespace에 현재 실행에서 생성한 UUID key와 합성 bytes만 사용한다. 버킷은 보존하고 정확히 해당 실행 소유 key만 정리한다. 외부 객체/정책/원본 자료를 삭제하지 않는다. 출력은 통계와 증거 경로뿐이며 key/token/원격 body를 출력하지 않는다. 생성한 JSON은 실제 cwd·원격 결과·PASS/FAIL/NOT_RUN 수를 기록한다. 일부 cleanup API 검증은 테스트 전용 가상 시각을 사용하므로 실제 24시간 만료를 기다린 증거가 아니다. 이 script는 명시적 원격 테스트 명령이며 일반 unit test에서 실행되지 않는다.
 
+### 동일 내용·새 버전 검증의 전제
+
+동일 bytes를 privileged upsert해도 실제 Storage id/version이 유지될 수 있다. 이전 후보의 이 probe는 독립 실행에서 6 PASS / 1 FAIL이었으며, 새 실행에서 7 PASS여도 이전 실패를 취소하지 않는다. 따라서 이 검사에서는 현재 실행 소유 final key의 정확한 version을 삭제하고, object-not-found 응답을 확인한 뒤 동일 bytes로 다시 생성한다. 실제 id와 version이 모두 달라지고 SHA-256·ETag·크기·bytes는 같다는 전제를 먼저 검사한 다음 이전 descriptor의 Range가 `INTEGRITY`로 거부되는지 확인한다. 임의 오류를 부재로 간주하지 않는다. 이 삭제·재생성은 합성 fixture 준비에만 존재하며 제품 transport의 final 삭제 기능을 추가하지 않는다.
+
 ## 공식 참고
 
 - [Supabase signed upload API](https://supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl)
