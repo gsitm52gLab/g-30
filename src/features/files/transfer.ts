@@ -2,8 +2,9 @@ import type { UploadCapability } from '@/domain/storage/types';
 import { FileTransferError, type DirectUploadCallbacks } from './contracts';
 export { boundedDownload, downloadMetadata } from './download';
 export type { DirectUploadCallbacks, DownloadMetadata, TransferFileInput, IssuedUpload } from './contracts';
-export interface UploadResumeState { grantId?: string; uploaded?: boolean; tusUrl?: string }
+export interface UploadResumeState { grantId?: string; fileFingerprint?: string; uploaded?: boolean; tusUrl?: string }
 const TUS_CHUNK = 6 * 1024 * 1024;
+const accessStatus = (error: unknown): number | undefined => error && typeof error === 'object' && 'status' in error && typeof error.status === 'number' && [401,403,404].includes(error.status) ? error.status : undefined;
 const invalid = (): never => { throw new FileTransferError('INVALID_INPUT'); };
 function capability(value: UploadCapability, bytes: number): UploadCapability {
   const signed = new URL(value.signedUrl), tus = new URL(value.resumableEndpoint);
@@ -34,7 +35,7 @@ export async function directUpload<T>(file: File, options: {
   const finalize = async (id: string) => {
     let status;
     try { status = await callbacks.finalize(id, signal); }
-    catch { signal?.throwIfAborted(); status = await callbacks.status(id, signal); }
+    catch (error) { if (accessStatus(error)) throw new FileTransferError('ACCESS_CHANGED', accessStatus(error)); signal?.throwIfAborted(); status = await callbacks.status(id, signal); }
     if (status.id !== id || status.state !== 'ready' || !status.result) throw new FileTransferError('NOT_READY');
     return await callbacks.resolve(status, signal);
   };
@@ -42,6 +43,10 @@ export async function directUpload<T>(file: File, options: {
     signal?.throwIfAborted();
     const maximum = options.maximumBytes ?? 25*1024*1024;
     if (!Number.isSafeInteger(maximum) || maximum < 1 || !Number.isSafeInteger(file.size) || file.size < 1 || file.size > maximum || !/^[a-zA-Z0-9_-]{1,160}$/.test(options.clientItemId)) invalid();
+    const sha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', await file.arrayBuffer()))].map(v=>v.toString(16).padStart(2,'0')).join(''); signal?.throwIfAborted();
+    const fingerprint = JSON.stringify([file.name,file.type,file.size,sha256]);
+    if (state.grantId && state.fileFingerprint !== fingerprint) invalid();
+    state.fileFingerprint = fingerprint;
     if (state.grantId) {
       const status = await callbacks.status(state.grantId, signal);
       if (status.id !== state.grantId) invalid();
@@ -49,7 +54,6 @@ export async function directUpload<T>(file: File, options: {
       if (state.uploaded || status.state === 'recovery_required' || status.state === 'finalizing') return await finalize(status.id);
       if (!['issued','issuing'].includes(status.state)) throw new FileTransferError('NOT_READY');
     }
-    const sha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', await file.arrayBuffer()))].map(v=>v.toString(16).padStart(2,'0')).join(''); signal?.throwIfAborted();
     const issued = await callbacks.issue({ clientItemId: options.clientItemId, originalName:file.name, declaredMime:file.type, expectedBytes:file.size, expectedSha256:sha256 }, signal);
     if (state.grantId && issued.status.id !== state.grantId) invalid(); state.grantId=issued.status.id;
     if (issued.status.state === 'ready') { if (!issued.status.result) invalid(); return await callbacks.resolve(issued.status, signal); }
@@ -84,5 +88,5 @@ export async function directUpload<T>(file: File, options: {
       }
     }
     state.uploaded=true;signal?.throwIfAborted();return await finalize(issued.status.id);
-  } catch(error) { if(signal?.aborted)throw new FileTransferError('ABORTED'); if(error instanceof FileTransferError)throw error;throw new FileTransferError('TRANSFER_FAILED'); }
+  } catch(error) { if(signal?.aborted)throw new FileTransferError('ABORTED'); if(error instanceof FileTransferError)throw error;if(accessStatus(error))throw new FileTransferError('ACCESS_CHANGED',accessStatus(error));throw new FileTransferError('TRANSFER_FAILED'); }
 }
