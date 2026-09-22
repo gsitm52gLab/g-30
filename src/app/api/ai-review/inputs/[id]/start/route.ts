@@ -5,4 +5,4 @@ export async function POST(request: Request, c: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(request, async (i, t) => json(await new AiReviewService(i).start(t, (await c.params).id, await readBody(request, ['inputVersionId', 'extractionRunId', 'expectedRunId', 'corpusReleaseId', 'corpusManifestHash', 'engine', 'idempotencyKey']))))); }
+}) { return route(request, async (i, t) => json(await new AiReviewService(i).start(t, (await c.params).id, await readBody(request, ['inputVersionId', 'extractionRunId', 'expectedRunId', 'corpusReleaseId', 'corpusManifestHash', 'engine', 'idempotencyKey'])))); }

@@ -120,7 +120,7 @@ async function fixture(input: ImportFixtureInput): Promise<ImportFixtureSnapshot
             return await importFixture(repo, input);
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     return new Promise((resolve, reject) => {
@@ -190,7 +190,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     for (const [c, name] of [[admin, 'admin'], [brand, 'luna'], [team, 'team'], [gsg, 'operator'], [price, 'price'], [foreign, 'wave']] as const)

@@ -17,14 +17,14 @@ it('SQLite raw corrupt imported row is safely rejected without rewriting immutab
         // This is an isolated raw storage corruption fixture, bypassing the normal repository write guard.
         db.prepare('INSERT INTO records(kind,id,context_id,data,revision,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').run('noticeVersion', badId, old.contextId, raw, 1, NOW, NOW);
         await repo.transaction(async (s) => { const n = (await s.get('notice', id))!; (await s.update('notice', id, n.revision, { ...n.data, currentVersionId: badId })); });
-        await expect((await service.detail(brand, id))).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
-        await expect((await service.list(brand, 'ctx-jp-a-luna'))).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+        await expect(service.detail(brand, id)).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
+        await expect(service.list(brand, 'ctx-jp-a-luna')).rejects.toMatchObject({ code: 'STORAGE_UNAVAILABLE', status: 503 });
         expect((db.prepare('SELECT data FROM records WHERE kind=? AND id=?').get('noticeVersion', badId) as {
             data: string;
         }).data).toBe(raw);
         expect(await repo.get('noticeVersion', version)).toEqual(old);
     }
     finally {
-        repo.close();
+        (await repo.close());
     }
 });

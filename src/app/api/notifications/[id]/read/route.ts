@@ -5,4 +5,4 @@ export async function POST(request: Request, context: {
     params: Promise<{
         id: string;
     }>;
-}) { const { id } = await context.params; return (await route(request, async (s, t) => json(await new NotificationService(s).read(t, id, await readBody(request, ['read', 'expectedRevision', 'idempotencyKey']))))); }
+}) { const { id } = await context.params; return route(request, async (s, t) => json(await new NotificationService(s).read(t, id, await readBody(request, ['read', 'expectedRevision', 'idempotencyKey'])))); }

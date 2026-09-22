@@ -115,7 +115,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     await brand.login('luna@example.test');
@@ -244,7 +244,7 @@ try {
         await repository.transaction(async (s) => { const row = (await s.get('aiAnalysisRun', next.runId))!; (await s.update('aiAnalysisRun', row.id, row.revision, { ...row.data, modelId: { value: 'G16_STORED_CANARY' } } as unknown as typeof row.data)); });
         const original = await repository.get('aiAnalysisRun', next.runId), bad = await gsg.send(`/api/ai-review/runs/${next.runId}`), badBody = await bad.text();
         check('H28 malformed known scalar safe503 and stored history untouched', bad.status === 503 && !badBody.includes('G16_STORED_CANARY') && JSON.stringify(await repository.get('aiAnalysisRun', next.runId)) === JSON.stringify(original), ['AC-16-05'], 'HTTP_WITH_ISOLATED_CORRUPT_FIXTURE');
-        repository.close();
+        (await repository.close());
     }
     else
         for (let n = 23; n <= 28; n++)

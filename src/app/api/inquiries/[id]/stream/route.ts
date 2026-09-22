@@ -7,7 +7,7 @@ export async function GET(request: Request, c: {
         id: string;
     }>;
 }) {
-    return (await route(request, async (identity, token) => {
+    return route(request, async (identity, token) => {
         const service = new InquiryService(identity), id = (await c.params).id, params = new URL(request.url).searchParams, last = request.headers.get('last-event-id');
         if (last) {
             if (params.has('after') && params.get('after') !== last)
@@ -53,5 +53,5 @@ export async function GET(request: Request, c: {
             }, cancel() { stop(); request.signal.removeEventListener('abort', stop); }
         });
         return new Response(stream, { headers: { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store, private', 'X-Accel-Buffering': 'no', 'Referrer-Policy': 'no-referrer' } });
-    }));
+    });
 }

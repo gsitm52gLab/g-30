@@ -8,5 +8,5 @@ export default async function Page({ params, searchParams }: {
         id: string;
     }>;
     searchParams: Search;
-}) { const data = await (await (async () => { const d = await catalogPage(searchParams); const project = await d.service.project(d.token, (await params).id); const catalog = await d.service.catalog(d.token, project.contextId!); return { ...d, workspace: await readWorkspace(project.contextId!), project, catalog }; })()).catch(workspaceFailure); if (!data)
+}) { const data = await (async () => { const d = await catalogPage(searchParams); const project = await d.service.project(d.token, (await params).id); const catalog = await d.service.catalog(d.token, project.contextId!); return { ...d, workspace: await readWorkspace(project.contextId!), project, catalog }; })().catch(workspaceFailure); if (!data)
     return <StorageFailure />; return <><ContextBar workspace={data.workspace}/><Project key={data.project.id} initial={data.project} catalog={data.catalog}/></>; }

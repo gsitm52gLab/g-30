@@ -6,4 +6,4 @@ export async function GET(request: Request, c: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(request, async (i, t) => json(await new AiInputService(i).detail(t, (await c.params).id, query(request, ['versionId']).get('versionId') ?? undefined)))); }
+}) { return route(request, async (i, t) => json(await new AiInputService(i).detail(t, (await c.params).id, query(request, ['versionId']).get('versionId') ?? undefined))); }

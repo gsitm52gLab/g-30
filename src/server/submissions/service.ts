@@ -43,7 +43,7 @@ export class SubmissionService {
                     return [{ fileVersionId, code: 'UNAVAILABLE' as const }];
                 }
             }));
-            const productIssues = (await asyncFlatMap(content.productSelections, async (selection) => {
+            const productIssues = (await asyncFlatMap(content.productSelections, async (selection): Promise<{ productId: string; code: 'CHANGED' | 'UNAVAILABLE' }[]> => {
                 try {
                     const r = (await resolveProduct(s, p, task.contextId!, selection.productId, this.clock));
                     return r.product.revision !== selection.expectedCommonRevision || r.relation.revision !== selection.expectedContextRevision ? [{ productId: selection.productId, code: 'CHANGED' as const }] : [];

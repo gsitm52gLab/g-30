@@ -28,7 +28,7 @@ export default async function CampaignPage({ params, searchParams }: {
             const auth = await identity(), token = await currentToken(), tasks = new TaskService(auth), campaigns = new CampaignService(auth), context = q.context as string, task = await tasks.detail(token, id, context), catalog = await tasks.catalog(token, context), list = await campaigns.list(token, context, id), detail = q.campaign ? await campaigns.detail(token, q.campaign as string, q.version as string | undefined) : null;
             if (detail && (detail.taskId !== id || detail.contextId !== context))
                 throw new AuthError('NOT_FOUND', 404, '자료를 찾을 수 없습니다.');
-            data = { task, catalog, list, detail, catalogs: task.canManage ? await campaigns.catalogs(token, context) : null, products: task.canManage ? await Promise.all((await asyncMap(task.task.data.productIds, async (pid) => (await new ProductService(auth).detail(token, pid, context))))) : [] };
+            data = { task, catalog, list, detail, catalogs: task.canManage ? await campaigns.catalogs(token, context) : null, products: task.canManage ? await Promise.all((await asyncMap(task.task.data.productIds, async (pid) => new ProductService(auth).detail(token, pid, context)))) : [] };
         }
         catch (e) {
             if (e instanceof AuthError) {

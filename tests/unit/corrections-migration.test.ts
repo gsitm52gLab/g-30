@@ -30,7 +30,7 @@ it('G10 populated accepted six migrations preserve all old business rows and act
     }
     finally {
         if (repo)
-            repo.close();
+            (await repo.close());
         else
             db.close();
         rmSync(dir, { recursive: true, force: true });

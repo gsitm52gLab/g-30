@@ -9,9 +9,9 @@ import { policyFixture, tokenFor, NOW } from '../fixtures/policy';
 import { brand } from '../fixtures/completion';
 import { completionCampaign, person, source } from '../fixtures/completion-campaign';
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} G13 campaign request recipient repair`, async () => {
+    describe(`${mode} G13 campaign request recipient repair`, () => {
         let repo: RecordRepository;
-        afterEach(() => repo?.close());
+        afterEach(async () => (await repo?.close()));
         it.each(['selection', 'external_fact'] as const)('S13-R01 %s actual new request preserves primary/co brand candidates independently of GSG event', async (cause) => {
             repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })();
             const identity = await policyFixture(repo), fixture = await completionCampaign(identity);

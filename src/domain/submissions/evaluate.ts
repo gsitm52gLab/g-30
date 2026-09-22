@@ -1,3 +1,4 @@
+import { jsonContentEqual } from '@/domain/json-content';
 import type { RequestContent, Requirement } from '../tasks/types';
 import type { AnswerInput, Evaluation, RequirementEvaluation } from './types';
 import { answerKey } from './types';
@@ -11,7 +12,7 @@ function signature(q: Requirement, content: RequestContent, seen = new Set<strin
 }
 export function compatibleRequirement(q: Requirement, current: RequestContent, previous: RequestContent | null): boolean {
     const old = previous?.requirements.find(r => r.key === q.key);
-    return !!old && JSON.stringify(signature(q, current)) === JSON.stringify(signature(old, previous!));
+    return !!old && jsonContentEqual(signature(q, current), signature(old, previous!));
 }
 /** One evaluator for live drafts/submissions and the G04 legacy evidence adapter. */
 export function evaluateAnswers(current: RequestContent, answers: AnswerInput[], previous: RequestContent | null = current, prior = false): Evaluation {

@@ -1,3 +1,4 @@
+import { jsonContentEqual } from '@/domain/json-content';
 import { asyncFilter, asyncFlatMap, asyncMap } from "@/domain/async-collections";
 import type { Clock, UnitOfWork, StoredRecord } from '@/domain/records';
 import type { Principal, IdentityService } from '@/server/auth/service';
@@ -58,7 +59,7 @@ export class NoticeService {
                 if (!content)
                     return [];
                 const ownReadAt = v ? nullableText((await s.list('noticeRead', contextId)).find(r => r.data.versionId === v.id && r.data.userId === p.user.id)?.data.readAt) : null;
-                const state = !v ? 'draft' as const : canManage && JSON.stringify(n.data.draft) !== JSON.stringify(v.data.content) ? 'revised' as const : 'published' as const;
+                const state = !v ? 'draft' as const : canManage && !jsonContentEqual(n.data.draft, v.data.content) ? 'revised' as const : 'published' as const;
                 return [{ id: n.id, revision: canManage ? n.revision : v ? noticeSequence(v) : 0, title: typeof content.title === 'string' ? content.title : '', type: noticeTypes.includes(content.type) ? content.type : 'notice' as const, category: typeof content.category === 'string' ? content.category : '', documentVersion: typeof content.documentVersion === 'string' ? content.documentVersion : '', state, currentVersionId: v?.id ?? null, sequence: v ? noticeSequence(v) : null, publishedAt: nullableText(v?.data.publishedAt), updatedAt: canManage ? n.updatedAt : nullableText(v?.data.publishedAt) ?? '', ownReadAt }];
             })).filter(n => (!query.q || `${n.title} ${n.category}`.toLowerCase().includes(query.q.toLowerCase())) && (!query.type || n.type === query.type) && (!query.state || query.state === 'unread' ? !query.state || !!n.currentVersionId && !n.ownReadAt : n.state === query.state)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id));
             return { context: projectContext((await s.get('context', contextId))!), actorId: p.user.id, canManage, items, total: items.length };

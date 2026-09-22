@@ -22,7 +22,7 @@ import { policyFixture, tokenFor, NOW } from '../fixtures/policy';
 import { admin, brand, contextId, completionSubmission, completionInquiry } from '../fixtures/completion';
 import { completionCampaign, campaignMarker } from '../fixtures/completion-campaign';
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} G13 actual producer source adapters`, async () => {
+    describe(`${mode} G13 actual producer source adapters`, () => {
         let repo: RecordRepository, identity: IdentityService, dir: string, taskId: string;
         const gsg = tokenFor('user-gsg'), co = tokenFor('user-co'), team = tokenFor('user-team');
         async function setup() {
@@ -43,10 +43,10 @@ for (const mode of ['mock', 'sqlite'] as const)
         }
         async function read<T>(token: string, fn: (s: UnitOfWork, p: ReturnType<IdentityService['principal']>) => T | Promise<T>) { return repo.transaction(async (s) => (await fn(s, (await identity.principal(s, token))))); }
         async function events(type: string, target = taskId) { return (await repo.list('domainEvent')).filter(e => e.data.eventType === type && e.data.targetId === target); }
-        async function event(token: string, type: string, target = taskId) { const rows = await events(type, target); expect(rows.length).toBeGreaterThan(0); return (await read(token, async (s, p) => (await notificationEventSource(s, p, rows.at(-1)!.id, () => NOW)))); }
-        async function schedules(token = brand, id = taskId) { return (await read(token, async (s, p) => (await taskSchedules(s, p, id, () => NOW)))); }
+        async function event(token: string, type: string, target = taskId) { const rows = await events(type, target); expect(rows.length).toBeGreaterThan(0); return read(token, async (s, p) => (await notificationEventSource(s, p, rows.at(-1)!.id, () => NOW))); }
+        async function schedules(token = brand, id = taskId) { return read(token, async (s, p) => (await taskSchedules(s, p, id, () => NOW))); }
         async function complete(id = taskId) { const c = new CompletionService(identity), w = await c.workspace(admin, id); return (await c.command(admin, { command: 'complete', taskId: id, expectedTaskRevision: w.taskRevision, expectedBasisHash: w.preview!.basisHash, memo: '', idempotencyKey: randomUUID() })).ids[0]; }
-        afterEach(async () => { repo?.close(); if (dir)
+        afterEach(async () => { (await repo?.close()); if (dir)
             await rm(dir, { recursive: true, force: true }); });
         it('S13-01 actual G04 public request/current recipients, private milestone exclusion, unknown fields never spread', async () => {
             await setup();
@@ -78,11 +78,11 @@ for (const mode of ['mock', 'sqlite'] as const)
         it('S13-03 current session/membership authority defeats previously captured principal and wrong context', async () => {
             await setup();
             const id = (await events('TASK_PUBLISHED'))[0].id;
-            await expect((await event(tokenFor('user-wave'), 'TASK_PUBLISHED'))).rejects.toMatchObject({ status: 404 });
+            await expect(event(tokenFor('user-wave'), 'TASK_PUBLISHED')).rejects.toMatchObject({ status: 404 });
             const old = await read(brand, (_s, p) => p);
             await repo.transaction(async (s) => { const m = (await s.list('membership', contextId)).find(m => m.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
             await expect(repo.transaction(async (s) => (await notificationEventSource(s, old, id, () => NOW)))).rejects.toMatchObject({ status: 404 });
-            await expect((await schedules())).rejects.toMatchObject({ status: 404 });
+            await expect(schedules()).rejects.toMatchObject({ status: 404 });
             await repo.transaction(async (s) => { const row = (await s.get('session', old.session.id))!; (await s.update('session', row.id, row.revision, { ...row.data, revokedAt: NOW })); });
             await expect(repo.transaction(async (s) => (await notificationEventSource(s, old, id, () => NOW)))).rejects.toMatchObject({ status: 401 });
         });
@@ -112,10 +112,10 @@ for (const mode of ['mock', 'sqlite'] as const)
             await notices.command(admin, id, { command: 'publish', expectedRevision: 1, idempotencyKey: randomUUID() });
             const old = (await events('NOTICE_PUBLISHED', id))[0], reads = await repo.list('noticeRead');
             expect((await event(brand, 'NOTICE_PUBLISHED', id)).disposition).toBe('eligible');
-            await expect((await event(co, 'NOTICE_PUBLISHED', id))).rejects.toMatchObject({ status: 404 });
+            await expect(event(co, 'NOTICE_PUBLISHED', id)).rejects.toMatchObject({ status: 404 });
             await notices.command(admin, id, { command: 'save', expectedRevision: 2, content: { ...c, audience: { mode: 'selected', userIds: ['user-co'] } }, idempotencyKey: randomUUID() });
             await notices.command(admin, id, { command: 'publish', expectedRevision: 3, idempotencyKey: randomUUID() });
-            await expect((await read(brand, async (s, p) => (await notificationEventSource(s, p, old.id, () => NOW))))).rejects.toMatchObject({ status: 404 });
+            await expect(read(brand, async (s, p) => (await notificationEventSource(s, p, old.id, () => NOW)))).rejects.toMatchObject({ status: 404 });
             expect((await event(co, 'NOTICE_REVISED', id)).disposition).toBe('eligible');
             expect(await repo.list('noticeRead')).toEqual(reads);
         });
@@ -135,7 +135,7 @@ for (const mode of ['mock', 'sqlite'] as const)
                 throw Error('fixture');
             await inquiries.command(admin, r.conversationId, { command: 'answer', questionId: r.questionId, expectedQuestionRevision: detail.questions[0].revision, content: { clientMessageId: randomUUID(), body: '공개 답변', fileVersionIds: [] }, idempotencyKey: randomUUID() });
             expect((await event(brand, 'INQUIRY_ANSWER', r.conversationId)).disposition).toBe('eligible');
-            await expect((await event(team, 'INQUIRY_ANSWER', r.conversationId))).rejects.toMatchObject({ status: 404 });
+            await expect(event(team, 'INQUIRY_ANSWER', r.conversationId)).rejects.toMatchObject({ status: 404 });
             expect(await read(gsg, async (s, p) => (await inquirySchedules(s, p, r.conversationId, () => NOW)))).toEqual([]);
         });
         it('S13-07 actual G10 internal opinions3/draft0 then one public batch facts per recipient, private originals0', async () => {
@@ -149,7 +149,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(await events('CORRECTION_BATCH_PUBLISHED')).toHaveLength(0);
             await corrections.command(admin, { command: 'publish', taskId, draftId: id, expectedRevision: 1, idempotencyKey: randomUUID() });
             expect(await events('CORRECTION_BATCH_PUBLISHED')).toHaveLength(1);
-            const rows = await Promise.all([(await event(brand, 'CORRECTION_BATCH_PUBLISHED')), (await event(co, 'CORRECTION_BATCH_PUBLISHED'))]);
+            const rows = await Promise.all([event(brand, 'CORRECTION_BATCH_PUBLISHED'), event(co, 'CORRECTION_BATCH_PUBLISHED')]);
             expect(rows.map(r => r.disposition)).toEqual(['eligible', 'eligible']);
             expect(rows[0].source.eventId).toBe(rows[1].source.eventId);
             expect(JSON.stringify(rows)).not.toContain('PRIVATE_G13');

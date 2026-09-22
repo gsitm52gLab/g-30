@@ -141,13 +141,23 @@ const workspace = (task: string, c = admin) => c.get<CompletionWorkspace>(`/api/
 async function ids(response: Response, status = 200): Promise<string[]> { assert.equal(response.status, status, await response.clone().text()); return (await response.json()).ids; }
 async function command(c: Client, id: string, command: string, extra: Record<string, unknown>) { const d = await detail(c, id); return ids(await c.mutate('/api/campaigns', { command, contextId: A, taskId: d.taskId, campaignId: id, expectedRevision: d.revision, idempotencyKey: randomUUID(), ...extra })); }
 async function completion(taskId: string) { const w = await workspace(taskId); return { command: 'complete', taskId, expectedTaskRevision: w.taskRevision, expectedBasisHash: w.preview!.basisHash, memo: '', idempotencyKey: randomUUID() }; }
-function residual(w: CompletionWorkspace) { const x = w.preview!.basis.campaign; assert.equal(x.state, 'available'); if (x.state !== 'available') throw Error('unavailable campaign'); return x.value; }
-const skipped: string[] = []; let reachedEnd = false;
+function residual(w: CompletionWorkspace) { const x = w.preview!.basis.campaign; assert.equal(x.state, 'available'); if (x.state !== 'available')
+    throw Error('unavailable campaign'); return x.value; }
+const skipped: string[] = [];
+let reachedEnd = false;
 try {
-    if (mode === 'sqlite') { const db = openDatabase(database, true); migrate(db); const repo = createSqliteRepository(db); await seed(repo); repo.close(); }
-    await start(); await admin.login('admin@example.test'); await brand.login('luna@example.test');
+    if (mode === 'sqlite') {
+        const db = openDatabase(database, true);
+        migrate(db);
+        const repo = createSqliteRepository(db);
+        await seed(repo);
+        (await repo.close());
+    }
+    await start();
+    await admin.login('admin@example.test');
+    await brand.login('luna@example.test');
     const p = await admin.get<ProductDetail>(`/api/products/product-serum?context=${A}`);
-    const p2id = (await ids(await admin.mutate('/api/products', { contextId: A, brandId: p.context.data.brandId, common: { ...blankCommon(), name: '미선택 상품', code: 'C11-'+randomUUID() }, fields: blankContext(), idempotencyKey: randomUUID() }), 201))[0];
+    const p2id = (await ids(await admin.mutate('/api/products', { contextId: A, brandId: p.context.data.brandId, common: { ...blankCommon(), name: '미선택 상품', code: 'C11-' + randomUUID() }, fields: blankContext(), idempotencyKey: randomUUID() }), 201))[0];
     const p2 = await admin.get<ProductDetail>(`/api/products/${p2id}?context=${A}`);
     const content = { ...blankContent(), title: 'G11 G12 actual completion', description: 'actual selected request', deadline: { ...blankContent().deadline, responsibleUserId: 'user-gsg' }, requirements: [{ ...blankRequirement('proof', 'file'), label: '사진' }, { ...blankRequirement('url', 'link'), label: 'URL' }, { ...blankRequirement('other', 'number'), label: '다른 메뉴' }] };
     const taskId = (await ids(await admin.mutate('/api/tasks', { category: 'spot', content, targets: [{ contextId: A, ownerId: 'user-gsg', assigneeId: 'user-luna', coAssigneeIds: ['user-co'], productIds: [p.productId, p2id] }], idempotencyKey: randomUUID() }), 201))[0];
@@ -169,35 +179,69 @@ try {
     const stale = await completion(taskId), taskBefore = (await admin.get<TaskDetail>(`/api/tasks/${taskId}`)).task;
     const physical = { campaignVersionId: versionId, menu: draft.menus[0].identity, physicalKey: 'shoot' }, provenance = { performedBy: person, occurredAt: null, evidence: [], note: 'PRIVATE_PHYSICAL_NOTE' };
     await command(brand, campaignId, 'physical', { ...physical, fact: { ...provenance, kind: 'tracking', carrier: '택배', trackingNumber: '0001', trackingUrl: null } });
-    const staleReply = await admin.mutate('/api/completion', stale); w = await workspace(taskId); m = residual(w).campaigns[0].menus[0];
+    const staleReply = await admin.mutate('/api/completion', stale);
+    w = await workspace(taskId);
+    m = residual(w).campaigns[0].menus[0];
     check('C04 actual tracking stales basis409 while task revision unchanged and no completion written', staleReply.status === 409 && (await staleReply.json()).error.code === 'BASIS_CHANGED' && w.taskRevision === taskBefore.revision && w.history.length === 0, ['AC-11-02', 'AC-11-05']);
     check('C05 tracking alone dispatch0 receipt0, separate quantities1/100', m.physical[0].dispatchFacts === 0 && m.physical.every(x => x.receiptFacts === 0 && x.receipt === 'unconfirmed' && x.fulfillment === 'not_inferred') && m.physical.map(x => x.requestedQuantity).join(',') === '1,100', ['C11-G12-03']);
     const dispatch = (await command(brand, campaignId, 'physical', { ...physical, fact: { ...provenance, kind: 'dispatch', quantity: '1', unit: '개', carrier: '', trackingNumber: '0001' } }))[1];
-    m = residual(await workspace(taskId)).campaigns[0].menus[0]; check('C06 explicit dispatch still no receipt', m.physical[0].dispatchFacts === 1 && m.physical[0].receiptFacts === 0, ['C11-G12-03']);
+    m = residual(await workspace(taskId)).campaigns[0].menus[0];
+    check('C06 explicit dispatch still no receipt', m.physical[0].dispatchFacts === 1 && m.physical[0].receiptFacts === 0, ['C11-G12-03']);
     await command(admin, campaignId, 'external', { campaignVersionId: versionId, menu: draft.menus[0].identity, fact: { axis: 'application', value: 'applied', requester: person, performedBy: person, occurredAt: null, source: source(), note: 'PRIVATE_EXTERNAL_NOTE' } });
     await command(brand, campaignId, 'participate', { campaignVersionId: versionId, response: 'decline', selectedMenus: [], providedBy: person, note: '' });
-    w = await workspace(taskId); r = residual(w); m = r.campaigns[0].menus[0]; const declined = await brand.get<SubmissionWorkspace>(`/api/tasks/${taskId}/submissions`);
+    w = await workspace(taskId);
+    r = residual(w);
+    m = r.campaigns[0].menus[0];
+    const declined = await brand.get<SubmissionWorkspace>(`/api/tasks/${taskId}/submissions`);
     check('C07 actual applied decline canonical noMaterials and missing0; retained cancellation keys', declined.request.content.requirements.length === 0 && r.requestSource!.noMaterials && r.requestSource!.materialProductIds.length === 0 && r.requestSource!.retainedRequirementKeys.join(',') === 'proof,url' && !!r.requestSource!.retainedCancellationMenuKeys.length && w.preview!.basis.currentEvaluation.state === 'available' && w.preview!.basis.currentEvaluation.value.missing === 0, ['C11-G12-02']);
     check('C08 inactive aggregate0 separate cancellationhold/unconfirmedphysical/pendingfollowup', !m.active && m.retainedForCancellationReview && m.state.application === 'applied' && m.state.response === 'decline' && m.state.cancellation === 'discussion' && m.missingRequired === 0 && m.missingFollowup === 0 && m.missingReceiptObservation === 0 && !m.reminderEligible && m.physical.every(x => x.receipt === 'unconfirmed') && m.followups.every(x => x.status === 'pending'), ['C11-G12-02']);
-    const cmd = await completion(taskId); check('C09 brand cannot manually complete', (await brand.mutate('/api/completion', cmd)).status === 403, ['AC-11-02']);
+    const cmd = await completion(taskId);
+    check('C09 brand cannot manually complete', (await brand.mutate('/api/completion', cmd)).status === 403, ['AC-11-02']);
     const completed = (await ids(await admin.mutate('/api/completion', cmd)))[0], original = await brand.get<CompletionSnapshot>(`/api/completion/${completed}`);
     check('C10 noMemo actual complete with hold/unreceived, same intent one immutable snapshot', original.memo === '' && (await workspace(taskId)).taskStatus === 'completed' && (await ids(await admin.mutate('/api/completion', cmd)))[0] === completed && (await workspace(taskId)).history.length === 1, ['AC-11-01', 'AC-11-05']);
     check('C11 brand completion body excludes original price/private notes/basisHash', !JSON.stringify(original).includes('PRIVATE_') && !JSON.stringify(original).includes('12345') && !('basisHash' in original), ['A19', 'C11-G12-06']);
     await command(brand, campaignId, 'physical', { ...physical, fact: { ...provenance, kind: 'receipt', quantity: '0', unit: '개', dispatchFactIds: [dispatch] } });
     check('C12 later explicit receipt does not rewrite old completion', hash(await brand.get(`/api/completion/${completed}`)) === hash(original) && (await workspace(taskId)).taskStatus === 'completed', ['AC-11-04']);
-    const reopen = await workspace(taskId); await ids(await admin.mutate('/api/completion', { command: 'reopen', taskId, completionId: completed, expectedTaskRevision: reopen.taskRevision, reason: '후속 실물 관찰', idempotencyKey: randomUUID() }));
+    const reopen = await workspace(taskId);
+    await ids(await admin.mutate('/api/completion', { command: 'reopen', taskId, completionId: completed, expectedTaskRevision: reopen.taskRevision, reason: '후속 실물 관찰', idempotencyKey: randomUUID() }));
     await command(brand, campaignId, 'participate', { campaignVersionId: versionId, response: 'participate', selectedMenus: [draft.menus[0].identity], providedBy: person, note: '' });
-    m = residual(await workspace(taskId)).campaigns[0].menus[0]; check('C13 quantity0 explicit receipt only removes one observation; no inferred fulfillment', m.active && m.missingReceiptObservation === 1 && m.physical[0].receipt === 'explicit_receipt_recorded' && m.physical[0].fulfillment === 'not_inferred' && m.physical[1].receiptFacts === 0, ['C11-G12-04']);
-    const second = (await ids(await admin.mutate('/api/completion', await completion(taskId))))[0]; check('C14 reasoned reopen second snapshot keeps first exact residual', second !== completed && (await workspace(taskId)).history.length === 2 && hash(await brand.get(`/api/completion/${completed}`)) === hash(original), ['AC-11-04']);
+    m = residual(await workspace(taskId)).campaigns[0].menus[0];
+    check('C13 quantity0 explicit receipt only removes one observation; no inferred fulfillment', m.active && m.missingReceiptObservation === 1 && m.physical[0].receipt === 'explicit_receipt_recorded' && m.physical[0].fulfillment === 'not_inferred' && m.physical[1].receiptFacts === 0, ['C11-G12-04']);
+    const second = (await ids(await admin.mutate('/api/completion', await completion(taskId))))[0];
+    check('C14 reasoned reopen second snapshot keeps first exact residual', second !== completed && (await workspace(taskId)).history.length === 2 && hash(await brand.get(`/api/completion/${completed}`)) === hash(original), ['AC-11-04']);
     const beforeRestart = await workspace(taskId, brand);
-    if (mode === 'sqlite') { await stop(port); await start(); await brand.login('luna@example.test'); await admin.login('admin@example.test'); check('C15 new PID real relogin exact campaign completion history', processes[0].pid !== processes.at(-1)!.pid && hash(await workspace(taskId, brand)) === hash(beforeRestart), ['D10'], 'PROCESS'); } else skipped.push('C15');
-    const members = await admin.get<{ members: { id: string; revision: number; data: { userId: string } }[] }>(`/api/contexts/${A}/members`), member = members.members.find(x => x.data.userId === 'user-luna')!;
+    if (mode === 'sqlite') {
+        await stop(port);
+        await start();
+        await brand.login('luna@example.test');
+        await admin.login('admin@example.test');
+        check('C15 new PID real relogin exact campaign completion history', processes[0].pid !== processes.at(-1)!.pid && hash(await workspace(taskId, brand)) === hash(beforeRestart), ['D10'], 'PROCESS');
+    }
+    else
+        skipped.push('C15');
+    const members = await admin.get<{
+        members: {
+            id: string;
+            revision: number;
+            data: {
+                userId: string;
+            };
+        }[];
+    }>(`/api/contexts/${A}/members`), member = members.members.find(x => x.data.userId === 'user-luna')!;
     assert.equal((await admin.mutate(`/api/contexts/${A}/members/${member.id}`, { expectedRevision: member.revision, status: 'suspended' }, 'PATCH')).status, 200);
     check('C16 actual current revoke denies exact old completion and campaign source', (await brand.send(`/api/completion/${completed}`)).status === 404 && (await brand.send(`/api/campaigns/${campaignId}`)).status === 404, ['A19']);
-    const frozen = await admin.get<CompletionSnapshot>(`/api/completion/${completed}`); check('C17 source revocation never rewrites old safe residual', hash(frozen.basis.campaign) === hash(original.basis.campaign), ['AC-11-04']); reachedEnd = true;
-} catch (error) { failure = error instanceof Error ? error.stack : 'unknown failure'; process.exitCode = 1; }
+    const frozen = await admin.get<CompletionSnapshot>(`/api/completion/${completed}`);
+    check('C17 source revocation never rewrites old safe residual', hash(frozen.basis.campaign) === hash(original.basis.campaign), ['AC-11-04']);
+    reachedEnd = true;
+}
+catch (error) {
+    failure = error instanceof Error ? error.stack : 'unknown failure';
+    process.exitCode = 1;
+}
 finally {
-    for (const p of [...children.keys()]) await stop(p);
+    for (const p of [...children.keys()])
+        await stop(p);
     const report = { candidate_commit: candidate, implementer_session_id: '01a0c307-9b54-7b83-b5eb-1b12b9a8553c', runner_sha256: hash(readFileSync('scripts/verify-completion-campaign-http.ts', 'utf8')), status: failure ? 'FAIL' : 'PASS', mode, cwd: process.cwd(), startedAt, finishedAt: new Date().toISOString(), failure, count_unit: 'assertion', pass: checks.filter(c => c.status === 'PASS').length, fail: checks.filter(c => c.status === 'FAIL').length + (failure && !checks.some(c => c.status === 'FAIL') ? 1 : 0), skip: skipped.length, skipped, reachedEnd, not_run: reachedEnd ? [] : 'Remaining checks after first failure', checks, transcript, processes, resources: { port, auxPort, database, files }, scope: 'Actual native Next HTTP G04/G06/G07/G12/G11 producer boundary; no mock response/DB fixture. UI/independent NOT_RUN.' };
-    writeFileSync(reportFile, JSON.stringify(report, null, 2), { mode: 0o600 }); console.log(JSON.stringify({ status: report.status, pass: report.pass, fail: report.fail, reportFile }));
+    writeFileSync(reportFile, JSON.stringify(report, null, 2), { mode: 0o600 });
+    console.log(JSON.stringify({ status: report.status, pass: report.pass, fail: report.fail, reportFile }));
 }

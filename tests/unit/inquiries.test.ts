@@ -16,18 +16,18 @@ const A = 'ctx-jp-a-luna', brand = tokenFor('user-team'), peer = tokenFor('user-
 const content = (body = '질문 원문', fileVersionIds: string[] = []) => ({ clientMessageId: randomUUID(), body, fileVersionIds });
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=', 'base64');
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} G09 actual service`, async () => {
+    describe(`${mode} G09 actual service`, () => {
         let repo: RecordRepository, identity: IdentityService, service: InquiryService, files: InquiryFiles, download: FileService, dir: string;
         async function setup() { repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); identity = await policyFixture(repo); service = new InquiryService(identity); dir = await mkdtemp(path.join(os.tmpdir(), 'gs-inquiry-')); files = new InquiryFiles(identity, dir); download = new FileService(identity, dir); }
-        const list = async (actor = brand) => (await service.list(actor, new URLSearchParams({ context: A })));
-        const draft = async () => (await service.createDraft(brand, { contextId: A, taskId: null, idempotencyKey: randomUUID() }));
+        const list = async (actor = brand) => service.list(actor, new URLSearchParams({ context: A }));
+        const draft = async () => service.createDraft(brand, { contextId: A, taskId: null, idempotencyKey: randomUUID() });
         async function active() { const d = await draft(); await service.command(brand, d.conversationId, { command: 'publish_first', expectedRevision: d.revision, title: '독립 질문', content: content(), idempotencyKey: randomUUID() }); return d.conversationId; }
         async function publicDetail(id: string, actor = brand) { const d = await service.detail(actor, id); if (d.phase !== 'active')
             throw Error('active expected'); return d; }
         async function upload(id: string, actor = brand, visibility: 'public' | 'internal' = 'public', clientItemId = randomUUID()) { const result = await files.upload(actor, id, [{ clientItemId, name: 'proof.png', type: 'image/png', bytes: png }], visibility); const item = result.items[0]; if (item.state !== 'ready')
             throw Error(JSON.stringify(item)); return item.file; }
         const business = () => Promise.all((['conversation', 'inquiryQuestion', 'inquiryMessage', 'inquiryTransition', 'inquiryRead', 'inquiryEvent', 'commandReceipt', 'audit', 'domainEvent'] as RecordKind[]).map(k => repo.list(k)));
-        afterEach(async () => { repo?.close(); if (dir)
+        afterEach(async () => { (await repo?.close()); if (dir)
             await rm(dir, { recursive: true, force: true }); });
         it('AC09-02 draft is initiator-only even admin; first attachment-only publishes selected exact bytes once', async () => {
             await setup();
@@ -36,10 +36,10 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect((await list()).total).toBe(0);
             expect((await list(gsg)).counts.questions).toBe(0);
             for (const t of [peer, gsg, admin, tokenFor('user-wave')])
-                await expect((await service.detail(t, a.conversationId))).rejects.toMatchObject({ status: 404 });
-            await expect((await service.createDraft(gsg, input))).rejects.toMatchObject({ status: 403 });
+                await expect(service.detail(t, a.conversationId)).rejects.toMatchObject({ status: 404 });
+            await expect(service.createDraft(gsg, input)).rejects.toMatchObject({ status: 403 });
             const f = await upload(a.conversationId), unused = await upload(a.conversationId);
-            await expect((await download.download(gsg, f.id, { kind: 'inquiry', conversationId: a.conversationId }, 'download'))).rejects.toMatchObject({ status: 404 });
+            await expect(download.download(gsg, f.id, { kind: 'inquiry', conversationId: a.conversationId }, 'download')).rejects.toMatchObject({ status: 404 });
             expect(await repo.list('inquiryMessage')).toHaveLength(0);
             expect(await repo.list('inquiryEvent')).toHaveLength(0);
             const send = { command: 'publish_first', title: '파일만 질문', expectedRevision: a.revision, content: content('', [f.id]), idempotencyKey: randomUUID() }, out = await service.command(brand, a.conversationId, send);
@@ -47,9 +47,9 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(await service.command(brand, a.conversationId, { ...send, idempotencyKey: randomUUID() })).toEqual(out);
             expect((await publicDetail(a.conversationId, gsg)).messages[0].files.map(x => x.id)).toEqual([f.id]);
             expect((await download.download(gsg, f.id, { kind: 'inquiry', conversationId: a.conversationId, messageId: out.messageId! }, 'original')).bytes).toEqual(png);
-            await expect((await download.download(gsg, unused.id, { kind: 'inquiry', conversationId: a.conversationId, messageId: out.messageId! }, 'original'))).rejects.toMatchObject({ status: 404 });
-            await expect((await download.download(peer, f.id, { kind: 'inquiry', conversationId: a.conversationId, messageId: out.messageId! }, 'original'))).rejects.toMatchObject({ status: 404 });
-            await expect((await service.command(brand, a.conversationId, { ...send, content: { ...send.content, body: '다른 내용' } }))).rejects.toMatchObject({ status: 409 });
+            await expect(download.download(gsg, unused.id, { kind: 'inquiry', conversationId: a.conversationId, messageId: out.messageId! }, 'original')).rejects.toMatchObject({ status: 404 });
+            await expect(download.download(peer, f.id, { kind: 'inquiry', conversationId: a.conversationId, messageId: out.messageId! }, 'original')).rejects.toMatchObject({ status: 404 });
+            await expect(service.command(brand, a.conversationId, { ...send, content: { ...send.content, body: '다른 내용' } })).rejects.toMatchObject({ status: 409 });
             expect(await repo.list('inquiryQuestion')).toHaveLength(1);
             expect(await repo.list('inquiryMessage')).toHaveLength(1);
         });
@@ -98,23 +98,23 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(p.events.map(e => e.type)).toEqual(['message', 'message']);
             expect(JSON.stringify(p)).not.toContain('INTERNAL_CURSOR_MARKER');
             expect((await service.events(brand, id, new URLSearchParams({ after: p.cursor }))).events).toEqual([]);
-            await expect((await service.events(gsg, id, new URLSearchParams({ after: p.cursor })))).rejects.toMatchObject({ status: 409 });
+            await expect(service.events(gsg, id, new URLSearchParams({ after: p.cursor }))).rejects.toMatchObject({ status: 409 });
             const other = await active();
-            await expect((await service.events(brand, other, new URLSearchParams({ after: p.cursor })))).rejects.toMatchObject({ status: 409 });
-            await expect((await service.events(brand, id, new URLSearchParams({ after: 'bad' })))).rejects.toMatchObject({ status: 422 });
+            await expect(service.events(brand, other, new URLSearchParams({ after: p.cursor }))).rejects.toMatchObject({ status: 409 });
+            await expect(service.events(brand, id, new URLSearchParams({ after: 'bad' }))).rejects.toMatchObject({ status: 422 });
         });
         it('A19 current scope and exact original AND message reference apply to internal files and replay', async () => {
             await setup();
             const id = await active(), internal = await upload(id, gsg, 'internal');
             const out = await service.command(gsg, id, { command: 'internal_note', questionId: null, content: content('', [internal.id]), idempotencyKey: randomUUID() });
-            await expect((await download.download(brand, internal.id, { kind: 'inquiry', conversationId: id, messageId: out.messageId! }, 'original'))).rejects.toMatchObject({ status: 404 });
+            await expect(download.download(brand, internal.id, { kind: 'inquiry', conversationId: id, messageId: out.messageId! }, 'original')).rejects.toMatchObject({ status: 404 });
             expect(JSON.stringify(await publicDetail(id))).not.toContain(internal.id);
-            await expect((await service.command(gsg, id, { command: 'message', kind: 'comment', questionId: null, content: content('', [internal.id]), idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 422 });
+            await expect(service.command(gsg, id, { command: 'message', kind: 'comment', questionId: null, content: content('', [internal.id]), idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 422 });
             const b = content('original'), command = { command: 'message', kind: 'comment', questionId: null, content: b, idempotencyKey: randomUUID() };
             await service.command(brand, id, command);
             await repo.transaction(async (s) => { const m = (await s.list('membership', A)).find(x => x.data.userId === 'user-team')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
-            await expect((await service.command(brand, id, command))).rejects.toMatchObject({ status: 404 });
-            await expect((await service.detail(brand, id))).rejects.toMatchObject({ status: 404 });
+            await expect(service.command(brand, id, command)).rejects.toMatchObject({ status: 404 });
+            await expect(service.detail(brand, id)).rejects.toMatchObject({ status: 404 });
             expect((await publicDetail(id, gsg)).messages.some(m => m.body === 'original')).toBe(true);
         });
         it('A20 upload per-item mixed retry, changed payload conflict, late rollback and after-IO revoke preserve only committed bytes', async () => {
@@ -132,22 +132,22 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(await repo.list('fileVersion')).toEqual(rows);
             expect(await readdir(dir)).toEqual(names);
             const revoke = new InquiryFiles(identity, dir, undefined, async () => { await repo.transaction(async (s) => { const m = (await s.list('membership', A)).find(x => x.data.userId === 'user-team')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); }); });
-            await expect((await revoke.upload(brand, id, [{ ...item, clientItemId: randomUUID() }]))).rejects.toMatchObject({ status: 404 });
+            await expect(revoke.upload(brand, id, [{ ...item, clientItemId: randomUUID() }])).rejects.toMatchObject({ status: 404 });
             expect(await readdir(dir)).toEqual(names);
             expect(createHash('sha256').update(await readFile(path.join(dir, names[0]))).digest('hex')).toBe(createHash('sha256').update(png).digest('hex'));
         });
         it('A20 first-send/CAS and duplicate client IDs are atomic with late-fault rollback', async () => {
             await setup();
             const d = await draft(), id = d.conversationId, b = { command: 'publish_first', title: '첫 질문', expectedRevision: d.revision, content: content(), idempotencyKey: randomUUID() }, before = await business();
-            await expect((await new InquiryService(identity, () => { throw Error('late command'); }).command(brand, id, b))).rejects.toThrow('late command');
+            await expect(new InquiryService(identity, () => { throw Error('late command'); }).command(brand, id, b)).rejects.toThrow('late command');
             expect(await business()).toEqual(before);
-            const race = await Promise.allSettled([(await service.command(brand, id, b)), (await service.command(brand, id, { ...b, content: content('다른 첫 질문'), idempotencyKey: randomUUID() }))]);
+            const race = await Promise.allSettled([service.command(brand, id, b), service.command(brand, id, { ...b, content: content('다른 첫 질문'), idempotencyKey: randomUUID() })]);
             expect(race.filter(r => r.status === 'fulfilled')).toHaveLength(1);
             expect(await repo.list('inquiryMessage')).toHaveLength(1);
-            const send = { command: 'message', kind: 'comment', questionId: null, content: content('두 탭'), idempotencyKey: randomUUID() }, both = await Promise.all([(await service.command(brand, id, send)), (await service.command(brand, id, { ...send, idempotencyKey: randomUUID() }))]);
+            const send = { command: 'message', kind: 'comment', questionId: null, content: content('두 탭'), idempotencyKey: randomUUID() }, both = await Promise.all([service.command(brand, id, send), service.command(brand, id, { ...send, idempotencyKey: randomUUID() })]);
             expect(both[0]).toEqual(both[1]);
             expect(await repo.list('inquiryMessage')).toHaveLength(2);
-            await expect((await service.command(brand, id, { ...send, content: { ...send.content, body: '변경' }, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
+            await expect(service.command(brand, id, { ...send, content: { ...send.content, body: '변경' }, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
         });
         it('AC09-04 link preserves messages/files and task/submission progress; read duplicate creates one fact', async () => {
             await setup();

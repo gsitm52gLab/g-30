@@ -88,7 +88,7 @@ export class CampaignService {
                 if (!def)
                     unavailable();
                 (await provider(s, p, x.contextId, x.fact.performedBy, p.user.data.role === 'brand' && x.fact.performedBy.kind === 'user'));
-                (await asyncForEach(x.fact.evidence, async (r) => (await exactReference(s, p, r, this.clock))));
+                (await asyncForEach(x.fact.evidence, async (r) => { await exactReference(s, p, r, this.clock); }));
                 if (x.fact.kind !== 'tracking' && x.fact.unit !== def.unit)
                     fail('VALIDATION', 422, '실물 요청과 같은 단위를 사용해 주세요.');
                 if (x.fact.kind === 'receipt')

@@ -129,7 +129,7 @@ async function fixture<T>(input: CompletionFixtureInput): Promise<T> {
             return await completionFixture(repo, input) as T;
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     const child = children.get(port)!;
@@ -257,7 +257,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     check('G11-H01 anonymous and invalid CSRF denied', (await new Client().send('/api/completion?taskId=task-onboarding')).status === 401 && (await admin.send('/api/completion', 'POST', {})).status === 403, ['A19']);

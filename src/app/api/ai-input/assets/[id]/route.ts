@@ -6,4 +6,4 @@ export async function GET(request: Request, c: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(request, async (i, t) => { const r = await new AiAssets(i).download(t, (await c.params).id); return binary(r.bytes, r.metadata.filename, r.metadata.mime); })); }
+}) { return route(request, async (i, t) => { const r = await new AiAssets(i).download(t, (await c.params).id); return binary(r.bytes, r.metadata.filename, r.metadata.mime); }); }

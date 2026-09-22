@@ -5,4 +5,4 @@ export async function POST(request: Request, c: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(request, async (i, t) => json(await new AiInputService(i).revise(t, (await c.params).id, await readBody(request, ['expectedRevision', 'content', 'idempotencyKey'], 100000))))); }
+}) { return route(request, async (i, t) => json(await new AiInputService(i).revise(t, (await c.params).id, await readBody(request, ['expectedRevision', 'content', 'idempotencyKey'], 100000)))); }

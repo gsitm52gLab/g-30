@@ -7,4 +7,4 @@ export const metadata: Metadata = { title: "상품정보" };
 export const dynamic = "force-dynamic";
 export default async function Page({ searchParams }: {
     searchParams: Search;
-}) { const result = await (await listPage(searchParams)).catch(workspaceFailure); return result ? <ProductListScreen {...result}/> : <StorageFailure />; }
+}) { const result = await listPage(searchParams).catch(workspaceFailure); return result ? <ProductListScreen {...result}/> : <StorageFailure />; }

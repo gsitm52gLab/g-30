@@ -45,8 +45,8 @@ export async function projectedBindings(s: UnitOfWork, p: Principal, r: Resolved
 export async function visibleContexts(s: UnitOfWork, p: Principal, r: ResolvedProduct, clock: Clock) {
     return (await asyncMap((await visibleProductRelations(s, p, clock)).filter(cp => cp.data.productId === r.product.id), async (cp) => projectContext((await s.get("context", cp.contextId!))!)));
 }
-export function priceView(s: UnitOfWork, p: Principal, r: ResolvedProduct, kind: "retailPrice", clock: Clock): Awaited<ReturnType<typeof publicPrice>>;
-export function priceView(s: UnitOfWork, p: Principal, r: ResolvedProduct, kind: "internalPrice", clock: Clock): Awaited<ReturnType<typeof privatePrice>>;
+export function priceView(s: UnitOfWork, p: Principal, r: ResolvedProduct, kind: "retailPrice", clock: Clock): ReturnType<typeof publicPrice>;
+export function priceView(s: UnitOfWork, p: Principal, r: ResolvedProduct, kind: "internalPrice", clock: Clock): ReturnType<typeof privatePrice>;
 export async function priceView(s: UnitOfWork, p: Principal, r: ResolvedProduct, kind: "retailPrice" | "internalPrice", clock: Clock) {
     void clock;
     return kind === "retailPrice" ? (await publicPrice(s, p, r)) : (await privatePrice(s, p, r));

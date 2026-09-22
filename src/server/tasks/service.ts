@@ -1,3 +1,4 @@
+import { jsonContentEqual } from '@/domain/json-content';
 import { asyncFilter, asyncFlatMap, asyncMap } from "@/domain/async-collections";
 import { campaignRequestSource } from './campaign-request';
 import { resolveProduct, visibleProductRelations } from "@/server/products/access";
@@ -208,7 +209,7 @@ export class TaskService {
         if (!c.description.trim() || !c.requirements.length)
             fail("VALIDATION", 422, "공개 설명과 요청 항목을 작성해 주세요.");
         const previous = row.data.currentRequestId ? (await s.get("requestVersion", row.data.currentRequestId)) : null;
-        const version = (await s.create("requestVersion", { id: id(), contextId: row.contextId, data: { taskId: row.id, sequence: (previous?.data.sequence ?? 0) + 1, previousId: previous?.id ?? null, templateVersionId, content: c, publishedBy: p.user.id, publishedAt: this.clock(), changedKeys: c.requirements.filter(q => !previous?.data.content.requirements.some(old => JSON.stringify(old) === JSON.stringify(q))).map(q => q.key) } }));
+        const version = (await s.create("requestVersion", { id: id(), contextId: row.contextId, data: { taskId: row.id, sequence: (previous?.data.sequence ?? 0) + 1, previousId: previous?.id ?? null, templateVersionId, content: c, publishedBy: p.user.id, publishedAt: this.clock(), changedKeys: c.requirements.filter(q => !previous?.data.content.requirements.some(old => jsonContentEqual(old, q))).map(q => q.key) } }));
         (await s.update("task", row.id, row.revision, { ...row.data, visibility: "public", status: row.data.status === "draft" || row.data.submissionProgress && ["partial", "submitted", "in_progress"].includes(row.data.status) ? "requested" : row.data.status, resumeStatus: row.data.submissionProgress && ["on_hold", "cancelled"].includes(row.data.status) ? "requested" : row.data.resumeStatus, title: c.title, description: c.description, deadline: c.deadline.value, nextAction: c.nextAction, currentRequestId: version.id, draft: preservedDraft ?? c, templateVersionId }));
         (await this.audit(s, p, row.contextId, "task.published", row.id, { requestVersionId: previous?.id ?? null }, { requestVersionId: version.id, sequence: version.data.sequence }));
         (await this.event(s, p, row.contextId, previous ? "TASK_REQUEST_REVISED" : "TASK_PUBLISHED", row.id, version.id));
@@ -294,7 +295,7 @@ export class TaskService {
                         const published = (await s.get("requestVersion", row.data.currentRequestId))!;
                         if (request.data.requestId !== published.id)
                             fail("CONFLICT", 409, "조정 요청 이후 공개 내용이 변경됐습니다. 최신 요청에서 일정을 다시 협의해 주세요.");
-                        resultingRequestId = decision === "apply" ? (await this.publish(s, p, row, { ...published.data.content, deadline: request.data.proposedDeadline! }, row.data.templateVersionId, JSON.stringify(row.data.draft) === JSON.stringify(published.data.content) ? undefined : row.data.draft)).id : published.id;
+                        resultingRequestId = decision === "apply" ? (await this.publish(s, p, row, { ...published.data.content, deadline: request.data.proposedDeadline! }, row.data.templateVersionId, jsonContentEqual(row.data.draft, published.data.content) ? undefined : row.data.draft)).id : published.id;
                     }
                     const sequence = 1 + Math.max(0, ...(await s.list("taskActivity", row.contextId!)).filter(a => a.data.taskId === row.id).map(a => a.data.sequence ?? 0));
                     const activity = (await s.create("taskActivity", { id: id(), contextId: row.contextId, data: { taskId: row.id, requestId: row.data.currentRequestId, userId: p.user.id, kind: cmd === "schedule_decide" ? "schedule_resolved" : cmd as "read" | "accept" | "schedule", at: this.clock(), sequence, reason, proposedDeadline: proposed, respondsTo: cmd === "schedule_decide" ? str(input.activityId, 160, true) : null, decision, resultingRequestId } }));
@@ -359,7 +360,7 @@ export class TaskService {
                         unavailable();
                     this.fresh(row, t.expectedRevision);
                     const previous = row.data.currentRequestId ? (await s.get("requestVersion", row.data.currentRequestId)) : null;
-                    return { id: row.id, title: row.data.title, currentVersionId: previous?.id ?? null, addedKeys: stringList(template.data.content.requirements.filter(q => !previous?.data.content.requirements.some(o => o.key === q.key)).map(q => q.key)), changedKeys: stringList(template.data.content.requirements.filter(q => previous?.data.content.requirements.some(o => o.key === q.key && JSON.stringify(o) !== JSON.stringify(q))).map(q => q.key)) };
+                    return { id: row.id, title: row.data.title, currentVersionId: previous?.id ?? null, addedKeys: stringList(template.data.content.requirements.filter(q => !previous?.data.content.requirements.some(o => o.key === q.key)).map(q => q.key)), changedKeys: stringList(template.data.content.requirements.filter(q => previous?.data.content.requirements.some(o => o.key === q.key && !jsonContentEqual(o, q))).map(q => q.key)) };
                 })) };
         });
     }

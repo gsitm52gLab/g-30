@@ -22,12 +22,12 @@ import { blankEvidenceMetadata } from '@/domain/evidence/types';
 const A = 'ctx-jp-a-luna', brand = tokenFor('user-luna'), admin = tokenFor('user-admin');
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=', 'base64');
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} G07 immutable evidence`, async () => {
+    describe(`${mode} G07 immutable evidence`, () => {
         let repo: RecordRepository, identity: IdentityService, service: EvidenceService, products: ProductService, dir: string;
         async function setup() { repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); identity = await policyFixture(repo); service = new EvidenceService(identity); products = new ProductService(identity); dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-g07-evidence-')); }
         async function source() { const pid = 'product-serum', file = (await new FileService(identity, dir).upload(brand, { kind: 'product', productId: pid, contextId: A }, [{ name: 'invoice.png', type: 'image/png', bytes: png }], 'public')).files[0]; const p = await products.detail(brand, pid, A), binding = blankFileBinding(randomUUID(), file.id); await products.command(brand, pid, { command: 'save_files', contextId: A, expectedContextRevision: p.contextRevision, files: [binding], idempotencyKey: randomUUID() }); const d = await products.detail(brand, pid, A); return { kind: 'product_binding' as const, productId: pid, contextProductId: d.contextProductId, contextVersionId: d.contextVersionId, bindingId: binding.id, fileVersionId: file.id }; }
         afterEach(async () => {
-            repo?.close();
+            (await repo?.close());
             if (dir)
                 await rm(dir, { recursive: true, force: true });
         });
@@ -106,14 +106,14 @@ for (const mode of ['mock', 'sqlite'] as const)
         it('fresh scope/current file authorization, assessment role, CAS, and late rollback enforced', async () => {
             await setup();
             const src = await source(), input = { contextId: A, source: src, metadata: { ...blankEvidenceMetadata(), title: '서명 질문지', documentType: 'signed_questionnaire' }, productIds: ['product-serum'], idempotencyKey: randomUUID() };
-            await expect((await new EvidenceService(identity, () => { throw new Error('fault'); }).register(brand, input))).rejects.toThrow('fault');
+            await expect(new EvidenceService(identity, () => { throw new Error('fault'); }).register(brand, input)).rejects.toThrow('fault');
             expect(await repo.list('evidence')).toHaveLength(0);
             const result = await service.register(brand, input), d = await service.detail(brand, result.ids[0]), link = d.current.links[0];
-            await expect((await service.command(brand, d.id, { command: 'assess', linkId: link.id, expectedLinkRevision: link.revision, status: 'application_confirmed', reason: '확인', idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 403 });
-            await expect((await service.command(admin, d.id, { command: 'unlink', linkId: link.id, expectedLinkRevision: 999, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
-            await expect((await service.detail(tokenFor('user-wave'), d.id))).rejects.toMatchObject({ status: 404 });
+            await expect(service.command(brand, d.id, { command: 'assess', linkId: link.id, expectedLinkRevision: link.revision, status: 'application_confirmed', reason: '확인', idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 403 });
+            await expect(service.command(admin, d.id, { command: 'unlink', linkId: link.id, expectedLinkRevision: 999, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+            await expect(service.detail(tokenFor('user-wave'), d.id)).rejects.toMatchObject({ status: 404 });
             await repo.transaction(async (s) => { const m = (await s.list('membership', A)).find(m => m.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
-            await expect((await service.register(brand, input))).rejects.toMatchObject({ status: 404 });
-            await expect((await service.download(brand, d.id, d.current.id, link.id, 'download', dir))).rejects.toMatchObject({ status: 404 });
+            await expect(service.register(brand, input)).rejects.toMatchObject({ status: 404 });
+            await expect(service.download(brand, d.id, d.current.id, link.id, 'download', dir)).rejects.toMatchObject({ status: 404 });
         });
     });

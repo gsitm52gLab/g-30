@@ -56,7 +56,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
             expect(preview.canApply).toBe(true);
             const command = { previewId: preview.id, idempotencyKey: randomUUID() }, result = await imports.apply(brand, command);
             expect((await evidence.detail(brand, eid)).versions).toHaveLength(2);
-            return { replay: async () => (await imports.apply(brand, command)), result };
+            return { replay: async () => imports.apply(brand, command), result };
         };
         const produceG08 = async () => {
             const content = { ...blankNotice(), title: '원 공지', body: '보존할 과거 본문', fileIds: [file.id] };
@@ -67,9 +67,9 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
             const command = { command: 'publish', expectedRevision: (await repo!.get('notice', id))!.revision, idempotencyKey: randomUUID() }, result = await notices.command(admin, id, command);
             expect((await notices.detail(brand, id)).versions).toHaveLength(2);
             expect((await notices.detail(brand, id, v1)).selected!.ownReadAt).toBe(NOW);
-            return { replay: async () => (await notices.command(admin, id, command)), result };
+            return { replay: async () => notices.command(admin, id, command), result };
         };
-        const original = await (firstModule === 6 ? (await produceG07()) : (await produceG08()));
+        const original = await (firstModule === 6 ? produceG07() : produceG08());
         const rows = () => db.prepare('SELECT * FROM records ORDER BY kind,id').all();
         const before = rows(), oldMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all();
         const fileHash = hash((await files.download(brand, file.id, reference, 'original')).bytes);
@@ -90,7 +90,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
         expect(await original.replay()).toEqual(original.result);
         expect(rows()).toEqual(before);
         expect(hash((await files.download(brand, file.id, reference, 'original')).bytes)).toBe(fileHash);
-        await (firstModule === 6 ? (await produceG08()) : (await produceG07()));
+        await (firstModule === 6 ? produceG08() : produceG07());
         for (const kind of ['evidenceVersion', 'evidenceAssessment', 'importBatch', 'noticeVersion', 'noticeRead']) {
             const row = db.prepare('SELECT id FROM records WHERE kind=? LIMIT 1').get(kind) as {
                 id: string;
@@ -102,7 +102,7 @@ it.each([6, 7])('populated chain through module 000%i gains missing sibling and 
     }
     finally {
         if (repo)
-            repo.close();
+            (await repo.close());
         else
             db.close();
         await rm(directory, { recursive: true, force: true });

@@ -23,7 +23,7 @@ it('G08 migration adds constraints to populated accepted G05 DB without changing
     }
     finally {
         if (repo)
-            repo.close();
+            (await repo.close());
         else
             db.close();
         rmSync(directory, { recursive: true, force: true });

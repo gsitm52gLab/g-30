@@ -6,5 +6,5 @@ export async function GET(request: Request, c: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(request, async (s, t) => { if (new URL(request.url).search)
-    fail('VALIDATION', 422, '정확한 공개 묶음 주소를 확인해 주세요.'); return json(await new CorrectionService(s).detail(t, (await c.params).id)); })); }
+}) { return route(request, async (s, t) => { if (new URL(request.url).search)
+    fail('VALIDATION', 422, '정확한 공개 묶음 주소를 확인해 주세요.'); return json(await new CorrectionService(s).detail(t, (await c.params).id)); }); }

@@ -45,7 +45,7 @@ function counts(cells: MaterialCell[]): MaterialCounts {
 export async function materialTable(s: UnitOfWork, p: Principal, contextId: string, clock: Clock, history = false) {
     (await authorize(s, p, 'evidence.read', evidenceScope(contextId), clock));
     const products = (await asyncMap((await visibleProductRelations(s, p, clock, contextId)), async (cp) => (await resolveProduct(s, p, contextId, cp.data.productId, clock))));
-    const tasks = (await asyncFilter((await s.list('task', contextId)), async (t) => t.data.visibility === 'public' && t.data.currentRequestId && (await decide(s, p, 'task.read', taskScope(t), clock)).allowed && (history ? ['completed', 'cancelled'].includes(t.data.status) : !['completed', 'cancelled'].includes(t.data.status))));
+    const tasks = (await asyncFilter((await s.list('task', contextId)), async (t) => t.data.visibility === 'public' && !!t.data.currentRequestId && (await decide(s, p, 'task.read', taskScope(t), clock)).allowed && (history ? ['completed', 'cancelled'].includes(t.data.status) : !['completed', 'cancelled'].includes(t.data.status))));
     const columns = (await asyncFlatMap(tasks, async (task) => {
         const request = (await s.get('requestVersion', task.data.currentRequestId!));
         if (!request || request.data.taskId !== task.id)

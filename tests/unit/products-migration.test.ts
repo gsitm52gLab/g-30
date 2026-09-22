@@ -7,9 +7,9 @@ import { migrate, openDatabase } from "@/server/db/database";
 import type { RecordRepository, ProductData } from "@/domain/records";
 const clock = () => "2026-09-21T00:00:00.000Z", ctx = "ctx-jp-a-luna", marker = "RAW_LEGACY_VALUE_MUST_NOT_LOG";
 for (const mode of ["mock", "sqlite"] as const)
-    describe(`${mode} bounded legacy migration diagnostic`, async () => {
+    describe(`${mode} bounded legacy migration diagnostic`, () => {
         let repo: RecordRepository;
-        afterEach(() => repo?.close());
+        afterEach(async () => (await repo?.close()));
         async function setup() {
             if (mode === "mock")
                 repo = createMockRepository(clock);

@@ -73,7 +73,7 @@ if (mode === "sqlite") {
     await seed(repo);
     if (projectionEnabled)
         await prepareProjectionFixture(repo);
-    repo.close();
+    (await repo.close());
 }
 let server: ChildProcess | undefined;
 const processes: {
@@ -121,7 +121,7 @@ async function storedProjectionSnapshot() {
             return await projectionSnapshot(repo);
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     return new Promise<{
@@ -227,7 +227,7 @@ try {
     if (mode === "sqlite") {
         const fixtureRepo = createSqliteRepository(openDatabase(filename));
         await fixtureRepo.transaction(async (s) => (await s.create("priorSubmission", { id: "g04-prior-http-fixture", contextId: ctx, data: { taskId, requestId: v1, authorId: "user-luna", answers: [{ requirementKey: "q-short_text", productId: null, value: "합성 이전 답변", fileVersionIds: [] }] } })));
-        fixtureRepo.close();
+        (await fixtureRepo.close());
         const next = { ...c, requirements: [...c.requirements, { ...blankRequirement("added-file", "file"), label: "개정 추가 필수 파일" }] };
         await command(admin, taskId, "save", { content: next });
         await command(admin, taskId, "publish");
@@ -252,13 +252,13 @@ try {
         const events = await inspect.list("domainEvent", ctx);
         check("CR03 durable acceptance event exists once", events.filter(e => e.data.targetId === taskId && e.data.eventType === "TASK_ACCEPTED").length === 1, ["AC-04-05", "CR03"]);
         check("change notice event persisted", events.some(e => e.data.targetId === taskId && e.data.eventType === "TASK_REQUEST_REVISED"), ["AC-04-04", "D07"]);
-        inspect.close();
+        (await inspect.close());
     }
     if (mode === "sqlite") {
         async function legacy(status: "on_hold" | "cancelled" | "requested") {
             const fixture = createSqliteRepository(openDatabase(filename));
             await fixture.transaction(async (s) => { const row = (await s.get("task", taskId))!; const data = { ...row.data, status }; delete data.resumeStatus; (await s.update("task", taskId, row.revision, data)); });
-            fixture.close();
+            (await fixture.close());
         }
         await legacy("cancelled");
         await command(admin, taskId, "resume", { reason: "V02 legacy latest not accepted" });
@@ -275,7 +275,7 @@ try {
         const inspect = createSqliteRepository(openDatabase(filename));
         const events = await inspect.list("domainEvent", ctx);
         check("V02 no duplicate acceptance event per request after repair", events.filter(e => e.data.targetId === taskId && e.data.eventType === "TASK_ACCEPTED").length === 2, ["G04-V02", "A20"]);
-        inspect.close();
+        (await inspect.close());
     }
     const catalog = await admin.json<TaskCatalog>(`/api/tasks?context=${ctx}`);
     check("seven basic templates present", catalog.templates.filter(t => t.builtin).length === 7, ["SA-47"]);

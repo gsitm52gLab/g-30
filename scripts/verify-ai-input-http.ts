@@ -112,7 +112,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     await brand.login('luna@example.test');
@@ -226,7 +226,7 @@ try {
         assert(oldRun);
         await fixtureRepo.transaction(async (s) => { const row = (await s.get('aiRun', crashRun.id))!; (await s.update('aiRun', row.id, row.revision, { ...row.data, leaseUntil: new Date(Date.now() - 1000).toISOString() })); });
         const expired = await fixtureRepo.get('aiRun', crashRun.id);
-        fixtureRepo.close();
+        (await fixtureRepo.close());
         writeFileSync(`${report}.crash-lease-expiry-fixture.json`, JSON.stringify({ meaning: 'Actual OS process SIGKILL after durable claim; elapsed lease represented by isolated DB fixture, not 90s wall time wait', oldRun, expired }, null, 2));
         const interrupted = await detail(crashD.id), recovered = await extract(crashD, brand, { ...crashBody, expectedRunId: crashRun.id, idempotencyKey: randomUUID() });
         check('H25 actual crash durable claim explicit expired-lease retry', interrupted.runs[0].state === 'interrupted' && recovered.detail.runs[0].attempt === 2 && recovered.detail.runs[0].state === 'finished' && recovered.detail.runs.find(r => r.id === crashRun.id)?.issue === 'INTERRUPTED', ['AC-15-03'], 'PROCESS_AND_EXPIRED_LEASE_DB_FIXTURE');

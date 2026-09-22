@@ -10,4 +10,4 @@ export default async function Page({ params, searchParams }: {
     }>;
     searchParams: Search;
 }) { const { id } = await params, query = await searchParams; if (typeof query.context !== 'string' || !query.context)
-    notFound(); const data = await (await detailPage(id, query.context)).catch(workspaceFailure); return data ? <ProductDetailScreen key={`${id}:${query.context}`} initial={data}/> : <StorageFailure />; }
+    notFound(); const data = await detailPage(id, query.context).catch(workspaceFailure); return data ? <ProductDetailScreen key={`${id}:${query.context}`} initial={data}/> : <StorageFailure />; }

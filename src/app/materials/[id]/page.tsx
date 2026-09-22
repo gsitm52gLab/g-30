@@ -10,5 +10,5 @@ export default async function Page({ params, searchParams }: {
     }>;
     searchParams: Search;
 }) { const { id } = await params, q = await searchParams; if (typeof q.context !== 'string' || !q.context)
-    notFound(); const workspace = await (await readWorkspace(q.context)).catch(workspaceFailure); if (!workspace)
-    return <StorageFailure />; const data = await (await evidenceDetail(id, q.context)).catch(workspaceFailure); return <><ContextBar workspace={workspace}/>{data ? <EvidenceDetailScreen key={`${id}:${q.context}`} {...data}/> : <StorageFailure />}</>; }
+    notFound(); const workspace = await readWorkspace(q.context).catch(workspaceFailure); if (!workspace)
+    return <StorageFailure />; const data = await evidenceDetail(id, q.context).catch(workspaceFailure); return <><ContextBar workspace={workspace}/>{data ? <EvidenceDetailScreen key={`${id}:${q.context}`} {...data}/> : <StorageFailure />}</>; }

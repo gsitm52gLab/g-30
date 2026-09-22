@@ -31,7 +31,7 @@ const usageFixture = { input_tokens: 11, input_tokens_details: { cached_tokens: 
 const malformedOutputs = [{ kind: 'output-object', output: {} }, { kind: 'content-object', output: [{ type: 'message', role: 'assistant', content: {} }] }];
 function envelope(output: unknown, usage: unknown = usageFixture) { return { object: 'response', id: 'resp_real_envelope', model: 'gpt-6-astra', service_tier: 'default', status: 'completed', output, usage, unknownPrivate: 'PRIVATE_PROVIDER_BODY_NOT_TO_STORE' }; }
 function response(body: unknown) { return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json', 'x-request-id': 'req_real_envelope' } }); }
-describe('G17-V01 actual response discriminator and durable safe projection', async () => {
+describe('G17-V01 actual response discriminator and durable safe projection', () => {
     for (const f of malformedOutputs)
         it(`G17-V01 ${f.kind} received parseable response retains safe metadata`, async () => { let calls = 0; vi.stubGlobal('fetch', async () => { calls++; return response(envelope(f.output)); }); const r = await openaiTransport(config, request, async () => { }, async () => { }); expect(r).toMatchObject({ issue: 'PARSE_ERROR', responseId: 'resp_real_envelope', requestId: 'req_real_envelope', responseModel: 'gpt-6-astra', serviceTier: 'default', providerStatus: 'completed', remoteOutcomeUnknown: false, rawCandidate: null, usage: { inputTokens: 11, cachedTokens: 0, cacheWriteTokens: 2, outputTokens: 7, reasoningTokens: 3, totalTokens: 18 } }); expect(r.responseHash).toMatch(/^[a-f0-9]{64}$/); expect(JSON.stringify(r)).not.toContain('PRIVATE_PROVIDER_BODY_NOT_TO_STORE'); expect(calls).toBe(1); });
     for (const mode of ['mock', 'sqlite'] as const)
@@ -53,7 +53,7 @@ describe('G17-V01 actual response discriminator and durable safe projection', as
                 expect(calls).toBe(1);
             }
             finally {
-                repo.close();
+                (await repo.close());
                 await rm(directory, { recursive: true, force: true });
             } });
     it('G17-V01 received lexical invalid JSON is PARSE_ERROR with no invented usage, not unreceived timeout', async () => { vi.stubGlobal('fetch', async () => new Response('{not-json', { headers: { 'content-type': 'application/json', 'x-request-id': 'req_lexical' } })); const r = await openaiTransport(config, request, async () => { }, async () => { }); expect(r).toMatchObject({ issue: 'PARSE_ERROR', remoteOutcomeUnknown: false, responseId: null, responseModel: null, usage: { inputTokens: null } }); expect(r.rawCandidate).toBeNull(); });

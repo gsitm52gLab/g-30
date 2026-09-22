@@ -133,7 +133,7 @@ async function fixture<T>(input: CampaignFixtureInput): Promise<T> {
             return await campaignFixture(repo, input) as T;
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     const child = children.get(port)!;
@@ -258,7 +258,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     check('G12-H01 anonymous and duplicate-scope query denied', (await new Client().send(`/api/campaigns?context=${A}`)).status === 401, ['A19']);

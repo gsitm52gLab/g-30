@@ -5,7 +5,7 @@ import { fail } from "@/server/auth/errors";
 import { MAX_FILE_BYTES, MAX_BATCH_FILES } from "@/domain/files/validate";
 export const runtime = "nodejs";
 export async function POST(request: Request) {
-    return (await route(request, async (identity, token) => {
+    return route(request, async (identity, token) => {
         const reference = fileReference(new URL(request.url).searchParams);
         await new FileService(identity).checkUpload(token, reference);
         const mime = request.headers.get("content-type");
@@ -47,5 +47,5 @@ export async function POST(request: Request) {
             fail("VALIDATION", 422, "공개 범위를 선택해 주세요.");
         const files = await Promise.all((selected as File[]).map(async (f) => ({ name: f.name, type: f.type, bytes: Buffer.from(await f.arrayBuffer()) })));
         return json(await new FileService(identity).upload(token, reference, files, visibility), 201);
-    }));
+    });
 }

@@ -4,4 +4,4 @@ export async function GET(request: Request, context: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(request, async (identity, token) => json(await new SubmissionService(identity).snapshot(token, (await context.params).id)))); }
+}) { return route(request, async (identity, token) => json(await new SubmissionService(identity).snapshot(token, (await context.params).id))); }

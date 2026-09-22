@@ -22,7 +22,7 @@ const A = "ctx-jp-a-luna", B = "ctx-jp-b-luna", admin = tokenFor("user-admin"), 
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS0cAAAAASUVORK5CYII=", "base64");
 const uploadFile = { name: "synthetic.png", type: "image/png", bytes: png };
 for (const mode of ["mock", "sqlite"] as const)
-    describe(`${mode} G06 product contracts`, async () => {
+    describe(`${mode} G06 product contracts`, () => {
         let repo: RecordRepository, identity: IdentityService, products: ProductService;
         const directories: string[] = [];
         function repository() {
@@ -37,10 +37,10 @@ for (const mode of ["mock", "sqlite"] as const)
         }
         async function setup() { repository(); identity = await policyFixture(repo); products = new ProductService(identity); }
         async function create(code: string = randomUUID(), contextId = A, token = brand, common = { ...blankCommon(), name: "합성 상품", code }) { return (await products.create(token, { contextId, brandId: "brand-luna", common, idempotencyKey: randomUUID() })).ids[0]; }
-        const detail = async (pid: string, contextId = A, token = brand) => (await products.detail(token, pid, contextId));
-        async function command(pid: string, command: string, extra: Record<string, unknown>, contextId = A, token = brand) { return (await products.command(token, pid, { contextId, command, idempotencyKey: randomUUID(), ...extra })); }
+        const detail = async (pid: string, contextId = A, token = brand) => products.detail(token, pid, contextId);
+        async function command(pid: string, command: string, extra: Record<string, unknown>, contextId = A, token = brand) { return products.command(token, pid, { contextId, command, idempotencyKey: randomUUID(), ...extra }); }
         async function upload(pid: string, token = brand, visibility: "public" | "internal" = "public") { const dir = await mkdtemp(path.join(os.tmpdir(), "gs-hale-g06-")); directories.push(dir); const fs = new FileService(identity, dir); return { fs, dir, file: (await fs.upload(token, { kind: "product", contextId: A, productId: pid }, [uploadFile], visibility)).files[0] }; }
-        afterEach(async () => { repo?.close(); await Promise.all(directories.splice(0).map(d => rm(d, { recursive: true, force: true }))); });
+        afterEach(async () => { (await repo?.close()); await Promise.all(directories.splice(0).map(d => rm(d, { recursive: true, force: true }))); });
         it("SA24 legacy migration preserves arbitrary edited IDs, unknown fields and original links; fault rolls back both adapters", async () => {
             repository();
             await repo.transaction(async (s) => {
@@ -82,8 +82,8 @@ for (const mode of ["mock", "sqlite"] as const)
             expect(after.common).toEqual({ ...full, capacity: { ...full.capacity, amount: "30.5" } });
             expect(after.local).toEqual(fields);
             expect(after.commonHistory).toHaveLength(2);
-            await expect((await products.create(brand, { contextId: A, brandId: "brand-luna", common: { name: "중복", code: " 001-ab-c " }, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
-            await expect((await command(d.productId, "save_common", { common: { ...after.common, brandId: "forged" }, expectedCommonRevision: after.commonRevision }))).rejects.toMatchObject({ status: 422 });
+            await expect(products.create(brand, { contextId: A, brandId: "brand-luna", common: { name: "중복", code: " 001-ab-c " }, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+            await expect(command(d.productId, "save_common", { common: { ...after.common, brandId: "forged" }, expectedCommonRevision: after.commonRevision })).rejects.toMatchObject({ status: 422 });
         });
         it("AC06-02 common edits through one allowed relation leave other context data/private prices isolated and impact never enumerates hidden context", async () => {
             await setup();
@@ -104,9 +104,9 @@ for (const mode of ["mock", "sqlite"] as const)
             await command(pid, "save_common", { common: next, expectedCommonRevision: teamDetail.commonRevision }, A, team);
             expect((await detail(pid, B)).common.name).toBe(next.name);
             expect((await detail(pid, B)).local.sku).toBe("B-001");
-            await expect((await detail(pid, B, team))).rejects.toMatchObject({ status: 404 });
-            await expect((await command(pid, "link_context", { targetContextId: "ctx-jp-a-wave", expectedCommonRevision: (await detail(pid)).commonRevision }, A, admin))).rejects.toMatchObject({ status: 404 });
-            await expect((await command(pid, "link_context", { targetContextId: B, expectedCommonRevision: (await detail(pid)).commonRevision }))).rejects.toMatchObject({ code: "CONFLICT" });
+            await expect(detail(pid, B, team)).rejects.toMatchObject({ status: 404 });
+            await expect(command(pid, "link_context", { targetContextId: "ctx-jp-a-wave", expectedCommonRevision: (await detail(pid)).commonRevision }, A, admin)).rejects.toMatchObject({ status: 404 });
+            await expect(command(pid, "link_context", { targetContextId: B, expectedCommonRevision: (await detail(pid)).commonRevision })).rejects.toMatchObject({ code: "CONFLICT" });
         });
         it("AC06-04 independent retail/private revisions preserve zero/high decimal prices; current grants govern all private histories", async () => {
             await setup();
@@ -122,7 +122,7 @@ for (const mode of ["mock", "sqlite"] as const)
             const granted = await detail(pid, A, price);
             expect(granted.internal!.current!.fields.supplyRate).toBe("0.4");
             expect(granted.retail.current!.fields.amount).toBe("0");
-            await expect((await command(pid, "save_internal", { price: blankInternalPrice(), expectedPriceRevision: granted.internal!.revision }, A, gsg))).rejects.toMatchObject({ status: 404 });
+            await expect(command(pid, "save_internal", { price: blankInternalPrice(), expectedPriceRevision: granted.internal!.revision }, A, gsg)).rejects.toMatchObject({ status: 404 });
             await repo.transaction(async (s) => { const m = (await s.list("membership", A)).find(x => x.data.userId === "user-price")!; (await s.update("membership", m.id, m.revision, { ...m.data, internalPriceAccess: false })); });
             expect(await detail(pid, A, price)).not.toHaveProperty("internal");
         });
@@ -131,13 +131,13 @@ for (const mode of ["mock", "sqlite"] as const)
             const pid = await create(), d = await detail(pid), input = { contextId: A, command: "save_common", common: { ...d.common, name: "한 번 저장" }, expectedCommonRevision: d.commonRevision, idempotencyKey: randomUUID() };
             expect(await products.command(brand, pid, input)).toEqual(await products.command(brand, pid, input));
             expect((await detail(pid)).commonHistory).toHaveLength(2);
-            await expect((await products.command(brand, pid, { ...input, common: { ...d.common, name: "다른 재시도" } }))).rejects.toMatchObject({ status: 409 });
-            await expect((await products.command(brand, pid, { ...input, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
-            const duplicate = await Promise.allSettled([(await create("RACE-001")), (await create("race-001"))]);
+            await expect(products.command(brand, pid, { ...input, common: { ...d.common, name: "다른 재시도" } })).rejects.toMatchObject({ status: 409 });
+            await expect(products.command(brand, pid, { ...input, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+            const duplicate = await Promise.allSettled([create("RACE-001"), create("race-001")]);
             expect(duplicate.filter(x => x.status === "fulfilled")).toHaveLength(1);
             const old = await detail(pid);
             const counts = await Promise.all([repo.list("productVersion"), repo.list("audit"), repo.list("domainEvent"), repo.list("commandReceipt")]);
-            await expect((await new ProductService(identity, () => { throw new Error("product fault"); }).command(brand, pid, { ...input, common: { ...old.common, name: "원복" }, expectedCommonRevision: old.commonRevision, idempotencyKey: randomUUID() }))).rejects.toThrow("product fault");
+            await expect(new ProductService(identity, () => { throw new Error("product fault"); }).command(brand, pid, { ...input, common: { ...old.common, name: "원복" }, expectedCommonRevision: old.commonRevision, idempotencyKey: randomUUID() })).rejects.toThrow("product fault");
             expect(await detail(pid)).toEqual(old);
             expect(await Promise.all([repo.list("productVersion"), repo.list("audit"), repo.list("domainEvent"), repo.list("commandReceipt")])).toEqual(counts);
         });
@@ -147,7 +147,7 @@ for (const mode of ["mock", "sqlite"] as const)
             await command(pid, "link_context", { targetContextId: B, expectedCommonRevision: (await detail(pid)).commonRevision });
             await create("HIDDEN-CODE", B);
             const d = await detail(pid, A, team);
-            const failure = await (await command(pid, "save_common", { common: { ...d.common, code: "hidden-code" }, expectedCommonRevision: d.commonRevision }, A, team)).catch(e => e);
+            const failure = await command(pid, "save_common", { common: { ...d.common, code: "hidden-code" }, expectedCommonRevision: d.commonRevision }, A, team).catch(e => e);
             expect(failure.status).toBe(409);
             expect(failure.message).not.toContain(B);
             expect(failure.message).not.toContain("HIDDEN-CODE");
@@ -163,7 +163,7 @@ for (const mode of ["mock", "sqlite"] as const)
             await command(pid, "link_context", { targetContextId: B, expectedCommonRevision: d.commonRevision });
             expect((await detail(pid, B)).files).toEqual([]);
             expect((await detail(pid, B)).image).toBeNull();
-            await expect((await u.fs.download(brand, u.file.id, { kind: "product", contextId: B, productId: pid }, "download"))).rejects.toMatchObject({ status: 404 });
+            await expect(u.fs.download(brand, u.file.id, { kind: "product", contextId: B, productId: pid }, "download")).rejects.toMatchObject({ status: 404 });
             const privateFile = await upload(pid, admin, "internal");
             await command(pid, "save_files", { files: [binding, blankFileBinding("hidden", privateFile.file.id)], expectedContextRevision: (await detail(pid)).contextRevision }, A, admin);
             const publicD = await detail(pid);
@@ -173,7 +173,7 @@ for (const mode of ["mock", "sqlite"] as const)
             expect((await detail(pid, A, admin)).files.map(f => f.id)).toEqual(["hidden", "doc-one"]);
             await command(pid, "save_context", { fields: { ...(await detail(pid)).local, sku: "SAME-CONTEXT" }, expectedContextRevision: (await detail(pid)).contextRevision });
             await repo.transaction(async (s) => { const m = (await s.list("membership", A)).find(m => m.data.userId === "user-luna")!; (await s.update("membership", m.id, m.revision, { ...m.data, status: "suspended" })); });
-            await expect((await u.fs.download(brand, u.file.id, { kind: "product", contextId: A, productId: pid }, "download"))).rejects.toMatchObject({ status: 404 });
+            await expect(u.fs.download(brand, u.file.id, { kind: "product", contextId: A, productId: pid }, "download")).rejects.toMatchObject({ status: 404 });
         });
         it("AC06-05 file uploader/time use immutable source for product and legacy task files, safe current labels and unchanged history", async () => {
             await setup();
@@ -214,7 +214,7 @@ for (const mode of ["mock", "sqlite"] as const)
             for (const key of ["uploaderId", "email", "user", "membership", "storageKey"])
                 expect(Object.hasOwn(d.files[0].file, key)).toBe(false);
             expect(await repo.list("fileVersion")).toEqual(raw);
-            await expect((await detail(pid, A, team))).rejects.toMatchObject({ status: 404 });
+            await expect(detail(pid, A, team)).rejects.toMatchObject({ status: 404 });
         });
         it("D09 initial prior-use fixture keeps exact old common/context/price/file hashes after current update; future price requires explicit date", async () => {
             await setup();
@@ -247,7 +247,7 @@ for (const mode of ["mock", "sqlite"] as const)
             expect((await tasks.detail(brand, tid)).task.data.productIds).toEqual([pid]);
             expect((await u.fs.download(brand, u.file.id, tid, "original")).bytes).toEqual(png);
             const second = await create();
-            await expect((await command(second, "link_task", { taskId: tid, expectedTaskRevision: (await repo.get("task", tid))!.revision }))).rejects.toMatchObject({ status: 403 });
+            await expect(command(second, "link_task", { taskId: tid, expectedTaskRevision: (await repo.get("task", tid))!.revision })).rejects.toMatchObject({ status: 403 });
             await command(second, "link_task", { taskId: tid, expectedTaskRevision: (await repo.get("task", tid))!.revision }, A, admin);
             expect((await repo.get("task", tid))!.data.productIds).toEqual([pid, second]);
             expect((await tasks.catalog(brand, A)).products.map(p => p.id)).toContain("product-serum");
@@ -263,7 +263,7 @@ for (const mode of ["mock", "sqlite"] as const)
             const pid = await create();
             const dir = await mkdtemp(path.join(os.tmpdir(), "gs-hale-g06-fault-"));
             directories.push(dir);
-            await expect((await new FileService(identity, dir, () => { throw new Error("file fault"); }).upload(brand, { kind: "product", contextId: A, productId: pid }, [uploadFile], "public"))).rejects.toThrow("file fault");
+            await expect(new FileService(identity, dir, () => { throw new Error("file fault"); }).upload(brand, { kind: "product", contextId: A, productId: pid }, [uploadFile], "public")).rejects.toThrow("file fault");
             expect(await readdir(dir)).toEqual([]);
             expect(await repo.list("fileVersion")).toHaveLength(0);
             await repo.transaction(async (s) => { const p = (await s.get("product", pid))!, old = (await s.get("productVersion", p.data.currentVersionId!))!; const v = (await s.create("productVersion", { id: randomUUID(), contextId: null, data: { ...old.data, sequence: old.data.sequence + 1, previousId: old.id, common: { ...old.data.common, unknown: "G06_CANARY", capacity: { ...old.data.common.capacity, secret: "G06_CANARY" }, localNames: [{ language: "ko", name: "공개", secret: "G06_CANARY" }] } as unknown as typeof old.data.common } })); (await s.update("product", p.id, p.revision, { ...p.data, currentVersionId: v.id })); });
@@ -272,6 +272,6 @@ for (const mode of ["mock", "sqlite"] as const)
                 expect(JSON.stringify(await products.list(actor))).not.toContain("G06_CANARY");
             }
             expect((await products.list(brand, { q: "G06_CANARY" })).total).toBe(0);
-            await expect((await detail(pid, A, foreign))).rejects.toMatchObject({ status: 404 });
+            await expect(detail(pid, A, foreign)).rejects.toMatchObject({ status: 404 });
         });
     });

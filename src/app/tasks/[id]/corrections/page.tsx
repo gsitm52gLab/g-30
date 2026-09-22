@@ -11,7 +11,7 @@ export default async function CorrectionsPage({ params }: {
     }>;
 }) {
     const { id } = await params;
-    const initial = await (await new CorrectionService(await identity()).workspace(await currentToken(), id)).catch(e => {
+    const initial = await new CorrectionService(await identity()).workspace(await currentToken(), id).catch(e => {
         if (e instanceof AuthError) {
             if (e.status === 401)
                 redirect('/login');

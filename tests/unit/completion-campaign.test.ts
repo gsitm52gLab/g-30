@@ -19,14 +19,14 @@ import { admin, brand, contextId } from '../fixtures/completion';
 import { completionCampaign, campaignMarker } from '../fixtures/completion-campaign';
 const kinds: RecordKind[] = ['completionSnapshot', 'task', 'audit', 'domainEvent', 'commandReceipt'];
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} completion consumes actual G12`, async () => {
+    describe(`${mode} completion consumes actual G12`, () => {
         let repo: RecordRepository, identity: IdentityService, service: CompletionService, fixture: Awaited<ReturnType<typeof completionCampaign>>, dir: string;
         async function setup(general = false) { repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); identity = await policyFixture(repo); service = new CompletionService(identity); fixture = await completionCampaign(identity, general); dir = await mkdtemp(path.join(os.tmpdir(), 'completion-campaign-')); }
         async function input() { const w = await service.workspace(admin, fixture.taskId); return { command: 'complete', taskId: fixture.taskId, expectedTaskRevision: w.taskRevision, expectedBasisHash: w.preview!.basisHash, memo: '', idempotencyKey: randomUUID() }; }
         async function basis() { const b = (await service.workspace(admin, fixture.taskId)).preview!.basis; if (b.campaign.state !== 'available')
             throw Error('campaign unavailable'); return { b, c: b.campaign.value, menu: b.campaign.value.campaigns[0].menus[0] }; }
         const writes = () => Promise.all(kinds.map(k => repo.list(k)));
-        afterEach(async () => { repo?.close(); if (dir)
+        afterEach(async () => { (await repo?.close()); if (dir)
             await rm(dir, { recursive: true, force: true }); });
         it('C11-G12-01 selected P1 only: canonical two requirements, unselected P2 evidence0; same-UoW read is pure', async () => {
             await setup();
@@ -80,7 +80,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(menu.physical[0]).toMatchObject({ dispatchFacts: 0, receiptFacts: 0, receipt: 'unconfirmed', fulfillment: 'not_inferred' });
             expect(await repo.get('task', fixture.taskId)).toEqual(task);
             const rows = await writes();
-            await expect((await service.command(admin, prior))).rejects.toMatchObject({ status: 409, code: 'BASIS_CHANGED' });
+            await expect(service.command(admin, prior)).rejects.toMatchObject({ status: 409, code: 'BASIS_CHANGED' });
             expect(await writes()).toEqual(rows);
             const dispatch = (await fixture.physical('dispatch')).ids[1];
             menu = (await basis()).menu;
@@ -91,9 +91,9 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(menu.physical[1]).toMatchObject({ dispatchFacts: 0, receiptFacts: 0, requestedQuantity: '100' });
             expect(menu.missingReceiptObservation).toBe(1);
             const cmd = await input(), before = await writes();
-            await expect((await new CompletionService(identity, () => { throw Error('late campaign completion'); }).command(admin, cmd))).rejects.toThrow('late campaign completion');
+            await expect(new CompletionService(identity, () => { throw Error('late campaign completion'); }).command(admin, cmd)).rejects.toThrow('late campaign completion');
             expect(await writes()).toEqual(before);
-            const result = await Promise.all([(await service.command(admin, cmd)), (await service.command(admin, cmd))]);
+            const result = await Promise.all([service.command(admin, cmd), service.command(admin, cmd)]);
             expect(result[0]).toEqual(result[1]);
             expect(await repo.list('completionSnapshot')).toHaveLength(1);
         });
@@ -126,7 +126,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect((await service.snapshot(brand, legacyId)).basis.campaign).toEqual(legacy.basis.campaign);
             expect(await repo.get('completionSnapshot', legacyId)).toEqual(stored);
             await repo.transaction(async (s) => { const m = (await s.list('membership', contextId)).find(m => m.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
-            await expect((await service.snapshot(brand, id))).rejects.toMatchObject({ status: 404 });
+            await expect(service.snapshot(brand, id)).rejects.toMatchObject({ status: 404 });
             expect(await repo.get('completionSnapshot', id)).toEqual(original);
         });
         it('Known nested corruption is safe503; unknown extensions excluded without rewriting captured history; inaccessible source is unavailable notzero', async () => {
@@ -143,7 +143,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             bad.sequence = 3;
             (bad.basis.campaign.value.campaigns[0].menus[0] as unknown as Record<string, unknown>).missingRequired = { secret: campaignMarker };
             await repo.transaction(async (s) => (await s.create('completionSnapshot', { id: badId, contextId, data: bad as CompletionRecords['completionSnapshot'] })));
-            await expect((await service.snapshot(brand, badId))).rejects.toMatchObject({ status: 503 });
+            await expect(service.snapshot(brand, badId)).rejects.toMatchObject({ status: 503 });
             expect((await repo.get('completionSnapshot', badId))!.data).toEqual(bad);
             // Simulate a denied exact version at the repository read boundary; never rewrite immutable producers.
             await repo.transaction(async (s) => { const deny = { ...s, get: (async (kind: RecordKind, key: string) => kind === 'campaignVersion' && key === fixture.versionId ? null : (await s.get(kind, key))) as typeof s.get }; const p = (await identity.principal(s, admin)); expect((await snapshotDTO(deny, p, original, () => NOW)).basis.campaign).toEqual({ connected: true, state: 'unavailable', value: null, reason: 'source_unavailable' }); expect((await collectBasis(deny, p, (await s.get('task', fixture.taskId))!, () => NOW)).basis.campaign).toEqual({ connected: true, state: 'unavailable', value: null, reason: 'source_unavailable' }); });

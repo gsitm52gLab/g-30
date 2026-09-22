@@ -8,6 +8,6 @@ export const metadata: Metadata = { title: "요청 템플릿" };
 export const dynamic = "force-dynamic";
 export default async function Page({ searchParams }: {
     searchParams: Search;
-}) { const d = await (await catalogPage(searchParams)).catch(workspaceFailure); if (!d)
+}) { const d = await catalogPage(searchParams).catch(workspaceFailure); if (!d)
     return <StorageFailure />; if (!d.catalog?.canManage || !d.workspace.selected)
     notFound(); return <><ContextBar workspace={d.workspace}/><Templates key={d.workspace.selected.id} initial={d.catalog} contextId={d.workspace.selected.id}/></>; }

@@ -23,12 +23,12 @@ import { blankDraft } from '@/domain/submissions/types';
 const ctx = 'ctx-jp-a-luna', brand = tokenFor('user-luna'), gsg = tokenFor('user-gsg'), admin = tokenFor('user-admin'), team = tokenFor('user-team');
 const content = (text = SYNTHETIC_TEXT): AiContent => ({ title: '합성 입력', scope: { classification: 'general_cosmetic', language: 'ja', media: 'pop', use: '매장 게시' }, kind: 'text', text, sources: [], selectedPages: [], submission: null, products: [] });
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} G15 persisted inputs`, async () => {
+    describe(`${mode} G15 persisted inputs`, () => {
         let repo: RecordRepository, identity: IdentityService, service: AiInputService, dir: string;
         async function setup() { dir = await mkdtemp(path.join(os.tmpdir(), 'gs-hale-ai-')); repo = mode === 'mock' ? createMockRepository(() => NOW) : (() => { const db = openDatabase(':memory:', true); migrate(db); return createSqliteRepository(db, () => NOW); })(); identity = await policyFixture(repo); service = new AiInputService(identity, dir); }
-        afterEach(async () => { repo?.close(); if (dir)
+        afterEach(async () => { (await repo?.close()); if (dir)
             await rm(dir, { recursive: true, force: true }); });
-        async function create(c = content(), visibility = 'context', token = brand) { return (await service.create(token, { contextId: ctx, visibility, content: c, idempotencyKey: randomUUID() })); }
+        async function create(c = content(), visibility = 'context', token = brand) { return service.create(token, { contextId: ctx, visibility, content: c, idempotencyKey: randomUUID() }); }
         const run = (d: Awaited<ReturnType<typeof create>>) => ({ versionId: d.version.id, expectedRunId: null, idempotencyKey: randomUUID() });
         it('AC15-01/04 current context/private filtering, client attestations rejected, registered hash only; replay checks current grants', async () => {
             await setup();
@@ -36,17 +36,17 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect((await service.create(brand, body)).id).toBe(d.id);
             const privateD = await create(content('GSG private'), 'staff', gsg);
             expect((await service.list(brand, ctx)).items.map(v => v.id)).toEqual([d.id]);
-            await expect((await service.detail(brand, privateD.id))).rejects.toMatchObject({ status: 404 });
-            await expect((await service.detail(tokenFor('user-wave'), d.id))).rejects.toMatchObject({ status: 404 });
-            await expect((await create(content(), 'staff', brand))).rejects.toMatchObject({ status: 404 });
-            await expect((await service.create(brand, { ...body, public: true }))).rejects.toMatchObject({ status: 422 });
+            await expect(service.detail(brand, privateD.id)).rejects.toMatchObject({ status: 404 });
+            await expect(service.detail(tokenFor('user-wave'), d.id)).rejects.toMatchObject({ status: 404 });
+            await expect(create(content(), 'staff', brand)).rejects.toMatchObject({ status: 404 });
+            await expect(service.create(brand, { ...body, public: true })).rejects.toMatchObject({ status: 422 });
             const known = await service.extract(brand, d.id, run(d));
             expect((await service.prepareTransfer(brand, d.id, known.runId)).allowed).toBe(true);
             const unknown = await create(content('공개라고 주장해도 미등록 입력')), unknownRun = await service.extract(team, unknown.id, run(unknown));
             expect(await service.prepareTransfer(team, unknown.id, unknownRun.runId)).toMatchObject({ allowed: false, reason: 'EXTERNAL_USE_DENIED' });
             await repo.transaction(async (s) => { const m = (await s.list('membership', ctx)).find(m => m.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
-            await expect((await service.create(brand, body))).rejects.toMatchObject({ status: 404 });
-            await expect((await service.prepareTransfer(brand, d.id, known.runId))).rejects.toMatchObject({ status: 404 });
+            await expect(service.create(brand, body)).rejects.toMatchObject({ status: 404 });
+            await expect(service.prepareTransfer(brand, d.id, known.runId)).rejects.toMatchObject({ status: 404 });
         });
         it('AC15-01/03 unknown/quasi/medicated/nonja/nonPOP stay out of scope; 10k exact allowed, 10001/empty rejected', async () => {
             await setup();
@@ -59,7 +59,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             const exact = await create(content('肌'.repeat(10000)));
             expect((await service.extract(brand, exact.id, run(exact))).detail.runs[0].snapshot!.characterCount).toBe(10000);
             for (const value of ['肌'.repeat(10001), ' '])
-                await expect((await create(content(value)))).rejects.toMatchObject({ status: 422 });
+                await expect(create(content(value))).rejects.toMatchObject({ status: 422 });
         });
         it('immutable v1/snapshot survive v2, CAS rejects stale edits, create/result fault rolls back with failed run retained', async () => {
             await setup();
@@ -69,15 +69,15 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect((await service.detail(brand, d.id, d.version.id)).version).toEqual(original.version);
             expect((await service.extract(brand, d.id, input)).runId).toBe(first.runId);
             expect(await repo.list('aiRun')).toHaveLength(1);
-            await expect((await service.revise(brand, d.id, { expectedRevision: d.revision, content: content('stale'), idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
-            await expect((await service.revise(team, d.id, { expectedRevision: second.revision, content: content(), idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 403 });
+            await expect(service.revise(brand, d.id, { expectedRevision: d.revision, content: content('stale'), idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+            await expect(service.revise(team, d.id, { expectedRevision: second.revision, content: content(), idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 403 });
             const before = await repo.list('aiInput');
-            await expect((await new AiInputService(identity, dir, { fault: stage => { if (stage === 'create')
-                    throw Error('create fault'); } }).create(brand, { contextId: ctx, visibility: 'context', content: content(), idempotencyKey: randomUUID() }))).rejects.toThrow('create fault');
+            await expect(new AiInputService(identity, dir, { fault: stage => { if (stage === 'create')
+                    throw Error('create fault'); } }).create(brand, { contextId: ctx, visibility: 'context', content: content(), idempotencyKey: randomUUID() })).rejects.toThrow('create fault');
             expect(await repo.list('aiInput')).toEqual(before);
             const snapBefore = await repo.list('aiSnapshot');
-            await expect((await new AiInputService(identity, dir, { fault: stage => { if (stage === 'result')
-                    throw Error('result fault'); } }).extract(brand, d.id, run(second)))).rejects.toThrow('result fault');
+            await expect(new AiInputService(identity, dir, { fault: stage => { if (stage === 'result')
+                    throw Error('result fault'); } }).extract(brand, d.id, run(second))).rejects.toThrow('result fault');
             expect(await repo.list('aiSnapshot')).toEqual(snapBefore);
             expect((await service.detail(brand, d.id)).runs[0]).toMatchObject({ state: 'failed', issue: 'STORAGE_UNAVAILABLE', retryable: true });
             await expect(repo.transaction(async (s) => { const v = (await s.get('aiVersion', d.version.id))!; (await s.update('aiVersion', v.id, v.revision, v.data)); })).rejects.toMatchObject({ code: 'INVALID_RECORD' });
@@ -88,7 +88,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             let release!: () => void, started!: () => void, count = 0;
             const gate = new Promise<void>(r => release = r), start = new Promise<void>(r => started = r);
             const worker = new AiInputService(identity, dir, { extract: async (request) => { count++; started(); await gate; return extractInput(request); } });
-            const pending = (await worker.extract(brand, d.id, input));
+            const pending = worker.extract(brand, d.id, input);
             await start;
             expect((await service.extract(brand, d.id, input)).detail.runs[0].state).toBe('reading');
             expect(count).toBe(1);
@@ -106,16 +106,16 @@ for (const mode of ['mock', 'sqlite'] as const)
             now = '2026-09-21T12:02:00.000Z';
             const svc = new AiInputService(timed, dir, { extract: async () => { throw Error('worker fault'); } });
             expect((await svc.detail(brand, d.id)).runs[0].state).toBe('interrupted');
-            await expect((await svc.extract(brand, d.id, { ...run(d), expectedRunId: first.id }))).rejects.toThrow('worker fault');
+            await expect(svc.extract(brand, d.id, { ...run(d), expectedRunId: first.id })).rejects.toThrow('worker fault');
             const second = (await svc.detail(brand, d.id)).runs[0];
             expect(second.attempt).toBe(2);
-            await expect((await svc.extract(brand, d.id, { ...run(d), expectedRunId: second.id }))).rejects.toThrow('worker fault');
+            await expect(svc.extract(brand, d.id, { ...run(d), expectedRunId: second.id })).rejects.toThrow('worker fault');
             const third = (await svc.detail(brand, d.id)).runs[0];
             expect(third.retryable).toBe(false);
-            await expect((await svc.extract(brand, d.id, { ...run(d), expectedRunId: third.id }))).rejects.toMatchObject({ status: 409 });
+            await expect(svc.extract(brand, d.id, { ...run(d), expectedRunId: third.id })).rejects.toMatchObject({ status: 409 });
             const freshD = await create(), before = await repo.list('commandReceipt');
-            await expect((await new AiInputService(identity, dir, { fault: stage => { if (stage === 'queue')
-                    throw Error('queue fault'); } }).extract(brand, freshD.id, run(freshD)))).rejects.toThrow('queue fault');
+            await expect(new AiInputService(identity, dir, { fault: stage => { if (stage === 'queue')
+                    throw Error('queue fault'); } }).extract(brand, freshD.id, run(freshD))).rejects.toThrow('queue fault');
             expect(await repo.list('commandReceipt')).toEqual(before);
             expect((await service.detail(brand, freshD.id)).runs).toHaveLength(0);
         });
@@ -124,10 +124,10 @@ for (const mode of ['mock', 'sqlite'] as const)
             let started = 0, release!: () => void;
             const gate = new Promise<void>(r => release = r);
             const limited = new AiInputService(identity, dir, { extract: async (request) => { started++; await gate; return extractInput(request); } });
-            const one = await create(), two = await create(), a = (await limited.extract(brand, one.id, run(one)));
+            const one = await create(), two = await create(), a = limited.extract(brand, one.id, run(one));
             while (started < 1)
                 await new Promise(r => setTimeout(r, 1));
-            const b = (await limited.extract(brand, two.id, run(two)));
+            const b = limited.extract(brand, two.id, run(two));
             while (started < 2)
                 await new Promise(r => setTimeout(r, 1));
             const queued = [];
@@ -139,7 +139,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             }
             expect(started).toBe(2);
             const overflow = await create();
-            await expect((await limited.extract(brand, overflow.id, run(overflow)))).rejects.toMatchObject({ code: 'QUEUE_FULL' });
+            await expect(limited.extract(brand, overflow.id, run(overflow))).rejects.toMatchObject({ code: 'QUEUE_FULL' });
             expect((await service.detail(brand, overflow.id)).runs).toHaveLength(0);
             release();
             await Promise.all([a, b]);
@@ -153,16 +153,16 @@ for (const mode of ['mock', 'sqlite'] as const)
             const d = await create();
             const q = await repo.transaction(async (s) => (await s.create('aiRun', { id: randomUUID(), contextId: ctx, data: { inputId: d.id, versionId: d.version.id, attempt: 1, createdBy: 'user-luna', state: 'queued', claimId: null, leaseUntil: null, startedAt: null, endedAt: null, snapshotId: null, issue: null } })));
             const body = { versionId: d.version.id, expectedRunId: q.id, idempotencyKey: randomUUID() };
-            await expect((await service.extract(team, d.id, { ...body, expectedRunId: null }))).rejects.toMatchObject({ status: 409, code: 'CONFLICT' });
-            await expect((await service.extract(tokenFor('user-wave'), d.id, body))).rejects.toMatchObject({ status: 404 });
+            await expect(service.extract(team, d.id, { ...body, expectedRunId: null })).rejects.toMatchObject({ status: 409, code: 'CONFLICT' });
+            await expect(service.extract(tokenFor('user-wave'), d.id, body)).rejects.toMatchObject({ status: 404 });
             let started!: () => void, release!: () => void, count = 0;
             const begun = new Promise<void>(r => started = r), gate = new Promise<void>(r => release = r);
             const worker = new AiInputService(identity, dir, { extract: async (request) => { count++; started(); await gate; return extractInput(request); } });
-            const pending = (await worker.extract(team, d.id, body));
+            const pending = worker.extract(team, d.id, body);
             await begun;
             expect((await worker.extract(team, d.id, body)).runId).toBe(q.id);
-            await expect((await worker.extract(brand, d.id, { ...body, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409, code: 'RETRY_UNAVAILABLE' });
-            await expect((await worker.extract(team, d.id, { ...body, expectedRunId: null }))).rejects.toMatchObject({ status: 409 });
+            await expect(worker.extract(brand, d.id, { ...body, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409, code: 'RETRY_UNAVAILABLE' });
+            await expect(worker.extract(team, d.id, { ...body, expectedRunId: null })).rejects.toMatchObject({ status: 409 });
             release();
             const result = await pending;
             expect(result.runId).toBe(q.id);
@@ -172,9 +172,9 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(await repo.list('aiSnapshot')).toHaveLength(1);
             expect((await worker.extract(team, d.id, body)).runId).toBe(q.id);
             expect(count).toBe(1);
-            await expect((await worker.extract(brand, d.id, { ...body, idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
+            await expect(worker.extract(brand, d.id, { ...body, idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
             await repo.transaction(async (s) => { const m = (await s.list('membership', ctx)).find(m => m.data.userId === 'user-team')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); });
-            await expect((await worker.extract(team, d.id, body))).rejects.toMatchObject({ status: 404 });
+            await expect(worker.extract(team, d.id, body)).rejects.toMatchObject({ status: 404 });
         });
         it('stored unknown extensions never project and malformed known run/asset metadata fails closed without mutation', async () => {
             await setup();
@@ -183,10 +183,10 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(JSON.stringify(await service.detail(brand, d.id))).not.toContain('AI_PRIVATE_CANARY');
             await repo.transaction(async (s) => { const row = (await s.get('aiRun', r.runId))!; (await s.update('aiRun', row.id, row.revision, { ...row.data, issue: { secret: 'AI_PRIVATE_CANARY' } } as unknown as typeof row.data)); });
             const before = await repo.get('aiRun', r.runId);
-            await expect((await service.detail(brand, d.id))).rejects.toMatchObject({ status: 503 });
+            await expect(service.detail(brand, d.id)).rejects.toMatchObject({ status: 503 });
             expect(await repo.get('aiRun', r.runId)).toEqual(before);
             const a = await repo.transaction(async (s) => (await s.create('aiAsset', { id: randomUUID(), contextId: ctx, data: { createdBy: 'user-luna', visibility: 'context', filename: { secret: 'AI_PRIVATE_CANARY' } as unknown as string, mime: 'image/png', bytes: 1, sha256: '0'.repeat(64), storageKey: randomUUID() } })));
-            await expect((await service.picker(brand, ctx))).rejects.toMatchObject({ status: 503 });
+            await expect(service.picker(brand, ctx)).rejects.toMatchObject({ status: 503 });
             expect(await repo.get('aiAsset', a.id)).toEqual(a);
         });
         it('AC15-02/03 actual private upload/PDF selected 2 pages, immutable bytes and retry, wrong signature/size rejected', async () => {
@@ -200,11 +200,11 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(result.detail.runs[0].snapshot!.text).not.toContain('PAGE_01');
             expect(result.detail.runs[0].snapshot!.units.filter(u => u.status === 'unselected')).toHaveLength(10);
             expect((await service.prepareTransfer(brand, d.id, result.runId)).allowed).toBe(true);
-            await expect((await assets.upload(brand, ctx, 'context', randomUUID(), { ...f, name: 'file.ai' }))).rejects.toMatchObject({ status: 422 });
-            await expect((await assets.upload(brand, ctx, 'context', randomUUID(), { ...f, bytes: Buffer.alloc(10485761) }))).rejects.toMatchObject({ status: 422 });
+            await expect(assets.upload(brand, ctx, 'context', randomUUID(), { ...f, name: 'file.ai' })).rejects.toMatchObject({ status: 422 });
+            await expect(assets.upload(brand, ctx, 'context', randomUUID(), { ...f, bytes: Buffer.alloc(10485761) })).rejects.toMatchObject({ status: 422 });
             await writeFile(assets.destination(a.id), Buffer.from('tamper'));
-            await expect((await assets.download(brand, a.id))).rejects.toMatchObject({ code: 'SOURCE_CHANGED' });
-            await expect((await service.prepareTransfer(brand, d.id, result.runId))).rejects.toMatchObject({ code: 'SOURCE_CHANGED' });
+            await expect(assets.download(brand, a.id)).rejects.toMatchObject({ code: 'SOURCE_CHANGED' });
+            await expect(service.prepareTransfer(brand, d.id, result.runId)).rejects.toMatchObject({ code: 'SOURCE_CHANGED' });
         }, 20000);
         it('AC15-03 persisted actual OCR retains canonical unread hash order and safe replay', async () => {
             await setup();
@@ -244,7 +244,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect((await service.detail(brand, d.id)).version.content.products[0].productVersionId).toBe(use.productVersionId);
             expect((await service.extract(brand, d.id, run(d))).detail.runs[0].snapshot!.sources[0].sourceId).toBe(item.file.id);
             expect(JSON.stringify(await service.picker(brand, ctx))).not.toContain('internalPrice');
-            await expect((await create({ ...linked, submission: { ...linked.submission!, submissionId: 'forged' } }))).rejects.toMatchObject({ status: 404 });
-            await expect((await create({ ...linked, products: [{ ...linked.products[0], productVersionId: 'forged' }] }))).rejects.toMatchObject({ status: 404 });
+            await expect(create({ ...linked, submission: { ...linked.submission!, submissionId: 'forged' } })).rejects.toMatchObject({ status: 404 });
+            await expect(create({ ...linked, products: [{ ...linked.products[0], productVersionId: 'forged' }] })).rejects.toMatchObject({ status: 404 });
         }, 20000);
     });

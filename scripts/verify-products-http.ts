@@ -143,7 +143,7 @@ async function fixture<T>(input: FixtureRequest): Promise<T> {
             return await productFixture(repo, input) as T;
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     const child = children.get(port)!;
@@ -213,7 +213,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     for (const [client, email] of [[admin, "admin"], [brand, "luna"], [team, "team"], [gsg, "operator"], [price, "price"], [foreign, "wave"]] as const)

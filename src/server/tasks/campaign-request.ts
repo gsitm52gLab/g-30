@@ -1,3 +1,4 @@
+import { jsonContentEqual } from '@/domain/json-content';
 import { asyncMap, asyncSome } from "@/domain/async-collections";
 import type { Clock, UnitOfWork, StoredRecord } from '@/domain/records';
 import type { CampaignRequestSource, RequestContent, Requirement } from '@/domain/tasks/types';
@@ -12,7 +13,7 @@ import { menuIdentityKey } from '@/domain/campaigns/types';
 import { storedMenuState } from '@/server/campaigns/state';
 import * as safe from '@/server/campaigns/stored';
 function conflict(): never { return fail('CAMPAIGN_REQUEST_CONFLICT', 409, '업무 요청 또는 메뉴 조건이 변경되었습니다. 기존 요청·답변을 유지하고 GSG가 메뉴와 요청 범위를 다시 확인해 주세요.'); }
-const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+const same = jsonContentEqual;
 /** Positive projection plus exact immutable relations, including the actual recorder. */
 export async function campaignRequestSource(s: UnitOfWork, r: StoredRecord<'requestVersion'>): Promise<CampaignRequestSource | null> {
     const x = r.data.source;

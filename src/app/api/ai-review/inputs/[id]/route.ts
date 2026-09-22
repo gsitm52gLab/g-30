@@ -6,4 +6,4 @@ export async function GET(request: Request, c: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(request, async (i, t) => { const q = query(request, ['versionId']); return json(await new AiReviewService(i).workspace(t, (await c.params).id, q.get('versionId') ?? undefined)); })); }
+}) { return route(request, async (i, t) => { const q = query(request, ['versionId']); return json(await new AiReviewService(i).workspace(t, (await c.params).id, q.get('versionId') ?? undefined)); }); }

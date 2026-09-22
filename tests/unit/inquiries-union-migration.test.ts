@@ -56,7 +56,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
         const preview = await imports.preview(brand, { sourceId: upload.sourceId, sheetId: upload.sheets[0].id, headerRow: 1, mapping: ['contextKey', 'common.code', 'common.name'].map((field, i) => ({ column: i + 1, field })), choices: [] });
         expect(preview.canApply).toBe(true);
         const command = { previewId: preview.id, idempotencyKey: randomUUID() }, result = await imports.apply(brand, command);
-        return { replay: async () => (await new ImportService(identity, new ImportStaging(path.join(directory, 'staging'))).apply(brand, command)), result };
+        return { replay: async () => new ImportService(identity, new ImportStaging(path.join(directory, 'staging'))).apply(brand, command), result };
     };
     const produceInquiry = async () => {
         const service = new InquiryService(identity), draft = await service.createDraft(initiator, { contextId, taskId: null, idempotencyKey: randomUUID() });
@@ -66,12 +66,12 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
         const command = { command: 'publish_first', expectedRevision: draft.revision, title: 'Original inquiry', content: { clientMessageId: randomUUID(), body: 'Original body', fileVersionIds: [uploaded.file.id] }, idempotencyKey: randomUUID() };
         const result = await service.command(initiator, draft.conversationId, command);
         await service.command(admin, draft.conversationId, { command: 'read', throughMessageId: result.messageId, idempotencyKey: randomUUID() });
-        return { replay: async () => (await new InquiryService(identity).command(initiator, draft.conversationId, command)), result };
+        return { replay: async () => new InquiryService(identity).command(initiator, draft.conversationId, command), result };
     };
     try {
-        const existing = await (missing === 8 ? (await produceEvidence()) : (await produceInquiry()));
+        const existing = await (missing === 8 ? produceEvidence() : produceInquiry());
         const before = db.prepare('SELECT * FROM records ORDER BY kind,id').all(), oldMigrations = db.prepare('SELECT * FROM schema_migrations ORDER BY name').all();
-        repo.close();
+        (await repo.close());
         // Never open the prior database to copy it. Record/copy all SQLite sidecars using filesystem bytes first.
         const copies: {
             source: string;
@@ -116,7 +116,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
             expect(hash(await readFile(path.join(copiedFiles, file.name)))).toBe(file.sha256);
         for (const copy of copies)
             expect(hash(await readFile(copy.source))).toBe(copy.sha256);
-        await (missing === 8 ? (await produceInquiry()) : (await produceEvidence()));
+        await (missing === 8 ? produceInquiry() : produceEvidence());
         for (const kind of ['inquiryMessage', 'inquiryRead', 'noticeVersion', 'noticeRead', 'evidenceVersion', 'evidenceAssessment', 'importBatch']) {
             const row = db.prepare('SELECT id FROM records WHERE kind=? LIMIT 1').get(kind) as {
                 id: string;
@@ -127,7 +127,7 @@ it.each([6, 8])('populated seven-migration branch gains 000%i and corrections/ca
         console.info('G09_UNION_MIGRATION ' + JSON.stringify({ missing, priorCount: 7, finalCount: 9, preservedRows: before.length, rowsSha256: hash(JSON.stringify(before)), copiedBeforeOpening: copies, originalFilesUnchanged: priorFileHashes, repeatNoop: true, replayUnchanged: true, bothModuleProducersAndGuards: true }));
     }
     finally {
-        repo.close();
+        (await repo.close());
         await rm(directory, { recursive: true, force: true });
     }
 });

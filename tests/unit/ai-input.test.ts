@@ -48,7 +48,7 @@ describe("AI input scope and admission (no provider)", () => {
         expect(preflight({ ...p, source: { ...p.source, bytes: Buffer.alloc(0) } })).toMatchObject({ issue: "EMPTY_INPUT" });
     });
 });
-describe("actual local extraction and immutable provenance", async () => {
+describe("actual local extraction and immutable provenance", () => {
     it("maps text positions, freezes snapshots, strips extensions, detects content-version mismatch", async () => {
         const text = "肌😀\n合成", input = textInput(text), r = await extractInput({ ...input, scope: { ...scope, secret: { marker: 1 } }, source: { ...input.source, secret: "hidden" } });
         expect(r.ok).toBe(true);

@@ -23,7 +23,7 @@ export default async function TaskDetail({ params, searchParams }: {
     const unavailableReference = <section className="panel" role="alert"><h1>지정한 자료를 열 수 없습니다</h1><p>주소와 현재 접근 권한을 확인해 주세요. 최신 제출로 대신 표시하지 않습니다.</p></section>;
     if (reference.kind === 'invalid')
         return unavailableReference;
-    const workspace = await (await readWorkspace(await contextFromSearch(Promise.resolve(search)))).catch(reference.kind === 'none' ? workspaceFailure : () => null);
+    const workspace = await readWorkspace(await contextFromSearch(Promise.resolve(search))).catch(reference.kind === 'none' ? workspaceFailure : () => null);
     if (!workspace)
         return reference.kind !== 'none' ? unavailableReference : <StorageFailure />;
     const task = workspace.tasks.find(t => t.id === id);
@@ -33,7 +33,7 @@ export default async function TaskDetail({ params, searchParams }: {
         notFound();
     }
     if (task.data.schemaVersion === 2) {
-        const result = await (await (async () => { const service = new TaskService(await identity()); const token = await currentToken(); return { detail: await service.detail(token, id, task.contextId!), catalog: await service.catalog(token, task.contextId!) }; })()).catch(workspaceFailure);
+        const result = await (async () => { const service = new TaskService(await identity()); const token = await currentToken(); return { detail: await service.detail(token, id, task.contextId!), catalog: await service.catalog(token, task.contextId!) }; })().catch(workspaceFailure);
         if (!result)
             return reference.kind !== 'none' ? unavailableReference : <StorageFailure />;
         return <><ContextBar workspace={workspace}/><TaskDetailView key={id} initial={result.detail} catalog={result.catalog}/></>;

@@ -9,7 +9,7 @@ export default async function CompletionPage({ params }: {
     params: Promise<{
         id: string;
     }>;
-}) { const { id } = await params; const initial = await (await (async () => { const service = await identity(), token = await currentToken(); const me = await service.me(token), data = await new CompletionService(service).workspace(token, id); return { actorId: me.user.id, data }; })()).catch(e => { if (e instanceof AuthError) {
+}) { const { id } = await params; const initial = await (async () => { const service = await identity(), token = await currentToken(); const me = await service.me(token), data = await new CompletionService(service).workspace(token, id); return { actorId: me.user.id, data }; })().catch(e => { if (e instanceof AuthError) {
     if (e.status === 401)
         redirect('/login');
     if (e.status === 403 || e.status === 404)

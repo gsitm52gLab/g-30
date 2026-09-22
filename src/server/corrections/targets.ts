@@ -1,3 +1,4 @@
+import { jsonContentEqual } from '@/domain/json-content';
 import { asyncMap } from "@/domain/async-collections";
 import type { Clock, UnitOfWork } from '@/domain/records';
 import type { Principal } from '@/server/auth/service';
@@ -31,7 +32,7 @@ export async function internalFiles(s: UnitOfWork, p: Principal, taskId: string,
 }
 export async function laterTarget(s: UnitOfWork, p: Principal, original: ReviewTarget, next: ReviewTarget, clock: Clock) {
     const old = (await exactTarget(s, p, original, clock)), now = (await exactTarget(s, p, next, clock));
-    if (now.row.data.sequence <= old.row.data.sequence || original.answer && JSON.stringify(original.answer) !== JSON.stringify(next.answer) || original.fileVersionIds.length && !next.fileVersionIds.length || old.products.some(u => !now.products.some(n => n.productId === u.productId)))
+    if (now.row.data.sequence <= old.row.data.sequence || original.answer && !jsonContentEqual(original.answer, next.answer) || original.fileVersionIds.length && !next.fileVersionIds.length || old.products.some(u => !now.products.some(n => n.productId === u.productId)))
         fail('TARGET_MISMATCH', 422, '같은 항목과 상품 범위의 후속 제출 및 반영 파일을 선택해 주세요.');
     return now;
 }

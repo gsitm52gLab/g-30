@@ -5,4 +5,4 @@ export async function GET(request: Request, c: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(request, async (s, t) => json(await new CorrectionService(s).preview(t, (await c.params).id)))); }
+}) { return route(request, async (s, t) => json(await new CorrectionService(s).preview(t, (await c.params).id))); }

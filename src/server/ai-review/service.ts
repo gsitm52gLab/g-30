@@ -40,7 +40,7 @@ export class AiReviewService {
     }
     async start(token: string | undefined, inputIdValue: string, raw: Record<string, unknown>) {
         if (raw.engine === 'provider')
-            return (await new AiProviderService(this.identity, this.directory).start(token, inputIdValue, raw));
+            return new AiProviderService(this.identity, this.directory).start(token, inputIdValue, raw);
         const input = obj(raw, ['inputVersionId', 'extractionRunId', 'expectedRunId', 'corpusReleaseId', 'corpusManifestHash', 'engine', 'idempotencyKey']), inputId = id(inputIdValue), versionId = id(input.inputVersionId), extractionRunId = id(input.extractionRunId);
         const corpusReleaseId = id(input.corpusReleaseId), corpusManifestHash = str(input.corpusManifestHash, 64);
         str(input.idempotencyKey);

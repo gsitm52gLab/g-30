@@ -1,4 +1,3 @@
-import { asyncMap } from "@/domain/async-collections";
 import { migrateLegacyProducts } from "@/data/products/migrate";
 import { afterEach, describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
@@ -22,7 +21,7 @@ const ctx = "ctx-jp-a-luna", ctx2 = "ctx-jp-b-luna";
 const target = { contextId: ctx, ownerId: "user-gsg", assigneeId: "user-luna", coAssigneeIds: ["user-co"], productIds: ["product-serum"] };
 const payload = () => ({ ...blankContent(), title: "G04 요청", description: "공개 설명 v1", internalOriginal: "내부 원문 보존", internalMemo: "내부 메모", deadline: { ...blankContent().deadline, value: "2026-10-10", responsibleUserId: "user-gsg" }, requirements: [{ ...blankRequirement("description"), label: "설명" }] });
 for (const mode of ["mock", "sqlite"] as const)
-    describe(`${mode} G04 actual task/file contract`, async () => {
+    describe(`${mode} G04 actual task/file contract`, () => {
         let repo: RecordRepository, identity: IdentityService, tasks: TaskService, admin: string, brand: string, co: string, team: string;
         const directories: string[] = [];
         async function setup() {
@@ -37,18 +36,18 @@ for (const mode of ["mock", "sqlite"] as const)
             await seed(repo);
             identity = new IdentityService(repo, clock);
             tasks = new TaskService(identity);
-            [admin, brand, co, team] = await Promise.all((await asyncMap(["admin", "luna", "co", "team"], async (u) => (await identity.login(undefined, { email: `${u}@example.test`, password: DEMO_PASSWORD })).token)));
+            [admin, brand, co, team] = await Promise.all(["admin", "luna", "co", "team"].map(async (u) => (await identity.login(undefined, { email: `${u}@example.test`, password: DEMO_PASSWORD })).token));
         }
         async function create(p = payload()) { return (await tasks.create(admin, { targets: [target], content: p, category: "spot", idempotencyKey: randomUUID() })).ids[0]; }
-        async function command(taskId: string, command: string, extra: Record<string, unknown> = {}, token = admin) { return (await tasks.command(token, taskId, { command, expectedRevision: (await repo.get("task", taskId))!.revision, idempotencyKey: randomUUID(), ...extra })); }
+        async function command(taskId: string, command: string, extra: Record<string, unknown> = {}, token = admin) { return tasks.command(token, taskId, { command, expectedRevision: (await repo.get("task", taskId))!.revision, idempotencyKey: randomUUID(), ...extra }); }
         async function publish(p = payload()) { const id = await create(p); await command(id, "publish"); return id; }
-        afterEach(async () => { repo?.close(); await Promise.all(directories.splice(0).map(d => rm(d, { recursive: true, force: true }))); });
+        afterEach(async () => { (await repo?.close()); await Promise.all(directories.splice(0).map(d => rm(d, { recursive: true, force: true }))); });
         it("AC-04-01/02 SA-12 drafts stay private; preview equals brand publication and filters original/milestone", async () => {
             await setup();
             const c = payload();
             c.milestones = [{ id: "external-print", kind: "printing_delivery", counterpart: "합성 외부 인쇄소", visibility: "internal", deadline: { ...c.deadline, certainty: "needs_confirmation", raw: "10/10 금요일 원문 충돌 보존" } }];
             const id = await create(c);
-            await expect((await tasks.detail(brand, id))).rejects.toMatchObject({ status: 404 });
+            await expect(tasks.detail(brand, id)).rejects.toMatchObject({ status: 404 });
             expect((await tasks.catalog(brand, ctx)).tasks.some(t => t.id === id)).toBe(false);
             const preview = await tasks.preview(admin, id);
             expect(preview.content).not.toHaveProperty("internalOriginal");
@@ -63,10 +62,10 @@ for (const mode of ["mock", "sqlite"] as const)
             expect((await tasks.detail(brand, id)).request!.description).toBe(c.description);
             expect((await tasks.detail(team, id)).canRespond).toBe(false);
             expect((await tasks.detail(co, id)).canRespond).toBe(true);
-            await expect((await command(id, "accept", {}, team))).rejects.toMatchObject({ status: 403 });
+            await expect(command(id, "accept", {}, team)).rejects.toMatchObject({ status: 403 });
             const foreign = (await identity.login(undefined, { email: "wave@example.test", password: DEMO_PASSWORD })).token;
-            await expect((await tasks.detail(foreign, id))).rejects.toMatchObject({ status: 404 });
-            await expect((await tasks.detail(admin, id, ctx2))).rejects.toMatchObject({ status: 404 });
+            await expect(tasks.detail(foreign, id)).rejects.toMatchObject({ status: 404 });
+            await expect(tasks.detail(admin, id, ctx2)).rejects.toMatchObject({ status: 404 });
         });
         it("AC-04-01/06 SA-07 project selection creates parallel independent work; dependency cycle and cross-project edge reject", async () => {
             await setup();
@@ -74,11 +73,11 @@ for (const mode of ["mock", "sqlite"] as const)
             const project = await tasks.project(admin, p.ids[0]);
             expect(project.tasks).toHaveLength(3);
             expect(project.data.dependencies).toEqual([]);
-            await expect((await tasks.project(brand, project.id))).rejects.toMatchObject({ status: 404 });
+            await expect(tasks.project(brand, project.id)).rejects.toMatchObject({ status: 404 });
             await tasks.dependencies(admin, project.id, { expectedRevision: project.revision, dependencies: [{ before: p.ids[1], after: p.ids[2] }], idempotencyKey: randomUUID() });
             const revision = (await repo.get("project", project.id))!.revision;
-            await expect((await tasks.dependencies(admin, project.id, { expectedRevision: revision, dependencies: [{ before: p.ids[1], after: p.ids[2] }, { before: p.ids[2], after: p.ids[1] }], idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 422 });
-            await expect((await tasks.dependencies(admin, project.id, { expectedRevision: revision, dependencies: [{ before: p.ids[1], after: "task-pop" }], idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 422 });
+            await expect(tasks.dependencies(admin, project.id, { expectedRevision: revision, dependencies: [{ before: p.ids[1], after: p.ids[2] }, { before: p.ids[2], after: p.ids[1] }], idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 422 });
+            await expect(tasks.dependencies(admin, project.id, { expectedRevision: revision, dependencies: [{ before: p.ids[1], after: "task-pop" }], idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 422 });
             await command(p.ids[1], "publish");
             expect((await tasks.project(brand, project.id)).tasks).toHaveLength(1);
             // G11 completion producer is not implemented: fixture proves project completion is independent.
@@ -137,7 +136,7 @@ for (const mode of ["mock", "sqlite"] as const)
             expect(JSON.stringify(b)).not.toContain("미공개 요건");
             expect(a.draft).toEqual(draft);
             expect(a.activities.find(x => x.data.kind === "schedule_resolved")!.data).toMatchObject({ decision: "apply", requestId: v1.id, resultingRequestId: b.versions[0].id, respondsTo: activity.id });
-            await expect((await command(id, "schedule_decide", { activityId: activity.id, decision: "keep" }))).rejects.toMatchObject({ status: 409 });
+            await expect(command(id, "schedule_decide", { activityId: activity.id, decision: "keep" })).rejects.toMatchObject({ status: 409 });
             await command(id, "schedule", { deadline: { ...payload().deadline, value: "2026-12-01" }, reason: "다음 협의" }, brand);
             const second = (await tasks.detail(admin, id)).activities.filter(a => a.data.kind === "schedule").at(-1)!;
             await command(id, "schedule_decide", { activityId: second.id, decision: "keep" });
@@ -153,17 +152,17 @@ for (const mode of ["mock", "sqlite"] as const)
             await command(id, "accept", {}, brand);
             expect((await repo.list("taskActivity")).filter(a => a.data.kind === "accept")).toHaveLength(1);
             expect((await repo.list("domainEvent")).filter(e => e.data.eventType === "TASK_ACCEPTED")).toHaveLength(1);
-            await expect((await tasks.command(brand, id, { ...input, reason: "changed" }))).rejects.toMatchObject({ status: 409 });
-            await expect((await tasks.command(admin, id, { command: "save", expectedRevision: revision, content: payload(), idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
+            await expect(tasks.command(brand, id, { ...input, reason: "changed" })).rejects.toMatchObject({ status: 409 });
+            await expect(tasks.command(admin, id, { command: "save", expectedRevision: revision, content: payload(), idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
             const before = await Promise.all([repo.list("task"), repo.list("requestVersion"), repo.list("audit"), repo.list("domainEvent"), repo.list("commandReceipt")]);
             const failing = new TaskService(identity, () => { throw new Error("injected G04 rollback"); });
-            await expect((await failing.command(admin, id, { command: "publish", expectedRevision: (await repo.get("task", id))!.revision, idempotencyKey: randomUUID() }))).rejects.toThrow("injected G04 rollback");
+            await expect(failing.command(admin, id, { command: "publish", expectedRevision: (await repo.get("task", id))!.revision, idempotencyKey: randomUUID() })).rejects.toThrow("injected G04 rollback");
             expect(await Promise.all([repo.list("task"), repo.list("requestVersion"), repo.list("audit"), repo.list("domainEvent"), repo.list("commandReceipt")])).toEqual(before);
         });
         it("SA-09 invalid/foreign/inactive assignees reject; stopped co-assignee marks work and history preserves both arrays", async () => {
             await setup();
             for (const bad of ["user-wave", "user-suspended", "user-admin"])
-                await expect((await tasks.create(admin, { targets: [{ ...target, assigneeId: bad }], content: payload(), category: "spot", idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 422 });
+                await expect(tasks.create(admin, { targets: [{ ...target, assigneeId: bad }], content: payload(), category: "spot", idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 422 });
             const id = await publish();
             await command(id, "assign", { assignment: { ownerId: "user-price", assigneeId: "user-luna", coAssigneeIds: ["user-team"] } });
             const history = (await tasks.detail(admin, id)).history.find(h => h.data.action === "task.reassigned")!;
@@ -172,7 +171,7 @@ for (const mode of ["mock", "sqlite"] as const)
             const u = (await repo.get("user", "user-team"))!;
             await identity.setUserStatus(admin, u.id, { status: "suspended", expectedRevision: u.revision });
             expect((await repo.get("task", id))!.data.assignmentNeedsAttention).toBe(true);
-            await expect((await command(id, "accept", {}, team))).rejects.toMatchObject({ status: 401 });
+            await expect(command(id, "accept", {}, team)).rejects.toMatchObject({ status: 401 });
             await command(id, "assign", { assignment: { ownerId: "user-gsg", assigneeId: "user-luna", coAssigneeIds: [] } });
             expect((await repo.get("task", id))!.data).toMatchObject({ authorId: "user-admin", assignmentNeedsAttention: false });
         });
@@ -203,7 +202,7 @@ for (const mode of ["mock", "sqlite"] as const)
             expect((await repo.get("task", result.ids[1]))!.data.status).toBe("draft");
             expect(await Promise.all(result.ids.slice(1).map(id => repo.get("task", id)))).toEqual(independentBefore);
             await command(result.ids[0], "hold", { reason: "잠시 보류" });
-            await expect((await command(result.ids[0], "accept", {}, brand))).rejects.toMatchObject({ status: 409 });
+            await expect(command(result.ids[0], "accept", {}, brand)).rejects.toMatchObject({ status: 409 });
             await command(result.ids[0], "cancel", { reason: "합의 취소" });
             await command(result.ids[0], "resume", { reason: "명시 재개" });
             // SA-15: hold/cancel must preserve already accepted progress, not reset it to requested.
@@ -250,12 +249,12 @@ for (const mode of ["mock", "sqlite"] as const)
             expect(internalOriginal).toBe("내부 원문 보존");
             expect(internalMemo).toBe("내부 메모");
             expect(await Promise.all([repo.get("task", id), repo.list("requestVersion"), repo.list("taskActivity"), repo.list("templateVersion"), repo.list("project")])).toEqual(before);
-            await expect((await command(id, "save", { content: c }))).rejects.toMatchObject({ status: 422 });
+            await expect(command(id, "save", { content: c })).rejects.toMatchObject({ status: 422 });
         });
         it("G04-V02 AC-04-05 SA-15 requested/accepted nested pause restores progress without duplicate acceptance or state events", async () => {
             await setup();
             const id = await publish();
-            await expect((await command(id, "resume", { reason: "not paused" }))).rejects.toMatchObject({ status: 409 });
+            await expect(command(id, "resume", { reason: "not paused" })).rejects.toMatchObject({ status: 409 });
             await command(id, "hold", { reason: "requested hold" });
             await command(id, "resume", { reason: "requested resume" });
             expect((await repo.get("task", id))!.data.status).toBe("requested");
@@ -275,10 +274,10 @@ for (const mode of ["mock", "sqlite"] as const)
             expect((await repo.get("task", id))!.data.resumeStatus).toBe("in_progress");
             const before = await Promise.all([repo.list("task"), repo.list("audit"), repo.list("domainEvent"), repo.list("commandReceipt")]);
             const failing = new TaskService(identity, () => { throw new Error("state rollback"); });
-            await expect((await failing.command(admin, id, { command: "resume", reason: "failure", expectedRevision: (await repo.get("task", id))!.revision, idempotencyKey: randomUUID() }))).rejects.toThrow("state rollback");
+            await expect(failing.command(admin, id, { command: "resume", reason: "failure", expectedRevision: (await repo.get("task", id))!.revision, idempotencyKey: randomUUID() })).rejects.toThrow("state rollback");
             expect(await Promise.all([repo.list("task"), repo.list("audit"), repo.list("domainEvent"), repo.list("commandReceipt")])).toEqual(before);
-            await expect((await tasks.command(admin, id, { ...hold, command: "resume", idempotencyKey: randomUUID() }))).rejects.toMatchObject({ status: 409 });
-            await expect((await command(id, "resume", { reason: "brand forbidden" }, brand))).rejects.toMatchObject({ status: 403 });
+            await expect(tasks.command(admin, id, { ...hold, command: "resume", idempotencyKey: randomUUID() })).rejects.toMatchObject({ status: 409 });
+            await expect(command(id, "resume", { reason: "brand forbidden" }, brand)).rejects.toMatchObject({ status: 403 });
             const resume = { command: "resume", reason: "restore", expectedRevision: (await repo.get("task", id))!.revision, idempotencyKey: randomUUID() };
             await tasks.command(admin, id, resume);
             const restored = await repo.get("task", id);
@@ -335,7 +334,7 @@ for (const mode of ["mock", "sqlite"] as const)
             expect((await repo.get("task", id))!.data.status).toBe("requested");
             expect((await repo.list("taskActivity")).filter(a => a.data.kind === "accept")).toHaveLength(1);
             await repo.transaction(async (s) => { const row = (await s.get("task", id))!; (await s.update("task", id, row.revision, { ...row.data, status: "completed" })); });
-            await expect((await command(id, "resume", { reason: "cannot invent completion" }))).rejects.toMatchObject({ status: 409 });
+            await expect(command(id, "resume", { reason: "cannot invent completion" })).rejects.toMatchObject({ status: 409 });
         });
         it("A04/A19 SA-04 exact reference bytes stay private before publish, survive revisions and revoke with membership", async () => {
             await setup();
@@ -346,7 +345,7 @@ for (const mode of ["mock", "sqlite"] as const)
             const bytes = Buffer.from("%PDF-1.4\nsynthetic G04 reference\n%%EOF");
             const uploaded = await files.upload(admin, id, [{ name: "참고 원문.pdf", type: "application/pdf", bytes }], "public");
             const fid = uploaded.files[0].id;
-            await expect((await files.download(brand, fid, id, "download"))).rejects.toMatchObject({ status: 404 });
+            await expect(files.download(brand, fid, id, "download")).rejects.toMatchObject({ status: 404 });
             const c = { ...payload(), referenceFileIds: [fid] };
             await command(id, "save", { content: c });
             const preview = await tasks.preview(admin, id);
@@ -358,12 +357,12 @@ for (const mode of ["mock", "sqlite"] as const)
             await command(id, "publish");
             expect((await files.download(brand, fid, id, "original")).bytes).toEqual(bytes);
             const privateFile = (await files.upload(admin, id, [{ name: "내부.pdf", type: "application/pdf", bytes }], "internal")).files[0];
-            await expect((await files.download(brand, privateFile.id, id, "download"))).rejects.toMatchObject({ status: 404 });
+            await expect(files.download(brand, privateFile.id, id, "download")).rejects.toMatchObject({ status: 404 });
             const m = (await repo.list("membership", ctx)).find(m => m.data.userId === "user-luna")!;
             await identity.setMembership(admin, ctx, m.id, { status: "suspended", expectedRevision: m.revision });
-            await expect((await files.download(brand, fid, id, "download"))).rejects.toMatchObject({ status: 404 });
+            await expect(files.download(brand, fid, id, "download")).rejects.toMatchObject({ status: 404 });
             await writeFile(path.join(directory, fid), "tampered");
-            await expect((await files.download(admin, fid, id, "download"))).rejects.toMatchObject({ status: 503 });
+            await expect(files.download(admin, fid, id, "download")).rejects.toMatchObject({ status: 503 });
         });
         it("A04 SA-04 partial-SA-19 upload failure leaves no metadata/orphan bytes; unsupported preview preserves original download", async () => {
             await setup();
@@ -372,13 +371,13 @@ for (const mode of ["mock", "sqlite"] as const)
             const id = await create();
             const bad = new FileService(identity, directory, () => { throw new Error("file rollback"); });
             const fixture = { name: "원문.csv", type: "text/csv", bytes: Buffer.from("제품,수량\n합성,2") };
-            await expect((await bad.upload(admin, id, [fixture], "public"))).rejects.toThrow("file rollback");
+            await expect(bad.upload(admin, id, [fixture], "public")).rejects.toThrow("file rollback");
             expect(await repo.list("fileVersion")).toEqual([]);
             expect(await readdir(directory)).toEqual([]);
             const files = new FileService(identity, directory), f = (await files.upload(admin, id, [fixture], "public")).files[0];
-            await expect((await files.download(admin, f.id, id, "preview"))).rejects.toMatchObject({ status: 422 });
+            await expect(files.download(admin, f.id, id, "preview")).rejects.toMatchObject({ status: 422 });
             expect((await files.download(admin, f.id, id, "download")).bytes).toEqual(fixture.bytes);
-            await expect((await files.upload(admin, id, Array.from({ length: 11 }, () => fixture), "public"))).rejects.toMatchObject({ status: 422 });
+            await expect(files.upload(admin, id, Array.from({ length: 11 }, () => fixture), "public")).rejects.toMatchObject({ status: 422 });
         });
     });
 describe("G04 declarative validation and evaluator boundaries", () => {

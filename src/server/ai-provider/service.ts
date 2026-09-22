@@ -88,7 +88,7 @@ export class AiProviderService {
             }));
             return (await this.claim(s, token, saved.ids[0]));
         });
-        return (await this.execute(token, claim));
+        return this.execute(token, claim);
     }
     async retry(token: string | undefined, runId: string, raw: Record<string, unknown>) {
         const input = obj(raw, ['expectedRevision', 'idempotencyKey', 'acknowledgeUnknown', 'restartConfiguration']);
@@ -140,7 +140,7 @@ export class AiProviderService {
             }));
             return claimed;
         });
-        return (await this.execute(token, claim));
+        return this.execute(token, claim);
     }
     private async current(s: UnitOfWork, token: string | undefined, claim: Claim) {
         const p = (await this.identity.principal(s, token)), r = (await resolveAnalysis(s, p, claim.runId, this.clock, true)), a = (await s.get('aiProviderAttempt', claim.attemptId!)), plan = (await s.get('aiProviderPlan', claim.runId));

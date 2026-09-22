@@ -129,7 +129,7 @@ async function fixture<T>(input: CorrectionFixtureInput): Promise<T> {
             return await correctionFixture(repo, input) as T;
         }
         finally {
-            repo.close();
+            (await repo.close());
         }
     }
     const child = children.get(port)!;
@@ -237,7 +237,7 @@ try {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     }
     await start();
     check('G10-H01 anonymous request denied', (await new Client().send('/api/corrections?taskId=task-onboarding')).status === 401, ['A19']);

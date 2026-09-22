@@ -62,7 +62,7 @@ export class ProviderHarness {
         migrate(db);
         const repo = createSqliteRepository(db);
         await seed(repo);
-        repo.close();
+        (await repo.close());
     } }
     async start(kind: 'fault' | 'missing' | 'live' = 'fault', port = this.port) {
         await free(port);

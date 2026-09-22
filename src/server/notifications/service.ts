@@ -137,6 +137,6 @@ export class NotificationService {
                 fail('CONFLICT', 409, '현재 일정과 담당자가 변경되었습니다. 새 목록을 확인해 주세요.');
             return { contextId: row.contextId, source };
         });
-        return (await this.deliver(token, target.contextId, target.source));
+        return this.deliver(token, target.contextId, target.source);
     }
 }

@@ -8,7 +8,7 @@ export async function POST(request: Request, context: {
         id: string;
     }>;
 }) {
-    return (await route(request, async (identity, token) => {
+    return route(request, async (identity, token) => {
         const taskId = (await context.params).id, baseRequestId = new URL(request.url).searchParams.get('requestId') ?? '', service = new SubmissionFiles(identity);
         await service.check(token, taskId, baseRequestId);
         const mime = request.headers.get('content-type');
@@ -46,5 +46,5 @@ export async function POST(request: Request, context: {
         if (!files.length || files.length > 10 || files.length !== itemIds.length || files.some(f => typeof f === 'string') || itemIds.some(v => typeof v !== 'string'))
             fail('VALIDATION', 422, '파일과 재시도 키를 같은 순서로 1~10개 보내 주세요.');
         return json(await service.upload(token, taskId, baseRequestId, await Promise.all((files as File[]).map(async (f, i) => ({ clientItemId: itemIds[i] as string, name: f.name, type: f.type, bytes: Buffer.from(await f.arrayBuffer()) })))));
-    }));
+    });
 }

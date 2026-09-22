@@ -4,4 +4,4 @@ export async function PATCH(r: Request, c: {
     params: Promise<{
         id: string;
     }>;
-}) { return (await route(r, async (s, t) => json(await s.setUserStatus(t, (await c.params).id, await readBody(r, ["expectedRevision", "status"]))))); }
+}) { return route(r, async (s, t) => json(await s.setUserStatus(t, (await c.params).id, await readBody(r, ["expectedRevision", "status"])))); }

@@ -1,3 +1,4 @@
+import { jsonContentEqual } from '@/domain/json-content';
 import type { Clock, UnitOfWork } from '@/domain/records';
 import type { Principal } from '@/server/auth/service';
 import { authorize } from '@/server/policy/policy';
@@ -21,7 +22,7 @@ export async function extractionSource(s: UnitOfWork, p: Principal, inputId: str
     if (snap.contextId !== run.contextId || snap.data.runId !== run.id || snap.data.inputId !== inputId || snap.data.versionId !== versionId)
         corrupt();
     const snapshot = readSnapshot(snap.data.payload, snap.data.snapshotHash), sources = (await sourceIdentities(s, resolved.version, resolved.content));
-    if (JSON.stringify(snapshot.sources) !== JSON.stringify(sources))
+    if (!jsonContentEqual(snapshot.sources, sources))
         corrupt();
     safely(() => validateSnapshotBinding(snapshot, resolved.input.contextId!, snap.data.snapshotHash));
     return { ...resolved, extraction: run, snapshotRow: snap, snapshot };

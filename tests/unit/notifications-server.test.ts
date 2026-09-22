@@ -21,7 +21,7 @@ import { policyFixture, tokenFor, NOW } from '../fixtures/policy';
 import { admin, brand, contextId, completionInquiry, completionSubmission } from '../fixtures/completion';
 import { completionCampaign, person, source } from '../fixtures/completion-campaign';
 for (const mode of ['mock', 'sqlite'] as const)
-    describe(`${mode} G13 persisted server`, async () => {
+    describe(`${mode} G13 persisted server`, () => {
         let repo: RecordRepository, identity: IdentityService, now: string, taskId: string, directory: string | undefined;
         const gsg = tokenFor('user-gsg'), co = tokenFor('user-co');
         async function setup() {
@@ -38,7 +38,7 @@ for (const mode of ['mock', 'sqlite'] as const)
         }
         function content(extra: Partial<ScheduleContent> = {}): ScheduleContent { return { taskId, title: '외부 검토 일정', kind: 'review', visibility: 'public', deadline: { ...blankContent().deadline, value: '2026-09-23', certainty: 'requested', responsibleUserId: 'user-gsg' }, statements: [], conflicts: [], ...extra }; }
         function save(c: ScheduleContent, scheduleId: string | null = null, expectedRevision = 0, idempotencyKey = randomUUID()) { return { command: 'save', contextId, scheduleId, expectedRevision, content: c, idempotencyKey }; }
-        afterEach(async () => { repo?.close(); if (directory) {
+        afterEach(async () => { (await repo?.close()); if (directory) {
             await rm(directory, { recursive: true, force: true });
             directory = undefined;
         } });
@@ -56,11 +56,11 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(detail.versions).toHaveLength(2);
             expect(detail.current.content.deadline).toMatchObject({ certainty: 'expected', timezone: 'America/New_York' });
             expect(await repo.get('scheduleVersion', result.ids[1])).toEqual(first);
-            await expect((await service.command(admin, save(content(), result.ids[0], 2)))).rejects.toMatchObject({ status: 409 });
-            await expect((await service.command(brand, save(content())))).rejects.toMatchObject({ status: 403 });
-            await expect((await service.command(admin, save(content({ deadline: { ...original.deadline, value: '2026-02-30' } }))))).rejects.toMatchObject({ status: 422 });
+            await expect(service.command(admin, save(content(), result.ids[0], 2))).rejects.toMatchObject({ status: 409 });
+            await expect(service.command(brand, save(content()))).rejects.toMatchObject({ status: 403 });
+            await expect(service.command(admin, save(content({ deadline: { ...original.deadline, value: '2026-02-30' } })))).rejects.toMatchObject({ status: 422 });
             await service.command(admin, save(content({ visibility: 'internal', title: 'PRIVATE_SCHEDULE' }), result.ids[0], detail.revision));
-            await expect((await service.detail(brand, result.ids[0]))).rejects.toMatchObject({ status: 404 });
+            await expect(service.detail(brand, result.ids[0])).rejects.toMatchObject({ status: 404 });
             expect(JSON.stringify(await service.list(brand, contextId))).not.toContain('PRIVATE_SCHEDULE');
         });
         it('N13-02 AC13-03 actual event + recipient atomic sync idempotency and isolated notification read', async () => {
@@ -68,7 +68,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             const service = new NotificationService(identity), first = await service.sync(brand, contextId);
             expect(first.items.filter(n => n.source.kind === 'event')).toHaveLength(1);
             expect(first.items.filter(n => n.source.kind === 'reminder')).toHaveLength(1);
-            await Promise.all(Array.from({ length: 8 }, async () => (await service.sync(brand, contextId))));
+            await Promise.all(Array.from({ length: 8 }, async () => service.sync(brand, contextId)));
             const before = await service.list(brand, contextId);
             expect(before.items).toHaveLength(2);
             expect(await repo.list('notificationReceipt')).toHaveLength(2);
@@ -77,7 +77,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             await service.read(brand, row.id, command);
             await service.read(brand, row.id, command);
             expect((await service.list(brand, contextId)).unread).toBe(1);
-            await expect((await service.read(co, row.id, command))).rejects.toMatchObject({ status: 404 });
+            await expect(service.read(co, row.id, command)).rejects.toMatchObject({ status: 404 });
             expect(await Promise.all([repo.list('taskActivity'), repo.list('noticeRead'), repo.list('inquiryRead')])).toEqual(markers);
             await service.read(brand, row.id, { read: false, expectedRevision: row.revision + 1, idempotencyKey: randomUUID() });
             expect((await service.list(brand, contextId)).unread).toBe(2);
@@ -133,7 +133,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             let changed = false;
             const service = new NotificationService(identity, { beforeDelivery: async () => { if (changed)
                     return; changed = true; await repo.transaction(async (s) => { const m = (await s.list('membership', contextId)).find(r => r.data.userId === 'user-luna')!; (await s.update('membership', m.id, m.revision, { ...m.data, status: 'suspended' })); }); } });
-            await expect((await service.sync(brand, contextId))).rejects.toMatchObject({ status: 404 });
+            await expect(service.sync(brand, contextId)).rejects.toMatchObject({ status: 404 });
             expect(await repo.list('notification')).toHaveLength(0);
             expect(await repo.list('notificationAttempt')).toHaveLength(0);
         });
@@ -165,7 +165,7 @@ for (const mode of ['mock', 'sqlite'] as const)
             expect(detail.calendar).toMatchObject({ recipientState: 'current_recipient', reminder: { eligible: true, recipientId: 'user-luna' } });
             await notifications.sync(brand, contextId);
             expect((await repo.list('notification')).filter(n => n.data.source.kind === 'reminder' && n.data.source.logicalKey === `manual:${id}`).map(n => n.data.recipientId)).toEqual(['user-luna']);
-            await expect((await scheduling.command(admin, save({ ...input, deadline: { ...input.deadline, responsibleUserId: 'user-team' } })))).rejects.toMatchObject({ status: 422 });
+            await expect(scheduling.command(admin, save({ ...input, deadline: { ...input.deadline, responsibleUserId: 'user-team' } }))).rejects.toMatchObject({ status: 422 });
         });
         it('N13-09 SA-52 submission recipients are current task assignees; confirmation actor policy is explicit', async () => {
             await setup();

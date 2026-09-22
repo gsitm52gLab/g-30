@@ -28,7 +28,7 @@ it('G09 migration preserves populated accepted G08 notice and all old rows; repe
     }
     finally {
         if (repo)
-            repo.close();
+            (await repo.close());
         else
             db.close();
         rmSync(dir, { recursive: true, force: true });

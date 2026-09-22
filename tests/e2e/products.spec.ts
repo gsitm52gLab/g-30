@@ -271,7 +271,7 @@ test('G06 UI06-H/I AC-06-03/05 SQLite exact synthetic use and old file survive c
         await writeFile(info.outputPath('synthetic-capture-private.json'), JSON.stringify({ producer: 'test direct captureProductUse UoW', database: process.env.DATABASE_FILE, snapshot }, null, 2));
     }
     finally {
-        repo.close();
+        (await repo.close());
     }
     await page.reload();
     const captured = await dto(page, id);

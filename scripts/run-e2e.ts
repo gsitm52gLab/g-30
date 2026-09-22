@@ -272,4 +272,4 @@ async function main() {
     console.log(JSON.stringify({ event: "isolated-e2e-finished", exit_code: exitCode, counts: summary.counts, summary: summaryPath }));
     process.exitCode = exitCode;
 }
-(await main()).catch(error => { console.error(error instanceof Error ? error.message : error); process.exitCode = 1; });
+main().catch(error => { console.error(error instanceof Error ? error.message : error); process.exitCode = 1; });
