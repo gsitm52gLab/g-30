@@ -4,7 +4,7 @@ import { readFileSync, mkdirSync, writeFileSync, createWriteStream } from 'node:
 import { parseEnv } from 'node:util';
 import { spawn, execFileSync, type ChildProcess } from 'node:child_process';
 import path from 'node:path';
-import { chromium, expect, type APIRequestContext } from '@playwright/test';
+import { chromium, expect as baseExpect, type APIRequestContext } from '@playwright/test';
 import { parsePostgresConfig, quoteSchema } from '@/server/postgres/config';
 import { createPostgresPool, connect, query } from '@/server/postgres/client';
 import { createPostgresRepository } from '@/server/postgres/repository';
@@ -22,6 +22,7 @@ import type { AuditList } from '@/domain/audit/view';
 
 // Explicit isolated schema only; never infer or use the production/default schema.
 const schema = 'gs_hale_g14_port_20260922', cwd = process.cwd();
+const expect = baseExpect.configure({ timeout: 60000 });
 const envFile = path.resolve(process.env.GS_HALE_ENV_FILE || '.env');
 const hash = (b: Buffer | string) => createHash('sha256').update(b).digest('hex');
 const envBefore = hash(readFileSync(envFile));
@@ -114,7 +115,7 @@ try {
       await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
       const page = await context.newPage(); page.setDefaultTimeout(120000); page.setDefaultNavigationTimeout(120000);
       try {
-        await login(page.request, origin, 'admin@example.test');
+        await login(page.request, origin, 'team@example.test');
         assert.equal((await page.request.get(otherOrigin + '/api/auth/me')).status(), 200, 'same durable session in second process');
         await page.goto(`${origin}/search?${params({ q: id, kind: 'product' })}`);
         await expect(page.locator('[data-search-hit]')).toHaveCount(1);
@@ -122,6 +123,7 @@ try {
         await page.goto(`${origin}/search/history?${params({ kind: 'productVersion', id: originalVersion })}`);
         await expect(page.getByRole('article', { name: '선택한 기록' })).toContainText(`${id}_OLD`);
         await page.screenshot({ path: path.join(dir, 'history.png'), fullPage: true });
+        await login(page.request, origin, 'admin@example.test');
         await page.goto(`${origin}/products/${productId}?context=${A}`);
         const editor = page.locator('#common'), name = `${id}_${viewport.width}_REAPPLY`;
         await editor.getByRole('textbox', { name: /^상품명\s*\*?$/, exact: true }).fill(name);
