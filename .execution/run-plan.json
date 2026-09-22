@@ -2942,7 +2942,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd ownruntime plus currentassignee search requirement investigation; goalsUIready7cf19 notassigned untilG17repair/finalG14contract.",
+      "next_action": "prd actualassignee red2F typedrepair check/build; goals UI waitingnewtypedbase (old7cfunusedworktreepreserved). Futureworkflowindependent wholeG14.",
       "readonly_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/preparation-task.json",
         "sha256": "8d2e5fb5bc7c7c59a0c1db0c615a3f8625ecd293b9d120d2402970426dd6bdab"
@@ -3020,7 +3020,19 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-task.json",
         "sha256": "66fa667b9a8b63ec51fdb24821d6465e708138a523cf30fde2bf886d8bf40650"
       },
-      "ui_worktree_ready": "/Users/evan/workspace/gs-hale/.worktrees/g14-ui"
+      "ui_worktree_ready": "/Users/evan/workspace/gs-hale/.worktrees/g14-ui",
+      "current_assignee_addendum": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/current-assignee-addendum.json",
+        "sha256": "0177deb5fa0c1c42041e7c5e7384f1566b842f512b07fb586ebbd048aaf80ede"
+      },
+      "g17_union_preparation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/g17-union-impact-preparation.json",
+        "sha256": "022325bf80d8bacc906af632bea7662679c9fd989e027db5a9e75c5bac79e959"
+      },
+      "verification_v2_draft": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/verification-task-draft-v2.json",
+        "sha256": "df4a57e0930dd4992496d3c8f83cb4c96dc659529c8fbf92a4f90992531cfe7a"
+      }
     },
     {
       "id": "G15",
@@ -3602,13 +3614,13 @@
       "dependencies": [
         "G16"
       ],
-      "state": "NEEDS_FIX",
+      "state": "VERIFYING",
       "required_for_product_completion": true,
-      "candidate_commit": "9dd4037a73c3779dd584de684b1b66e63b915d5f",
+      "candidate_commit": "a0d6432568a4eff097f8e006e8cf2abea14d99b5",
       "integration_commit": null,
       "implementer_session_id": "01a0c307-c975-75b1-b96a-5a5c4e448aec",
       "verifier_session_id": "01a0c307-fd0c-7d41-bb8a-43ee5f85f03a",
-      "attempt": 1,
+      "attempt": 3,
       "owned_paths": [],
       "actual_worktree_cwd": "/Users/evan/workspace/gs-hale/.worktrees/g17-impl",
       "evidence_root": ".execution/private/runs/<run-id>/G17/<attempt>/",
@@ -3644,7 +3656,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Workflow independent bodydeadline4cfd vs9dd boundedrepro; goals separate narrowbodytimeout red/fix; rootreview then exactfinalindependent/live1. ActualAPI0 HELD; previous560unit/UI32/HTTP39+3skip preserved.",
+      "next_action": "Workflow exacta0d643 V01/V02 closure+affectedHTTP/UI/check/build thenactualminimalOpenAI1; failed9dd/4cfd evidence preserved. RootintegrateafterPASS.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/task-draft.json",
         "sha256": "acf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3"
@@ -3789,7 +3801,7 @@
         "sha256": "7f13de05d2f7289509cde53b522bf35bc02865585c4b7bbbbfdf458c4fdeb6df"
       },
       "v01_repair_candidate": "4cfd6a73dfe5be51670bb03d63acf0c7eeecfbfe",
-      "independent_live_status": "HELD_0_CALLS_PENDING_V01_REPAIR",
+      "independent_live_status": "MANDATORY_ONE_CALL_AUTHORIZED_AFTER_FINAL_OFFLINE_CLOSURE_PENDING",
       "integration_preparation": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/integration-impact-preparation.json",
         "sha256": "0904a7c2d3126af1310d85e25ccaf53eaefa4a63760963622a9b583c8806e876"
@@ -3823,7 +3835,28 @@
       "body_timeout_repair_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/body-timeout-repair-task.json",
         "sha256": "e2079fb075ea38781a3c94471481a64cd35c4d771fc0ed0f50b513c14fd7777c"
-      }
+      },
+      "v02_independent_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/2/verification-result.json",
+        "sha256": "98ebd5e07b1a343bb1f0acd6a8c9a9a351342f71c503481ba426e9abdb5002c0"
+      },
+      "v02_independent_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/2/verification/main-review.json",
+        "sha256": "887794de37c56aa971dab2052f91ffb21b9f61dd80400be700f8863002b9a09b"
+      },
+      "v02_author_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/3/body-timeout-repair/implementation-result.json",
+        "sha256": "099149b1327d732c9360aa37af4cbdd705127739571000b47091cd378cbc0af8"
+      },
+      "v02_author_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/3/body-timeout-repair/main-review.json",
+        "sha256": "3d9952794b452dcddecdbac0e793e9f7341809dfcd101f349d426decb3f4f48a"
+      },
+      "verification_repair2_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verification-repair2-task.json",
+        "sha256": "13fad1a54a1337a4b294561b2c9691bf41d0828b9a7e934f9db10748feb9bb3c"
+      },
+      "verification_repair2_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g17-verification-repair2"
     },
     {
       "id": "G18",
@@ -3917,8 +3950,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "f48e3487544f46d46118f856d823111fd953f073",
   "current_goal": "G14",
-  "next_action": "Close G17 SDKwholebodydeadline plusV01 independent thenactual1; G14runtime/currentassignee search review thenUI. Accepted15/19 f48e, G03/G18 pending.",
-  "state_version": 167,
+  "next_action": "Workflow G17finala0d643independent thenactual1; prd G14assignee typedfix; goalsUI next. Accepted15f48e; G03/G18 remain.",
+  "state_version": 168,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3950,7 +3983,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T00:17:44.578917+00:00",
+  "updated_at": "2026-09-22T00:21:58.093299+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
