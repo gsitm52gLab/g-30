@@ -151,3 +151,7 @@ G13 committed UI-I leaves response.json unawaited beyond page teardown. Original
 
 ## 2026-09-21T23:46:01.968310+00:00 — G13 accepted; G14 narrow server implementation
 G13 exactf48e independently verified and integrated regression reviewed. Original19P1F preserved and testonly0c97closed4cases, freshintegration16realcases (rootoriginal12assumptioncorrectedaddendum5011). G14 begins onlyafterallsevenrequireddependenciesACCEPTED. New0016audit appendonly nolegacybackfill; optional typedmetadata andlistedproducerseams only, currentG17ai-review/service/SDK/package notowned. Finalsearch/history/price existence filters must beindependentlytested.
+
+
+## 2026-09-22T00:12:50.582242+00:00 — SDK envelope boundary and typed search handoff
+Independent G17-V01 uses real object:response and exposes SDK addOutputText before application metadata preservation; earlier author fixture omitted discriminator. Preserve original failing evidence, fix author-owned transport only, then new candidate independent validation. Actual configured verification call waits for repaired final path. G14 server typed7cf19 author634/check/build evidence reviewed; lease released, runtime/UI/independent still pending.

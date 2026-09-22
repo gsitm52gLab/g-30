@@ -1,3 +1,7 @@
+# Latest state166 — 2026-09-22T00:12:50.582242+00:00
+
+Goal ACTIVE. Accepted15/19 f48e; root+prd/goals/workflow. G17 independent9dd confirmed V01 real object:response malformed output/content throws inside SDK before safe metadata; author goals narrowrepair4cfd finalcheck/build underway. workflow old9dd unaffected groups continue, actualOpenAI0 HELD until repaired candidate. Failure early-findings and main-v01-review retained. G14 typedserver7cf19 frozen634unit/build and root40artifacts54sources verified; commonlease RELEASED; prd ownHTTP/history continues. UI taskdraft-v2 intendedgoals afterV01repair; workflow remainsG14nonauthor. Userdocs execution-v2 untouched. Next exactrepair independent+minimumactualcall; G14UI then combinedindependent; G03 andG18 remain.
+
 # Current checkpoint — state165
 
 2026-09-22T00:02:51.620633+00:00; Workflow G17independent9dd4259/60; prd G14typed server/common0016; goals G14UI future aftertypedhandoff. Accepted15/19f48e. No AIintegrationacceptance yet. G17root1d60 verifies1843artifacts/720refs/457sources/914priorpairs/40commands/47ZIP; repaird02b raw0P4F→32P,13P5F→18P; actual40browser/16defaultskip keptseparate. RootgenericcopiedBeforeOpen hashchecker failure correctedwithoutdatachanges, recordedinreview. Formalverifierpacket f4a2753ca63a63b5746e5a8d5789eb5ffe18cad93472b9f8e781931ff3c01e16. Actualauthor07c1call preserved; finalindependentcallrequired. G14goals UI onlyaftertypednotyetassigned.

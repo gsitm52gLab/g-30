@@ -2942,7 +2942,7 @@
           "evidence": []
         }
       ],
-      "next_action": "prd serverfirst typed freeze/check/build→releasecommon thenownHTTP/history; separateUI later. G17ownservice untouched.",
+      "next_action": "prd ownHTTP/races/history continuing frozenserver7cf19; root reviewed634unit/build; goals UI afterV01repair handoff, workflow futureindependent.",
       "readonly_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/preparation-task.json",
         "sha256": "8d2e5fb5bc7c7c59a0c1db0c615a3f8625ecd293b9d120d2402970426dd6bdab"
@@ -2989,7 +2989,7 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/server-task.json",
         "sha256": "c924742066dae6083cd6bc499d8b168229d1027904e32e2a72cb52754d3ffa83"
       },
-      "common_lease_status": "EXCLUSIVE_PRD_RECORDS_CONSTRAINTS_SHARED_AUDIT_AND_ENUMERATED_PRODUCERS",
+      "common_lease_status": "RELEASED_7CF19_TYPED_FREEZE",
       "ui_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-preparation-task.json",
         "sha256": "b9f48edd20cf249ed1512d706302af1b158327fbdf55675d43d51cb9dfdbd3f5"
@@ -3002,6 +3002,19 @@
       "ui_preparation_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-preparation/main-review.json",
         "sha256": "339fd2d60978893761320412f07c27e6f050dcd3b03e132f4404a5e5252a5730"
+      },
+      "typed_server_candidate": "7cf19c5553b246a6c96b47dd860f10669498ea6e",
+      "typed_server_result": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/1/server/contract-result.json",
+        "sha256": "933596929badb6e0b03ecd7b4bb5c6ce2454d89d9f4bc310efa397a0b5b8104d"
+      },
+      "typed_server_root_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/1/server/main-typed-review.json",
+        "sha256": "13db21ecb41e3ece1fb3d8054b77c4c7cddf469db67d33250c9490df7e290f2e"
+      },
+      "ui_draft_v2": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui-task-draft-v2.json",
+        "sha256": "eb09776ad9cc64fbcd83887795c966003defb013896da1f7ba758916ecfa78b7"
       }
     },
     {
@@ -3584,7 +3597,7 @@
       "dependencies": [
         "G16"
       ],
-      "state": "VERIFYING",
+      "state": "NEEDS_FIX",
       "required_for_product_completion": true,
       "candidate_commit": "9dd4037a73c3779dd584de684b1b66e63b915d5f",
       "integration_commit": null,
@@ -3626,7 +3639,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Workflow exact9dd nonauthor independent8groups including minimalactualconfiguredOpenAI1. Rootreview→serialintegration→affectedregression pending. GoalsavailablefutureG14UI.",
+      "next_action": "Goals narrow V01 repair4cfd exactcheck/build; workflow finish9dd independent unaffected groups, actualAPI HELD0. Root newcandidate review then exactrepair verifier+actualminimumcall.",
       "task_draft": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/task-draft.json",
         "sha256": "acf6f41ddedb7fea5e530d82301f64ac54f4181bae214caa755a975dca9514d3"
@@ -3757,7 +3770,25 @@
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/verification-task.json",
         "sha256": "f4a2753ca63a63b5746e5a8d5789eb5ffe18cad93472b9f8e781931ff3c01e16"
       },
-      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g17-verification"
+      "verification_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g17-verification",
+      "v01_independent_defect": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/verification/early-findings.json",
+        "sha256": "13259af57adfc1e197165b3eef3eb48fff132cffe122b3007e02d01f25d926e9"
+      },
+      "v01_root_review": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/1/main-v01-review.json",
+        "sha256": "3f37e8257227f3f903f74fa73a512e75353ca3a9378e0f141f79454430d59859"
+      },
+      "v01_repair_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/v01-repair-task.json",
+        "sha256": "7f13de05d2f7289509cde53b522bf35bc02865585c4b7bbbbfdf458c4fdeb6df"
+      },
+      "v01_repair_candidate": "4cfd6a73dfe5be51670bb03d63acf0c7eeecfbfe",
+      "independent_live_status": "HELD_0_CALLS_PENDING_V01_REPAIR",
+      "integration_preparation": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G17/integration-impact-preparation.json",
+        "sha256": "0904a7c2d3126af1310d85e25ccaf53eaefa4a63760963622a9b583c8806e876"
+      }
     },
     {
       "id": "G18",
@@ -3851,8 +3882,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "f48e3487544f46d46118f856d823111fd953f073",
   "current_goal": "G14",
-  "next_action": "Workflow G17independent9dd4259/60; prd G14typed server/common0016; goals G14UI future aftertypedhandoff. Accepted15/19f48e. No AIintegrationacceptance yet.",
-  "state_version": 165,
+  "next_action": "Close G17-V01 repair then independent exactnewcandidate incl minimalactualAPI; G14 typedserver7cf19 reviewed and commonlease released, UI aftergoals repair. 15/19 accepted f48e.",
+  "state_version": 166,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -3884,7 +3915,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T00:02:51.620633+00:00",
+  "updated_at": "2026-09-22T00:12:50.582242+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {
