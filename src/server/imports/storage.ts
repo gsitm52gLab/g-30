@@ -4,6 +4,7 @@ import type { UploadInput } from '@/domain/storage/types';
 import { canonical, digest } from '@/domain/storage/validate';
 import { previewInput } from '@/domain/imports/validate';
 import { importLimits } from '@/domain/imports/types';
+import { checkMapping } from './plan';
 import { commonInput, contextInput, retailInput, internalInput } from '@/domain/products/validate';
 import type { IdentityService } from '@/server/auth/service';
 import { fail } from '@/server/auth/errors';
@@ -40,9 +41,14 @@ export function previewStage(value: unknown): PreviewStage {
     if (typeof v.privatePrice !== 'boolean' || typeof v.sourceName !== 'string' || typeof v.sheetName !== 'string' || !Number.isFinite(Date.parse(v.expiresAt)) || !Array.isArray(v.plans) || v.plans.length > importLimits.rows || !Array.isArray(v.warnings) || v.warnings.some(x => typeof x !== 'string')) bad();
     const input = previewInput(v.input);
     if (canonical(input) !== canonical(v.input) || v.privatePrice !== input.mapping.some(m => m.field.startsWith('internal.'))) bad();
+    checkMapping(input.mapping, v.privatePrice);
+    const mapped = new Set(input.mapping.map(m => m.field));
     for (const plan of v.plans) {
       const p = plan.preview;
       if (!p || !Number.isSafeInteger(p.row) || !['new','update','skip'].includes(p.action) || !Array.isArray(p.errors) || !Array.isArray(p.visibleContexts) || !p.raw || Object.values(p.raw).some(x => typeof x !== 'string') || !p.normalized || Object.values(p.normalized).some(x => x !== null && !['string','boolean'].includes(typeof x)) || !plan.changed || ['common','local','retail','internal'].some(k=>typeof plan.changed[k as keyof typeof plan.changed] !== 'boolean') || !v.privatePrice && (plan.internal !== null || plan.changed.internal)) bad();
+      // A correct payload hash does not make an unselected/private field authorized.
+      if (Array.isArray(p.raw) || Array.isArray(p.normalized) || [...Object.keys(p.raw), ...Object.keys(p.normalized)].some(key => !mapped.has(key)) || !v.privatePrice && p.target?.internalRevision !== undefined || plan.changed.internal !== (plan.internal !== null)) bad();
+      if (p.errors.some(e => e.field !== null && e.field.startsWith('internal.') && (!v.privatePrice || !mapped.has(e.field)))) bad();
       if (p.errors.some(e=>!e || typeof e.code !== 'string' || typeof e.message !== 'string' || e.column !== null && !Number.isSafeInteger(e.column) || e.field !== null && typeof e.field !== 'string') || p.visibleContexts.some(c=>!c || [c.id,c.country,c.retailer,c.brand].some(x=>typeof x !== 'string'))) bad();
       if (p.target && (typeof p.target.productId !== 'string' || typeof p.target.contextProductId !== 'string' || ![p.target.commonRevision,p.target.contextRevision,p.target.retailRevision,p.target.internalRevision ?? 0].every(x => Number.isSafeInteger(x) && x >= 0))) bad();
       if (!p.errors.length) { commonInput(plan.common); contextInput(plan.local); if (plan.retail) retailInput(plan.retail); if (plan.internal) internalInput(plan.internal); }
@@ -99,6 +105,7 @@ export class ImportStorage {
     await this.identity.repo.transaction(async s => { const p = await this.identity.principal(s, token), row = await s.get('importStage', id); if (!row || row.contextId !== payload.contextId || row.data.actorId !== p.user.id || row.data.actorId !== payload.actorId || row.data.sourceHash !== payload.sourceHash || row.data.stageType !== type) bad(); });
   }
   async putPreview(token: string | undefined, stage: PreviewStage) {
+    previewStage(stage);
     return this.identity.repo.transaction(async s => {
       const p = await this.identity.principal(s, token), source = await s.get('importStage', stage.input.sourceId);
       if (!source || source.data.stageType !== 'source' || source.data.actorId !== p.user.id || stage.actorId !== p.user.id || source.contextId !== stage.contextId || source.data.sourceHash !== stage.sourceHash) fail('NOT_FOUND', 404, '자료를 찾을 수 없습니다.');

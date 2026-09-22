@@ -1,4 +1,4 @@
-import { ImportStorage } from './storage';
+import { ImportStorage, previewStage } from './storage';
 import type { StorageTransport } from '@/server/storage/contracts';
 import { asyncMap } from "@/domain/async-collections";
 import { batchDTO } from './projection';
@@ -51,10 +51,11 @@ export async function importAccess(s: UnitOfWork, p: Principal, contextId: strin
 function previewDTO(id: string, v: PreviewStage, page: number): ImportPreview {
     if (!Number.isSafeInteger(page) || page < 1)
         fail('VALIDATION', 422, '페이지를 확인해 주세요.');
+    const fields = new Set(v.input.mapping.map(m => m.field).filter(key => importFields.some(f => f.key === key && (v.privatePrice || !f.privatePrice))));
     const errorRows = v.plans.filter(r => r.preview.errors.length).length, counts = { new: 0, update: 0, skip: 0 };
     for (const plan of v.plans)
         counts[plan.preview.action]++;
-    return { id, contextId: v.contextId, sourceHash: v.sourceHash, schema: IMPORT_SCHEMA, createdAt: v.createdAt, expiresAt: v.expiresAt, sheetId: v.input.sheetId, sheetName: v.sheetName, headerRow: v.input.headerRow, mapping: v.input.mapping.map(m => ({ column: m.column, field: m.field })), totalRows: v.plans.length, errorRows, canApply: errorRows === 0, page, pageSize: importLimits.pageSize, rows: v.plans.slice((page - 1) * 100, page * 100).map(({preview:r}) => ({ row:r.row, action:r.action, raw:Object.fromEntries(Object.entries(r.raw).filter(([key])=>importFields.some(f=>f.key===key))), normalized:Object.fromEntries(Object.entries(r.normalized).filter(([key])=>importFields.some(f=>f.key===key))), errors:r.errors.map(e=>({code:e.code,message:e.message,column:e.column,field:e.field})), target:r.target ? {productId:r.target.productId,contextProductId:r.target.contextProductId,commonRevision:r.target.commonRevision,contextRevision:r.target.contextRevision,retailRevision:r.target.retailRevision,...r.target.internalRevision!==undefined?{internalRevision:r.target.internalRevision}:{}} : null, visibleContexts:r.visibleContexts.map(c=>({id:c.id,country:c.country,retailer:c.retailer,brand:c.brand})) })), counts, sharedCommonNotice, warnings: v.warnings };
+    return { id, contextId: v.contextId, sourceHash: v.sourceHash, schema: IMPORT_SCHEMA, createdAt: v.createdAt, expiresAt: v.expiresAt, sheetId: v.input.sheetId, sheetName: v.sheetName, headerRow: v.input.headerRow, mapping: v.input.mapping.map(m => ({ column: m.column, field: m.field })), totalRows: v.plans.length, errorRows, canApply: errorRows === 0, page, pageSize: importLimits.pageSize, rows: v.plans.slice((page - 1) * 100, page * 100).map(({preview:r}) => ({ row:r.row, action:r.action, raw:Object.fromEntries(Object.entries(r.raw).filter(([key])=>fields.has(key))), normalized:Object.fromEntries(Object.entries(r.normalized).filter(([key])=>fields.has(key))), errors:r.errors.map(e=>({code:e.code,message:e.message,column:e.column,field:e.field})), target:r.target ? {productId:r.target.productId,contextProductId:r.target.contextProductId,commonRevision:r.target.commonRevision,contextRevision:r.target.contextRevision,retailRevision:r.target.retailRevision,...v.privatePrice&&r.target.internalRevision!==undefined?{internalRevision:r.target.internalRevision}:{}} : null, visibleContexts:r.visibleContexts.map(c=>({id:c.id,country:c.country,retailer:c.retailer,brand:c.brand})) })), counts, sharedCommonNotice, warnings: v.warnings };
 }
 export class ImportService {
     constructor(public identity: IdentityService, public staging = new ImportStaging(), private fault?: (row: number) => void, private transport?: () => StorageTransport) { }
@@ -89,7 +90,7 @@ export class ImportService {
         return previewDTO(id, stage, 1);
     }
     async readPreview(token: string | undefined, id: string, page = 1) {
-        const stage = this.identity.repo.mode === 'supabase' ? await this.storage.preview(token, id) : await this.staging.get<PreviewStage>(id);
+        const stage = previewStage(this.identity.repo.mode === 'supabase' ? await this.storage.preview(token, id) : await this.staging.get<PreviewStage>(id));
         await this.identity.repo.transaction(async (s) => {
             const p = (await this.identity.principal(s, token));
             if (p.user.id !== stage.actorId)
@@ -110,7 +111,7 @@ export class ImportService {
         });
         if (replay)
             return replay;
-        const stage = this.identity.repo.mode === 'supabase' ? await this.storage.preview(token, previewId) : await this.staging.get<PreviewStage>(previewId);
+        const stage = previewStage(this.identity.repo.mode === 'supabase' ? await this.storage.preview(token, previewId) : await this.staging.get<PreviewStage>(previewId));
         return this.identity.repo.transaction(async (s) => {
             const p = (await this.identity.principal(s, token));
             if (p.user.id !== stage.actorId)
