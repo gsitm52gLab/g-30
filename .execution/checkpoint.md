@@ -1,4 +1,4 @@
-# GS HALE checkpoint — state182 / Goal active
+# GS HALE checkpoint — state183 / Goal active
 
 Actual Goal re-observed active through get_goal on 2026-09-22 after the user continuation. No second Goal created. Latest user wanted background work; no return to synchronous broad questioning. Previous turn is PROGRESS: code integrated/pushed and real deployed auth + populated screens observed.
 
@@ -10,7 +10,7 @@ Notion original fetch returned Authentication required in this continuation. Rea
 
 ## Git and release
 
-Root/integration cwd `/Users/evan/workspace/gs-hale`, branch `run/supabase-transition`, origin `https://github.com/gsitm52gLab/g-30.git`, old remote `legacy-gs-hale` preserved. Current source HEAD/main `eece434adf3793fd7a603f997eee15f729c4eef0` after normal ff integration. User untracked `docs/execution-v2/`, root.env, worktrees and historical failure artifacts preserved. Never force/reset/delete originals.
+Root/integration cwd `/Users/evan/workspace/gs-hale`, branch `run/supabase-transition`, origin `https://github.com/gsitm52gLab/g-30.git`, old remote `legacy-gs-hale` preserved. Production main remains `eece434adf3793fd7a603f997eee15f729c4eef0`. Root source integration `3dd9078dadb6a8cc4e0817aba526830f691963da` adds verified Storage primitives; metadata parenta036b9c pushed transition branch. User untracked `docs/execution-v2/`, root.env, worktrees and historical failure artifacts preserved. Never force/reset/delete originals.
 
 Production `https://g-30-pi.vercel.app` GitHub Vercel status SUCCESS for eece434, deployment `H13c6Cc3vAmG7QwUcw6ZMMXNb4ug`. Current `vercel.json` explicit DATA_SOURCE=supabase and region bom1, same region as provided SQL pooler (ap-south-1). No secrets in vercel.json. SQL project derived from DATABASE_URL, no unnecessary SUPABASE_URL requirement for PostgreSQL. Strict TLS/host/port retained. DATABASE_URL runtime6543, DIRECT_URL migration5432; root.env server-only.
 
@@ -38,10 +38,12 @@ Private prefix `.execution/private/runs/RUN-20260921-01/SUPABASE/`.
 
 1. Auth release packet reviewed: navigation-fix/root-evidence-review.json, 42artifact hashes match. Continue background implementation; no repeated auth broad tests absent changes.
 2. Commit/push reviewedmetadata on transition branch only; do not unnecessarily deploymetadata to main. Agentprd may push only boundedauth release (alreadydone); further productintegration rootsupervised.
-3. Verify repairedStorageprimitivecandidate independently then integrate5primitivefiles and rerunaffectedtests. Plan async DB grants/finalize/read/Excel/AI wiring after G14sharedcontractfrozen.
+3. DONE bounded primitive integration: candidate880f15c independent38unit+7actual/typecheck; root3dd9078 38unit/typecheck. Artifact8hashes match. AppStorage remains unimplemented; plan async DB grants/finalize/read/Excel/AI wiring after G14sharedcontractfrozen.
 4. G14port→independentverification→serialintegration/regression→ACCEPTED before dependentG03integration. No originalfeaturedeleted.
 5. Finish allSupabase18supplemental gates and finalG03/G18audit; mandatoryactualOpenAI still needs newSupabase flow, historicalG17livecall is notcurrentnewbackendproof. Avoid unnecessary repeatcalls.
 
 No new payments, external emails, private work data transmission, destructive git, or original data deletion. Currentmain push/deploy is explicitly user-authorized. Full Goal remains active; do not complete based on narrow login proof.
 
 State182 amendment: G14 task-amendment-01.json permits tests/unit/postgres-foundation.test.ts migration-count17 and optional postgres_name expectations only. Storage repair candidate880f15c author verifying; independent reviewer next. Final auth author packet actual execution session01a0c307-9b54-7b83-b5eb-1b12b9a8553c takes precedence over parent handle session for those commands.
+
+State183: prd now private-only storage-app-plan inventory; scope reviewer private-only sb01-06-audit-plan coverage/gaps. G14 author checking async port (first773PASS2oldsync-testFAIL preserved; restored currentbase test assertions, no product failure waiver). sharedschema lease G14stillactive; contract21e83 frozen but no fullG14acceptance.
