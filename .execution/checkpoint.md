@@ -132,3 +132,8 @@ User explicitly removes task draft-save/separate-publication UI and requests spe
 ## State197 — direct save released, production home defect found
 
 Main `38e76c2` pushed; Vercel wu7Ei9xZ8hFUw89f4msqvneXMBRS success. Actual production registration/pass and brand task list/detail API200. Home409 CONFLICT from unsent inquiry, newly observed on production fixtures; root delegated minimal fix to scope before broader S3 verification. Two original production failures retained; own synthetic tasks cancelled only. UX forms assigned prd from accepted38. S4 actual one OpenAI completion usage returned but app lease expired; SB authoring narrow repeated-read fix, not accepted and no automatic second API call. Whole Goal ACTIVE/incomplete.
+
+
+## State198 — direct save and home production acceptance
+
+Main `b72cef844650b091703c4100004a52453841ef47`, Vercel deployment7LkcQumuBD2x8jVETPkNBDREEqr2 success. Actual1280 GSG UI register→public request;390 brand list/detail/reload/home and cross-context404:4PASS/0FAIL/0NOT_RUN. Existing unsent inquiry caused home409, fixed by authorized valid-draft schedule omission;75 independent units/type0,33 integrated tests. Original production attempts01/02 failures preserved. Only three own synthetic tasks cancelled; existing drafts/user rows unchanged. Acceptance `.execution/private/runs/RUN-20260921-01/SUPABASE/task-direct-save-hotfix/production-acceptance.json`. Whole Goal ACTIVE; next UX2forms, S2 independent, S3 independent UI, S4 AI latency+independent and full remaining audit.
