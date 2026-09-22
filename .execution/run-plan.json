@@ -2955,7 +2955,7 @@
           "evidence": []
         }
       ],
-      "next_action": "Goals UIb3 active; server4646finalreview0f4d. G17consumerreadonly8290/root44da ready; patchafterG17accepted exactunion thenwholeG14workflowindependent.",
+      "next_action": "prd providerconsumer on7382union; goals UI helperfrozen50ec route405 independentworkflow diagnosis; root wholecandidatecombine afterbothfrozen.",
       "readonly_preparation_task": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/preparation-task.json",
         "sha256": "8d2e5fb5bc7c7c59a0c1db0c615a3f8625ecd293b9d120d2402970426dd6bdab"
@@ -3077,6 +3077,16 @@
       "g17_consumer_preparation_review": {
         "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/g17-consumer-preparation/main-review.json",
         "sha256": "44da46ac1fbb0d7ce93709b1dfff22cf54f2d32e93e336df79c708a16167eb20"
+      },
+      "provider_consumer_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/provider-consumer-task.json",
+        "sha256": "d72b740137cb22fe065b5fada76c5877fd0f7c76cf96f8f98e673e8de092118c"
+      },
+      "provider_consumer_worktree": "/Users/evan/workspace/gs-hale/.worktrees/g14-union",
+      "union_base_commit": "7382a389bf7451dcdbbfe5a36fca274bad58107a",
+      "ui_fixture_investigation_task": {
+        "path": "/Users/evan/workspace/gs-hale/.execution/private/runs/RUN-20260921-01/G14/ui/fixture-route-investigation-task.json",
+        "sha256": "58255697f4402ea7a341a2ac194271cf1813c798bde1404384bbd98a38f3598f"
       }
     },
     {
@@ -4048,8 +4058,8 @@
   "started_at": "2026-09-21T08:28:39.078082+00:00",
   "accepted_commit": "ddb88d940a36f64febd3ecdbd0ceffd380ef3c61",
   "current_goal": "G14",
-  "next_action": "16/19 accepted ddb. G14 UI goals, unionproviderconsumer prd next after root serial union. G03 prepared gateG14; G18 pending.",
-  "state_version": 171,
+  "next_action": "G14 prd consumer4255/56 andgoals UI4261/62; workflow narrowreadonly fixture route diagnosis then wholeG14independent. Accepted16ddb.",
+  "state_version": 172,
   "source_hashes": {
     "docs/execution-v1/document-validation.json": "7eb136ff80d922ce9c88978009b29c69564cff4c69e316592b82d05d943457c3",
     "docs/execution-v1/02-goal-matrix.md": "45e9ceea49c0a6b4338d7b3e02b0ba9fee860780295a23a398ea858106dc5763",
@@ -4081,7 +4091,7 @@
     "sha256": "5abd895b39dff2d9b59ebd289aef9aca59206e461b54b1a18e664892c9488357",
     "scope": "Four actual private unmodified growing prefixes, finaltails/sanitizedderivatives pending"
   },
-  "updated_at": "2026-09-22T00:41:57.725451+00:00",
+  "updated_at": "2026-09-22T00:43:54.979600+00:00",
   "traceability_path": ".execution/traceability.json",
   "initial_implementation_branch": "run/g00-impl",
   "platform_goal_observation": {

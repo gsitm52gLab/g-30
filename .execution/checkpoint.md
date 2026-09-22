@@ -1,3 +1,7 @@
+# Latest state172 — 2026-09-22T00:43:54.979600+00:00
+
+Accepted16ddb; G14serialunion candidate7382 server4646+acceptedddb constructed in .worktrees/g14-union, audit/providerSQL inventory16 allpriorbytespreserved; 2mergeconflicts and9testhelperinventory updates documented. Prd consumer task d72b740137cb22fe065b5fada76c5877fd0f7c76cf96f8f98e673e8de092118c ports4255/56 owns only6paths, noactualAPI. GoalsUI50ec helper405 T04 afterT01-03PASS; workflow readonly exactroute diagnosis 58255697f4402ea7a341a2ac194271cf1813c798bde1404384bbd98a38f3598f then goalsownrepair/rerun. G14independentwhole/notaccepted, G03gate andG18 unchanged.
+
 # Latest state171 — 2026-09-22T00:41:57.725451+00:00
 
 G17 ACCEPTED: accepted16/19 product ddb88d940a36f64febd3ecdbd0ceffd380ef3c61. Final a0d independent PASS302349 with actual1call; integrated regression0e967 root8212 reviewed1359artifacts730sources17commands16ZIP/92sourcepairs. fresh669unit, G17HTTP39P3skip+UI8P, G13HTTP49P7skip+UI8P, old13history10P and2actualDB28P4PIDs. No additionalcalls; all priorfailures retained. G14 server4646 frozen, goalsUI944b product/636checkbuild helperfixture fixes underway. Root serial unionddb+4646 then prd narrowproviderconsumer patch6cases. G03readonlyprep0bbdb/root53cde 18+32canonicalsources verified; gateG14 unchanged. G18 final and207rowaudit/README pending. Userdocs preserved.
